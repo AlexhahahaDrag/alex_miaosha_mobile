@@ -4,6 +4,8 @@ import Message from '@/views/message/index.vue';
 import Layout from '@/layouts/index.vue';
 import Home from '@/views/home/index.vue';
 import User from '@/views/user/index.vue';
+import Login from '@/views/login/index.vue'
+import UserManager from '@/views/user/userManager/index.vue';
 
 export const routes: MenuDataItem[] = [
   {
@@ -42,17 +44,29 @@ export const routes: MenuDataItem[] = [
   {
     path: "/user",
     component: Layout,
-    redirect: "/user/userManager",
+    redirect: "/about",
     name: "用户管理",
     meta: { title: "用户管理", icon: "userManager", hiedInMenu: false },
     children: [
       {
-        path: "/user/userManager",
-        name: "用户管理",
+        path: "/about",
+        name: "我的",
         component: User,
-        meta: { title: "用户信息", icon: "user", hiedInMenu: false },
+        meta: { title: "我的", icon: "about", hiedInMenu: false },
+      },
+      {
+        path: "/user/userManager",
+        name: "个人信息",
+        component: UserManager,
+        meta: { title: "个人信息", icon: "userManager", hiedInMenu: false },
       },
     ],
+  },
+  {
+    path: "/login",
+    component: Login,
+    name: "login",
+    meta: { title: "登录", icon: "login", hiedInMenu: false },
   },
 ];
 
