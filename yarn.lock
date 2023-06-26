@@ -873,6 +873,11 @@ copy-descriptor@^0.1.0:
   resolved "http://10.10.30.112:12000/nexus/repository/npm-repo-group/copy-descriptor/-/copy-descriptor-0.1.1.tgz#676f6eb3c39997c2ee1ac3a924fd6124748f578d"
   integrity sha512-XgZ0pFcakEUlbwQEVNg3+QAis1FyTL3Qel9FYy8pSkQqoG3PNoT0bOCQtOXcOkur21r2Eq2kI+IE+gsmAEVlYw==
 
+core-js@^3.20.1:
+  version "3.31.0"
+  resolved "http://10.10.30.112:12000/nexus/repository/npm-repo-group/core-js/-/core-js-3.31.0.tgz#4471dd33e366c79d8c0977ed2d940821719db344"
+  integrity sha512-NIp2TQSGfR6ba5aalZD+ZQ1fSxGhDo/s1w0nx3RYzf2pnJxt7YynxFlFScP6eV7+GZsKO95NSjGxyJsU3DZgeQ==
+
 core-util-is@~1.0.0:
   version "1.0.3"
   resolved "http://10.10.30.112:12000/nexus/repository/npm-repo-group/core-util-is/-/core-util-is-1.0.3.tgz#a6042d3634c2b27e9328f837b965fac83808db85"
@@ -2423,6 +2428,15 @@ parse-node-version@^1.0.1:
   resolved "http://10.10.30.112:12000/nexus/repository/npm-repo-group/parse-node-version/-/parse-node-version-1.0.1.tgz#e2b5dbede00e7fa9bc363607f53327e8b073189b"
   integrity sha512-3YHlOa/JgH6Mnpr05jP9eDG254US9ek25LyIxZlDItp2iJtwyaXQb57lBYLdT3MowkUFYEV2XXNAYIPlESvJlA==
 
+particles.vue3@^1.22.0:
+  version "1.43.1"
+  resolved "http://10.10.30.112:12000/nexus/repository/npm-repo-group/particles.vue3/-/particles.vue3-1.43.1.tgz#1bcfd018c2c116c29b3e63c5822a154a5c1077a8"
+  integrity sha512-3w/0If0aQiuZvbV+n1EQDJVial+AiILeOqlQsXZ+EuHmfuapsjYTs/feBvl+rFurFqK90vgHwY5mSo/3TG6phA==
+  dependencies:
+    core-js "^3.20.1"
+    tsparticles "^1.43.1"
+    vue-class-component "^8.0.0-rc.1"
+
 pascal-case@^3.1.2:
   version "3.1.2"
   resolved "http://10.10.30.112:12000/nexus/repository/npm-repo-group/pascal-case/-/pascal-case-3.1.2.tgz#b48e0ef2b98e205e7c1dae747d0b1508237660eb"
@@ -2483,6 +2497,11 @@ pify@^4.0.1:
   version "4.0.1"
   resolved "http://10.10.30.112:12000/nexus/repository/npm-repo-group/pify/-/pify-4.0.1.tgz#4b2cd25c50d598735c50292224fd8c6df41e3231"
   integrity sha512-uB80kBFb/tfd68bVleG9T5GGsGPjJrLAUpR5PZIrhBnIaRTQRjqdJSsIKkOP6OAIFbj7GOrcudc5pNjZ+geV2g==
+
+pinia-plugin-persistedstate@^3.1.0:
+  version "3.1.0"
+  resolved "http://10.10.30.112:12000/nexus/repository/npm-repo-group/pinia-plugin-persistedstate/-/pinia-plugin-persistedstate-3.1.0.tgz#eada2b61ecd478fce88e490a685210415cd7a1b4"
+  integrity sha512-8UN+vYMEPBdgNLwceY08mi5olI0wkYaEb8b6hD6xW7SnBRuPydWHlEhZvUWgNb/ibuf4PvufpvtS+dmhYjJQOw==
 
 pinia@^2.1.3:
   version "2.1.3"
@@ -3194,6 +3213,11 @@ tslib@^2.0.3, tslib@^2.3.0:
   resolved "http://10.10.30.112:12000/nexus/repository/npm-repo-group/tslib/-/tslib-2.5.3.tgz#24944ba2d990940e6e982c4bea147aba80209913"
   integrity sha512-mSxlJJwl3BMEQCUNnxXBU9jP4JBktcEGhURcPR6VQVlnP0FdDEsIaz0C35dXNGLyRfrATNofF0F5p2KPxQgB+w==
 
+tsparticles@^1.43.1:
+  version "1.43.1"
+  resolved "http://10.10.30.112:12000/nexus/repository/npm-repo-group/tsparticles/-/tsparticles-1.43.1.tgz#1f6b37ee41b6ab043d66a0e20bfe0855a1aea006"
+  integrity sha512-6EuHncwqzoyTlUxc11YH8LVlwVUgpYaZD0yMOeA2OvRqFZ9VQV8EjjQ6ZfXt6pfGA1ObPwU929jveFatxwTQkg==
+
 type-fest@^0.18.0:
   version "0.18.1"
   resolved "http://10.10.30.112:12000/nexus/repository/npm-repo-group/type-fest/-/type-fest-0.18.1.tgz#db4bc151a4a2cf4eebf9add5db75508db6cc841f"
@@ -3379,6 +3403,11 @@ vite@^4.3.5:
     rollup "^3.21.0"
   optionalDependencies:
     fsevents "~2.3.2"
+
+vue-class-component@^8.0.0-rc.1:
+  version "8.0.0-rc.1"
+  resolved "http://10.10.30.112:12000/nexus/repository/npm-repo-group/vue-class-component/-/vue-class-component-8.0.0-rc.1.tgz#db692cd97656eb9a08206c03d0b7398cdb1d9420"
+  integrity sha512-w1nMzsT/UdbDAXKqhwTmSoyuJzUXKrxLE77PCFVuC6syr8acdFDAq116xgvZh9UCuV0h+rlCtxXolr3Hi3HyPQ==
 
 vue-demi@>=0.14.5:
   version "0.14.5"

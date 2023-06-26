@@ -6,6 +6,9 @@ import Home from '@/views/home/index.vue';
 import User from '@/views/user/index.vue';
 import Login from '@/views/login/index.vue'
 import UserManager from '@/views/user/userManager/index.vue';
+import FinanceManager from '@v/finance/financeManager/index.vue';
+import FinanceAnalysis from '@v/finance/financeAnalysis/index.vue';
+import AccountRecordInfo from '@v/finance/accountRecordInfo/index.vue';
 
 export const routes: MenuDataItem[] = [
   {
@@ -59,6 +62,33 @@ export const routes: MenuDataItem[] = [
         name: "个人信息",
         component: UserManager,
         meta: { title: "个人信息", icon: "userManager", hiedInMenu: false },
+      },
+    ],
+  },
+  {
+    path: "/finance",
+    component: Layout,
+    redirect: "/finance/financeManager",
+    name: "财务管理",
+    meta: { title: "财务管理", icon: "financeManager", hiedInMenu: false },
+    children: [
+      {
+        path: "/finance/financeManager",
+        name: "财务信息",
+        component: FinanceManager,
+        meta: { title: "财务信息", icon: "finance", hiedInMenu: false },
+      },
+      {
+        path: "/finance/financeAnalysis",
+        name: "财务分析",
+        component: FinanceAnalysis,
+        meta: { title: "财务分析", icon: "financeAnalysis", hiedInMenu: false },
+      },
+      {
+        path: "/finance/accountRecordInfo",
+        name: "账号管理",
+        component: AccountRecordInfo,
+        meta: { title: "账号管理", icon: "accountRecordInfo", hiedInMenu: false },
       },
     ],
   },
