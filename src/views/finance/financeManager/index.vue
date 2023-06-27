@@ -1,21 +1,17 @@
 <template>
     <van-list v-model:loading="loading" :finished="finished" finished-text="没有更多了" @load="getFinancePage">
-        <van-cell v-for="item in list" :key="item" :title="item"></van-cell>
+        <van-cell v-for="item in dataSource" :key="item" :title="item"></van-cell>
     </van-list>
 </template>
 <script lang="ts" setup>
 import { ref } from "vue";
-import { getFinanceMangerPage } from '@/api/finance/financeManager/index.ts';
+import { getFinanceMangerPage } from '@/api/finance/financeManager/index';
 import {
   SearchInfo,
   pagination,
-  columns,
-  DataItem,
-  fromSourceTransferList,
   pageInfo,
 } from "./financeManager";
 
-const list = ref<number[]>([]);
 const loading = ref(false);
 const finished = ref(false);
 let dataSource = ref();
