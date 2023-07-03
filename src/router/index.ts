@@ -9,6 +9,7 @@ import UserManager from '@/views/user/userManager/index.vue';
 import FinanceManager from '@v/finance/financeManager/index.vue';
 import FinanceAnalysis from '@v/finance/financeAnalysis/index.vue';
 import AccountRecordInfo from '@v/finance/accountRecordInfo/index.vue';
+import FinanceManagerDetail from '@v/finance/financeManager/detail/index.vue';
 
 export const routes: MenuDataItem[] = [
   {
@@ -77,6 +78,13 @@ export const routes: MenuDataItem[] = [
         name: "财务信息",
         component: FinanceManager,
         meta: { title: "财务信息", icon: "finance", hiedInMenu: false },
+        children: [
+          {
+            path: '/finance/financeManagerDetail:id?',
+            name: 'WaterDetail',
+            component: FinanceManagerDetail,
+        },
+        ]
       },
       {
         path: "/finance/financeAnalysis",
