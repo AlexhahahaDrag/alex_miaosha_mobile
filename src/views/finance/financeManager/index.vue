@@ -6,19 +6,26 @@
         <template #label>
           <div style="margin-top: 10px; display: flex">
             <div class="icon" style="background-color: #ffcc00">
-              {{ item.fromSource }}
+              <div v-for="fromSource in fromSourceTransferList">
+              <svgIcon v-if="item.fromSource.indexOf(fromSource.value) >= 0 && fromSource.value != ''"
+                :name="fromSource.label" class="svg" style="
+                    width: 1.5em;
+                    height: 1.5em;
+                    font-size: 18px;
+                    cursor: pointer;
+                    verticle-align: middle;"></svgIcon>
             </div>
-            <div class="time-box">{{ item.belongTo }}</div>
+            </div>
           </div>
         </template>
         <template #right-icon>
           <div class="text-right">
             <div style="display: flex">
-              <div class="van-ellipsis" style="width: 130px">
+              <div class="van-ellipsis" style="width: 130px;text-align:right">
                 {{ item?.infoDate ? String(item.infoDate).substring(0, 10) : '--' }}
               </div>
             </div>
-            <div style="margin-top: 10px">
+            <div style="margin-top: 10px;text-align: right">
               {{ item.amount ? (item.incomeAndExpenses === 'income' ? item.amount : -item.amount) : '--' }}
             </div>
           </div>
@@ -32,13 +39,14 @@
 import { ref } from "vue";
 import { getFinanceMangerPage, } from '@/api/finance/financeManager/index';
 import { getUserManagerList } from "@/api/user/userManager";
-import { getDictList } from "@/api/finance/dict/dictManager";
 import {
   SearchInfo,
   pagination,
   pageInfo,
+  fromSourceTransferList,
 } from "./financeManager";
 import { showToast } from 'vant';
+import svgIcon from "@/views/common/icons/svgIcon.vue";
 
 const loading = ref(false);
 const finished = ref(false);
@@ -79,24 +87,7 @@ function getUserInfoList() {
   });
 }
 
-// function getDictInfoList() {
-//   getDictList("pay_way,income_expense_type").then((res) => {
-//     if (res.code == "200") {
-//       fromSourceList.value = res.data.filter(
-//         (item: { belongTo: string }) => item.belongTo == "pay_way"
-//       );
-//       incomeAndExpensesList.value = res.data.filter(
-//         (item: { belongTo: string }) => item.belongTo == "income_expense_type"
-//       );
-//     } else {
-//       message.error((res && res.message) || "查询列表失败！");
-//     }
-//   });
-// }
-
 function init() {
-  //获取字典列表
-  // getDictInfoList();
   //获取财务管理页面数据
   getFinancePage(searchInfo.value, pagination.value);
   //获取用户信息
