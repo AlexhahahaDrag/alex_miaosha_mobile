@@ -9,6 +9,7 @@
 
 <script setup lang="ts">
 import { ref, } from 'vue';
+import uploadImage from '@/views/common/upload/uploadImage.vue'
 
 const value = ref('');
 </script>

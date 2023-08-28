@@ -80,7 +80,7 @@ export const routes: MenuDataItem[] = [
         meta: { title: "财务信息", icon: "finance", hiedInMenu: false },
         children: [
           {
-            path: '/finance/financeManagerDetail:id?',
+            path: '/finance/financeManagerDetail',
             name: 'WaterDetail',
             component: FinanceManagerDetail,
         },
