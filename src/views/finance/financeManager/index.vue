@@ -1,5 +1,5 @@
 <template>
-  <van-nav-bar title="财务管理" right-text="新增" left-arrow @click-left="getBack" @click-right="addFinance"></van-nav-bar>
+  <navBar :info="info" @clickRight="addFinance"></navBar>
   <van-pull-refresh pulling-text="加载中。。。" :style="{ height: 'calc(100% - 44px)' }" v-model="isRefresh"
     @refresh="onRefresh" ref="pullRefresh" immediate-check="false">
     <form action="/">
@@ -44,6 +44,8 @@ import { ref } from "vue";
 import { getFinanceMangerPage, } from '@/api/finance/financeManager/index';
 import { getUserManagerList, } from "@/api/user/userManager";
 import svgIcon from "@/views/common/icon/svgIcon.vue";
+import navBar from '@/views/common/navBar/index.vue';
+
 import {
   SearchInfo,
   pagination,
@@ -51,9 +53,11 @@ import {
   fromSourceTransferList,
 } from "./financeManager";
 import { showToast } from 'vant';
-import { useRouter } from "vue-router";
 
-let router = useRouter();
+const info = ref<any>({
+  title: '财务管理',
+  rightButton: '新增',
+})
 let loading = ref<boolean>(false);
 let dataSource = ref<any[]>([]);
 let searchInfo = ref<SearchInfo>({});
@@ -93,10 +97,6 @@ const addFinance = () => {
   console.log(11111);
 }
 
-const getBack = () => {
-  router.go(-1);
-}
-
 let userMap = {};
 function getUserInfoList() {
   getUserManagerList({}).then((res) => {
@@ -117,6 +117,7 @@ const onRefresh = () => {
 };
 
 function init() {
+  pagination.value.current = 0;
   //获取财务管理页面数据
   getFinancePage(searchInfo.value, pagination.value);
   //获取用户信息

@@ -81,7 +81,7 @@ export const routes: MenuDataItem[] = [
         children: [
           {
             path: '/finance/financeManagerDetail',
-            name: 'WaterDetail',
+            name: 'financeManager',
             component: FinanceManagerDetail,
         },
         ]
