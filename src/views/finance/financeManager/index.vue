@@ -3,7 +3,8 @@
   <van-pull-refresh pulling-text="加载中。。。" :style="{ height: 'calc(100% - 44px)' }" v-model="isRefresh"
     @refresh="onRefresh" ref="pullRefresh" immediate-check="false">
     <form action="/">
-      <van-search v-model="searchInfo.typeCode" show-action placeholder="请输入搜索关键词" @search="onSearch" @cancel="onCancel" />
+      <van-search v-model="searchInfo.typeCode" show-action placeholder="请输入搜索关键词" @search="onSearch"
+        @cancel="onCancel" />
     </form>
     <van-empty v-if="dataSource.length == 0" description="暂无数据" />
     <van-list v-else v-model:loading="loading" :finished="finished" finished-text="没有更多了" @load="onRefresh">
@@ -13,6 +14,7 @@
           <template #label>
             <div style="margin-top: 10px; display: flex">
               <div class="icon" style="background-color: #ffcc00">
+                {{ item.fromSource }}
                 <div v-for="fromSource in fromSourceTransferList">
                   <svgIcon v-if="item.fromSource.indexOf(fromSource.value) >= 0 && fromSource.value != ''"
                     :name="fromSource.label" class="svg"
@@ -53,9 +55,12 @@ import {
   fromSourceTransferList,
 } from "./financeManager";
 import { showToast } from 'vant';
+import { useRouter, useRoute } from "vue-router";
 
+let router = useRouter();
+let route = useRoute();
 const info = ref<any>({
-  title: '财务管理',
+  title: route?.name || '财务管理11',
   rightButton: '新增',
 })
 let loading = ref<boolean>(false);
@@ -94,7 +99,7 @@ function getFinancePage(param: SearchInfo, cur: pageInfo) {
 }
 
 const addFinance = () => {
-  console.log(11111);
+  router.push({ path: '/finance/financeManager/detail' });
 }
 
 let userMap = {};

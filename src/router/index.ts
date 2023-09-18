@@ -78,13 +78,12 @@ export const routes: MenuDataItem[] = [
         name: "财务信息",
         component: FinanceManager,
         meta: { title: "财务信息", icon: "finance", hiedInMenu: false },
-        children: [
-          {
-            path: '/finance/financeManagerDetail',
-            name: 'financeManager',
-            component: FinanceManagerDetail,
-        },
-        ]
+      },
+      {
+        path: "/finance/financeManager/detail",
+        name: "财务信息详情",
+        component: FinanceManagerDetail,
+        meta: { title: "财务信息详情", icon: "financeManager", hiedInMenu: true },
       },
       {
         path: "/finance/financeAnalysis",
