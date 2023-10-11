@@ -22,6 +22,7 @@ const props = defineProps<Props>();
 const emit = defineEmits(["clickRight"]);
 const router = useRouter();
 const onClickLeft = () => {
+    // todo修改为返回前一路由
     router.go(-1);
 }
 

@@ -4,8 +4,10 @@
         <van-cell-group inset>
             <van-field v-model="formInfo.name" name="name" :label="label.name + '：'" :placeholder="'请输入' + label.name"
                 :rules="rulesRef.name" />
-            <van-field v-model="formInfo.amount" type="number" name="amount" :label="label.name + '：'"
-                :placeholder="'请输入' + label.name" :rules="rulesRef.amount" />
+            <van-field v-model="formInfo.typeCode" name="typeCode" :label="label.typeCode + '：'"
+                :placeholder="'请输入' + label.typeCode" :rules="rulesRef.typeCode" />
+            <van-field v-model="formInfo.amount" type="number" name="amount" :label="label.amount + '：'"
+                :placeholder="'请输入' + label.amount" :rules="rulesRef.amount" />
             <van-field v-model="fromSourceName" name="fromSource" :label="label.fromSource + '：'"
                 :placeholder="'请输入' + label.fromSource" :rules="rulesRef.fromSource" @click="choose('fromSource')"
                 readonly />
@@ -16,10 +18,6 @@
                 :placeholder="'请输入' + label.isValid" :rules="rulesRef.isValid" @click="choose('isValid')" readonly />
             <van-field v-model="infoDateName" name="infoDate" :label="label.infoDate + '：'"
                 :placeholder="'请输入' + label.infoDate" :rules="rulesRef.infoDate" @click="chooseDate" readonly />
-            <!-- <van-popup v-model:show="showDate" position="bottom" :style="{ width: '100%' }">
-                <van-date-picker :formatter="formatter" v-model="chooseDateInfo" @confirm="confirmDate"
-                    @cancel="showDate = false" title="业务日期：" :rules="rulesRef.infoDate" />
-            </van-popup> -->
             <van-field v-model="belongToName" name="belongTo" :label="label.belongTo + '：'"
                 :placeholder="'请输入' + label.belongTo" :rules="rulesRef.belongTo" @click="choose('belongTo')" readonly />
             <selectPop :info="popInfo" @selectInfo="selectInfo" @cancelInfo="cancelInfo"></selectPop>
@@ -35,7 +33,7 @@
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue';
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import navBar from '@/views/common/navBar/index.vue';
 import dayjs, { Dayjs } from 'dayjs';
 import { getDictList } from "@/api/finance/dict/dictManager";
@@ -45,11 +43,11 @@ import selectPop from '@/views/common/pop/selectPop.vue';
 import { Info } from '@/views/common/pop/selectPop.vue';
 import datePop from '@/views/common/pop/datePop.vue';
 import { showToast } from 'vant';
-import { getFinanceMangerDetail } from '@/api/finance/financeManager';
+import { addOrEditFinanceManger, getFinanceMangerDetail } from '@/api/finance/financeManager';
 
 let route = useRoute();
+let router = useRouter();
 let userInfo = useUserStore()?.getUserInfo;
-
 const info = ref<any>({
     title: route?.name || '财务明细',
 });
@@ -249,30 +247,40 @@ let incomeAndExpensesName = ref<string>('');
 let isValidName = ref<string>('');
 let belongToName = ref<string>('');
 
-const onSubmit = (values: any) => {
-    console.log(formInfo.value);
-    console.log('submit', values);
+const onSubmit = () => {
+    let method = 'post';
+    if (formInfo.value.id) {
+        method = 'put'
+    }
+    addOrEditFinanceManger(method, formInfo.value).then((res: any) => {
+        if (res?.code == '200') {
+            showToast(res?.message || '保存成功!');
+            // todo 是否修改成返回列表对应的位置
+            router.push({ path: '/finance/financeManager' });
+        } else {
+            showToast(res?.message || '保存失败，请联系管理员!');
+        }
+    })
+
 };
 
-function getDictInfoList() {
-    getDictList("pay_way,income_expense_type,is_valid").then((res) => {
-        if (res.code == "200") {
-            fromSourceInfo.value.list = res.data.filter(
-                (item: { belongTo: string }) => item.belongTo == "pay_way"
-            );
-            incomeAndExpensesInfo.value.list = res.data.filter(
-                (item: { belongTo: string }) => item.belongTo == "income_expense_type"
-            );
-            isValidInfo.value.list = res.data.filter(
-                (item: { belongTo: string }) => item.belongTo == "is_valid"
-            );
-            fromSourceName.value = getListName(fromSourceInfo.value.list || [], formInfo.value.fromSource, 'typeCode', 'typeName');
-            incomeAndExpensesName.value = getListName(incomeAndExpensesInfo.value.list || [], formInfo.value.incomeAndExpenses, 'typeCode', 'typeName');
-            isValidName.value = getListName(isValidInfo.value.list || [], formInfo.value.isValid, 'typeCode', 'typeName');
-        } else {
-            // message.error((res && res.message) || "查询列表失败！");
-        }
-    });
+function getDictInfoList(res: any) {
+    if (res.code == "200") {
+        fromSourceInfo.value.list = res.data.filter(
+            (item: { belongTo: string }) => item.belongTo == "pay_way"
+        );
+        incomeAndExpensesInfo.value.list = res.data.filter(
+            (item: { belongTo: string }) => item.belongTo == "income_expense_type"
+        );
+        isValidInfo.value.list = res.data.filter(
+            (item: { belongTo: string }) => item.belongTo == "is_valid"
+        );
+        fromSourceName.value = getListName(fromSourceInfo.value.list || [], formInfo.value.fromSource, 'typeCode', 'typeName');
+        incomeAndExpensesName.value = getListName(incomeAndExpensesInfo.value.list || [], formInfo.value.incomeAndExpenses, 'typeCode', 'typeName');
+        isValidName.value = getListName(isValidInfo.value.list || [], formInfo.value.isValid, 'typeCode', 'typeName');
+    } else {
+        showToast(res?.message || '查询失败，请联系管理员!')
+    }
 }
 
 const getListName = (list: any[], value: any, code: string, name: string) => {
@@ -288,29 +296,39 @@ const getListName = (list: any[], value: any, code: string, name: string) => {
     return listName;
 };
 
-function getUserInfoList() {
-    getUserManagerList({}).then((res) => {
-        if (res.code == "200") {
-            belongToInfo.value.list = res.data;
-            belongToName.value = getListName(res.data, formInfo.value.belongTo, 'id', 'nickName');
-        } else {
-            // message.error((res && res.message) || "查询列表失败！");
-        }
-    });
+function getUserInfoList(res: any) {
+    if (res.code == "200") {
+        belongToInfo.value.list = res.data;
+        belongToName.value = getListName(res.data, formInfo.value.belongTo, 'id', 'nickName');
+    } else {
+        showToast(res[2]?.message || '查询失败，请联系管理员!')
+    }
+}
+
+const initInfoDate = (infoDate: Dayjs) => {
+    if (infoDate) {
+        infoDateName.value = infoDate.format('YYYY-MM-DD');
+        chooseDateInfo.value.selectValue = infoDate;
+    }
 }
 
 function init() {
-    // TODO修改为promiseAll
-    if (false) {
-        Promise.all([getFinanceMangerDetail(1), getUserInfoList, getDictInfoList]).then(res => {
+    let id: any = route?.query?.id;
+    if (id) {
+        Promise.all([getFinanceMangerDetail(id || '-1'),
+        getUserManagerList({}),
+        getDictList('pay_way,income_expense_type,is_valid')]).then((res: any[]) => {
             console.log(res);
-            if (true) {
-                // formState.value = res.data;
-                // formState.value.infoDate = dayjs(formState.value.infoDate);
-                // modelConfig.confirmLoading = false;
+            if (res[0].code == '200') {
+                formInfo.value = res[0].data;
+                console.log(formInfo.value);
+                formInfo.value.infoDate = dayjs(formInfo.value.infoDate);
+                initInfoDate(formInfo.value.infoDate);
             } else {
-                showToast('查询失败!')
+                showToast(res[0]?.message || '查询详情失败，请联系管理员!')
             }
+            getUserInfoList(res[1])
+            getDictInfoList(res[2]);
         }).catch(() => {
             showToast('系统问题，请联系管理员！')
         });
@@ -323,14 +341,12 @@ function init() {
             fromSource: 'wx',
         };
         //获取用户信息
-        getUserInfoList();
+        getUserManagerList({}).then((res: any) => { getUserInfoList(res) });
         //获取字典信息
-        getDictInfoList();
+        getDictList('pay_way,income_expense_type,is_valid').then((res: any) => { getDictInfoList(res) });
+        initInfoDate(formInfo.value.infoDate);
     }
-    if (formInfo.value.infoDate) {
-        infoDateName.value = formInfo.value.infoDate.format('YYYY-MM-DD');
-        chooseDateInfo.value.selectValue = formInfo.value.infoDate;
-    }
+
 }
 
 init();
