@@ -1,7 +1,7 @@
 <template>
   <navBar :info="info" @clickRight="addFinance"></navBar>
-  <van-pull-refresh pulling-text="加载中。。。" :style="{ height: 'calc(100% - 44px)' }" v-model="isRefresh"
-    @refresh="refresh" ref="pullRefresh" immediate-check="false">
+  <van-pull-refresh pulling-text="加载中。。。" :style="{ height: 'calc(100% - 44px)' }" v-model="isRefresh" @refresh="refresh"
+    ref="pullRefresh" immediate-check="false">
     <form action="/">
       <van-search v-model="searchInfo.typeCode" show-action placeholder="请输入搜索关键词" @search="onSearch"
         @cancel="onCancel" />
@@ -60,7 +60,7 @@ import {
   pageInfo,
   fromSourceTransferList,
 } from "./financeManager";
-import { showToast } from 'vant';
+import { showSuccessToast, showFailToast } from 'vant';
 import { useRouter, useRoute } from "vue-router";
 
 let router = useRouter();
@@ -95,8 +95,11 @@ function getFinancePage(param: SearchInfo, cur: pageInfo) {
         pagination.value.pageSize = res.data.size;
         pagination.value.total = res.data.total;
         console.log(`pageInfo`, pagination.value);
+        if (pagination.value.total || 0 < (pagination.value.current || 1) * (pagination.value.pageSize || 10)) {
+          finished.value = true;
+        }
       } else {
-        showToast((res && res.message) || "查询列表失败！");
+        showFailToast((res && res.message) || "查询列表失败！");
       }
     })
     .finally(() => {
@@ -118,7 +121,7 @@ function getUserInfoList() {
         });
       }
     } else {
-      showToast((res && res.message) || "查询列表失败！");
+      showFailToast((res && res.message) || "查询列表失败！");
     }
   });
 }
@@ -154,10 +157,9 @@ const delFinance = (id: number) => {
   deleteFinanceManager(id + "").then((res: any) => {
     if (res?.code == '200') {
       refresh();
-      console.log('refresh:', 123)
-      showToast((res && res.message) || "删除成功！");
+      showSuccessToast((res && res.message) || "删除成功！");
     } else {
-      showToast((res && res.message) || "删除失败，请联系管理员！");
+      showFailToast((res && res.message) || "删除失败，请联系管理员！");
     }
   })
 };
