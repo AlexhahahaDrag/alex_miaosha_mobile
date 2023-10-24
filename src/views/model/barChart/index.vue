@@ -4,7 +4,8 @@
 
 <script setup lang="ts">
 import { onMounted, watch, PropType, ref } from "vue";
-import { barItem } from "./bar";
+import chart from "@/views/model/chart/index.vue";
+import { barItem } from "@/views/model/chart/bar";
 
 const props = defineProps({
   config: {
@@ -102,18 +103,16 @@ const setOption = (data: any[]) => {
       },
       series: [
         {
-          type: "line",
+          type: "bar",
           data: data,
           smooth: true,
           showSymbol: 0,
           itemStyle: {
-            normal: {
-              color: color,
+            color: color,
               lineStyle: {
                 type: "line",
                 color: color,
               },
-            },
           },
         }
       ],

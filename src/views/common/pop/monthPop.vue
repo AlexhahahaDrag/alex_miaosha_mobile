@@ -1,7 +1,7 @@
 <template>
     <van-popup v-model:show="showFlag" position="bottom" :style="{ width: '100%' }" @click-overlay="onClickOverlay">
         <van-date-picker v-model="curSelectValue" :title="cur.labelName" :formatter="info.formatter" @confirm="confirm"
-            @cancel="cancel" />
+            @cancel="cancel" :columns-type="info.columnsType" />
     </van-popup>
 </template>
 
@@ -16,6 +16,7 @@ export interface Info {
     selectValue?: any;
     showFlag?: boolean;
     formatter?: any;
+    columnsType: any[],
 }
 
 interface Props {
@@ -32,8 +33,12 @@ let curSelectValue = ref<string[]>([]);
 
 const confirm = ({ selectedValues }) => {
     showFlag.value = false;
-    let dateName = selectedValues[0] + '-' + selectedValues[1] + '-' + selectedValues[2];
-    emit('selectInfo', dayjs(dateName), dateName);
+    let dateName = selectedValues[0] + '年' + selectedValues[1] + '月';
+    emit('selectInfo', dayjs(dateName +'-01'), dateName);
+};
+
+const onClickOverlay = () => {
+    cancel();
 };
 
 const cancel = () => {
@@ -41,23 +46,18 @@ const cancel = () => {
     emit('cancelInfo', false);
 };
 
-const onClickOverlay = () => {
-    cancel();
-};
-
-let cur = ref<Info>({});
+let cur = ref<Info>();
 
 watch(
     () => props.info.showFlag,
     () => {
         if (props.info.showFlag) {
+            console.log(`props.info:`, props.info);
             cur.value = props.info;
             showFlag.value = props.info.showFlag;
-            console.log(`cur selectValue`, props.info.selectValue)
             if (props.info.selectValue) {
                 let month = props.info.selectValue.month() + 1;
-                curSelectValue.value = [props.info.selectValue.year() + '',
-                month < 10 ? '0' + month : month + '', props.info.selectValue.date() + ''];
+                curSelectValue.value = [props.info.selectValue.year() + '', month < 10 ? '0' + month : month + ''];
             }
         }
     })

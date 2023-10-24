@@ -6,6 +6,7 @@
                 </pieChart>
             </div>
         </div>
+        <van-divider />
         <div class="mainGrid">
             <div class="div2">
                 <pieChart title="当月支出分析" height="100%" width="100%" :data="pieExpenseData" :tooltip="tooltip">
@@ -17,23 +18,24 @@
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
-import pieChart from "../chart/pieChart.vue";
+import pieChart from "@/views/model/pieChart/index.vue";
 import { getIncomeAndExpense } from '@/api/finance/financeAnalysis/index';
-import dayjs, { Dayjs } from "dayjs";
-import { showFailToast } from 'vant';
+import { showNotify } from 'vant';
 import { ItemInfo } from "./common";
 
 let pieExpenseData = ref<object[]>([]);
 
 interface Props {
-    activeTab: string|number;
+    activeTab: Number;
+    dateStr: string,
+    belongTo: number | null,
 }
 
 let pieIncomeData = ref<object[]>([]);
 
 let props = defineProps<Props>();
 
-const getIncomeAndExpenseInfo = (userId: number, dateStr: string) => {
+const getIncomeAndExpenseInfo = (userId: number | null, dateStr: string) => {
     getIncomeAndExpense(userId, dateStr).then(
         (res: { code: string; data: any[]; message: any }) => {
             if (res.code == "200") {
@@ -52,10 +54,9 @@ const getIncomeAndExpenseInfo = (userId: number, dateStr: string) => {
                             expense.push({ name: item.typeCode, value: item.amount });
                         });
                     pieExpenseData.value = expense;
-                    console.log(`pieExpenseData:`, pieExpenseData.value)
                 }
             } else {
-                showFailToast((res && res.message) || "查询列表失败！");
+                showNotify({ type: 'danger', message: (res && res.message) || '查询列表失败！' });
             }
         }
     );
@@ -66,22 +67,19 @@ const tooltip = ref({
     formatter: "{b} : {c}元({d}%)",
 });
 
-const dateFormatter = "YYYY-MM";
-
-let searchDateTime = ref<Dayjs>(dayjs());
-
-const init = () => {
-    let dateStr = searchDateTime.value.format(dateFormatter);
-    getIncomeAndExpenseInfo(0, dateStr);
+const init = (dateStr: string, belongTo: number | null) => {
+    getIncomeAndExpenseInfo(belongTo, dateStr);
 };
 
 watch(
-    () => props.activeTab,
+    () => [props.activeTab],
     () => {
-        if (props.activeTab === '2') {
-            init();
+        console.log(`analysis before`)
+        if (props.activeTab === 2 && props.dateStr) {
+            init(props.dateStr, props.belongTo || null);
         }
-    }
+    },
+    { immediate: true },
 );
 </script>
 

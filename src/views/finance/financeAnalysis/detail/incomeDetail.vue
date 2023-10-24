@@ -6,6 +6,7 @@
                 </bar-chart>
             </div>
         </div>
+        <van-divider />
         <div class="mainGrid">
             <div class="div2">
                 <bar-chart height="100%" width="100%" title="月消费" :data="monthData" :config="monthConfig">
@@ -18,16 +19,17 @@
 <script lang="ts" setup>
 import { ref, watch } from "vue";
 import type { barItem } from "./common";
-import { showFailToast } from 'vant';
+import { showNotify } from 'vant';
 import {
     getDayExpense,
     getMonthExpense,
 } from "@/api/finance/financeAnalysis";
-import barChart from "../chart/barChart.vue";
-import dayjs, { Dayjs } from "dayjs";
+import barChart from "@/views/model/barChart/index.vue";
 
 interface Props {
-    activeTab: string | number;
+    activeTab: Number;
+    dateStr: string;
+    belongTo: number | null,
 }
 let props = defineProps<Props>();
 
@@ -57,7 +59,7 @@ let monthConfig = ref<barItem>({
 
 let dayData = ref<any>([]);
 
-function getDayExpenseInfo(userId: number, dateStr: string) {
+function getDayExpenseInfo(userId: number | null, dateStr: string) {
     getDayExpense(userId, dateStr).then(
         (res: { code: string; data: any[]; message: any }) => {
             if (res.code == "200") {
@@ -102,13 +104,13 @@ function getDayExpenseInfo(userId: number, dateStr: string) {
                     dayData.value = series;
                 }
             } else {
-                showFailToast((res && res.message) || "查询列表失败！");
+                showNotify({ type: 'danger', message: (res && res.message) || '查询列表失败！' });
             }
         }
     );
 }
 
-function getMonthExpenseInfo(userId: number, dateStr: string) {
+function getMonthExpenseInfo(userId: number | null, dateStr: string) {
     getMonthExpense(userId, dateStr).then(
         (res: { code: string; data: any[]; message: any }) => {
             if (res.code == "200") {
@@ -154,28 +156,27 @@ function getMonthExpenseInfo(userId: number, dateStr: string) {
                     console.log(`monthData.value`, monthData.value)
                 }
             } else {
-                showFailToast((res && res.message) || "查询列表失败！");
+                showNotify({ type: 'danger', message: (res && res.message) || '查询列表失败！' });
             }
         }
     );
 }
 
-const dateFormatter = "YYYY-MM";
-let searchDateTime = ref<Dayjs>(dayjs());
-
-const init = () => {
-    let dateStr = searchDateTime.value.format(dateFormatter);
-    getDayExpenseInfo(0, dateStr);
-    getMonthExpenseInfo(0, dateStr);
+const init = (dateStr: string, belongTo: number | null) => {
+    getDayExpenseInfo(belongTo, dateStr);
+    getMonthExpenseInfo(belongTo, dateStr);
 };
 
 watch(
-    () => props.activeTab,
+    () => [props.activeTab],
     () => {
-        if (props.activeTab === '3') {
-            init();
+        console.log(`detail:`)
+        if (props.activeTab === 3 && props.dateStr) {
+            console.log(`detail`)
+            init(props.dateStr, props.belongTo || null);
         }
-    }
+    },
+    { immediate: true },
 );
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-    <van-popup v-model:show="showFlag" position="bottom" :style="{ width: '100%' }">
+    <van-popup v-model:show="showFlag" position="bottom" :style="{ width: '100%' }" @click-overlay="onClickOverlay">
         <van-picker v-model="cur.selectValue" :title="cur.labelName" :columns="cur.list"
             :columns-field-names="customFieldName" @confirm="confirm" @cancel="cancel" />
     </van-popup>
@@ -39,6 +39,9 @@ const cancel = () => {
     emit('cancelInfo', false);
 };
 
+const onClickOverlay = () => {
+    cancel();
+};
 
 let customFieldName = ref<any>({
     text: 'typeName',
@@ -50,9 +53,9 @@ let cur = ref<Info>({});
 watch(
     () => props.info.showFlag,
     () => {
-        console.log(`pop:`, props.info);
         if (props.info.showFlag) {
             cur.value = props.info;
+            console.log(`cur.value`, cur.value, props.info);
             showFlag.value = props.info.showFlag;
             customFieldName = props.info.customFieldName;
         }
