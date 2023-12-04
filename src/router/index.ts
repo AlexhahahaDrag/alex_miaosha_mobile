@@ -10,6 +10,7 @@ import FinanceManager from '@v/finance/financeManager/index.vue';
 import FinanceAnalysis from '@v/finance/financeAnalysis/index.vue';
 import AccountRecordInfo from '@v/finance/accountRecordInfo/AccountRecordInfo.vue';
 import FinanceManagerDetail from '@v/finance/financeManager/detail/index.vue';
+import accountRecordInfoDetailVue from '@/views/finance/accountRecordInfo/detail/accountRecordInfoDetail.vue';
 
 export const routes: MenuDataItem[] = [
   {
@@ -96,6 +97,12 @@ export const routes: MenuDataItem[] = [
         name: "账号管理",
         component: AccountRecordInfo,
         meta: { title: "账号管理", icon: "accountRecordInfo", hiedInMenu: false },
+      },
+      {
+        path: "/finance/accountRecordInfo/detail",
+        name: "账号管理详情",
+        component: accountRecordInfoDetailVue,
+        meta: { title: "账号管理详情", icon: "accountRecordInfo", hiedInMenu: true },
       },
     ],
   },

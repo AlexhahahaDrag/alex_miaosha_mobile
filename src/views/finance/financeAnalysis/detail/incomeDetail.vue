@@ -27,9 +27,9 @@ import {
 import barChart from "@/views/model/barChart/index.vue";
 
 interface Props {
-    activeTab: Number;
+    activeTab: number| string;
     dateStr: string;
-    belongTo: number | null,
+    belongTo?: number | null,
 }
 let props = defineProps<Props>();
 
@@ -153,7 +153,6 @@ function getMonthExpenseInfo(userId: number | null, dateStr: string) {
                         color: "#5555ff",
                     };
                     monthData.value = series;
-                    console.log(`monthData.value`, monthData.value)
                 }
             } else {
                 showNotify({ type: 'danger', message: (res && res.message) || '查询列表失败！' });
@@ -168,11 +167,9 @@ const init = (dateStr: string, belongTo: number | null) => {
 };
 
 watch(
-    () => [props.activeTab],
+    () => [props.activeTab, props.dateStr, props.belongTo],
     () => {
-        console.log(`detail:`)
-        if (props.activeTab === 3 && props.dateStr) {
-            console.log(`detail`)
+        if (props.activeTab === '3') {
             init(props.dateStr, props.belongTo || null);
         }
     },

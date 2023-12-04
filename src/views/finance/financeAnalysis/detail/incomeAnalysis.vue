@@ -26,9 +26,9 @@ import { ItemInfo } from "./common";
 let pieExpenseData = ref<object[]>([]);
 
 interface Props {
-    activeTab: Number;
+    activeTab: number | string;
     dateStr: string,
-    belongTo: number | null,
+    belongTo?: number | null,
 }
 
 let pieIncomeData = ref<object[]>([]);
@@ -72,10 +72,9 @@ const init = (dateStr: string, belongTo: number | null) => {
 };
 
 watch(
-    () => [props.activeTab],
+    () => [props.activeTab, props.dateStr, props.belongTo],
     () => {
-        console.log(`analysis before`)
-        if (props.activeTab === 2 && props.dateStr) {
+        if (props.activeTab === '2' && props.dateStr) {
             init(props.dateStr, props.belongTo || null);
         }
     },

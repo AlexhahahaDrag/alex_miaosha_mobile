@@ -113,7 +113,7 @@ const selectInfo = (type: string, value: any, name: string) => {
         case 'belongTo':
             belongTo.value = value || null;
             belongToName.value = name;
-            props.belongTo = value;
+            props.belongTo = value || null;
             break;
     }
 };

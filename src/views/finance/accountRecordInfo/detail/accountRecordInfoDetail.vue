@@ -10,8 +10,6 @@
                 :placeholder="'请输入' + label.amount" :rules="rulesRef.amount" />
             <van-field v-model="formInfo.account" name="account" :label="label.account + '：'"
                 :placeholder="'请输入' + label.account" :rules="rulesRef.account" />
-            <van-field v-model="formInfo.isSend" name="isSend" :label="label.isSend + '：'"
-                :placeholder="'请输入' + label.isSend" :rules="rulesRef.isSend" />
             <!--  <van-field v-model="belongToName" name="belongTo" :label="label.belongTo + '：'"
                 :placeholder="'请输入' + label.belongTo" :rules="rulesRef.belongTo" @click="choose('belongTo')" readonly /> -->
             <!--   <selectPop :info="popInfo" @selectInfo="selectInfo" @cancelInfo="cancelInfo"></selectPop> -->
@@ -45,11 +43,11 @@ const info = ref<any>({
 let formInfo = ref<any>({});
 
 const label = reactive({
-    name: '名称不能为空！',
-    avliDate: '有效期不能为空！',
-    amount: '金额不能为空！',
-    account: '账号不能为空！',
-    isSend: '是否发送提醒不能为空！',
+    name: '名称',
+    avliDate: '有效期',
+    amount: '金额',
+    account: '账号',
+    isSend: '是否发送提醒',
 });
 
 const rulesRef = reactive({
@@ -75,12 +73,6 @@ const rulesRef = reactive({
         {
             required: true,
             message: '账号不能为空！',
-        },
-    ],
-    isSend: [
-        {
-            required: true,
-            message: '是否发送提醒不能为空！',
         },
     ],
 });
@@ -175,7 +167,7 @@ const onSubmit = () => {
     addOrEditAccountRecordInfo(method, formInfo.value).then((res: any) => {
         if (res?.code == '200') {
             showSuccessToast(res?.message || '保存成功!');
-            router.push({ path: '/finance/financeManager' });
+            router.push({ path: '/finance/accountRecordInfo' });
         } else {
             showFailToast (res?.message || '保存失败，请联系管理员!');
         }

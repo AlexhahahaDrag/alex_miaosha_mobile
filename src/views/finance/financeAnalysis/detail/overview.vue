@@ -1,14 +1,16 @@
 <template>
-    <h1>总览</h1>
-    <van-row>
-        <van-col span="8">span: 8</van-col>
-        <van-col span="8">span: 8</van-col>
-        <van-col span="8">span: 8</van-col>
-    </van-row>
-    <van-row>
-        <van-col span="16">span: 16</van-col>
-        <van-col span="16">span: 16</van-col>
-    </van-row>
+    <van-grid :column-num="2">
+        <van-grid-item :center="false">
+            总金额:{{ sum }}
+        </van-grid-item>
+    </van-grid>
+    <van-grid :column-num="2">
+        <van-grid-item v-for="item in balanceList" :key="item.typeCode"
+            :default="item.typeName + ':' + (item.amount ? item.amount : 0)" :center="false">
+            {{ item.typeName }}:{{ item.amount }}
+            <!-- <van-card :price="item.amount" :title="item.typeName" /> -->
+        </van-grid-item>
+    </van-grid>
 </template>
 
 <script lang="ts" setup>
@@ -19,9 +21,9 @@ import { showNotify } from 'vant';
 import * as math from 'mathjs';
 
 interface Props {
-    activeTab: Number;
+    activeTab: number | string;
     dateStr: string,
-    belongTo: number | null,
+    belongTo?: number | null,
 }
 
 let props = defineProps<Props>();
@@ -38,10 +40,10 @@ const getBalanceInfo = (userId: number | null, dateStr: string) => {
                 if (res.data && res.data.length) {
                     res.data.forEach(
                         (item) =>
-                        (sum.value = math.add(
-                            sum.value,
-                            math.bignumber(item.amount ? item.amount : 0)
-                        ))
+                            sum.value = math.add(
+                                sum.value,
+                                math.bignumber(item.amount ? item.amount : 0)
+                            )
                     );
                 }
             } else {
@@ -56,10 +58,9 @@ const init = (dateStr: string, belongTo: number | null) => {
 };
 
 watch(
-    () => [props.activeTab],
+    () => [props.activeTab, props.dateStr, props.belongTo],
     () => {
-        console.log(`overviews`)
-        if (props.activeTab === 1 && props.dateStr) {
+        if (props.activeTab === '1') {
             init(props.dateStr, props.belongTo || null);
         }
     },
