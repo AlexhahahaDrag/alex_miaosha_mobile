@@ -9,19 +9,13 @@
     <van-empty v-if="dataSource.length == 0" description="暂无数据" />
     <van-list v-else v-model:loading="loading" :finished="finished" finished-text="没有更多了" @load="onRefresh">
       <van-cell-group>
-        <van-swipe-cell v-for="(item, index) in dataSource" :before-close="beforeClose">
+        <van-swipe-cell v-for="(item, index) in dataSource" :before-close="beforeClose" :key="index">
           <van-cell :title="userMap[item.belongTo] + '的' + item.name" :key="index" is-link
             :to="{ path: '/finance/financeManager/detail', query: { id: item.id } }">
             <template #label>
               <div style="margin-top: 10px; display: flex">
-                <div class="icon" style="background-color: #ffcc00">
-                  {{ item.fromSource }}
-                  <div v-for="fromSource in fromSourceTransferList">
-                    <svgIcon v-if="item.fromSource.indexOf(fromSource.value) >= 0 && fromSource.value != ''"
-                      :name="fromSource.label" class="svg"
-                      style="width: 1.5em;height: 1.5em; font-size: 18px;cursor: pointer;verticle-align: middle;">
-                    </svgIcon>
-                  </div>
+                <div class="svgDiv" v-for="(fromSource, index) in fromSourceTransferList" :key="index">
+                  <img class="svgClass" v-if="item.fromSource.indexOf(fromSource.value) >= 0" :src="fromSource.src" />
                 </div>
               </div>
             </template>
@@ -32,7 +26,7 @@
                     {{ item?.infoDate ? String(item.infoDate).substring(0, 10) : '--' }}
                   </div>
                 </div>
-                <div style="margin-top: 10px;text-align: right">
+                <div :class="item.incomeAndExpenses === 'income' ? 'rightDiv' : 'rightRedDiv'">
                   {{ item.amount ? (item.incomeAndExpenses === 'income' ? item.amount : -item.amount) : '--' }}
                 </div>
               </div>
@@ -41,6 +35,8 @@
           <template #right>
             <van-button class="right_info" @click="delFinance(item.id)" square type="danger" text="删除" />
           </template>
+          <van-divider :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px' }">
+          </van-divider>
         </van-swipe-cell>
       </van-cell-group>
     </van-list>
@@ -51,9 +47,7 @@
 import { ref } from "vue";
 import { getFinanceMangerPage, deleteFinanceManager, } from '@/api/finance/financeManager/index';
 import { getUserManagerList, } from "@/api/user/userManager";
-import svgIcon from "@/views/common/icon/svgIcon.vue";
 import navBar from '@/views/common/navBar/index.vue';
-
 import {
   SearchInfo,
   pagination,
@@ -95,7 +89,7 @@ function getFinancePage(param: SearchInfo, cur: pageInfo) {
         pagination.value.pageSize = res.data.size;
         pagination.value.total = res.data.total;
         console.log(`pageInfo`, pagination.value);
-        if (pagination.value.total || 0 < (pagination.value.current || 1) * (pagination.value.pageSize || 10)) {
+        if (!(pagination.value.total || 0 < (pagination.value.current || 1) * (pagination.value.pageSize || 10))) {
           finished.value = true;
         }
       } else {
@@ -138,19 +132,6 @@ const onRefresh = () => {
 
 const beforeClose = (e) => {
   console.log(e);
-  // let position = e.position;
-  // switch (position) {
-  //   case 'outside':
-  //     return true;
-  //   case 'right':
-  //     return new Promise((resolve) => {
-  //       showConfirmDialog({
-  //         title: '确定删除吗？',
-  //       })
-  //         .then(() => delFinance(1, resolve))
-  //         .catch(() => resolve(false));
-  //     });
-  // }
 };
 
 const delFinance = (id: number) => {
@@ -179,5 +160,22 @@ init();
 <style lang="scss">
 .right_info {
   height: 100%;
+}
+.svgDiv {
+  height: 30px;
+  .svgClass {
+    height: 100%;
+  }
+}
+
+.rightDiv {
+  margin-top: 10px;
+  text-align: right;
+}
+
+.rightRedDiv {
+  margin-top: 10px;
+  text-align: right;
+  color:red
 }
 </style>

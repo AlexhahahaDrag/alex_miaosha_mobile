@@ -3,9 +3,8 @@ import { defineStore } from "pinia";
 import { UserState } from "./typing";
 import { LoginParams } from "@/api/user/login";
 import { piniaPersistConfig } from '@/config/piniaPersist';
+import { showFailToast } from 'vant';
 
-// useStore could be anything like useUser, useCart
-// the first argument is a unique id of the store across your application
 export const useUserStore = defineStore({
   id: 'app-user',
   state: (): UserState => ({
@@ -48,7 +47,7 @@ export const useUserStore = defineStore({
       try {
         const { goHome = true, ...loginParams } = params;
         const data = await loginApi(loginParams);
-        if (data.code == '200') {
+        if (data?.code == '200') {
           const { token, admin } = data.data;
           // save userInfo
           this.setUserInfo(admin);
@@ -56,8 +55,7 @@ export const useUserStore = defineStore({
           this.setToken(token);
           return admin;
         } else {
-          // todo 添加提示信息
-          // message.error((data && data.message) || "删除失败！", 3);
+          showFailToast((data?.message) || '登录失败！');
         }
       } catch (error) {
         // message.error("系统错误，请联系管理员！", 3);

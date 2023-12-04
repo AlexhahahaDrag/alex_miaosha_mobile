@@ -133,7 +133,7 @@ const onSubmit = async (values) => {
     if (res) {
         router.push("/");
     }
-    console.log('submit', values);
+    console.log('submit', values, res);
 };
 // const onSubmit = () => {
 //     formRef.value

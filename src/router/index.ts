@@ -8,9 +8,8 @@ import Login from '@/views/login/index.vue'
 import UserManager from '@/views/user/userManager/index.vue';
 import FinanceManager from '@v/finance/financeManager/index.vue';
 import FinanceAnalysis from '@v/finance/financeAnalysis/index.vue';
-import AccountRecordInfo from '@v/finance/accountRecordInfo/index.vue';
+import AccountRecordInfo from '@v/finance/accountRecordInfo/AccountRecordInfo.vue';
 import FinanceManagerDetail from '@v/finance/financeManager/detail/index.vue';
-import testInfo from '@v/finance/test/index.vue';
 
 export const routes: MenuDataItem[] = [
   {
@@ -97,12 +96,6 @@ export const routes: MenuDataItem[] = [
         name: "账号管理",
         component: AccountRecordInfo,
         meta: { title: "账号管理", icon: "accountRecordInfo", hiedInMenu: false },
-      },
-      {
-        path: "/finance/test",
-        name: "测试",
-        component: testInfo,
-        meta: { title: "测试", icon: "test", hiedInMenu: false },
       },
     ],
   },
