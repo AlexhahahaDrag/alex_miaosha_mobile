@@ -51,7 +51,6 @@ let userInfo = useUserStore()?.getUserInfo;
 const info = ref<any>({
     title: route?.name || '财务明细',
 });
-// TODO 修改成类型
 let formInfo = ref<any>({});
 
 const label = reactive({
@@ -317,10 +316,8 @@ function init() {
         Promise.all([getFinanceMangerDetail(id || '-1'),
         getUserManagerList({}),
         getDictList('pay_way,income_expense_type,is_valid')]).then((res: any[]) => {
-            console.log(res);
             if (res[0].code == '200') {
                 formInfo.value = res[0].data;
-                console.log(formInfo.value);
                 formInfo.value.infoDate = dayjs(formInfo.value.infoDate);
                 initInfoDate(formInfo.value.infoDate);
             } else {

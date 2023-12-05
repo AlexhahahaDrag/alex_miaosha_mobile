@@ -1,41 +1,112 @@
 <template>
   <navBar :info="info" @clickRight="addFinance"></navBar>
-  <van-pull-refresh pulling-text="加载中。。。" :style="{ height: 'calc(100% - 44px)' }" v-model="isRefresh" @refresh="refresh"
-    ref="pullRefresh" immediate-check="false">
+  <van-pull-refresh
+    pulling-text="加载中。。。"
+    :style="{ height: 'calc(100% - 44px)' }"
+    v-model="isRefresh"
+    @refresh="refresh"
+    ref="pullRefresh"
+    immediate-check="false"
+  >
     <form action="/">
-      <van-search v-model="searchInfo.typeCode" show-action placeholder="请输入搜索关键词" @search="onSearch"
-        @cancel="onCancel" />
+      <van-search
+        v-model="searchInfo.typeCode"
+        show-action
+        placeholder="请输入搜索关键词"
+        @search="onSearch"
+        @cancel="onCancel"
+      />
     </form>
+    <van-divider :style="{ color: '#1989fa', borderColor: 'grey' }">
+    </van-divider>
     <van-empty v-if="dataSource.length == 0" description="暂无数据" />
-    <van-list v-else v-model:loading="loading" :finished="finished" finished-text="没有更多了" @load="onRefresh">
+    <van-list
+      v-else
+      v-model:loading="loading"
+      :finished="finished"
+      finished-text="没有更多了"
+      @load="onRefresh"
+    >
       <van-cell-group>
-        <van-swipe-cell v-for="(item, index) in dataSource" :before-close="beforeClose" :key="index">
-          <van-cell :title="userMap[item.belongTo] + '的' + item.name" :key="index" is-link
-            :to="{ path: '/finance/financeManager/detail', query: { id: item.id } }">
+        <van-swipe-cell
+          v-for="(item, index) in dataSource"
+          :before-close="beforeClose"
+          :key="index"
+        >
+          <van-cell
+            :title="userMap[item.belongTo] + '的' + item.name"
+            :key="index"
+            is-link
+            :to="{
+              path: '/finance/financeManager/detail',
+              query: { id: item.id },
+            }"
+          >
             <template #label>
               <div style="margin-top: 10px; display: flex">
-                <div class="svgDiv" v-for="(fromSource, index) in fromSourceTransferList" :key="index">
-                  <img class="svgClass" v-if="item.fromSource.indexOf(fromSource.value) >= 0" :src="fromSource.src" />
+                <div
+                  class="svgDiv"
+                  v-for="(fromSource, index) in fromSourceTransferList"
+                  :key="index"
+                >
+                  <img
+                    class="svgClass"
+                    v-if="item.fromSource.indexOf(fromSource.value) >= 0"
+                    :src="fromSource.src"
+                  />
                 </div>
               </div>
             </template>
             <template #right-icon>
               <div class="text-right">
                 <div style="display: flex">
-                  <div class="van-ellipsis" style="width: 130px;text-align:right">
-                    {{ item?.infoDate ? String(item.infoDate).substring(0, 10) : '--' }}
+                  <div
+                    class="van-ellipsis"
+                    style="width: 130px; text-align: right"
+                  >
+                    {{
+                      item?.infoDate
+                        ? String(item.infoDate).substring(0, 10)
+                        : "--"
+                    }}
                   </div>
                 </div>
-                <div :class="item.incomeAndExpenses === 'income' ? 'rightDiv' : 'rightRedDiv'">
-                  {{ item.amount ? (item.incomeAndExpenses === 'income' ? item.amount : -item.amount) : '--' }}
+                <div
+                  :class="
+                    item.incomeAndExpenses === 'income'
+                      ? 'rightDiv'
+                      : 'rightRedDiv'
+                  "
+                >
+                  {{
+                    item.amount
+                      ? (item.incomeAndExpenses === "income"
+                          ? item.amount
+                          : -item.amount) + "元"
+                      : "--"
+                  }}
                 </div>
               </div>
             </template>
           </van-cell>
           <template #right>
-            <van-button class="right_info" @click="delFinance(item.id)" square type="danger" text="删除" />
+            <van-button
+              class="right_info"
+              @click="delFinance(item.id)"
+              square
+              type="danger"
+              text="删除"
+            />
           </template>
-          <van-divider :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px' }">
+          <van-divider
+            :style="{
+              color: '#1989fa',
+              borderColor: 'grey',
+              padding: '0 16px',
+              'margin-top': '0px',
+              'margin-bottom': '0px',
+            }"
+          >
           </van-divider>
         </van-swipe-cell>
       </van-cell-group>
@@ -45,24 +116,27 @@
 </template>
 <script lang="ts" setup>
 import { ref } from "vue";
-import { getFinanceMangerPage, deleteFinanceManager, } from '@/api/finance/financeManager/index';
-import { getUserManagerList, } from "@/api/user/userManager";
-import navBar from '@/views/common/navBar/index.vue';
+import {
+  getFinanceMangerPage,
+  deleteFinanceManager,
+} from "@/api/finance/financeManager/index";
+import { getUserManagerList } from "@/api/user/userManager";
+import navBar from "@/views/common/navBar/index.vue";
 import {
   SearchInfo,
   pagination,
   pageInfo,
   fromSourceTransferList,
 } from "./financeManager";
-import { showSuccessToast, showFailToast } from 'vant';
+import { showSuccessToast, showFailToast } from "vant";
 import { useRouter, useRoute } from "vue-router";
 
 let router = useRouter();
 let route = useRoute();
 const info = ref<any>({
-  title: route?.name || '财务管理11',
-  rightButton: '新增',
-})
+  title: route?.name || "财务管理11",
+  rightButton: "新增",
+});
 let loading = ref<boolean>(false);
 let dataSource = ref<any[]>([]);
 let searchInfo = ref<SearchInfo>({});
@@ -72,16 +146,20 @@ let isRefresh = ref<boolean>(false); //是否下拉刷新
 
 const onSearch = () => {
   pagination.value.current = 1;
-  dataSource.value = []
+  dataSource.value = [];
   onRefresh();
 };
 const onCancel = () => {
-  searchInfo.value.typeCode = '';
+  searchInfo.value.typeCode = "";
 };
 
 function getFinancePage(param: SearchInfo, cur: pageInfo) {
   loading.value = true;
-  getFinanceMangerPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
+  getFinanceMangerPage(
+    param,
+    cur?.current ? cur.current : 1,
+    cur?.pageSize || 10
+  )
     .then((res) => {
       if (res.code == "200") {
         dataSource.value = [...dataSource.value, ...res.data.records];
@@ -89,7 +167,14 @@ function getFinancePage(param: SearchInfo, cur: pageInfo) {
         pagination.value.pageSize = res.data.size;
         pagination.value.total = res.data.total;
         console.log(`pageInfo`, pagination.value);
-        if (!(pagination.value.total || 0 < (pagination.value.current || 1) * (pagination.value.pageSize || 10))) {
+        if (
+          !(
+            pagination.value.total ||
+            0 <
+              (pagination.value.current || 1) *
+                (pagination.value.pageSize || 10)
+          )
+        ) {
           finished.value = true;
         }
       } else {
@@ -102,15 +187,15 @@ function getFinancePage(param: SearchInfo, cur: pageInfo) {
 }
 
 const addFinance = () => {
-  router.push({ path: '/finance/financeManager/detail' });
-}
+  router.push({ path: "/finance/financeManager/detail" });
+};
 
 let userMap = {};
 function getUserInfoList() {
   getUserManagerList({}).then((res) => {
     if (res.code == "200") {
       if (res?.data) {
-        res.data.forEach((user: { id: string | number; nickName: any; }) => {
+        res.data.forEach((user: { id: string | number; nickName: any }) => {
           userMap[user.id] = user.nickName;
         });
       }
@@ -122,9 +207,9 @@ function getUserInfoList() {
 
 const refresh = () => {
   pagination.value.current = 0;
-  dataSource.value = []
+  dataSource.value = [];
   getFinancePage(searchInfo.value, pagination.value);
-}
+};
 
 const onRefresh = () => {
   getFinancePage(searchInfo.value, pagination.value);
@@ -136,13 +221,13 @@ const beforeClose = (e) => {
 
 const delFinance = (id: number) => {
   deleteFinanceManager(id + "").then((res: any) => {
-    if (res?.code == '200') {
+    if (res?.code == "200") {
       refresh();
       showSuccessToast((res && res.message) || "删除成功！");
     } else {
       showFailToast((res && res.message) || "删除失败，请联系管理员！");
     }
-  })
+  });
 };
 
 function init() {
@@ -176,6 +261,6 @@ init();
 .rightRedDiv {
   margin-top: 10px;
   text-align: right;
-  color:red
+  color: red;
 }
 </style>

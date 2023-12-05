@@ -33,7 +33,7 @@ let curSelectValue = ref<string[]>([]);
 const confirm = ({ selectedValues }) => {
     showFlag.value = false;
     let dateName = selectedValues[0] + '-' + selectedValues[1] + '-' + selectedValues[2];
-    emit('selectInfo', dayjs(dateName), dateName);
+    emit('selectInfo', dayjs(dateName), dateName, props.info.label);
 };
 
 const cancel = () => {

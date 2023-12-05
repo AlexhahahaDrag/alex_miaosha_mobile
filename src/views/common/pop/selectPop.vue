@@ -29,6 +29,7 @@ const props = defineProps<Props>();
 let showFlag = ref<boolean>(false);
 
 const confirm = ({ selectedOptions }) => {
+    console.log(`==========selectedOptions============`, selectedOptions[0])
     showFlag.value = false;
     emit('selectInfo', props.info.label, selectedOptions ? selectedOptions[0][customFieldName.value] : '',
         selectedOptions ? selectedOptions[0][customFieldName.text] : '');
@@ -55,7 +56,7 @@ watch(
     () => {
         if (props.info.showFlag) {
             cur.value = props.info;
-            console.log(`cur.value`, cur.value, props.info);
+            console.log(`cur.value`, cur.value, props.info.value);
             showFlag.value = props.info.showFlag;
             customFieldName = props.info.customFieldName;
         }

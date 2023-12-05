@@ -1,69 +1,115 @@
 <template>
-  <navBar :info='info' @clickRight='addAccountRecordInfo'></navBar>
-  <van-pull-refresh pulling-text="加载中。。。" :style="{ height: 'calc(100% - 44px)' }" v-model='isRefresh' @refresh='refresh'
-    ref='pullRefresh' immediate-check='false'>
-    <form action='/'>
-    <!--   <van-search v-model='searchInfo.typeCode' show-action placeholder='请输入搜索关键词' @search='onSearch'
+  <navBar :info="info" @clickRight="addAccountRecordInfo"></navBar>
+  <van-pull-refresh
+    pulling-text="加载中。。。"
+    :style="{ height: 'calc(100% - 44px)' }"
+    v-model="isRefresh"
+    @refresh="refresh"
+    ref="pullRefresh"
+    immediate-check="false"
+  >
+    <form action="/">
+      <!--   <van-search v-model='searchInfo.typeCode' show-action placeholder='请输入搜索关键词' @search='onSearch'
         @cancel='onCancel' /> -->
     </form>
-    <van-empty v-if='dataSource.length == 0' description='暂无数据' />
-    <van-list v-else v-model:loading='loading' :finished='finished' finished-text='没有更多了' @load='onRefresh'>
+    <van-divider
+      :style="{
+        color: '#1989fa',
+        borderColor: 'grey',
+      }"
+    ></van-divider>
+    <van-empty v-if="dataSource.length == 0" description="暂无数据" />
+    <van-list
+      v-else
+      v-model:loading="loading"
+      :finished="finished"
+      finished-text="没有更多了"
+      @load="onRefresh"
+    >
       <van-cell-group>
-        <van-swipe-cell v-for='(item, index) in dataSource' :before-close='beforeClose' :key="index">
-          <van-cell :title="userMap[item.belongTo] + '的' + item.name" :key='index' is-link
-            :to='{ path: "/finance/accountRecordInfo/detail", query: { id: item.id } }'>
+        <van-swipe-cell
+          v-for="(item, index) in dataSource"
+          :before-close="beforeClose"
+          :key="index"
+        >
+          <van-cell
+            :title="item.accountName + '的' + item.name"
+            :key="index"
+            is-link
+            :to="{
+              path: '/finance/accountRecordInfo/detail',
+              query: { id: item.id },
+            }"
+          >
             <template #label>
-              <div style='margin-top: 10px; display: flex'>
-                <div class='icon' style='background-color: #ffcc00'>
+              <div style="margin-top: 0px; display: flex">
+                <div class="icon" style="background-color: #ffcc00">
                   {{ item.fromSource }}
                 </div>
               </div>
             </template>
             <template #right-icon>
-              <div class='text-right'>
-                <div style='display: flex'>
-                  <div class='van-ellipsis' style='width: 130px;text-align:right'>
-                    {{ item?.infoDate ? String(item.infoDate).substring(0, 10) : '--' }}
+              <div class="text-right">
+                <div style="display: flex">
+                  <div
+                    class="van-ellipsis"
+                    style="width: 130px; text-align: right"
+                  >
+                    {{
+                      item?.avliDate
+                        ? String(item.avliDate).substring(0, 10)
+                        : "--"
+                    }}
                   </div>
                 </div>
-                <div :class="item.incomeAndExpenses === 'income' ? 'rightDiv' : 'rightRedDiv'">
-                  {{ item.amount ? (item.incomeAndExpenses === 'income' ? item.amount : -item.amount) : '--' }}
+                <div class="rightRedDiv">
+                  {{ item.amount + "元" || "--" }}
                 </div>
               </div>
             </template>
           </van-cell>
           <template #right>
-            <van-button class='right_info' @click='delAccountRecordInfo(item.id)' square type='danger' text='删除' />
+            <van-button
+              class="right_info"
+              @click="delAccountRecordInfo(item.id)"
+              square
+              type="danger"
+              text="删除"
+            />
           </template>
+          <van-divider
+            :style="{
+              color: '#1989fa',
+              borderColor: 'grey',
+              padding: '0 16px',
+              'margin-top': '0px',
+              'margin-bottom': '0px',
+            }"
+          ></van-divider>
         </van-swipe-cell>
       </van-cell-group>
     </van-list>
   </van-pull-refresh>
   <van-back-top />
 </template>
-<script lang='ts' setup>
-import { ref } from 'vue';
+<script lang="ts" setup>
+import { ref } from "vue";
 import {
-    getAccountRecordInfoPage,
-    deleteAccountRecordInfo,
-} from '@/api/finance/accountRecordInfo/accountRecordInfoTs';
-import { getUserManagerList, } from '@/api/user/userManager';
-import navBar from '@/views/common/navBar/index.vue';
-
-import {
-  SearchInfo,
-  pagination,
-  pageInfo,
-} from './accountRecordInfoTs';
-import { showSuccessToast, showFailToast } from 'vant';
-import { useRouter, useRoute } from 'vue-router';
+  getAccountRecordInfoPage,
+  deleteAccountRecordInfo,
+} from "@/api/finance/accountRecordInfo/accountRecordInfoTs";
+import { getUserManagerList } from "@/api/user/userManager";
+import navBar from "@/views/common/navBar/index.vue";
+import { SearchInfo, pagination, pageInfo } from "./accountRecordInfoTs";
+import { showSuccessToast, showFailToast } from "vant";
+import { useRouter, useRoute } from "vue-router";
 
 let router = useRouter();
 let route = useRoute();
 const info = ref<any>({
-  title: route?.name || '财务管理11',
-  rightButton: '新增',
-})
+  title: route?.meta?.title || "财务管理11",
+  rightButton: "新增",
+});
 let loading = ref<boolean>(false);
 let dataSource = ref<any[]>([]);
 let searchInfo = ref<SearchInfo>({});
@@ -82,19 +128,28 @@ let isRefresh = ref<boolean>(false); //是否下拉刷新
 
 function query(param: SearchInfo, cur: pageInfo) {
   loading.value = true;
-  getAccountRecordInfoPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
+  getAccountRecordInfoPage(
+    param,
+    cur?.current ? cur.current : 1,
+    cur?.pageSize || 10
+  )
     .then((res: any) => {
-      if (res.code == '200') {
+      if (res.code == "200") {
         dataSource.value = [...dataSource.value, ...res.data.records];
         pagination.value.current = res.data.current + 1;
         pagination.value.pageSize = res.data.size;
         pagination.value.total = res.data.total;
-        console.log(`pageInfo`, pagination.value);
-        if (pagination.value.total || 0 < (pagination.value.current || 1) * (pagination.value.pageSize || 10)) {
+        if (
+          !pagination.value?.total ||
+          (pagination.value.total &&
+            pagination.value.total <
+              (pagination.value.current || 1) *
+                (pagination.value.pageSize || 10))
+        ) {
           finished.value = true;
         }
       } else {
-        showFailToast((res && res.message) || '查询列表失败！');
+        showFailToast((res && res.message) || "查询列表失败！");
       }
     })
     .finally(() => {
@@ -103,29 +158,29 @@ function query(param: SearchInfo, cur: pageInfo) {
 }
 
 const addAccountRecordInfo = () => {
-  router.push({ path: '/finance/accountRecordInfo/detail' });
-}
+  router.push({ path: "/finance/accountRecordInfo/detail" });
+};
 
 let userMap = {};
 function getUserInfoList() {
   getUserManagerList({}).then((res) => {
-    if (res.code == '200') {
+    if (res.code == "200") {
       if (res?.data) {
-        res.data.forEach((user: { id: string | number; nickName: any; }) => {
+        res.data.forEach((user: { id: string | number; nickName: any }) => {
           userMap[user.id] = user.nickName;
         });
       }
     } else {
-      showFailToast((res && res.message) || '查询列表失败！');
+      showFailToast((res && res.message) || "查询列表失败！");
     }
   });
 }
 
 const refresh = () => {
   pagination.value.current = 0;
-  dataSource.value = []
+  dataSource.value = [];
   query(searchInfo.value, pagination.value);
-}
+};
 
 const onRefresh = () => {
   query(searchInfo.value, pagination.value);
@@ -136,20 +191,19 @@ const beforeClose = (e: any) => {
 };
 
 const delAccountRecordInfo = (id: number) => {
-  deleteAccountRecordInfo(id + '').then((res: any) => {
-    if (res?.code == '200') {
+  deleteAccountRecordInfo(id + "").then((res: any) => {
+    if (res?.code == "200") {
       refresh();
-      showSuccessToast((res && res.message) || '删除成功！');
+      showSuccessToast((res && res.message) || "删除成功！");
     } else {
-      showFailToast((res && res.message) || '删除失败，请联系管理员！');
+      showFailToast((res && res.message) || "删除失败，请联系管理员！");
     }
-  })
+  });
 };
 
 function init() {
   dataSource.value = [];
   pagination.value.current = 0;
-  //获取财务管理页面数据
   query(searchInfo.value, pagination.value);
   //获取用户信息
   getUserInfoList();
@@ -158,19 +212,19 @@ function init() {
 init();
 </script>
 
-<style lang='scss'>
+<style lang="scss">
 .right_info {
   height: 100%;
 }
 
 .rightDiv {
   margin-top: 10px;
-  text-align: right; 
+  text-align: right;
 }
 
 .rightRedDiv {
   margin-top: 10px;
-  text-align: right; 
-  color:red
+  text-align: right;
+  color: red;
 }
 </style>

@@ -40,7 +40,7 @@ export const routes: MenuDataItem[] = [
     children: [
       {
         path: "/message/messageManager",
-        name: "消息管理",
+        name: "messageManager",
         component: Message,
         meta: { title: "消息管理", icon: "message", hiedInMenu: false },
       },
@@ -55,13 +55,13 @@ export const routes: MenuDataItem[] = [
     children: [
       {
         path: "/about",
-        name: "我的",
+        name: "about",
         component: User,
         meta: { title: "我的", icon: "about", hiedInMenu: false },
       },
       {
         path: "/user/userManager",
-        name: "个人信息",
+        name: "userManager",
         component: UserManager,
         meta: { title: "个人信息", icon: "userManager", hiedInMenu: false },
       },
@@ -88,19 +88,19 @@ export const routes: MenuDataItem[] = [
       },
       {
         path: "/finance/financeAnalysis",
-        name: "财务分析",
+        name: "financeAnalysis",
         component: FinanceAnalysis,
         meta: { title: "财务分析", icon: "financeAnalysis", hiedInMenu: false },
       },
       {
         path: "/finance/accountRecordInfo",
-        name: "账号管理",
+        name: "accountRecordInfo",
         component: AccountRecordInfo,
         meta: { title: "账号管理", icon: "accountRecordInfo", hiedInMenu: false },
       },
       {
         path: "/finance/accountRecordInfo/detail",
-        name: "账号管理详情",
+        name: "accountRecordInfoDetail",
         component: accountRecordInfoDetailVue,
         meta: { title: "账号管理详情", icon: "accountRecordInfo", hiedInMenu: true },
       },
