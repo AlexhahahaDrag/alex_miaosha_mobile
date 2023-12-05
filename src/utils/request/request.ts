@@ -3,6 +3,7 @@ import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "ax
 import { ResponseBody } from "@/api/typing";
 // import { message } from "ant-design-vue";
 import  router from "@/router";
+import { decrypt } from '@/utils/crypto/index';
 
 const request = axios.create({
   // baseURL: process.env.VUE_APP_API_BASE_URL,
@@ -37,6 +38,13 @@ const requestHandler = (
   } else {
     router.push('/Login');
   }
+  if (config?.data) {
+    for (const k in config.data) {
+      if (config.data[k] && config.data[k].$L == 'zh-cn') {
+        config.data[k] = config.data[k].add(8, 'hours');
+      }
+    }
+  }
   return config;
 };
 
@@ -62,12 +70,16 @@ request.interceptors.request.use(requestHandler, errorHandler);
 const responseHandler = (
   response: AxiosResponse<any>
 ): ResponseBody<any> | AxiosResponse<any> | Promise<any> | any => {
-  const { data } = response;
-  if (data.code == 403) {
+  const { data, request } = response;
+  if (request?.responseURL?.indexOf('/user/login') >= 0) {
+    return data;
+  }
+  let resData = decrypt(data);
+  if (resData.code == 403) {
     router.push('/Login');
     return;
   }
-  return data;
+  return resData;
 };
 
 // 添加响应拦截器
