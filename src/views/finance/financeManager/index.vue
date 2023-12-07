@@ -15,6 +15,7 @@
         placeholder="请输入搜索关键词"
         @search="onSearch"
         @cancel="onCancel"
+        action-text="清空"
       />
     </form>
     <van-divider :style="{ color: '#1989fa', borderColor: 'grey' }">
