@@ -34,7 +34,14 @@
           :key="index"
         >
           <van-cell
-            :title="userMap[item.belongTo] + '的' + item.name"
+            :title="
+              userMap[item.belongTo] +
+              '的' +
+              item.name +
+              '(' +
+              item.typeCode +
+              ')'
+            "
             :key="index"
             is-link
             :to="{
@@ -182,6 +189,7 @@ function getFinancePage(param: SearchInfo, cur: pageInfo) {
       }
     })
     .finally(() => {
+      isRefresh.value = false;
       loading.value = false;
     });
 }

@@ -21,8 +21,8 @@ export const useUserStore = defineStore({
       // return this.userInfo || getAuthCache<UserInfo>(USER_INFO_KEY) || {};
     },
     getToken(): string {
-      let sessionStorage = window.sessionStorage;
-      return this.token || sessionStorage.getItem("token") || "";
+      let localStorage = window.localStorage;
+      return this.token || localStorage.getItem("token") || "";
     },
     getSessionTimeout(): boolean {
       return !!this.sessionTimeout;

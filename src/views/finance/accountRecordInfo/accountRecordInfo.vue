@@ -153,6 +153,7 @@ function query(param: SearchInfo, cur: pageInfo) {
       }
     })
     .finally(() => {
+      isRefresh.value = false;
       loading.value = false;
     });
 }
