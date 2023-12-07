@@ -8,8 +8,8 @@
                 :placeholder="'请输入' + label.orgName" :rules="rulesRef.orgName" />
             <van-field v-model="formInfo.orgShortName" name="orgShortName" :label="label.orgShortName + '：'"
                 :placeholder="'请输入' + label.orgShortName" :rules="rulesRef.orgShortName" />
-            <van-field v-model="formInfo.pId" name="pId" :label="label.pId + '：'"
-                :placeholder="'请输入' + label.pId" :rules="rulesRef.pId" />
+            <van-field v-model="formInfo.parentId" name="parentId" :label="label.parentId + '：'"
+                :placeholder="'请输入' + label.parentId" :rules="rulesRef.parentId" />
             <van-field v-model="formInfo.summary" name="summary" :label="label.summary + '：'"
                 :placeholder="'请输入' + label.summary" :rules="rulesRef.summary" />
             <van-field v-model="statusName" name="status" :label="label.status + '：'"
@@ -46,7 +46,7 @@ const label = reactive({
     orgCode: '机构编码',
     orgName: '机构名称',
     orgShortName: '机构简称',
-    pId: '父级机构id',
+    parentId: '父级机构id',
     summary: '简介最多150字',
     status: '状态',
 });
@@ -55,37 +55,37 @@ const rulesRef = reactive({
     orgCode: [
         {
             required: true,
-            message: '机构编码不能为空！',
+            message: label.orgCode + '不能为空！',
         },
     ],
     orgName: [
         {
             required: true,
-            message: '机构名称不能为空！',
+            message: label.orgName + '不能为空！',
         },
     ],
     orgShortName: [
         {
             required: true,
-            message: '机构简称不能为空！',
+            message: label.orgShortName + '不能为空！',
         },
     ],
-    pId: [
+    parentId: [
         {
             required: true,
-            message: '父级机构id不能为空！',
+            message: label.parentId + '不能为空！',
         },
     ],
     summary: [
         {
             required: true,
-            message: '简介最多150字不能为空！',
+            message: label.summary + '不能为空！',
         },
     ],
     status: [
         {
             required: true,
-            message: '状态不能为空！',
+            message: label.status + '不能为空！',
         },
     ],
 });
@@ -95,66 +95,66 @@ let popInfo = ref<Info>({ showFlag: false });
 let statusName = ref<string>("");
 
 let statusInfo = ref<Info>({
-  label: "status",
-  labelName: "状态",
-  rule: rulesRef.status,
-  customFieldName: {
-    text: "typeName",
-    value: "typeCode",
-  },
-  selectValue: formInfo.value.status,
+    label: "status",
+    labelName: label.status,
+    rule: rulesRef.status,
+    customFieldName: {
+        text: "typeName",
+        value: "typeCode",
+    },
+    selectValue: formInfo.value.status,
 });
 
 const choose = (type: string) => {
-   switch (type) {
-       case 'status':
-           popInfo.value = statusInfo.value;
-           break;
-   }
-   popInfo.value.showFlag = true;
+    switch (type) {
+        case 'status':
+            popInfo.value = statusInfo.value;
+            break;
+    }
+    popInfo.value.showFlag = true;
 };
 
 const selectInfo = (type: string, value: any, name: string) => {
-   popInfo.value.showFlag = false;
-   switch (type) {
-       case 'status':
-          formInfo.value.status = value;
-          statusName.value = name;
-          break;
-   }
+    popInfo.value.showFlag = false;
+    switch (type) {
+        case 'status':
+           formInfo.value.status = value;
+           statusName.value = name;
+           break;
+    }
 };
 
 const cancelInfo = () => {
-   popInfo.value.showFlag = false;
+    popInfo.value.showFlag = false;
 };
 
 const getListName = (list: any[], value: any, code: string, name: string) => {
-  if (!list?.length) {
+   if (!list?.length) {
     return "";
-  }
-  let listName = "";
-  list.forEach((item) => {
-    if (item[code] == value) {
-      listName = item[name];
-    }
-  });
-  return listName;
+   }
+   let listName = "";
+   list.forEach((item) => {
+     if (item[code] == value) {
+       listName = item[name];
+     }
+   });
+   return listName;
 };
 
 function getDictInfoList(res: any) {
-  if (res.code == "200") {
-    statusInfo.value.list = res.data.filter(
-      (item: { belongTo: string }) => item.belongTo == "account_type"
-    );
-    statusName.value = getListName(
-      statusInfo.value.list || [],
-      formInfo.value.status,
-      "typeCode",
-      "typeName"
-    );
-  } else {
-    showFailToast(res?.message || "查询失败，请联系管理员!");
-  }
+   if (res.code == "200") {
+     statusInfo.value.list = res.data.filter(
+       (item: { belongTo: string }) => item.belongTo == "is_valid"
+     );
+     statusName.value = getListName(
+         statusInfo.value.list || [],
+         formInfo.value.status,
+         "typeCode",
+         "typeName"
+     );
+   } else {
+     showFailToast(res?.message || "查询失败，请联系管理员!");
+   }
 }
 
 
@@ -191,7 +191,7 @@ function init() {
         });
     } else {
         getDictList("is_valid").then((res: any) => {
-          getDictInfoList(res);
+            getDictInfoList(res);
         });
         formInfo.value = {
         };
