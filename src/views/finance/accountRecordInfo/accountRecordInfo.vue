@@ -107,7 +107,7 @@ import { useRouter, useRoute } from "vue-router";
 let router = useRouter();
 let route = useRoute();
 const info = ref<any>({
-  title: route?.meta?.title || "财务管理11",
+  title: route?.meta?.title || "账号管理",
   rightButton: "新增",
 });
 let loading = ref<boolean>(false);

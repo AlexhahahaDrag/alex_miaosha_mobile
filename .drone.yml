@@ -1,6 +1,6 @@
 kind: pipeline
 type: docker
-name: alex_miaosha_front
+name: alex_miaosha_mobile
 
 steps: # 定义流水线执行步骤，这些步骤将顺序执行
   - name: yarn-package # 流水线名称
