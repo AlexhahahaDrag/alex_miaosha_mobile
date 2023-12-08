@@ -1,4 +1,5 @@
 <template>
+  <div v-touch:left="onSwipeLeft" v-touch:right="onSwipeRight">
   <navBar :info="info" @clickRight="addFinance"></navBar>
   <van-pull-refresh
     pulling-text="加载中。。。"
@@ -121,6 +122,7 @@
     </van-list>
   </van-pull-refresh>
   <van-back-top />
+  </div>
 </template>
 <script lang="ts" setup>
 import { ref } from "vue";
@@ -159,7 +161,19 @@ const onSearch = () => {
 };
 const onCancel = () => {
   searchInfo.value.typeCode = "";
+  pagination.value.current = 0;
+  dataSource.value = [];
+  getFinancePage(searchInfo.value, pagination.value);
 };
+
+const onSwipeLeft = () => {
+  showFailToast( "onSwipeLefts");
+};
+
+const onSwipeRight = () => {
+  showFailToast( "onSwipeLefts");
+};
+
 
 function getFinancePage(param: SearchInfo, cur: pageInfo) {
   loading.value = true;
