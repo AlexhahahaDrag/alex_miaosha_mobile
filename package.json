@@ -27,6 +27,7 @@
     "vant": "^4.6.6",
     "vite-plugin-svg-icons": "^2.0.1",
     "vue": "^3.3.4",
+    "vue-directive-touch": "^1.0.28",
     "vue-router": "^4.2.2"
   },
   "devDependencies": {
