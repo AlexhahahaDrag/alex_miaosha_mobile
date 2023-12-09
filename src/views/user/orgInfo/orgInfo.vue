@@ -3,8 +3,15 @@
   <van-pull-refresh pulling-text="加载中。。。" :style="{ height: 'calc(100% - 44px)' }" v-model='isRefresh' @refresh='refresh'
     ref='pullRefresh' immediate-check='false'>
     <form action='/'>
-    <!--   <van-search v-model='searchInfo.typeCode' show-action placeholder='请输入搜索关键词' @search='onSearch'
-        @cancel='onCancel' /> -->
+    <!--
+    <van-search
+        v-model='searchInfo.typeCode'
+        show-action
+        placeholder='请输入搜索关键词'
+        @search='onSearch'
+        @cancel='onCancel'
+        action-text="清空"/>
+    -->
     </form>
     <van-divider
       :style="{
@@ -21,7 +28,7 @@
             <template #label>
               <div style='margin-top: 10px; display: flex'>
                 <div class='icon' style='background-color: #ffcc00'>
-                  {{item.orgCode + '' + item.orgName + '' + item.orgShortName + '' + item.pId + '' + item.summary + '' + item.status + '' + }}
+                  {{item.orgCode + '' + item.orgName + '' + item.orgShortName + '' + item.parentId + '' + item.summary + '' + item.status + '' + }}
                 </div>
               </div>
             </template>
@@ -64,7 +71,6 @@ import {
 } from '@/api/user/orgInfo/orgInfoTs';
 import { getUserManagerList, } from '@/api/user/userManager';
 import navBar from '@/views/common/navBar/index.vue';
-
 import {
   SearchInfo,
   pagination,
@@ -118,6 +124,7 @@ function query(param: SearchInfo, cur: pageInfo) {
       }
     })
     .finally(() => {
+      isRefresh.value = false;
       loading.value = false;
     });
 }

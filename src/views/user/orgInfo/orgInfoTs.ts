@@ -3,7 +3,7 @@ export interface SearchInfo {
   orgCode?: string;
   orgName?: string;
   orgShortName?: string;
-  pId?: number;
+  parentId?: number;
   summary?: string;
   status?: string;
 }
@@ -64,8 +64,8 @@ export const columns = [
   },
   {
     title: '父级机构id',
-    dataIndex: 'pId',
-    key: 'pId',
+    dataIndex: 'parentId',
+    key: 'parentId',
   },
   {
     title: '简介最多150字',
@@ -73,7 +73,7 @@ export const columns = [
     key: 'summary',
   },
   {
-    title: '状态,字典(is_valid) 1：有效,0:失效)',
+    title: '状态',
     dataIndex: 'status',
     key: 'status',
   },
@@ -90,7 +90,7 @@ export interface DataItem {
   orgCode: string;
   orgName: string;
   orgShortName: string;
-  pId: number;
+  parentId: number;
   summary: string;
   status: string;
 }
