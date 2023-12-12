@@ -14,13 +14,13 @@ steps: # 定义流水线执行步骤，这些步骤将顺序执行
       - yarn build
       - mkdir -p /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/
       # 将打包后的dist包，拷贝到挂载目录
-      - cp -r /drone/src/  /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/
-      - cp -r /drone/  /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/
+      - cp -r /drone/src/  /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/mobile/
+      - cp -r /drone/  /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/mobile/
       - cp -f /drone/src/Dockerfile  /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/
       - cp -f /drone/src/docker/nginx.conf  /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/
       - cp -rf /drone/src/dist  /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/mobile/
     retries: 5
-    on_failure: steps.yarn-mobile-package
+    on_failure: retry
 
   - name: ssh-mobile-front
     pull: if-not-exists
@@ -68,6 +68,12 @@ volumes: # 定义流水线挂载目录，用于共享数据
   - name: yarn-mobile-package
     host:
       path: /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/mobile   #jar包目录可以修改从宿主机中挂载的目录
+
+  - name: retry
+    image: drone/retry
+    settings:
+      attempts: 3
+      intervals: 10
 
 # 可限制哪些分支可以推送自动CICD
 trigger:
