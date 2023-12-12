@@ -6,7 +6,7 @@ import {
   baseService,
 } from '@/api/common/index';
 
-const baseAccountRecordInfo = '/api/v1//account-record-info';
+const baseAccountRecordInfo = '/api/v1/account-record-info';
 
 const AccountRecordInfoUrl = {
   page: '/page',
