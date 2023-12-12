@@ -8,9 +8,9 @@ import Login from '@/views/login/index.vue'
 import UserManager from '@/views/user/userManager/index.vue';
 import FinanceManager from '@/views/finance/financeManager/index.vue';
 import FinanceAnalysis from '@/views/finance/financeAnalysis/index.vue';
-import AccountRecordInfo from '@/views/finance/accountRecordInfo/AccountRecordInfo.vue';
+import AccountRecordInfo from '@/views/finance/accountRecordInfo/accountRecordInfo.vue';
 import FinanceManagerDetail from '@/views/finance/financeManager/detail/index.vue';
-// import accountRecordInfoDetailVue from '@/views/finance/accountRecordInfo/detail/accountRecordInfoDetail.vue';
+import accountRecordInfoDetailVue from '@/views/finance/accountRecordInfo/detail/accountRecordInfoDetail.vue';
 
 export const routes: MenuDataItem[] = [
   {
@@ -98,12 +98,12 @@ export const routes: MenuDataItem[] = [
         component: AccountRecordInfo,
         meta: { title: "账号管理", icon: "accountRecordInfo", hiedInMenu: false },
       },
-      // {
-      //   path: "/finance/accountRecordInfo/detail",
-      //   name: "accountRecordInfoDetail",
-      //   component: accountRecordInfoDetailVue,
-      //   meta: { title: "账号管理详情", icon: "accountRecordInfo", hiedInMenu: true },
-      // },
+      {
+        path: "/finance/accountRecordInfo/detail",
+        name: "accountRecordInfoDetail",
+        component: accountRecordInfoDetailVue,
+        meta: { title: "账号管理详情", icon: "accountRecordInfo", hiedInMenu: true },
+      },
     ],
   },
   {
