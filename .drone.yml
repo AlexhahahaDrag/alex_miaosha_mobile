@@ -19,6 +19,8 @@ steps: # 定义流水线执行步骤，这些步骤将顺序执行
       - cp -f /drone/src/Dockerfile  /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/
       - cp -f /drone/src/docker/nginx.conf  /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/
       - cp -rf /drone/src/dist  /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/mobile/
+    retries: 5
+    on_failure: always
 
   - name: ssh-mobile-front
     pull: if-not-exists
