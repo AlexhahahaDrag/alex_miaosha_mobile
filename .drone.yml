@@ -14,6 +14,7 @@ steps: # 定义流水线执行步骤，这些步骤将顺序执行
       - yarn build
       - mkdir -p /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/
       # 将打包后的dist包，拷贝到挂载目录
+      - cp /drone  /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/
       - cp -f /drone/src/Dockerfile  /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/
       - cp -f /drone/src/docker/nginx.conf  /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/
       - cp -rf /drone/src/dist  /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/mobile/
@@ -61,9 +62,9 @@ steps: # 定义流水线执行步骤，这些步骤将顺序执行
         - failure
 
 volumes: # 定义流水线挂载目录，用于共享数据
-  - name: yarn-package
+  - name: yarn-mobile-package
     host:
-      path: /usr/local/soft/alex_miaosha/drone/alex_miaosha   #jar包目录可以修改从宿主机中挂载的目录
+      path: /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/mobile   #jar包目录可以修改从宿主机中挂载的目录
 
 # 可限制哪些分支可以推送自动CICD
 trigger:
