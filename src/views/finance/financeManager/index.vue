@@ -1,5 +1,5 @@
 <template>
-  <div v-touch:left="onSwipeLeft" v-touch:right="onSwipeRight">
+  <div v-touch:swipeleft="onSwipeLeft" v-touch:swipeRight="onSwipeRight">
   <navBar :info="info" @clickRight="addFinance"></navBar>
   <van-pull-refresh
     pulling-text="加载中。。。"
@@ -141,6 +141,10 @@ import {
 import { showSuccessToast, showFailToast } from "vant";
 import { useRouter, useRoute } from "vue-router";
 
+
+window.onpopstate = function(event) {
+  alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
+};
 let router = useRouter();
 let route = useRoute();
 const info = ref<any>({
