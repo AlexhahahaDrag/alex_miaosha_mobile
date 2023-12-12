@@ -20,7 +20,7 @@ steps: # 定义流水线执行步骤，这些步骤将顺序执行
       - cp -f /drone/src/docker/nginx.conf  /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/
       - cp -rf /drone/src/dist  /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/mobile/
     retries: 5
-    on_failure: always
+    on_failure: steps.yarn-mobile-package
 
   - name: ssh-mobile-front
     pull: if-not-exists
@@ -63,12 +63,6 @@ steps: # 定义流水线执行步骤，这些步骤将顺序执行
         - success
         - changed
         - failure
-
-  - name: retry
-    image: drone/retry
-    settings:
-      attempts: 3
-      intervals: 10
 
 volumes: # 定义流水线挂载目录，用于共享数据
   - name: yarn-mobile-package
