@@ -15,7 +15,7 @@ COPY ./nginx.conf /etc/nginx/
 #COPY ./cert/server.key /cert/server.key
 
 # 拷贝前端vue项目打包后生成的文件到nginx下运行
-COPY ./dist /usr/share/nginx/pc
+COPY ./pc/dist /usr/share/nginx/pc
 COPY ./mobile/dist /usr/share/nginx/mobile
 # 暴露3000端口
 EXPOSE 3000
