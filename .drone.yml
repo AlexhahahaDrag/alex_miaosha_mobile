@@ -14,9 +14,9 @@ steps: # 定义流水线执行步骤，这些步骤将顺序执行
       - yarn build
       - mkdir -p /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/
       # 将打包后的dist包，拷贝到挂载目录
-      - \cp /drone/src/Dockerfile  /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/
-      - \cp /drone/src/docker/nginx.conf  /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/
-      - \cp -r /drone/src/dist  /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/mobile/
+      - cp -f /drone/src/Dockerfile  /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/
+      - cp -f /drone/src/docker/nginx.conf  /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/
+      - cp -rf /drone/src/dist  /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/mobile/
 
   - name: ssh-mobile-front
     pull: if-not-exists
