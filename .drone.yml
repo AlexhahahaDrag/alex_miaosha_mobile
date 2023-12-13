@@ -15,6 +15,7 @@ steps: # 定义流水线执行步骤，这些步骤将顺序执行
       - mkdir -p /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/
       # 将打包后的dist包，拷贝到挂载目录
       - cp -r /drone/src/  /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/mobile/
+      - cp -rf /drone/src/Dockerfile  /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/mobile/
       - cp -rf /drone/src/Dockerfile  /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/
       - cp -rf /drone/src/docker/nginx.conf  /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/
       - cp -rf /drone/src/dist  /usr/local/soft/alex_miaosha/drone/alex_miaosha/front/mobile/
