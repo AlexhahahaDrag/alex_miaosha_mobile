@@ -24,10 +24,10 @@ export default defineConfig({
     }),
     createSvgIconsPlugin({
       iconDirs: [
-        pathResolve('/src/icons/menu'), 
-        pathResolve('/src/icons/finance'), 
-        pathResolve('/src/icons/soft'),
-        pathResolve('src/icons')
+        pathResolve('src/assets/icons/menu'),
+        pathResolve('src/assets/icons/finance'),
+        pathResolve('src/assets/icons/soft'),
+        pathResolve('src/assets/icons')
       ],
       symbolId: 'icon-[dir]-[name]',
       inject: 'body-last',//body-last|body-first默认body-last

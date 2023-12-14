@@ -58,11 +58,13 @@
                   v-for="(fromSource, index) in fromSourceTransferList"
                   :key="index"
                 >
-                  <img
-                    class="svgClass"
-                    v-if="item.fromSource.indexOf(fromSource.value) >= 0"
-                    :src="fromSource.src"
-                  />
+                  <svgIcon v-if="item.fromSource.indexOf(fromSource.value) >= 0 && fromSource.value != ''"
+                           :name="fromSource.label" class="svg" style="
+                    width: 1.5em;
+                    height: 1.5em;
+                    font-size: 18px;
+                    cursor: pointer;
+                    verticle-align: middle;"></svgIcon>
                 </div>
               </div>
             </template>
@@ -140,7 +142,7 @@ import {
 } from "./financeManager";
 import { showSuccessToast, showFailToast } from "vant";
 import { useRouter, useRoute } from "vue-router";
-
+import svgIcon from "@/views/common/icons/svgIcon.vue";
 
 window.onpopstate = function(event) {
   alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
