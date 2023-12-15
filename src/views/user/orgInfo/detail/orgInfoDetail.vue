@@ -16,7 +16,7 @@
                 :placeholder="'请输入' + label.status" :rules="rulesRef.status" @click="choose('status')" readonly />
             <selectPop :info="popInfo" @selectInfo="selectInfo" @cancelInfo="cancelInfo"></selectPop>
         </van-cell-group>
-        <div style="margin: 16px;">
+        <div class="subButton">
             <van-button round block type="primary" native-type="submit">
                 提交
             </van-button>
@@ -201,4 +201,7 @@ function init() {
 init();
 </script>
 <style lang='scss' scoped>
+.subButton {
+   margin: 16px;
+}
 </style>

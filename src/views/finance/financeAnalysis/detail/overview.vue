@@ -8,7 +8,6 @@
         <van-grid-item v-for="item in balanceList" :key="item.typeCode"
             :default="item.typeName + ':' + (item.amount ? item.amount : 0)" :center="false">
             {{ item.typeName }}:{{ item.amount }}
-            <!-- <van-card :price="item.amount" :title="item.typeName" /> -->
         </van-grid-item>
     </van-grid>
 </template>

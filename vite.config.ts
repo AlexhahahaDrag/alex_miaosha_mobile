@@ -27,6 +27,7 @@ export default defineConfig({
         pathResolve('src/assets/icons/menu'),
         pathResolve('src/assets/icons/finance'),
         pathResolve('src/assets/icons/soft'),
+        pathResolve('src/assets/icons/home'),
         pathResolve('src/assets/icons')
       ],
       symbolId: 'icon-[dir]-[name]',

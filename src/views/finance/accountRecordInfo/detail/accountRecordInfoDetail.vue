@@ -45,7 +45,7 @@
         @cancelInfo="cancelDateInfo"
       ></datePop>
     </van-cell-group>
-    <div style="margin: 16px">
+    <div class="subButton">
       <van-button round block type="primary" native-type="submit">
         提交
       </van-button>
@@ -288,4 +288,8 @@ function init() {
 
 init();
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.subButton{
+  margin: 16px;
+}
+</style>

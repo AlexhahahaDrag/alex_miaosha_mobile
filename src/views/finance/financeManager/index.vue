@@ -144,9 +144,10 @@ import { showSuccessToast, showFailToast } from "vant";
 import { useRouter, useRoute } from "vue-router";
 import svgIcon from "@/views/common/icons/svgIcon.vue";
 
-window.onpopstate = function(event) {
-  alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
-};
+// window.onpopstate = function(event) {
+//   alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
+// };
+
 let router = useRouter();
 let route = useRoute();
 const info = ref<any>({

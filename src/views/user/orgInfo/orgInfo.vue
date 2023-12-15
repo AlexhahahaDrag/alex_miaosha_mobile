@@ -26,7 +26,7 @@
           <van-cell :title="item.id" :key='index' is-link
             :to='{ path: "/user/orgInfo/detail", query: { id: item.id } }'>
             <template #label>
-              <div style='margin-top: 10px; display: flex'>
+              <div class="iconClass">
                 <div class='icon' style='background-color: #ffcc00'>
                   {{item.orgCode + '' + item.orgName + '' + item.orgShortName + '' + item.parentId + '' + item.summary + '' + item.status + '' + }}
                 </div>
@@ -35,7 +35,7 @@
             <template #right-icon>
               <div class='text-right'>
                 <div style='display: flex'>
-                  <div class='van-ellipsis' style='width: 130px;text-align:right'>
+                  <div class='van-ellipsis'>
 
                   </div>
                 </div>
@@ -48,15 +48,7 @@
           <template #right>
             <van-button class='right_info' @click='delOrgInfo(item.id)' square type='danger' text='删除' />
           </template>
-          <van-divider
-            :style="{
-              color: '#1989fa',
-              borderColor: 'grey',
-              padding: '0 16px',
-              'margin-top': '0px',
-              'margin-bottom': '0px',
-          }"
-          ></van-divider>
+          <van-divider class="dividerClass"></van-divider>
         </van-swipe-cell>
       </van-cell-group>
     </van-list>
@@ -99,6 +91,9 @@ let isRefresh = ref<boolean>(false); //是否下拉刷新
 // };
 // const onCancel = () => {
 //   searchInfo.value.typeCode = '';
+//   pagination.value.current = 0;
+//   dataSource.value = [];
+//   getFinancePage(searchInfo.value, pagination.value);
 // };
 
 function query(param: SearchInfo, cur: pageInfo) {
@@ -198,5 +193,22 @@ init();
   margin-top: 10px;
   text-align: right;
   color:red
+}
+
+.iconClass {
+   margin-top: 10px;
+   display: flex;
+}
+.van-ellipsis {
+    width: 130px;
+    text-align:right;
+}
+
+.dividerClass {
+    color: '#1989fa',
+    borderColor: 'grey',
+    padding: '0 16px',
+    margin-top: '0px',
+    margin-bottom: '0px',
 }
 </style>
