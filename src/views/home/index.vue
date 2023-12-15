@@ -13,6 +13,10 @@
             <svgIcon class="homeSvgClass" name="homeAccordManager"></svgIcon>
             <span class="homeFontClass">猫超管理</span>
         </van-grid-item>
+        <van-grid-item key="orgManagerInfo" text="机构管理" to="/user/orgInfo">
+            <svgIcon class="homeSvgClass" name="homeOrgManager"></svgIcon>
+            <span class="homeFontClass">机构管理</span>
+        </van-grid-item>
     </van-grid>
     <Tabbar :data="useTabBar"></Tabbar>
 </template>

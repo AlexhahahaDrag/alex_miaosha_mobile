@@ -1,6 +1,6 @@
 <template>
   <navBar :info="info"></navBar>
-  <van-form @submit="onSubmit" :rules="rulesRef">
+  <van-form @submit="onSubmit" :rules="rulesRef" required="auto">
     <van-cell-group>
       <van-field
         v-model="formInfo.name"

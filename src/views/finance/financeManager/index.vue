@@ -36,6 +36,7 @@
           :key="index"
         >
           <van-cell
+            :title-class="item.isValid == '1' ? 'validClass' : 'notValidClass'"
             :title="
               userMap[item.belongTo] +
               '的' +
@@ -52,29 +53,21 @@
             }"
           >
             <template #label>
-              <div style="margin-top: 10px; display: flex">
+              <div class="svgInfo">
                 <div
                   class="svgDiv"
                   v-for="(fromSource, index) in fromSourceTransferList"
                   :key="index"
                 >
                   <svgIcon v-if="item.fromSource.indexOf(fromSource.value) >= 0 && fromSource.value != ''"
-                           :name="fromSource.label" class="svg" style="
-                    width: 1.5em;
-                    height: 1.5em;
-                    font-size: 18px;
-                    cursor: pointer;
-                    verticle-align: middle;"></svgIcon>
+                           :name="fromSource.label" class="svg"></svgIcon>
                 </div>
               </div>
             </template>
             <template #right-icon>
               <div class="text-right">
                 <div style="display: flex">
-                  <div
-                    class="van-ellipsis"
-                    style="width: 130px; text-align: right"
-                  >
+                  <div class="van-ellipsis">
                     {{
                       item?.infoDate
                         ? String(item.infoDate).substring(0, 10)
@@ -85,7 +78,7 @@
                 <div
                   :class="
                     item.incomeAndExpenses === 'income'
-                      ? 'rightDiv'
+                      ? 'rightGreenDiv'
                       : 'rightRedDiv'
                   "
                 >
@@ -276,11 +269,27 @@ init();
 .right_info {
   height: 100%;
 }
-.svgDiv {
-  height: 30px;
-  .svgClass {
-    height: 100%;
+.svgInfo {
+  margin-top: 10px; 
+  display: flex;
+  .svgDiv {
+    height: 30px;
+    .svgClass {
+      height: 100%;
+    }
+    .svg {
+      width: 1.5em;
+      height: 1.5em;
+      font-size: 18px;
+      cursor: pointer;
+      vertical-align: middle;
+    }
   }
+}
+
+.van-ellipsis {
+  width: 130px; 
+  text-align: right;
 }
 
 .rightDiv {
@@ -288,9 +297,23 @@ init();
   text-align: right;
 }
 
+.rightGreenDiv {
+  margin-top: 10px;
+  text-align: right;
+  color: green;
+}
+
 .rightRedDiv {
   margin-top: 10px;
   text-align: right;
   color: red;
+}
+
+.validClass {
+  font-weight: bolder;
+}
+
+.notValidClass {
+  color: gray;
 }
 </style>

@@ -34,7 +34,8 @@ let curSelectValue = ref<string[]>([]);
 const confirm = ({ selectedValues }) => {
     showFlag.value = false;
     let dateName = selectedValues[0] + '年' + selectedValues[1] + '月';
-    emit('selectInfo', dayjs(dateName +'-01'), dateName);
+    let dateStr = selectedValues[0] + '-' + selectedValues[1] + '-' + '01';
+    emit('selectInfo', dayjs(dateStr), dateName);
 };
 
 const onClickOverlay = () => {

@@ -94,7 +94,7 @@ let chooseDateInfo = ref<any>({
 
 const selectDateInfo = (dateInfo: Dayjs, dateName: string) => {
     chooseDateInfo.value.showFlag = false;
-    props.dateStr = dateInfo.format(YYYYMM);
+    props.dateStr = dayjs(dateInfo).format(YYYYMM);
     infoDateName.value = dateName;
     chooseDateInfo.value.selectValue = dateInfo;
 };

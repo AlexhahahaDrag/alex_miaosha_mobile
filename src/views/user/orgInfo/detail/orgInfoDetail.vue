@@ -1,19 +1,24 @@
 <template>
     <navBar :info="info"></navBar>
-    <van-form @submit="onSubmit" :rules="rulesRef">
+    <van-form @submit="onSubmit" :rules="rulesRef" required="auto">
         <van-cell-group>
             <van-field v-model="formInfo.orgCode" name="orgCode" :label="label.orgCode + '：'"
-                :placeholder="'请输入' + label.orgCode" :rules="rulesRef.orgCode" />
+                :placeholder="'请输入' + label.orgCode" :rules="rulesRef.orgCode" :maxlength="255"/>
             <van-field v-model="formInfo.orgName" name="orgName" :label="label.orgName + '：'"
-                :placeholder="'请输入' + label.orgName" :rules="rulesRef.orgName" />
+                :placeholder="'请输入' + label.orgName" :rules="rulesRef.orgName" :maxlength="512"/>
             <van-field v-model="formInfo.orgShortName" name="orgShortName" :label="label.orgShortName + '：'"
-                :placeholder="'请输入' + label.orgShortName" :rules="rulesRef.orgShortName" />
-            <van-field v-model="formInfo.parentId" name="parentId" :label="label.parentId + '：'"
-                :placeholder="'请输入' + label.parentId" :rules="rulesRef.parentId" />
-            <van-field v-model="formInfo.summary" name="summary" :label="label.summary + '：'"
-                :placeholder="'请输入' + label.summary" :rules="rulesRef.summary" />
+                :placeholder="'请输入' + label.orgShortName" :rules="rulesRef.orgShortName" :maxlength="512"/>
+            <van-field v-model="formInfo.parentName" name="parentId" :label="label.parentId + '：'"
+                :placeholder="'请输入' + label.parentId" readonly/>
             <van-field v-model="statusName" name="status" :label="label.status + '：'"
                 :placeholder="'请输入' + label.status" :rules="rulesRef.status" @click="choose('status')" readonly />
+            <van-field v-model="formInfo.summary" name="summary" :label="label.summary + '：'"
+                :placeholder="'请输入' + label.summary" :rules="rulesRef.summary"  
+                rows="2"
+                type="textarea"
+                :maxlength="2000"
+                show-word-limit
+                autosize/>
             <selectPop :info="popInfo" @selectInfo="selectInfo" @cancelInfo="cancelInfo"></selectPop>
         </van-cell-group>
         <div class="subButton">
@@ -46,8 +51,8 @@ const label = reactive({
     orgCode: '机构编码',
     orgName: '机构名称',
     orgShortName: '机构简称',
-    parentId: '父级机构id',
-    summary: '简介最多150字',
+    parentId: '父级机构',
+    summary: '简介',
     status: '状态',
 });
 
@@ -68,12 +73,6 @@ const rulesRef = reactive({
         {
             required: true,
             message: label.orgShortName + '不能为空！',
-        },
-    ],
-    parentId: [
-        {
-            required: true,
-            message: label.parentId + '不能为空！',
         },
     ],
     summary: [
@@ -157,7 +156,6 @@ function getDictInfoList(res: any) {
    }
 }
 
-
 const onSubmit = () => {
     let method = 'post';
     if (formInfo.value.id) {
@@ -166,7 +164,7 @@ const onSubmit = () => {
     addOrEditOrgInfo(method, formInfo.value).then((res: any) => {
         if (res?.code == '200') {
             showSuccessToast(res?.message || '保存成功!');
-            router.push({ path: 'user/orgInfo/orgInfo' });
+            router.push({ path: '/user/orgInfo' });
         } else {
             showFailToast (res?.message || '保存失败，请联系管理员!');
         }
@@ -194,6 +192,7 @@ function init() {
             getDictInfoList(res);
         });
         formInfo.value = {
+            status: 1,
         };
     }
 }
