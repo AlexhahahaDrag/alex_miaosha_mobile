@@ -8,7 +8,6 @@
         <van-grid-item v-for="item in balanceList" :key="item.typeCode"
             :default="item.typeName + ':' + (item.amount ? item.amount : 0)" :center="false">
             {{ item.typeName }}:{{ item.amount }}
-            <!-- <van-card :price="item.amount" :title="item.typeName" /> -->
         </van-grid-item>
     </van-grid>
 </template>
@@ -60,6 +59,7 @@ const init = (dateStr: string, belongTo: number | null) => {
 watch(
     () => [props.activeTab, props.dateStr, props.belongTo],
     () => {
+        console.log('1111111111111')
         if (props.activeTab === '1') {
             init(props.dateStr, props.belongTo || null);
         }

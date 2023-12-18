@@ -1,16 +1,17 @@
 <template>
-    <van-row style="padding-top: 10px;">
+    <navBar :info="info"></navBar>
+    <van-row class="topRow">
         <van-col offset="10" span="5">
             <span name="belongTo" @click="choose()">
-                {{ belongToName }}
-                <van-icon name="arrow-down" />
+                <a>{{ belongToName }}</a>
             </span>
+        的
         </van-col>
-        <van-col span="7">
+        <van-col span="8">
             <span name="infoDate" @click="chooseDate()">
-                {{ infoDateName }}
-                <van-icon name="arrow-down" />
+                <a> {{ infoDateName }}</a>
             </span>
+            账单
         </van-col>
     </van-row>
     <van-tabs v-model:active="activeTab" sticky swipeable @change="changeTab">
@@ -40,6 +41,14 @@ import selectPop from '@/views/common/pop/selectPop.vue';
 import { useUserStore } from "@/store/modules/user/user";
 import { getUserManagerList } from "@/api/user/userManager";
 import { showFailToast } from 'vant';
+import navBar from '@/views/common/navBar/index.vue';
+import { useRoute } from "vue-router";
+
+let route = useRoute();
+
+const info = ref<any>({
+  title: route?.meta?.title || "财务分析",
+});
 
 let userInfo = useUserStore()?.getUserInfo;
 const dateFormatter = "YYYY年MM月";
@@ -68,7 +77,7 @@ const chooseDate = () => {
 
 let chooseDateInfo = ref<any>({
     label: 'infoDate',
-    labelName: '业务日期',
+    labelName: '月份选择',
     selectValue: dayjs(),
     showFlag: false,
     columnsType: ['year', 'month'],
@@ -85,7 +94,7 @@ let chooseDateInfo = ref<any>({
 
 const selectDateInfo = (dateInfo: Dayjs, dateName: string) => {
     chooseDateInfo.value.showFlag = false;
-    props.dateStr = dateInfo.format(YYYYMM);
+    props.dateStr = dayjs(dateInfo).format(YYYYMM);
     infoDateName.value = dateName;
     chooseDateInfo.value.selectValue = dateInfo;
 };
@@ -156,3 +165,13 @@ const init = () => {
 
 init();
 </script>
+<style scoped>
+.topRow {
+    padding-top: 10px;
+}
+
+a {  
+    color: blue;  
+    text-decoration: underline;  
+}  
+</style>

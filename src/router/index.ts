@@ -8,9 +8,12 @@ import Login from '@/views/login/index.vue'
 import UserManager from '@/views/user/userManager/index.vue';
 import FinanceManager from '@/views/finance/financeManager/index.vue';
 import FinanceAnalysis from '@/views/finance/financeAnalysis/index.vue';
-import AccountRecordInfo from '@/views/finance/accountRecordInfo/AccountRecordInfo.vue';
+import AccountRecordInfo from '@/views/finance/accountRecordInfo/accountRecordInfo.vue';
 import FinanceManagerDetail from '@/views/finance/financeManager/detail/index.vue';
 import accountRecordInfoDetailVue from '@/views/finance/accountRecordInfo/detail/accountRecordInfoDetail.vue';
+import { useUserStore } from "@/store/modules/user/user";
+import orgManager from '@/views/user/orgInfo/orgInfo.vue';
+import orgDetail from '@/views/user/orgInfo/detail/orgInfoDetail.vue';
 
 export const routes: MenuDataItem[] = [
   {
@@ -64,6 +67,18 @@ export const routes: MenuDataItem[] = [
         name: "userManager",
         component: UserManager,
         meta: { title: "个人信息", icon: "userManager", hiedInMenu: false },
+      },
+      {
+        path: "/user/orgInfo",
+        name: "orgManager",
+        component: orgManager,
+        meta: { title: "机构管理", icon: "org", hiedInMenu: false },
+      },
+      {
+        path: "/user/orgInfo/detail",
+        name: "orgDetail",
+        component: orgDetail,
+        meta: { title: "机构详情", icon: "orgDetail", hiedInMenu: true },
       },
     ],
   },
@@ -119,12 +134,18 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, _from, next) => {
+router.beforeEach((to, from, next) => {
   const title = to?.meta?.title
   if (title) {
     document.title = title as string
   }
-  next()
+  const userStore = useUserStore();
+  if (to.path=='/login' || userStore.getToken) {
+    next();
+    console.log('from' + from)
+  } else {
+    next({ name: 'login' });
+  }
 });
 
 router.afterEach(() => {

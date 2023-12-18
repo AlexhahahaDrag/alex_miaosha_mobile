@@ -1,5 +1,5 @@
 <template>
-  <div v-touch:left="onSwipeLeft" v-touch:right="onSwipeRight">
+  <div v-touch:swipeleft="onSwipeLeft" v-touch:swipeRight="onSwipeRight">
   <navBar :info="info" @clickRight="addFinance"></navBar>
   <van-pull-refresh
     pulling-text="加载中。。。"
@@ -36,6 +36,7 @@
           :key="index"
         >
           <van-cell
+            :title-class="item.isValid == '1' ? 'validClass' : 'notValidClass'"
             :title="
               userMap[item.belongTo] +
               '的' +
@@ -52,27 +53,21 @@
             }"
           >
             <template #label>
-              <div style="margin-top: 10px; display: flex">
+              <div class="svgInfo">
                 <div
                   class="svgDiv"
                   v-for="(fromSource, index) in fromSourceTransferList"
                   :key="index"
                 >
-                  <img
-                    class="svgClass"
-                    v-if="item.fromSource.indexOf(fromSource.value) >= 0"
-                    :src="fromSource.src"
-                  />
+                  <svgIcon v-if="item.fromSource.indexOf(fromSource.value) >= 0 && fromSource.value != ''"
+                           :name="fromSource.label" class="svg"></svgIcon>
                 </div>
               </div>
             </template>
             <template #right-icon>
               <div class="text-right">
                 <div style="display: flex">
-                  <div
-                    class="van-ellipsis"
-                    style="width: 130px; text-align: right"
-                  >
+                  <div class="van-ellipsis">
                     {{
                       item?.infoDate
                         ? String(item.infoDate).substring(0, 10)
@@ -83,7 +78,7 @@
                 <div
                   :class="
                     item.incomeAndExpenses === 'income'
-                      ? 'rightDiv'
+                      ? 'rightGreenDiv'
                       : 'rightRedDiv'
                   "
                 >
@@ -140,6 +135,11 @@ import {
 } from "./financeManager";
 import { showSuccessToast, showFailToast } from "vant";
 import { useRouter, useRoute } from "vue-router";
+import svgIcon from "@/views/common/icons/svgIcon.vue";
+
+// window.onpopstate = function(event) {
+//   alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
+// };
 
 let router = useRouter();
 let route = useRoute();
@@ -269,11 +269,27 @@ init();
 .right_info {
   height: 100%;
 }
-.svgDiv {
-  height: 30px;
-  .svgClass {
-    height: 100%;
+.svgInfo {
+  margin-top: 10px; 
+  display: flex;
+  .svgDiv {
+    height: 30px;
+    .svgClass {
+      height: 100%;
+    }
+    .svg {
+      width: 1.5em;
+      height: 1.5em;
+      font-size: 18px;
+      cursor: pointer;
+      vertical-align: middle;
+    }
   }
+}
+
+.van-ellipsis {
+  width: 130px; 
+  text-align: right;
 }
 
 .rightDiv {
@@ -281,9 +297,23 @@ init();
   text-align: right;
 }
 
+.rightGreenDiv {
+  margin-top: 10px;
+  text-align: right;
+  color: green;
+}
+
 .rightRedDiv {
   margin-top: 10px;
   text-align: right;
   color: red;
+}
+
+.validClass {
+  font-weight: bolder;
+}
+
+.notValidClass {
+  color: gray;
 }
 </style>
