@@ -4,6 +4,7 @@ import { UserState } from "./typing";
 import { LoginParams } from "@/api/user/login";
 import { piniaPersistConfig } from '@/config/piniaPersist';
 import { showFailToast } from 'vant';
+import type { MenuInfo } from "./typing";
 
 export const useUserStore = defineStore({
   id: 'app-user',
@@ -13,6 +14,8 @@ export const useUserStore = defineStore({
     roleList: [],
     sessionTimeout: false,
     lastUpdateTime: 0,
+    menuInfo: null,
+    hasMenu: false,
   }),
 
   getters: {
@@ -24,11 +27,17 @@ export const useUserStore = defineStore({
       let localStorage = window.localStorage;
       return this.token || localStorage.getItem("token") || "";
     },
+    getMenuInfo(): MenuInfo[] | null {
+      return this.menuInfo || null;
+    },
     getSessionTimeout(): boolean {
       return !!this.sessionTimeout;
     },
     getLastUpdateTime(): number {
       return this.lastUpdateTime;
+    },
+    getRouteStatus(): Boolean {
+      return this.hasMenu;
     },
   },
   actions: {
@@ -39,6 +48,13 @@ export const useUserStore = defineStore({
     setUserInfo(admin) {
       this.userInfo = admin;
     },
+    setMenuInfo(info: MenuInfo[]) {
+      this.menuInfo = info ? info : null;
+    },
+    changeRouteStatus(state: any) {
+      this.hasMenu = state
+      sessionStorage.setItem("hasRoute", state)
+    },
     async login(
       params: LoginParams & {
         goHome?: boolean;
@@ -48,11 +64,12 @@ export const useUserStore = defineStore({
         const { goHome = true, ...loginParams } = params;
         const data = await loginApi(loginParams);
         if (data?.code == '200') {
-          const { token, admin } = data.data;
+          const { token, admin, menuInfo } = data.data;
           // save userInfo
           this.setUserInfo(admin);
           // save token
           this.setToken(token);
+          this.setMenuInfo(menuInfo);
           return admin;
         } else {
           showFailToast((data?.message) || '登录失败！');
