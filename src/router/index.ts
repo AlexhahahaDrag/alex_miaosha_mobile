@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { RouteRecordRaw, createRouter, createWebHashHistory } from 'vue-router'
 import { MenuDataItem } from './typing'
 import Message from '@/views/message/index.vue';
 import Layout from '@/layouts/index.vue';
@@ -6,14 +6,12 @@ import Home from '@/views/home/index.vue';
 import User from '@/views/user/index.vue';
 import Login from '@/views/login/index.vue'
 import UserManager from '@/views/user/userManager/index.vue';
-import FinanceManager from '@/views/finance/financeManager/index.vue';
-import FinanceAnalysis from '@/views/finance/financeAnalysis/index.vue';
-import AccountRecordInfo from '@/views/finance/accountRecordInfo/accountRecordInfo.vue';
-import FinanceManagerDetail from '@/views/finance/financeManager/detail/index.vue';
-import accountRecordInfoDetailVue from '@/views/finance/accountRecordInfo/detail/accountRecordInfoDetail.vue';
 import { useUserStore } from "@/store/modules/user/user";
-import orgManager from '@/views/user/orgInfo/orgInfo.vue';
-import orgDetail from '@/views/user/orgInfo/detail/orgInfoDetail.vue';
+import type { MenuInfo } from "@/store/modules/user/typing";
+import Error404 from '@/views/common/error/404.vue';
+import type { Component } from 'vue';
+
+const modules = import.meta.glob("@/views/**/**.vue");
 
 export const routes: MenuDataItem[] = [
   {
@@ -24,6 +22,7 @@ export const routes: MenuDataItem[] = [
     meta: {
       title: "仪表盘",
       hiedInMenu: false,
+      showInHome: false,
     },
     children: [
       {
@@ -38,8 +37,8 @@ export const routes: MenuDataItem[] = [
     path: "/message",
     component: Layout,
     redirect: "/message/messageManager",
-    name: "消息管理",
-    meta: { title: "消息管理", icon: "messageManager", hiedInMenu: false },
+    name: "message",
+    meta: { title: "消息管理", icon: "messageManager", hiedInMenu: false, showInHome: false, },
     children: [
       {
         path: "/message/messageManager",
@@ -50,74 +49,23 @@ export const routes: MenuDataItem[] = [
     ],
   },
   {
-    path: "/user",
+    path: "/myself",
     component: Layout,
-    redirect: "/about",
-    name: "用户管理",
-    meta: { title: "用户管理", icon: "userManager", hiedInMenu: false },
+    redirect: "/myself",
+    name: "myself",
+    meta: { title: "我的", icon: "myself", hiedInMenu: false, showInHome: false, },
     children: [
       {
-        path: "/about",
+        path: "/myself/about",
         name: "about",
         component: User,
         meta: { title: "我的", icon: "about", hiedInMenu: false },
       },
       {
-        path: "/user/userManager",
-        name: "userManager",
+        path: "/myself/info",
+        name: "myselfInfo",
         component: UserManager,
         meta: { title: "个人信息", icon: "userManager", hiedInMenu: false },
-      },
-      {
-        path: "/user/orgInfo",
-        name: "orgManager",
-        component: orgManager,
-        meta: { title: "机构管理", icon: "org", hiedInMenu: false },
-      },
-      {
-        path: "/user/orgInfo/detail",
-        name: "orgDetail",
-        component: orgDetail,
-        meta: { title: "机构详情", icon: "orgDetail", hiedInMenu: true },
-      },
-    ],
-  },
-  {
-    path: "/finance",
-    component: Layout,
-    redirect: "/finance/financeManager",
-    name: "finance",
-    meta: { title: "财务管理", icon: "financeManager", hiedInMenu: false },
-    children: [
-      {
-        path: "/finance/financeManager",
-        name: "financeManager",
-        component: FinanceManager,
-        meta: { title: "财务信息", icon: "finance", hiedInMenu: false },
-      },
-      {
-        path: "/finance/financeManager/detail",
-        name: "financeManagerDetail",
-        component: FinanceManagerDetail,
-        meta: { title: "财务信息详情", icon: "financeManager", hiedInMenu: true },
-      },
-      {
-        path: "/finance/financeAnalysis",
-        name: "financeAnalysis",
-        component: FinanceAnalysis,
-        meta: { title: "财务分析", icon: "financeAnalysis", hiedInMenu: false },
-      },
-      {
-        path: "/finance/accountRecordInfo",
-        name: "accountRecordInfo",
-        component: AccountRecordInfo,
-        meta: { title: "账号管理", icon: "accountRecordInfo", hiedInMenu: false },
-      },
-      {
-        path: "/finance/accountRecordInfo/detail",
-        name: "accountRecordInfoDetail",
-        component: accountRecordInfoDetailVue,
-        meta: { title: "账号管理详情", icon: "accountRecordInfo", hiedInMenu: true },
       },
     ],
   },
@@ -125,8 +73,12 @@ export const routes: MenuDataItem[] = [
     path: "/login",
     component: Login,
     name: "login",
-    meta: { title: "登录", icon: "login", hiedInMenu: false },
+    meta: { title: "登录", icon: "login", hiedInMenu: false, showInHome: false, },
   },
+  {
+    path: '/:catchAll(.*)',
+    component: () => import("@/views/common/error/404.vue")
+  }
 ];
 
 const router = createRouter({
@@ -135,21 +87,55 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const title = to?.meta?.title
-  if (title) {
-    document.title = title as string
-  }
   const userStore = useUserStore();
-  if (to.path=='/login' || userStore.getToken) {
+  if (to.path == '/login') {
     next();
     console.log('from' + from)
+  } else if (userStore.getToken) {
+    if (!userStore.getRouteStatus) {
+      addRouter();
+    } else if (routes.length <= 5) {
+      addRouter();
+      next({ ...to, replace: true })
+    } else {
+      next();
+    }
   } else {
     next({ name: 'login' });
   }
 });
 
+const addRouter = () => {
+  const userStore = useUserStore();
+  if (userStore.menuInfo?.length) {
+    userStore.menuInfo.forEach((item: MenuInfo) => {
+      let newRouter = getChildren(item);
+      router.addRoute(newRouter);
+      routes.push(newRouter);
+    });
+    userStore.changeRouteStatus(true);
+  }
+};
+
+const getChildren = (item: MenuInfo): any => {
+  let component = item.component == null ? Error404 : ("Layout" === item.component ? Layout : (): Component => import(/* @vite-ignore */ item.component));
+  let routeInfo: RouteRecordRaw = {
+    path: item.path,
+    component: component,
+    redirect: item.redirect,
+    name: item.name,
+    meta: { title: item.title, icon: item.icon, hiedInMenu: item.hideInMenu == '0' ? false : true, showInHome: true, },
+    children: [],
+  };
+  if (item?.children?.length) {
+    item.children.forEach((childItem: any) => {
+      routeInfo.children?.push(getChildren(childItem));
+    });
+  }
+  return routeInfo;
+};
+
 router.afterEach(() => {
-  // NProgress.done() // finish progress bar
 });
 
 export default router;

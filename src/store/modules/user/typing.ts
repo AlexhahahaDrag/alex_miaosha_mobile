@@ -8,6 +8,8 @@ export interface UserState {
   roleList: RoleEnum[];
   sessionTimeout?: boolean;
   lastUpdateTime: number;
+  menuInfo: MenuInfo[] | null;
+  hasMenu: boolean;
 }
 
 export interface RoleInfo {
@@ -27,4 +29,19 @@ export interface GetUserInfoModel {
   avatar?: string;
   // 介绍
   desc?: string;
+}
+
+export interface MenuInfo {
+  id: string;
+  name: string;
+  path: string;
+  title: string;
+  component: string;
+  redirect: string;
+  icon: string;
+  hideInMenu: string;
+  parentId: string;
+  summary: string;
+  status: string;
+  children: MenuInfo[];
 }
