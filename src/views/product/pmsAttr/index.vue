@@ -125,6 +125,7 @@ function query(param: SearchInfo, cur: pageInfo) {
 }
 
 const addPmsAttr = () => {
+  console.log(`addPmsAttr`, router.options.routes);
   router.push({ path: '/product/pmsAttr/detail' });
 }
 

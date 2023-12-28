@@ -3,21 +3,21 @@
     <van-form @submit="onSubmit" :rules="rulesRef" required="auto">
         <van-cell-group>
             <van-field v-model="formInfo.attrName" name="attrName" :label="label.attrName + '：'"
-                :placeholder="'请输入' + label.attrName" :rules="rulesRef.attrName" :maxlength="attrName" />
+                :placeholder="'请输入' + label.attrName" :rules="rulesRef.attrName" maxlength="30" />
             <van-field v-model="formInfo.searchType" name="searchType" :label="label.searchType + '：'"
-                :placeholder="'请输入' + label.searchType" :rules="rulesRef.searchType" :maxlength="searchType" />
+                :placeholder="'请输入' + label.searchType" :rules="rulesRef.searchType" maxlength="3" />
             <van-field v-model="formInfo.icon" name="icon" :label="label.icon + '：'"
-                :placeholder="'请输入' + label.icon" :rules="rulesRef.icon" :maxlength="icon" />
+                :placeholder="'请输入' + label.icon" :rules="rulesRef.icon" maxlength="255" />
             <van-field v-model="formInfo.valueSelect" name="valueSelect" :label="label.valueSelect + '：'"
-                :placeholder="'请输入' + label.valueSelect" :rules="rulesRef.valueSelect" :maxlength="valueSelect" />
+                :placeholder="'请输入' + label.valueSelect" :rules="rulesRef.valueSelect" maxlength="255" />
             <van-field v-model="formInfo.attrType" name="attrType" :label="label.attrType + '：'"
-                :placeholder="'请输入' + label.attrType" :rules="rulesRef.attrType" :maxlength="attrType" />
+                :placeholder="'请输入' + label.attrType" :rules="rulesRef.attrType" maxlength="3" />
             <van-field v-model="formInfo.enable" name="enable" :label="label.enable + '：'"
-                :placeholder="'请输入' + label.enable" :rules="rulesRef.enable" :maxlength="enable" />
+                :placeholder="'请输入' + label.enable" :rules="rulesRef.enable" maxlength="19" />
             <van-field v-model="formInfo.catelogId" name="catelogId" :label="label.catelogId + '：'"
-                :placeholder="'请输入' + label.catelogId" :rules="rulesRef.catelogId" :maxlength="catelogId" />
+                :placeholder="'请输入' + label.catelogId" :rules="rulesRef.catelogId" maxlength="19" />
             <van-field v-model="formInfo.showDesc" name="showDesc" :label="label.showDesc + '：'"
-                :placeholder="'请输入' + label.showDesc" :rules="rulesRef.showDesc" :maxlength="showDesc" />
+                :placeholder="'请输入' + label.showDesc" :rules="rulesRef.showDesc" maxlength="3" />
         </van-cell-group>
         <div class="subButton">
             <van-button round block type="primary" native-type="submit">
@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
+import { ref } from 'vue';
 import { useRoute, useRouter } from "vue-router";
 import navBar from '@/views/common/navBar/index.vue';
 import { showFailToast, showSuccessToast } from 'vant';
@@ -42,8 +42,6 @@ const info = ref<any>({
 });
 
 let formInfo = ref<any>({});
-
-
 
 const onSubmit = () => {
     let method = 'post';
@@ -61,6 +59,7 @@ const onSubmit = () => {
 };
 
 function init() {
+    console.log(222222222222)
     let id: any = route?.query?.id;
     if (id) {
         Promise.all([
@@ -80,6 +79,7 @@ function init() {
     }
 }
 
+console.log(11111111)
 init();
 </script>
 <style lang='scss' scoped>
