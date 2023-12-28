@@ -28,7 +28,7 @@
             <template #label>
               <div class="iconClass">
                 <div class='icon' style='background-color: #ffcc00'>
-                  {{item.attrId }}
+                  {{item.attrName }}
                 </div>
               </div>
             </template>
@@ -36,11 +36,11 @@
               <div class='text-right'>
                 <div style='display: flex'>
                   <div class='van-ellipsis'>
-                    {{item.attrName }}
+                    {{item.searchType }}
                   </div>
                 </div>
                 <div :class="true ? 'rightDiv' : 'rightRedDiv'">
-                    item.icon+item.valueSelect+item.attrType+item.enable+item.catelogId+item.showDesc+;
+                    item.valueSelect+item.attrType+item.enable+item.catelogId+item.showDesc+;
                 </div>
               </div>
             </template>

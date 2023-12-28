@@ -99,7 +99,6 @@ export const columns = [
 
 
 export interface DataItem {
-  attrId: number;
   attrName: string;
   searchType: number;
   icon: string;

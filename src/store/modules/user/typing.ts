@@ -40,6 +40,7 @@ export interface MenuInfo {
   redirect: string;
   icon: string;
   hideInMenu: string;
+  showInHome: string;
   parentId: string;
   summary: string;
   status: string;
