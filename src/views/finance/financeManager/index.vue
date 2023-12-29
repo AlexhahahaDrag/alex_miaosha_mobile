@@ -146,6 +146,7 @@ let route = useRoute();
 const info = ref<any>({
   title: route?.meta?.title || "财务管理",
   rightButton: "新增",
+  leftPath: "/",
 });
 let loading = ref<boolean>(false);
 let dataSource = ref<any[]>([]);
@@ -188,7 +189,6 @@ function getFinancePage(param: SearchInfo, cur: pageInfo) {
         pagination.value.current = res.data.current + 1;
         pagination.value.pageSize = res.data.size;
         pagination.value.total = res.data.total;
-        console.log(`pageInfo`, pagination.value);
         if (
           !(
             pagination.value.total ||
@@ -238,7 +238,7 @@ const onRefresh = () => {
   getFinancePage(searchInfo.value, pagination.value);
 };
 
-const beforeClose = (e) => {
+const beforeClose = (e: any) => {
   console.log(e);
 };
 

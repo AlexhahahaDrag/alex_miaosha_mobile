@@ -1,93 +1,7 @@
-<!-- <template>
-    <van-form ref="formRef" class="flex flex-col items-center" @submit="handleSubmit">
-        <van-field class="enter-y items-center mb-25px !rounded-md" v-model="formData.username" name="username"
-            placeholder="用户名">
-            <template #left-icon>
-                <Icon>
-                    <UserOutlined />
-                </Icon>
-            </template>
-        </van-field>
-        <van-field class="enter-y items-center mb-25px !rounded-md" v-model="formData.password"
-            :type="switchPassType ? 'password' : 'text'" name="password" placeholder="密码"
-            @click-right-icon="switchPassType = !switchPassType">
-            <template #left-icon>
-                <Icon>
-                    <LockOutlined />
-                </Icon>
-            </template>
-            <template #right-icon>
-                <Icon v-if="switchPassType">
-                    <EyeInvisibleOutlined />
-                </Icon>
-                <Icon v-else>
-                    <EyeOutlined />
-                </Icon>
-            </template>
-        </van-field>
-
-        <div class="enter-y w-full px-5px flex justify-between mb-100px">
-            <div class="flex items-center">
-                <van-switch class="mr-8px !text-30px" v-model="rememberMe" />
-                <span class="!text-25px">记住我</span>
-            </div>
-            <a class="!text-25px">忘记密码?</a>
-        </div>
-
-        <van-button class="enter-y !rounded-md !mb-25px" type="primary" block native-type="submit" :loading="loading">
-            登 录
-        </van-button>
-        <van-button class="enter-y !mb-25 !rounded-md" plain type="primary" block>
-            注 册
-        </van-button>
-    </van-form>
-</template>
-  
-<script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { showLoadingToast, showSuccessToast } from 'vant';
-import type { FormInstance } from 'vant';
-
-const router = useRouter();
-
-const formRef = ref<FormInstance>();
-const loading = ref(false);
-const rememberMe = ref(false);
-const switchPassType = ref(true);
-const formData = reactive({
-    username: 'admin',
-    password: '123456',
-});
-
-
-function handleSubmit() {
-    formRef.value
-        ?.validate()
-        .then(async () => {
-            try {
-                loading.value = true;
-                showLoadingToast('登录中...');
-                showSuccessToast('登录成功，即将进入系统');
-                router.replace('/');
-            } finally {
-                loading.value = false;
-            }
-        })
-        .catch(() => {
-            console.error('验证失败');
-        });
-}
-
-onMounted(() => { });
-</script>
-  
-<style scoped lang="less"></style>
-   -->
 <template>
     <div class="login-container">
         <!--引入粒子特效-->
-        <!-- <Particles id="tsparticles" :options="options" /> -->
+        <Particles id="tsparticles" :options="options" />
         <div style="height:100vh;">
             <div style="height:35vh;line-height:35vh;text-align:center;">
                 <span style="font-size:3.5rem;margin-bottom:15vh;color:#fff;"><b>alex系统管理平台</b></span>
@@ -135,103 +49,84 @@ const onSubmit = async (values) => {
     }
     console.log('submit', values, res);
 };
-// const onSubmit = () => {
-//     formRef.value
-//         .validate()
-//         .then(async () => {
-//             let param: LoginParams = {
-//                 type: "account",
-//                 username: loginForm.username,
-//                 password: loginForm.password,
-//                 isRememberMe: true,
-//             };
-//             const res = await userStore.login(param);
-//             if (res) {
-//                 router.push("/");
-//             }
-//         })
-//         .catch((error: ValidateErrorEntity<loginForm>) => {
-//             console.log("error", error);
-//         });
-// };
 
-// const options = {
-//     background: {
-//         color: {
-//             value: "#000", //粒子颜色
-//         },
-//     },
-//     fpsLimit: 60,
-//     interactivity: {
-//         events: {
-//             onClick: {
-//                 enable: true,
-//                 mode: "push", //可用的click模式有: "push", "remove", "repulse", "bubble"。
-//             },
-//             onHover: {
-//                 enable: true,
-//                 mode: "grab", //可用的hover模式有: "grab", "repulse", "bubble"。
-//             },
-//             resize: true,
-//         },
-//         modes: {
-//             bubble: {
-//                 distance: 400,
-//                 duration: 2,
-//                 opacity: 0.8,
-//                 size: 40,
-//             },
-//             push: {
-//                 quantity: 4,
-//             },
-//             repulse: {
-//                 distance: 200,
-//                 duration: 0.4,
-//             },
-//         },
-//     },
-//     particles: {
-//         color: {
-//             value: "#ffffff",
-//         },
-//         links: {
-//             color: "#ffffff", //'#dedede'。线条颜色。
-//             distance: 150, //线条长度
-//             enable: true, //是否有线条
-//             opacity: 0.5, //线条透明度。
-//             width: 1, //线条宽度。
-//         },
-//         collisions: {
-//             enable: false,
-//         },
-//         move: {
-//             direction: "none",
-//             enable: true,
-//             outMode: "bounce",
-//             random: false,
-//             speed: 2, //粒子运动速度。
-//             straight: false,
-//         },
-//         number: {
-//             density: {
-//                 enable: true,
-//                 area: 800,
-//             },
-//             value: 80, //粒子数量。
-//         },
-//         opacity: {
-//             value: 0.5, //粒子透明度。
-//         },
-//         shape: {
-//             type: "circle", //可用的粒子外观类型有："circle","edge","triangle", "polygon","star"
-//         },
-//         size: {
-//             random: true,
-//             value: 5,
-//         },
-//     },
-//     detectRetina: true,
-// };
+const options = {
+    background: {
+        color: {
+            value: "#000", //粒子颜色
+        },
+    },
+    fpsLimit: 60,
+    interactivity: {
+        events: {
+            onClick: {
+                enable: true,
+                mode: "push", //可用的click模式有: "push", "remove", "repulse", "bubble"。
+            },
+            onHover: {
+                enable: true,
+                mode: "grab", //可用的hover模式有: "grab", "repulse", "bubble"。
+            },
+            resize: true,
+        },
+        modes: {
+            bubble: {
+                distance: 400,
+                duration: 2,
+                opacity: 0.8,
+                size: 40,
+            },
+            push: {
+                quantity: 4,
+            },
+            repulse: {
+                distance: 200,
+                duration: 0.4,
+            },
+        },
+    },
+    particles: {
+        color: {
+            value: "#ffffff",
+        },
+        links: {
+            color: "#ffffff", //'#dedede'。线条颜色。
+            distance: 150, //线条长度
+            enable: true, //是否有线条
+            opacity: 0.5, //线条透明度。
+            width: 1, //线条宽度。
+        },
+        collisions: {
+            enable: false,
+        },
+        move: {
+            direction: "none",
+            enable: true,
+            outMode: "bounce",
+            random: false,
+            speed: 2, //粒子运动速度。
+            straight: false,
+        },
+        number: {
+            density: {
+                enable: true,
+                area: 800,
+            },
+            value: 80, //粒子数量。
+        },
+        opacity: {
+            value: 0.5, //粒子透明度。
+        },
+        shape: {
+            type: "circle", //可用的粒子外观类型有："circle","edge","triangle", "polygon","star"
+        },
+        size: {
+            random: true,
+            value: 5,
+        },
+    },
+    detectRetina: true,
+};
 </script>
 <style rel="stylesheet/scss" lang="scss">
 $bg: #2d3a4b;

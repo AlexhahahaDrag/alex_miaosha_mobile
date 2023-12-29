@@ -43,6 +43,7 @@ let route = useRoute();
 let router = useRouter();
 const info = ref<any>({
     title: route?.meta?.title || '机构表',
+    leftPath: '/user/orgInfo',
 });
 
 let formInfo = ref<any>({});

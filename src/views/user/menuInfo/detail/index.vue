@@ -49,6 +49,7 @@ let route = useRoute();
 let router = useRouter();
 const info = ref<any>({
     title: route?.meta?.title || '菜单管理表',
+    leftPath: '/user/menuInfo',
 });
 
 let formInfo = ref<any>({});
@@ -157,7 +158,7 @@ const onSubmit = () => {
     addOrEditMenuInfo(method, formInfo.value).then((res: any) => {
         if (res?.code == '200') {
             showSuccessToast(res?.message || '保存成功!');
-            router.push({ path: 'user/menuInfo' });
+            router.push({ path: '/user/menuInfo' });
         } else {
             showFailToast (res?.message || '保存失败，请联系管理员!');
         }

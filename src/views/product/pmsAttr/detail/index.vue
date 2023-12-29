@@ -39,6 +39,7 @@ let route = useRoute();
 let router = useRouter();
 const info = ref<any>({
     title: route?.meta?.title || '商品属性',
+    leftPath: '/product/pmsAttr',
 });
 
 let formInfo = ref<any>({});
@@ -51,7 +52,7 @@ const onSubmit = () => {
     addOrEditPmsAttr(method, formInfo.value).then((res: any) => {
         if (res?.code == '200') {
             showSuccessToast(res?.message || '保存成功!');
-            router.push({ path: 'product/pmsAttr' });
+            router.push({ path: '/product/pmsAttr' });
         } else {
             showFailToast (res?.message || '保存失败，请联系管理员!');
         }
@@ -59,7 +60,6 @@ const onSubmit = () => {
 };
 
 function init() {
-    console.log(222222222222)
     let id: any = route?.query?.id;
     if (id) {
         Promise.all([
@@ -79,7 +79,6 @@ function init() {
     }
 }
 
-console.log(11111111)
 init();
 </script>
 <style lang='scss' scoped>

@@ -19,18 +19,15 @@ import { reactive, ref } from "vue";
 import Tabbar from "./tabbar/index.vue";
 import navBar from "@/views/common/navBar/index.vue";
 import svgIcon from "@/views/common/icons/svgIcon.vue";
-import { useRouter, useRoute } from "vue-router";
+import { useRouter } from "vue-router";
 
 let router = useRouter();
-let route = useRoute();
-console.log(`routerInfo:`, router, route);
 let homeList = ref<any>([]);
 
 const getHomeList = (arr: any[] | null) => {
   if (arr?.length) {
     arr.forEach((item: any) => {
       if (item) {
-        console.log(item)
         if(item?.meta?.showInHome) {
             homeList.value.push(item);
         }

@@ -76,6 +76,7 @@ let route = useRoute();
 const info = ref<any>({
   title: route?.meta?.title || '财务管理11',
   rightButton: '新增',
+  leftPath: '/',
 })
 let loading = ref<boolean>(false);
 let dataSource = ref<any[]>([]);
@@ -105,7 +106,6 @@ function query(param: SearchInfo, cur: pageInfo) {
         pagination.value.current = res.data.current + 1;
         pagination.value.pageSize = res.data.size;
         pagination.value.total = res.data.total;
-        console.log(`pageInfo`, pagination.value);
         if (!pagination.value?.total ||
           (pagination.value.total &&
             pagination.value.total <
@@ -125,7 +125,6 @@ function query(param: SearchInfo, cur: pageInfo) {
 }
 
 const addPmsAttr = () => {
-  console.log(`addPmsAttr`, router.options.routes);
   router.push({ path: '/product/pmsAttr/detail' });
 }
 

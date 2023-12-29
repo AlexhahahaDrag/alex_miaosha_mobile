@@ -12,6 +12,7 @@ interface Info {
     rightButton?: string;
     noShowLeft?: Boolean;
     showRight?: Boolean;
+    leftPath?:string;
 }
 
 interface Props {
@@ -22,8 +23,11 @@ const props = defineProps<Props>();
 const emit = defineEmits(["clickRight"]);
 const router = useRouter();
 const onClickLeft = () => {
-    // todo修改为返回前一路由
-    router.go(-1);
+    if (props.info?.leftPath) {
+        router.push({path: props.info.leftPath});
+    } else {
+        router.go(-1);
+    }
 }
 
 const onClickRight = () => {

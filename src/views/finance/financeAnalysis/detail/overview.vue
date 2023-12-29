@@ -59,7 +59,6 @@ const init = (dateStr: string, belongTo: number | null) => {
 watch(
     () => [props.activeTab, props.dateStr, props.belongTo],
     () => {
-        console.log('1111111111111')
         if (props.activeTab === '1') {
             init(props.dateStr, props.belongTo || null);
         }
