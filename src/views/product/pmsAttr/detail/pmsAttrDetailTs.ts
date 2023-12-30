@@ -1,3 +1,5 @@
+import { reactive } from 'vue';
+
 export const label = reactive({
     attrName: '属性名',
     searchType: '是否需要检索[0-不需要，1-需要]',

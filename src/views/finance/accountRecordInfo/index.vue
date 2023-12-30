@@ -109,6 +109,7 @@ let route = useRoute();
 const info = ref<any>({
   title: route?.meta?.title || "账号管理",
   rightButton: "新增",
+  leftPath: "/",
 });
 let loading = ref<boolean>(false);
 let dataSource = ref<any[]>([]);

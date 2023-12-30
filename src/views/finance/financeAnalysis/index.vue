@@ -48,6 +48,7 @@ let route = useRoute();
 
 const info = ref<any>({
   title: route?.meta?.title || "财务分析",
+  leftPath: "/",
 });
 
 let userInfo = useUserStore()?.getUserInfo;

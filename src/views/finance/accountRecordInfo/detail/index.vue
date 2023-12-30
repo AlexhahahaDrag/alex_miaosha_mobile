@@ -72,8 +72,9 @@ let route = useRoute();
 let router = useRouter();
 const info = ref<any>({
   title: route?.meta?.title || "",
+  leftPath: "/finance/accountRecordInfo",
 });
-// TODO 修改成类型
+
 let formInfo = ref<any>({});
 
 const label = reactive({
