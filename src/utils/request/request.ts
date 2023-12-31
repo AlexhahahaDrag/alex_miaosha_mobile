@@ -39,7 +39,7 @@ const requestHandler = (
   }
   if (config?.data) {
     for (const k in config.data) {
-      if (config.data[k] && config.data[k].$L == 'zh-cn') {
+      if (config.data[k] && config.data[k].$L == 'en') {
         config.data[k] = config.data[k].add(8, 'hours');
       }
     }

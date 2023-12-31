@@ -185,17 +185,13 @@ function getFinancePage(param: SearchInfo, cur: pageInfo) {
   )
     .then((res) => {
       if (res.code == "200") {
+        console.log(`pagination.value:`, pagination.value);
         dataSource.value = [...dataSource.value, ...res.data.records];
         pagination.value.current = res.data.current + 1;
         pagination.value.pageSize = res.data.size;
         pagination.value.total = res.data.total;
         if (
-          !(
-            pagination.value.total ||
-            0 <
-              (pagination.value.current || 1) *
-                (pagination.value.pageSize || 10)
-          )
+          (pagination.value.total || 0) < (pagination.value.current || 1) * (pagination.value.pageSize || 10)  
         ) {
           finished.value = true;
         }
