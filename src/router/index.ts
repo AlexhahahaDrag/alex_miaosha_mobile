@@ -12,6 +12,7 @@ import Error404 from '@/views/common/error/404.vue';
 import type { Component } from 'vue';
 
 const modules = import.meta.glob("@/views/**/**.vue");
+console.log(`modules, `, modules)
 
 export const routes: MenuDataItem[] = [
   {
@@ -118,7 +119,9 @@ const addRouter = () => {
 };
 
 const getChildren = (item: MenuInfo): any => {
-  let component = item.component == null ? Error404 : ("Layout" === item.component ? Layout : (): Component => import(/* @vite-ignore */ item.component));
+  let component = item.component == null ? Error404 : 
+    ("Layout" === item.component ? Layout : 
+      (): Component => import(/* @vite-ignore */ item.component));
   let routeInfo: RouteRecordRaw = {
     path: item.path,
     component: component,
