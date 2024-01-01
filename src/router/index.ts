@@ -9,7 +9,6 @@ import UserManager from '@/views/user/userManager/index.vue';
 import { useUserStore } from "@/store/modules/user/user";
 import type { MenuInfo } from "@/store/modules/user/typing";
 import Error404 from '@/views/common/error/404.vue';
-import type { Component } from 'vue';
 
 const modules = import.meta.glob("@/views/**/**.vue");
 console.log(`modules, `, modules)
@@ -89,16 +88,20 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore();
-  if (to.path == '/login') {
+  if (to.path == '/login' || !userStore.getToken) {
     next();
     console.log('from' + from)
   } else if (userStore.getToken) {
     if (!userStore.getRouteStatus) {
+      console.log(`router0:`, router.options.routes);
       addRouter();
     } else if (routes.length <= 5) {
+      console.log(`router1:`, router.options.routes);
       addRouter();
+      console.log(`router2:`, router.options.routes);
       next({ ...to, replace: true })
     } else {
+      console.log(`router3:`, router.options.routes);
       next();
     }
   } else {
@@ -121,7 +124,8 @@ const addRouter = () => {
 const getChildren = (item: MenuInfo): any => {
   let component = item.component == null ? Error404 : 
     ("Layout" === item.component ? Layout : 
-      (): Component => import(/* @vite-ignore */ item.component));
+      modules[item.component]);
+      console.log(22222222222222, item.component, modules[item.component])
   let routeInfo: RouteRecordRaw = {
     path: item.path,
     component: component,
