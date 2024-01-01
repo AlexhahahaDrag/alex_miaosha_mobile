@@ -87,8 +87,10 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
+  console.log(`out:`, router.options.routes);
   const userStore = useUserStore();
   if (to.path == '/login' || !userStore.getToken) {
+    console.log(`token:`, router.options.routes);
     next();
     console.log('from' + from)
   } else if (userStore.getToken) {
