@@ -84,7 +84,7 @@ const totalPrice = computed(() =>
 );
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .card-goods {
   padding: 10px 0;
   background-color: #fff;

@@ -47,7 +47,6 @@ const onSubmit = async (values) => {
     if (res) {
         router.push("/");
     }
-    console.log('submit', values, res);
 };
 
 const options = {
@@ -128,7 +127,7 @@ const options = {
     detectRetina: true,
 };
 </script>
-<style rel="stylesheet/scss" lang="scss">
+<style rel="stylesheet/scss" lang="scss" scoped>
 $bg: #2d3a4b;
 $light_gray: #eee;
 

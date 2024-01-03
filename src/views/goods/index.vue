@@ -104,7 +104,7 @@ const sorry = (text: string = '暂无后续逻辑~') => {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .goods {
   padding-bottom: 50px;
 

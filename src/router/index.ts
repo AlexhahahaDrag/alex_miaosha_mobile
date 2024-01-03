@@ -89,21 +89,16 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   console.log(`out:`, router.options.routes);
   const userStore = useUserStore();
-  if (to.path == '/login' || !userStore.getToken) {
-    console.log(`token:`, router.options.routes);
+  if (to.path == '/login') {
     next();
     console.log('from' + from)
   } else if (userStore.getToken) {
     if (!userStore.getRouteStatus) {
-      console.log(`router0:`, router.options.routes);
       addRouter();
     } else if (routes.length <= 5) {
-      console.log(`router1:`, router.options.routes);
       addRouter();
-      console.log(`router2:`, router.options.routes);
       next({ ...to, replace: true })
     } else {
-      console.log(`router3:`, router.options.routes);
       next();
     }
   } else {

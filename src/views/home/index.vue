@@ -39,7 +39,7 @@ const getHomeList = (arr: any[] | null) => {
   }
 };
 
-getHomeList(router.options.routes);
+getHomeList(router?.options?.routes || []);
 
 const useTabBar = reactive([
   {
@@ -65,13 +65,13 @@ const info = ref<any>({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .homeSvgClass {
   height: 100%;
   width: 100%;
   font-size: 18px;
   cursor: pointer;
-  verticle-align: middle;
+  vertical-align: middle;
 }
 
 .homeFontClass {

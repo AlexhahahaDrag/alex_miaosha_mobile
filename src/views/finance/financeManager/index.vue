@@ -184,7 +184,7 @@ function getFinancePage(param: SearchInfo, cur: pageInfo) {
     cur?.pageSize || 10
   )
     .then((res) => {
-      if (res.code == "200") {
+      if (res?.code == "200") {
         console.log(`pagination.value:`, pagination.value);
         dataSource.value = [...dataSource.value, ...res.data.records];
         pagination.value.current = res.data.current + 1;
@@ -261,7 +261,7 @@ function init() {
 init();
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .right_info {
   height: 100%;
 }

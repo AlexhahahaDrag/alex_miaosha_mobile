@@ -53,7 +53,6 @@ watch(
         if (props.info.showFlag) {
             cur.value = props.info;
             showFlag.value = props.info.showFlag;
-            console.log(`cur selectValue`, props.info.selectValue)
             if (props.info.selectValue) {
                 let month = props.info.selectValue.month() + 1;
                 curSelectValue.value = [props.info.selectValue.year() + '',

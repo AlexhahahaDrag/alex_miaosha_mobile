@@ -179,7 +179,7 @@ function init() {
 init();
 </script>
 
-<style lang='scss'>
+<style lang='scss' scoped>
 .right_info {
   height: 100%;
 }

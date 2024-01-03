@@ -264,7 +264,7 @@ const onSubmit = () => {
 };
 
 function getDictInfoList(res: any) {
-    if (res.code == "200") {
+    if (res?.code == "200") {
         fromSourceInfo.value.list = res.data.filter(
             (item: { belongTo: string }) => item.belongTo == "pay_way"
         );
