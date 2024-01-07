@@ -11,7 +11,6 @@ import type { MenuInfo } from "@/store/modules/user/typing";
 import Error404 from '@/views/common/error/404.vue';
 
 const modules = import.meta.glob("@/views/**/**.vue");
-console.log(`modules, `, modules)
 
 export const routes: MenuDataItem[] = [
   {
@@ -87,7 +86,6 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  console.log(`out:`, router.options.routes);
   const userStore = useUserStore();
   if (to.path == '/login') {
     next();
@@ -122,7 +120,6 @@ const getChildren = (item: MenuInfo): any => {
   let component = item.component == null ? Error404 : 
     ("Layout" === item.component ? Layout : 
       modules[item.component]);
-      console.log(22222222222222, item.component, modules[item.component])
   let routeInfo: RouteRecordRaw = {
     path: item.path,
     component: component,

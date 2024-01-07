@@ -11,7 +11,7 @@
   >
     <form action="/">
       <van-search
-        v-model="searchInfo.typeCode"
+        v-model="searchInfo.bigTypeCode"
         show-action
         placeholder="请输入搜索关键词"
         @search="onSearch"
@@ -161,7 +161,7 @@ const onSearch = () => {
   onRefresh();
 };
 const onCancel = () => {
-  searchInfo.value.typeCode = "";
+  searchInfo.value.bigTypeCode = "";
   pagination.value.current = 0;
   dataSource.value = [];
   getFinancePage(searchInfo.value, pagination.value);

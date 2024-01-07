@@ -1,13 +1,13 @@
 <template>
     <van-popup v-model:show="showFlag" position="bottom" :style="{ width: '100%' }" @click-overlay="onClickOverlay">
-        <van-date-picker v-model="curSelectValue" :title="cur.labelName" :formatter="info.formatter" @confirm="confirm"
+        <van-date-picker v-model="curSelectValue" :title="cur?.labelName" :formatter="info.formatter" @confirm="confirm"
             @cancel="cancel" :columns-type="info.columnsType" />
     </van-popup>
 </template>
 
 <script setup lang="ts">
-import dayjs from 'dayjs';
 import { ref, watch } from 'vue';
+import { formatDayjs } from '@/utils/dayjs/index';
 
 export interface Info {
     label?: string;
@@ -35,7 +35,7 @@ const confirm = ({ selectedValues }) => {
     showFlag.value = false;
     let dateName = selectedValues[0] + '年' + selectedValues[1] + '月';
     let dateStr = selectedValues[0] + '-' + selectedValues[1] + '-' + '01';
-    emit('selectInfo', dayjs(dateStr), dateName);
+    emit('selectInfo', formatDayjs(dateStr), dateName);
 };
 
 const onClickOverlay = () => {
@@ -53,7 +53,6 @@ watch(
     () => props.info.showFlag,
     () => {
         if (props.info.showFlag) {
-            console.log(`props.info:`, props.info);
             cur.value = props.info;
             showFlag.value = props.info.showFlag;
             if (props.info.selectValue) {

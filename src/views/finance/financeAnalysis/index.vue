@@ -166,7 +166,7 @@ const init = () => {
 
 init();
 </script>
-<style scoped>
+<style lang="scss" scoped>
 .topRow {
     padding-top: 10px;
 }

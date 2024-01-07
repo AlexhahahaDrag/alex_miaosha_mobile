@@ -6,8 +6,8 @@
 </template>
 
 <script setup lang="ts">
-import dayjs from 'dayjs';
 import { ref, watch } from 'vue';
+import { formatDayjs } from '@/utils/dayjs/index.ts';
 
 export interface Info {
     label?: string;
@@ -33,7 +33,7 @@ let curSelectValue = ref<string[]>([]);
 const confirm = ({ selectedValues }) => {
     showFlag.value = false;
     let dateName = selectedValues[0] + '-' + selectedValues[1] + '-' + selectedValues[2];
-    emit('selectInfo', dayjs(dateName), dateName, props.info.label);
+    emit('selectInfo', formatDayjs(dateName), dateName, props.info.label);
 };
 
 const cancel = () => {

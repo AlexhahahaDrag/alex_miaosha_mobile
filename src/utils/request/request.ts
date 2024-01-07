@@ -37,13 +37,6 @@ const requestHandler = (
   } else {
     router.push('/Login');
   }
-  if (config?.data) {
-    for (const k in config.data) {
-      if (config.data[k] && config.data[k].$L == 'en') {
-        config.data[k] = config.data[k].add(8, 'hours');
-      }
-    }
-  }
   return config;
 };
 
