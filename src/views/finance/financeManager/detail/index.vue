@@ -44,7 +44,7 @@ let route = useRoute();
 let router = useRouter();
 let userInfo = useUserStore()?.getUserInfo;
 const info = ref<any>({
-    title: route?.name || '财务明细',
+    title: route?.meta?.title || '财务明细',
     leftPath: '/finance/financeManager',
 });
 let formInfo = ref<any>({});

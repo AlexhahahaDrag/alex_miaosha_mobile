@@ -66,7 +66,8 @@
 <script lang="ts" setup>
 import { showToast } from 'vant';
 
- interface IGoods  {
+let router = useRouter();
+interface IGoods  {
   title: string,
   price: number,
   express: string,
