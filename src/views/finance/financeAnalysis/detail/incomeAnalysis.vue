@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts" setup>
-import { getIncomeAndExpense } from '@/api/finance/financeAnalysis/index';
+import { getIncomeAndExpense } from '@/api/finance/financeAnalysis';
 import { showNotify } from 'vant';
 import { ItemInfo } from "./common";
 

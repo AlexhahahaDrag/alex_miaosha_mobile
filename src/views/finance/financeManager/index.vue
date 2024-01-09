@@ -121,7 +121,7 @@
 import {
   getFinanceMangerPage,
   deleteFinanceManager,
-} from "@/api/finance/financeManager/index";
+} from "@/api/finance/financeManager";
 import { getUserManagerList } from "@/api/user/userManager";
 import {
   SearchInfo,
