@@ -32,14 +32,11 @@
 </template>
 
 <script setup lang="ts">
-import navBar from '@/views/common/navBar/index.vue';
 import dayjs, { Dayjs } from 'dayjs';
 import { getDictList } from "@/api/finance/dict/dictManager";
 import { getUserManagerList } from "@/api/user/userManager";
 import { useUserStore } from "@/store/modules/user/user";
-import selectPop from '@/views/common/pop/selectPop.vue';
 import { Info } from '@/views/common/pop/selectPop.vue';
-import datePop from '@/views/common/pop/datePop.vue';
 import { showFailToast ,showSuccessToast } from 'vant';
 import { addOrEditFinanceManger, getFinanceMangerDetail } from '@/api/finance/financeManager';
 

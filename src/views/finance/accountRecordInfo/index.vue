@@ -93,13 +93,11 @@
   <van-back-top />
 </template>
 <script lang="ts" setup>
-import { ref } from "vue";
 import {
   getAccountRecordInfoPage,
   deleteAccountRecordInfo,
 } from "@/api/finance/accountRecordInfo/accountRecordInfoTs";
 import { getUserManagerList } from "@/api/user/userManager";
-import navBar from "@/views/common/navBar/index.vue";
 import { SearchInfo, pagination, pageInfo } from "./accountRecordInfoTs";
 import { showSuccessToast, showFailToast } from "vant";
 

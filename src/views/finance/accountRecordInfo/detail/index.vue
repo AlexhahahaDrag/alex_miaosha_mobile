@@ -54,12 +54,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from "vue";
-import navBar from "@/views/common/navBar/index.vue";
 import dayjs, { Dayjs } from "dayjs";
-import selectPop from "@/views/common/pop/selectPop.vue";
-import { Info } from "@/views/common/pop/selectPop.vue";
-import datePop from "@/views/common/pop/datePop.vue";
 import { showFailToast, showSuccessToast } from "vant";
 import {
   addOrEditAccountRecordInfo,

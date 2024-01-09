@@ -64,7 +64,6 @@
 </template>
 
 <script lang="ts" setup>
-import router from '@/router';
 import { showToast } from 'vant';
 
  interface IGoods  {

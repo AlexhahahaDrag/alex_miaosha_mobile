@@ -3,8 +3,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import chart from "@/views/model/chart/index.vue";
 
 const props = defineProps({
   title: {

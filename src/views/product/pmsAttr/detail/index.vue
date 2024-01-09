@@ -28,7 +28,6 @@
 </template>
 
 <script setup lang="ts">
-import navBar from '@/views/common/navBar/index.vue';
 import { showFailToast, showSuccessToast } from 'vant';
 import { addOrEditPmsAttr, getPmsAttrDetail } from '@/api/product/pmsAttr/pmsAttrTs';
 import { label, rulesRef } from './pmsAttrDetailTs';

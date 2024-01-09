@@ -17,14 +17,12 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from "vue";
 import type { barItem } from "./common";
 import { showNotify } from 'vant';
 import {
     getDayExpense,
     getMonthExpense,
 } from "@/api/finance/financeAnalysis";
-import barChart from "@/views/model/barChart/index.vue";
 
 interface Props {
     activeTab: number| string;

@@ -3,9 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch, PropType, ref } from "vue";
 import { barItem } from "@/views/model/chart/bar";
-import chart from "@/views/model/chart/index.vue";
 
 const props = defineProps({
   config: {

@@ -35,12 +35,10 @@
 </template>
 
 <script setup lang="ts">
-import navBar from '@/views/common/navBar/index.vue';
 import { showFailToast, showSuccessToast } from 'vant';
 import { addOrEditMenuInfo, getMenuInfoDetail } from '@/api/user/menuInfo/menuInfoTs';
 import { Info } from '@/views/common/pop/selectPop.vue';
 import { getDictList } from "@/api/finance/dict/dictManager";
-import selectPop from '@/views/common/pop/selectPop.vue';
 import { label, rulesRef } from './menuInfoDetailTs';
 
 let route = useRoute();

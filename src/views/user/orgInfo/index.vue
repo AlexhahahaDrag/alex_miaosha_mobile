@@ -61,7 +61,6 @@ import {
     deleteOrgInfo,
 } from '@/api/user/orgInfo/orgInfoTs';
 import { getUserManagerList, } from '@/api/user/userManager';
-import navBar from '@/views/common/navBar/index.vue';
 import {
   SearchInfo,
   pagination,

@@ -3,7 +3,6 @@
 </template>
 
 <script setup lang="ts">
-import { onUnmounted, onMounted, ref, watch } from "vue";
 import * as echarts from "echarts";
 import { nanoid } from "nanoid";
 //import dark from './dark';

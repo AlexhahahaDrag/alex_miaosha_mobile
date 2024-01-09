@@ -61,7 +61,6 @@ import {
     deleteMenuInfo,
 } from '@/api/user/menuInfo/menuInfoTs';
 import { getUserManagerList, } from '@/api/user/userManager';
-import navBar from '@/views/common/navBar/index.vue';
 import {
   SearchInfo,
   pagination,

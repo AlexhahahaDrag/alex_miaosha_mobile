@@ -1,17 +1,21 @@
-<template> 
-    <van-action-sheet v-model:show="show" :actions="actions" @select="onSelect" @cancel="cancel" description="确认退出登录" cancel-text="取消"
-        close-on-click-action :closeable="true" />
+<template>
+    <van-action-sheet v-model:show="show" :actions="actions" @select="onSelect" @cancel="cancel" description="确认退出登录"
+        cancel-text="取消" close-on-click-action :closeable="true" />
 </template>
 
 <script setup lang="ts">
 import { ToastOptions, showToast } from 'vant';
 import { logoutApi } from '@/api/user/login'
-import router from '@/router/index'
 
 interface Props {
     visible: boolean,
 }
 
+let router = useRouter();
+const logout = async () => {
+    await logoutApi();
+    router.push('/login');
+}
 const emit = defineEmits(["select"]);
 const props = defineProps<Props>();
 const show = ref(false);
@@ -26,17 +30,7 @@ const onSelect = (item: { name: string | ToastOptions | undefined; }) => {
 
 const cancel = () => {
     show.value = false;
-    emit("select", false); 
-}
-
-const logout = () => {
-    logoutApi().then(() => {
-        //跳转到登录页面
-        router.push("/login");
-        emit("select", false);
-    }).catch(e => {
-        console.log(e);
-    });
+    emit("select", false);
 }
 
 watch(

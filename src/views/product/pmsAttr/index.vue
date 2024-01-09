@@ -61,7 +61,6 @@ import {
     deletePmsAttr,
 } from '@/api/product/pmsAttr/pmsAttrTs';
 import { getUserManagerList, } from '@/api/user/userManager';
-import navBar from '@/views/common/navBar/index.vue';
 import {
   SearchInfo,
   pagination,

@@ -123,7 +123,6 @@ import {
   deleteFinanceManager,
 } from "@/api/finance/financeManager/index";
 import { getUserManagerList } from "@/api/user/userManager";
-import navBar from "@/views/common/navBar/index.vue";
 import {
   SearchInfo,
   pagination,
@@ -131,7 +130,6 @@ import {
   fromSourceTransferList,
 } from "./financeManager";
 import { showSuccessToast, showFailToast } from "vant";
-import svgIcon from "@/views/common/icons/svgIcon.vue";
 
 // window.onpopstate = function(event) {
 //   alert("location: " + document.location + ", state: " + JSON.stringify(event.state));

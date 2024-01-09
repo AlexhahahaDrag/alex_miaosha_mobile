@@ -30,12 +30,10 @@
 </template>
 
 <script setup lang="ts">
-import navBar from '@/views/common/navBar/index.vue';
 import { showFailToast, showSuccessToast } from 'vant';
 import { addOrEditOrgInfo, getOrgInfoDetail } from '@/api/user/orgInfo/orgInfoTs';
 import { Info } from '@/views/common/pop/selectPop.vue';
 import { getDictList } from "@/api/finance/dict/dictManager";
-import selectPop from '@/views/common/pop/selectPop.vue';
 
 let route = useRoute();
 let router = useRouter();
