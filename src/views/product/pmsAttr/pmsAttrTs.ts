@@ -1,4 +1,3 @@
-import { ref } from 'vue';
 export interface SearchInfo {
   attrName?: string;
   searchType?: number;

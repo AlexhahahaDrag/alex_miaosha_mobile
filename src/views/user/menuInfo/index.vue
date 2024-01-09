@@ -56,7 +56,6 @@
   <van-back-top />
 </template>
 <script lang='ts' setup>
-import { ref } from 'vue';
 import {
     getMenuInfoPage,
     deleteMenuInfo,
@@ -69,7 +68,6 @@ import {
   pageInfo,
 } from './menuInfoTs';
 import { showSuccessToast, showFailToast } from 'vant';
-import { useRouter, useRoute } from 'vue-router';
 
 let router = useRouter();
 let route = useRoute();

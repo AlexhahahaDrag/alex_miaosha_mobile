@@ -16,7 +16,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
 import test1 from './test1/index.vue';
 import test2 from './test2/index.vue';
 import test3 from './test3/index.vue';

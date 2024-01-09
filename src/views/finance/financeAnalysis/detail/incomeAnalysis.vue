@@ -17,7 +17,6 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
 import pieChart from "@/views/model/pieChart/index.vue";
 import { getIncomeAndExpense } from '@/api/finance/financeAnalysis/index';
 import { showNotify } from 'vant';

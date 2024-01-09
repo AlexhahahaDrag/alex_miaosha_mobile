@@ -30,19 +30,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive } from 'vue';
-import overview from './detail/overview.vue';
-import incomeAnalysis from './detail/incomeAnalysis.vue';
-import incomeDetail from './detail/incomeDetail.vue';
-import monthPop from '@/views/common/pop/monthPop.vue';
 import dayjs, { Dayjs } from "dayjs";
 import { Info } from '@/views/common/pop/selectPop.vue';
-import selectPop from '@/views/common/pop/selectPop.vue';
 import { useUserStore } from "@/store/modules/user/user";
 import { getUserManagerList } from "@/api/user/userManager";
-import { showFailToast } from 'vant';
-import navBar from '@/views/common/navBar/index.vue';
-import { useRoute } from "vue-router";
+import { showFailToast } from "vant";
 
 let route = useRoute();
 

@@ -16,7 +16,6 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, } from 'vue';
 import Logout from './logout/index.vue'
 import Tabbar from '@/views/home/tabbar/index.vue';
 

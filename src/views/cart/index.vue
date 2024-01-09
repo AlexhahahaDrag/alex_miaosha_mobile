@@ -26,7 +26,6 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
 import { showToast } from 'vant';
 
 import type { CardGoods } from '@/types';

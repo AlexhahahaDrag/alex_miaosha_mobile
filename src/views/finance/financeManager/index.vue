@@ -1,5 +1,4 @@
 <template>
-  <div v-touch:swipeleft="onSwipeLeft" v-touch:swipeRight="onSwipeRight">
   <navBar :info="info" @clickRight="addFinance"></navBar>
   <van-pull-refresh
     pulling-text="加载中。。。"
@@ -117,10 +116,8 @@
     </van-list>
   </van-pull-refresh>
   <van-back-top />
-  </div>
 </template>
 <script lang="ts" setup>
-import { ref } from "vue";
 import {
   getFinanceMangerPage,
   deleteFinanceManager,
@@ -134,7 +131,6 @@ import {
   fromSourceTransferList,
 } from "./financeManager";
 import { showSuccessToast, showFailToast } from "vant";
-import { useRouter, useRoute } from "vue-router";
 import svgIcon from "@/views/common/icons/svgIcon.vue";
 
 // window.onpopstate = function(event) {
@@ -166,15 +162,6 @@ const onCancel = () => {
   dataSource.value = [];
   getFinancePage(searchInfo.value, pagination.value);
 };
-
-const onSwipeLeft = () => {
-  showFailToast( "onSwipeLefts");
-};
-
-const onSwipeRight = () => {
-  showFailToast( "onSwipeLefts");
-};
-
 
 function getFinancePage(param: SearchInfo, cur: pageInfo) {
   loading.value = true;

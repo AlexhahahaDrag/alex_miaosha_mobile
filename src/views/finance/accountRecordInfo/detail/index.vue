@@ -55,7 +55,6 @@
 
 <script setup lang="ts">
 import { ref, reactive } from "vue";
-import { useRoute, useRouter } from "vue-router";
 import navBar from "@/views/common/navBar/index.vue";
 import dayjs, { Dayjs } from "dayjs";
 import selectPop from "@/views/common/pop/selectPop.vue";

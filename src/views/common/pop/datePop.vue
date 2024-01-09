@@ -7,7 +7,6 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs';
-import { ref, watch } from 'vue';
 
 export interface Info {
     label?: string;

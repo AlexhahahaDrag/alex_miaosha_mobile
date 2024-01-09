@@ -13,7 +13,8 @@
     "sourceMap": true,
     "baseUrl": ".",
     "types": [
-      "vite/client"
+      "vite/client",
+      "src/auto-imports.d.ts", // 添加这一行
     ],
     "noLib": false,
     "forceConsistentCasingInFileNames": true,
@@ -52,7 +53,9 @@
     "build/**/*.d.ts",
     "mock/**/*.ts",
     "vite.config.ts",
-    "env.d.tssrc/main.tsn.ts"
+    "env.d.tssrc/main.tsn.ts",
+    "components.d.ts",
+    "src/auto-imports.d.ts"
   ],
   "references": [
     {

@@ -102,7 +102,6 @@ import { getUserManagerList } from "@/api/user/userManager";
 import navBar from "@/views/common/navBar/index.vue";
 import { SearchInfo, pagination, pageInfo } from "./accountRecordInfoTs";
 import { showSuccessToast, showFailToast } from "vant";
-import { useRouter, useRoute } from "vue-router";
 
 let router = useRouter();
 let route = useRoute();

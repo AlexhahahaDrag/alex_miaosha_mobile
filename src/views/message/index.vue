@@ -7,7 +7,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 
 const list = ref<number[]>([]);
 const loading = ref(false);

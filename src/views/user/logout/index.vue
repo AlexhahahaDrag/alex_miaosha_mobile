@@ -4,7 +4,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, } from 'vue';
 import { ToastOptions, showToast } from 'vant';
 import { logoutApi } from '@/api/user/login'
 import router from '@/router/index'

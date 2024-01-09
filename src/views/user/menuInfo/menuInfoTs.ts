@@ -1,4 +1,3 @@
-import { ref } from 'vue';
 export interface SearchInfo {
   name?: string;
   path?: string;

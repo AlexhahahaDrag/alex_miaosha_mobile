@@ -35,8 +35,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
-import { useRoute, useRouter } from "vue-router";
 import navBar from '@/views/common/navBar/index.vue';
 import { showFailToast, showSuccessToast } from 'vant';
 import { addOrEditMenuInfo, getMenuInfoDetail } from '@/api/user/menuInfo/menuInfoTs';

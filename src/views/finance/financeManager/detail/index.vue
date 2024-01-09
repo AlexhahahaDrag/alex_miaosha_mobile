@@ -32,8 +32,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
-import { useRoute, useRouter } from "vue-router";
 import navBar from '@/views/common/navBar/index.vue';
 import dayjs, { Dayjs } from 'dayjs';
 import { getDictList } from "@/api/finance/dict/dictManager";

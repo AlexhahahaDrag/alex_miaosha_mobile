@@ -1,4 +1,3 @@
-import { ref } from 'vue';
 import { Dayjs } from 'dayjs';
 export interface SearchInfo {
   name?: string;

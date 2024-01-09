@@ -19,7 +19,6 @@ import { reactive, ref } from "vue";
 import Tabbar from "./tabbar/index.vue";
 import navBar from "@/views/common/navBar/index.vue";
 import svgIcon from "@/views/common/icons/svgIcon.vue";
-import { useRouter } from "vue-router";
 
 let router = useRouter();
 let homeList = ref<any>([]);

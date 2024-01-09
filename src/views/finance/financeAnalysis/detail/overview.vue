@@ -13,7 +13,6 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
 import { getBalance, } from '@/api/finance/financeAnalysis';
 import { FinanceDetail } from "./common";
 import { showNotify } from 'vant';

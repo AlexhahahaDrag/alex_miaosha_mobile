@@ -1,4 +1,3 @@
-import { ref } from 'vue';
 export interface SearchInfo {
   orgCode?: string;
   orgName?: string;
