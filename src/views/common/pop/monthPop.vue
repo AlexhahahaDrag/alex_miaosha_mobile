@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-import dayjs from 'dayjs';
+import { formatDayjs } from '@/utils/dayjs/index';
 
 export interface Info {
     label?: string;
@@ -34,7 +34,7 @@ const confirm = ({ selectedValues }) => {
     showFlag.value = false;
     let dateName = selectedValues[0] + '年' + selectedValues[1] + '月';
     let dateStr = selectedValues[0] + '-' + selectedValues[1] + '-' + '01';
-    emit('selectInfo', dayjs(dateStr), dateName);
+    emit('selectInfo', formatDayjs(dateStr), dateName);
 };
 
 const onClickOverlay = () => {
@@ -52,7 +52,6 @@ watch(
     () => props.info.showFlag,
     () => {
         if (props.info.showFlag) {
-            console.log(`props.info:`, props.info);
             cur.value = props.info;
             showFlag.value = props.info.showFlag;
             if (props.info.selectValue) {

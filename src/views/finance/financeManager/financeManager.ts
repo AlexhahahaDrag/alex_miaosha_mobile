@@ -11,6 +11,7 @@ export interface SearchInfo {
   belongTo?: number;
   infoDateStart?: string | null;
   infoDateEnd?: string | null;
+  bigTypeCode?: string | null;
 }
 
 export interface pageInfo {
@@ -142,4 +143,4 @@ export const fromSourceTransferList = [
   { value: "df", label: "electricCharge",  },
   { value: "jd", label: "jingdong", },
   { value: "other", label: "", },
-]
+];

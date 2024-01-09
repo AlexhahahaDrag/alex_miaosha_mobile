@@ -67,16 +67,6 @@ volumes: # 定义流水线挂载目录，用于共享数据
     host:
       path: /usr/local/soft/alex_miaosha/drone/alex_miaosha/front   #jar包目录可以修改从宿主机中挂载的目录
 
-  - name: retry
-    image: drone/retry
-    settings:
-      attempts: 3
-      intervals: 10
-
-plugins:
-  retriable:
-    enabled: true
-
 # 可限制哪些分支可以推送自动CICD
 trigger:
   branch:
