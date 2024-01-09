@@ -1,5 +1,3 @@
-import { ref } from "vue";
-
 export interface SearchInfo {
   name?: string;
   typeCode?: string;
