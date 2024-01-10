@@ -24,7 +24,7 @@
           <van-cell             
             :title-class="item.status == '1' ? 'validClass' : 'notValidClass'"
             :title="item.orgName" :key='index' is-link
-            :to='{ path: "/user/orgInfo/detail", query: { id: item.id } }'>
+            :to='{ path: "/user/orgInfo/orgInfoDetail", query: { id: item.id } }'>
             <template #label>
               <div class="iconClass">
                 <div class='icon'>
@@ -122,7 +122,7 @@ function query(param: SearchInfo, cur: pageInfo) {
 }
 
 const addOrgInfo = () => {
-  router.push({ path: '/user/orgInfo/detail' });
+  router.push({ path: '/user/orgInfo/orgInfoDetail' });
 }
 
 let userMap = {};

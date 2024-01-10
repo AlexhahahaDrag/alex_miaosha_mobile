@@ -47,7 +47,7 @@
             :key="index"
             is-link
             :to="{
-              path: '/finance/financeManager/detail',
+              path: '/finance/financeManager/financeManagerDetail',
               query: { id: item.id },
             }"
           >
@@ -170,7 +170,6 @@ function getFinancePage(param: SearchInfo, cur: pageInfo) {
   )
     .then((res) => {
       if (res?.code == "200") {
-        console.log(`pagination.value:`, pagination.value);
         dataSource.value = [...dataSource.value, ...res.data.records];
         pagination.value.current = res.data.current + 1;
         pagination.value.pageSize = res.data.size;
@@ -191,7 +190,7 @@ function getFinancePage(param: SearchInfo, cur: pageInfo) {
 }
 
 const addFinance = () => {
-  router.push({ path: "/finance/financeManager/detail" });
+  router.push({ path: "/finance/financeManager/financeManagerDetail" });
 };
 
 let userMap = {};

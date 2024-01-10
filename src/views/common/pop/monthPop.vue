@@ -1,6 +1,6 @@
 <template>
     <van-popup v-model:show="showFlag" position="bottom" :style="{ width: '100%' }" @click-overlay="onClickOverlay">
-        <van-date-picker v-model="curSelectValue" :title="cur.labelName" :formatter="info.formatter" @confirm="confirm"
+        <van-date-picker v-model="curSelectValue" :title="cur?.labelName" :formatter="info.formatter" @confirm="confirm"
             @cancel="cancel" :columns-type="info.columnsType" />
     </van-popup>
 </template>

@@ -37,7 +37,7 @@ import { getDictList } from "@/api/finance/dict/dictManager";
 import { getUserManagerList } from "@/api/user/userManager";
 import { useUserStore } from "@/store/modules/user/user";
 import { Info } from '@/views/common/pop/selectPop.vue';
-import { showFailToast ,showSuccessToast } from 'vant';
+import { showFailToast, showSuccessToast } from 'vant';
 import { addOrEditFinanceManger, getFinanceMangerDetail } from '@/api/finance/financeManager';
 
 let route = useRoute();
@@ -253,7 +253,7 @@ const onSubmit = () => {
             // todo 是否修改成返回列表对应的位置
             router.push({ path: '/finance/financeManager' });
         } else {
-            showFailToast (res?.message || '保存失败，请联系管理员!');
+            showFailToast(res?.message || '保存失败，请联系管理员!');
         }
     });
 };
@@ -273,7 +273,7 @@ function getDictInfoList(res: any) {
         incomeAndExpensesName.value = getListName(incomeAndExpensesInfo.value.list || [], formInfo.value.incomeAndExpenses, 'typeCode', 'typeName');
         isValidName.value = getListName(isValidInfo.value.list || [], formInfo.value.isValid, 'typeCode', 'typeName');
     } else {
-        showFailToast (res?.message || '查询失败，请联系管理员!')
+        showFailToast(res?.message || '查询失败，请联系管理员!')
     }
 }
 
@@ -295,7 +295,7 @@ function getUserInfoList(res: any) {
         belongToInfo.value.list = res.data;
         belongToName.value = getListName(res.data, formInfo.value.belongTo, 'id', 'nickName');
     } else {
-        showFailToast (res[2]?.message || '查询失败，请联系管理员!')
+        showFailToast(res[2]?.message || '查询失败，请联系管理员!')
     }
 }
 
@@ -317,12 +317,12 @@ function init() {
                 formInfo.value.infoDate = dayjs(formInfo.value.infoDate);
                 initInfoDate(formInfo.value.infoDate);
             } else {
-                showFailToast (res[0]?.message || '查询详情失败，请联系管理员!')
+                showFailToast(res[0]?.message || '查询详情失败，请联系管理员!')
             }
             getUserInfoList(res[1])
             getDictInfoList(res[2]);
         }).catch(() => {
-            showFailToast ('系统问题，请联系管理员！')
+            showFailToast('系统问题，请联系管理员！')
         });
     } else {
         formInfo.value = {

@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-import { formatDayjs } from '@/utils/dayjs/index.ts';
+import { formatDayjs } from '@/utils/dayjs/index';
 
 export interface Info {
     label?: string;

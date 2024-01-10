@@ -24,7 +24,7 @@
       <van-cell-group>
         <van-swipe-cell v-for='(item, index) in dataSource' :before-close='beforeClose' :key="index">
           <van-cell :title="item.id" :key='index' is-link
-            :to='{ path: "/product/pmsAttr/detail", query: { id: item.id } }'>
+            :to='{ path: "/product/pmsAttr/pmsAttrDetail", query: { id: item.id } }'>
             <template #label>
               <div class="iconClass">
                 <div class='icon' style='background-color: #ffcc00'>
@@ -122,7 +122,7 @@ function query(param: SearchInfo, cur: pageInfo) {
 }
 
 const addPmsAttr = () => {
-  router.push({ path: '/product/pmsAttr/detail' });
+  router.push({ path: '/product/pmsAttr/pmsAttrDetail' });
 }
 
 let userMap = {};

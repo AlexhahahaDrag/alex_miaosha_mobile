@@ -85,15 +85,12 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _from, next) => {
   const userStore = useUserStore();
   if (to.path == '/login') {
     next();
-    console.log('from' + from)
   } else if (userStore.getToken) {
-    if (!userStore.getRouteStatus) {
-      addRouter();
-    } else if (routes.length <= 5) {
+    if (!userStore.getRouteStatus || routes.length <= 5) {
       addRouter();
       next({ ...to, replace: true })
     } else {
@@ -120,6 +117,7 @@ const getChildren = (item: MenuInfo): any => {
   let component = item.component == null ? Error404 : 
     ("Layout" === item.component ? Layout : 
       modules[item.component]);
+      console.log('modules:', item.component, modules[item.component], modules, component)
   let routeInfo: RouteRecordRaw = {
     path: item.path,
     component: component,
@@ -128,8 +126,8 @@ const getChildren = (item: MenuInfo): any => {
     meta: {
       title: item.title,
       icon: item.icon,
-      hiedInMenu: item.hideInMenu == '0' ? false : true,
-      showInHome: item.showInHome == '1' ? true : false,
+      hiedInMenu: item.hideInMenu != '0',
+      showInHome: item.showInHome == '1',
     },
     children: [],
   };

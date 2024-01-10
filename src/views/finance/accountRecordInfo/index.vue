@@ -37,7 +37,7 @@
             :key="index"
             is-link
             :to="{
-              path: '/finance/accountRecordInfo/detail',
+              path: '/finance/accountRecordInfo/accountRecordInfoDetail',
               query: { id: item.id },
             }"
           >
@@ -157,7 +157,7 @@ function query(param: SearchInfo, cur: pageInfo) {
 }
 
 const addAccountRecordInfo = () => {
-  router.push({ path: "/finance/accountRecordInfo/detail" });
+  router.push({ path: "/finance/accountRecordInfo/accountRecordInfoDetail" });
 };
 
 let userMap = {};
