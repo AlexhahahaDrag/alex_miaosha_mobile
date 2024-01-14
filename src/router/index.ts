@@ -117,7 +117,6 @@ const getChildren = (item: MenuInfo): any => {
   let component = item.component == null ? Error404 : 
     ("Layout" === item.component ? Layout : 
       modules[item.component]);
-      console.log('modules:', item.component, modules[item.component], modules, component)
   let routeInfo: RouteRecordRaw = {
     path: item.path,
     component: component,
