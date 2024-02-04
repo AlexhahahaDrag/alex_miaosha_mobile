@@ -10,6 +10,8 @@ export interface UserState {
   lastUpdateTime: number;
   menuInfo: MenuInfo[] | null;
   hasMenu: boolean;
+  orgInfo: any,
+  roleInfo: any,
 }
 
 export interface RoleInfo {
@@ -45,4 +47,5 @@ export interface MenuInfo {
   summary: string;
   status: string;
   children: MenuInfo[];
+  permissionCode: string;
 }

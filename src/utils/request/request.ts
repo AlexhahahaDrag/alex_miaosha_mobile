@@ -18,8 +18,6 @@ const errorHandler = (error: AxiosError): Promise<any> => {
     const { status } = error.response;
     // 403 无权限
     if (status === 403) {
-      // todo修改提示信息
-      // message.warning("请先登录！", 3);
       router.push('/Login');
     }
   }
@@ -62,10 +60,7 @@ request.interceptors.request.use(requestHandler, errorHandler);
 const responseHandler = (
   response: AxiosResponse<any>
 ): ResponseBody<any> | AxiosResponse<any> | Promise<any> | any => {
-  const { data, request } = response;
-  if (request?.responseURL?.indexOf('/user/login') >= 0) {
-    return data;
-  }
+  const { data } = response;
   let resData = decrypt(data);
   if (resData.code == 403) {
     router.push('/Login');
