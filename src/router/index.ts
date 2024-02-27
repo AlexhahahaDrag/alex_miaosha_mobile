@@ -85,12 +85,15 @@ const router = createRouter({
   routes,
 });
 
+let dynamicRouter = [] as any[];
+
 router.beforeEach((to, _from, next) => {
   const userStore = useUserStore();
   if (to.path == '/login') {
     next();
   } else if (userStore.getToken) {
     if (!userStore.getRouteStatus || routes.length <= 5) {
+      dynamicRouter = [];
       addRouter();
       next({ ...to, replace: true })
     } else {
@@ -99,21 +102,30 @@ router.beforeEach((to, _from, next) => {
   } else {
     next({ name: 'login' });
   }
+  console.log(`router`, router, routes)
 });
 
 const addRouter = () => {
   const userStore = useUserStore();
   if (userStore.menuInfo?.length) {
+    let aa = userStore.getRoleInfo;
+    console.log(`role`, aa);
+    if (!aa?.permissionList?.length) {
+      return;
+    }
     userStore.menuInfo.forEach((item: MenuInfo) => {
-      let newRouter = getChildren(item);
-      router.addRoute(newRouter);
-      routes.push(newRouter);
+      if (judgePermission(aa?.permissionList, item?.permissionCode)) {
+        let newRouter = getChildren(item, aa?.permissionList);
+        router.addRoute(newRouter);
+        dynamicRouter.push(newRouter);
+        routes.push(newRouter);
+      }
     });
     userStore.changeRouteStatus(true);
   }
 };
 
-const getChildren = (item: MenuInfo): any => {
+const getChildren = (item: MenuInfo, permissionList: any[]): any => {
   let component = item.component == null ? Error404 : 
     ("Layout" === item.component ? Layout : 
       modules[item.component]);
@@ -127,12 +139,15 @@ const getChildren = (item: MenuInfo): any => {
       icon: item.icon,
       hiedInMenu: item.hideInMenu != '0',
       showInHome: item.showInHome == '1',
+      permissionCode: item.permissionCode,
     },
     children: [],
   };
   if (item?.children?.length) {
     item.children.forEach((childItem: any) => {
-      routeInfo.children?.push(getChildren(childItem));
+      if (judgePermission(permissionList, childItem?.permissionCode)) {
+        routeInfo.children?.push(getChildren(childItem, permissionList));
+      }
     });
   }
   return routeInfo;
@@ -140,5 +155,26 @@ const getChildren = (item: MenuInfo): any => {
 
 router.afterEach(() => {
 });
+
+const judgePermission = (permissionList: any[], permissionCode: string) => {
+  if (!permissionList?.length) {
+    return false;
+  }
+  for (const item of permissionList) {
+    if (item?.permissionCode === permissionCode) {
+        return true;
+    }
+  }
+  return false;
+}
+
+export const refreshRouter = () => {
+  dynamicRouter.forEach(route => {
+    router.removeRoute(route.name);
+    let index = routes.findIndex(item => item.name === route.name);
+    routes.splice(index);
+  });
+  dynamicRouter = []; // 清空引用
+}
 
 export default router;

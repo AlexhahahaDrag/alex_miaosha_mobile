@@ -11,7 +11,7 @@
                     <van-field v-model="loginForm.username" name="username" label="用户名" placeholder="用户名"
                         :rules="[{ required: true, message: '请填写用户名' }]" />
                     <van-field v-model="loginForm.password" type="password" name="password" label="密码" placeholder="密码"
-                        :rules="[{ required: true, message: '请填写密码' }]" autocomplete="" />
+                        :rules="[{ required: true, message: '请填写密码' }]" autocomplete="on" />
                 </van-cell-group>
                 <div style="margin: 16px;">
                     <van-button round block type="primary" native-type="submit">
