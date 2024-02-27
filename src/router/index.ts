@@ -108,14 +108,13 @@ router.beforeEach((to, _from, next) => {
 const addRouter = () => {
   const userStore = useUserStore();
   if (userStore.menuInfo?.length) {
-    let aa = userStore.getRoleInfo;
-    console.log(`role`, aa);
-    if (!aa?.permissionList?.length) {
+    let roleInfo = userStore.getRoleInfo;
+    if (roleInfo.roleCode !== 'super_super' && !roleInfo?.permissionList?.length) {
       return;
     }
     userStore.menuInfo.forEach((item: MenuInfo) => {
-      if (judgePermission(aa?.permissionList, item?.permissionCode)) {
-        let newRouter = getChildren(item, aa?.permissionList);
+      if (judgePermission(roleInfo?.permissionList, item?.permissionCode, roleInfo.roleCode)) {
+        let newRouter = getChildren(item, roleInfo?.permissionList, roleInfo.roleCode);
         router.addRoute(newRouter);
         dynamicRouter.push(newRouter);
         routes.push(newRouter);
@@ -125,7 +124,7 @@ const addRouter = () => {
   }
 };
 
-const getChildren = (item: MenuInfo, permissionList: any[]): any => {
+const getChildren = (item: MenuInfo, permissionList: any[], roleCode: string): any => {
   let component = item.component == null ? Error404 : 
     ("Layout" === item.component ? Layout : 
       modules[item.component]);
@@ -145,8 +144,8 @@ const getChildren = (item: MenuInfo, permissionList: any[]): any => {
   };
   if (item?.children?.length) {
     item.children.forEach((childItem: any) => {
-      if (judgePermission(permissionList, childItem?.permissionCode)) {
-        routeInfo.children?.push(getChildren(childItem, permissionList));
+      if (judgePermission(permissionList, childItem?.permissionCode, roleCode)) {
+        routeInfo.children?.push(getChildren(childItem, permissionList, roleCode));
       }
     });
   }
@@ -156,7 +155,10 @@ const getChildren = (item: MenuInfo, permissionList: any[]): any => {
 router.afterEach(() => {
 });
 
-const judgePermission = (permissionList: any[], permissionCode: string) => {
+const judgePermission = (permissionList: any[], permissionCode: string,  roleCode: string) => {
+  if (roleCode === 'super_super') {
+    return true;
+  }
   if (!permissionList?.length) {
     return false;
   }
