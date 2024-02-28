@@ -8,7 +8,7 @@
       :to="item.path"
     >
       <svgIcon class="homeSvgClass" :name="item?.meta?.icon"></svgIcon>
-      <span class="homeFontClass">{{ item?.meta?.title || "null" }}</span>
+      <span class="homeFontClass">{{ item?.meta?.title || "null" }}{{ item.meta.title }}</span>
     </van-grid-item>
   </van-grid>
   <Tabbar :data="useTabBar"></Tabbar>
@@ -21,6 +21,7 @@ let homeList = ref<any>([]);
 
 const getHomeList = (arr: any[] | null) => {
   if (arr?.length) {
+    homeList.value = [];
     arr.forEach((item: any) => {
       if (item) {
         if(item?.meta?.showInHome) {
@@ -29,6 +30,7 @@ const getHomeList = (arr: any[] | null) => {
         if (item.children?.length) {
           getHomeList(item.children);
         }
+        console.log(`homeList:`, homeList.value);
       }
     });
   }
@@ -62,8 +64,8 @@ const info = ref<any>({
 
 <style lang="scss" scoped>
 .homeSvgClass {
-  height: 100%;
-  width: 100%;
+  height: 80%;
+  width: 80%;
   font-size: 18px;
   cursor: pointer;
   vertical-align: middle;
@@ -71,6 +73,7 @@ const info = ref<any>({
 
 .homeFontClass {
   margin-top: 8px;
+  margin-bottom: 8px;
   color: darkgray;
   font-weight: bold;
   font-size: 14px;

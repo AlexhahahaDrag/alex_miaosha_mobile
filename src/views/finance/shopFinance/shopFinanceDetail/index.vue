@@ -91,12 +91,12 @@ const cancelDateInfo = () => {
     chooseDateInfo.value.showFlag = false;
 }
 
-const initInfoDate = (infoDate: Dayjs, type: string) => {
-    if (infoDate) {
+const initSaleDate = (saleDate: Dayjs, type: string) => {
+    if (saleDate) {
         switch (type) {
             case 'saleDate':
-                saleDateName.value = dayjs(infoDate).format('YYYY-MM-DD');
-                saleDateInfo.value.selectValue = infoDate;
+                saleDateName.value = dayjs(saleDate).format('YYYY-MM-DD');
+                saleDateInfo.value.selectValue = saleDate;
                 break;
         }
     }
@@ -234,19 +234,20 @@ function init() {
         ]).then((res: any) => {
             if (res[0].code == '200') {
                 formInfo.value = res[0].data;
-                initInfoDate(formInfo.value.saleDate, 'saleDate');
+                formInfo.value.saleDate = dayjs(formInfo.value.saleDate);
+                initSaleDate(formInfo.value.saleDate, 'saleDate');
             } else {
                 showFailToast(res?.message || '查询详情失败，请联系管理员!')
             }
             getDictInfoList(res[1]);
-        }).catch((error: any) => {
+        }).catch((_error: any) => {
             showFailToast('系统问题，请联系管理员！')
         });
     } else {
         formInfo.value = {
             saleDate: dayjs(),
         };
-        initInfoDate(formInfo.value.saleDate, 'saleDate');
+        initSaleDate(formInfo.value.saleDate, 'saleDate');
     }
 }
 

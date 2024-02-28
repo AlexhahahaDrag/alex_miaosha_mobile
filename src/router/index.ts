@@ -109,7 +109,7 @@ const addRouter = () => {
   const userStore = useUserStore();
   if (userStore.menuInfo?.length) {
     let roleInfo = userStore.getRoleInfo;
-    if (roleInfo.roleCode !== 'super_super' && !roleInfo?.permissionList?.length) {
+    if (roleInfo?.roleCode !== 'super_super' && !roleInfo?.permissionList?.length) {
       return;
     }
     userStore.menuInfo.forEach((item: MenuInfo) => {
