@@ -5,6 +5,7 @@ import { LoginParams } from "@/api/user/login";
 import { piniaPersistConfig } from '@/config/piniaPersist';
 import { showFailToast } from 'vant';
 import type { MenuInfo } from "./typing";
+import { refreshRouter } from "@/router";
 
 export const useUserStore = defineStore({
   id: 'app-user',
@@ -87,6 +88,8 @@ export const useUserStore = defineStore({
           this.setMenuInfo(admin.menuInfoVoList);
           this.setRoleInfo(admin.roleInfoVo);
           this.setOrgInfo(admin.orgInfoVo);
+          this.changeRouteStatus(false);
+          refreshRouter();
           return admin;
         } else {
           showFailToast((data?.message) || '登录失败！');

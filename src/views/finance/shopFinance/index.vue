@@ -3,7 +3,7 @@
   <van-pull-refresh pulling-text="加载中。。。" :style="{ height: 'calc(100% - 44px)' }" v-model='isRefresh' @refresh='refresh'
     ref='pullRefresh' immediate-check='false'>
     <form action='/'>
-    <!--
+      <!--
     <van-search
         v-model='searchInfo.typeCode'
         show-action
@@ -13,42 +13,62 @@
         action-text="清空"/>
     -->
     </form>
-    <van-divider
-      :style="{
-        color: '#1989fa',
-        borderColor: 'grey',
-      }"
-    ></van-divider>
+    <van-divider :style="{
+      color: '#1989fa',
+      borderColor: 'grey',
+    }"></van-divider>
     <van-empty v-if='dataSource.length == 0' description='暂无数据' />
     <van-list v-else v-model:loading='loading' :finished='finished' finished-text='没有更多了' @load='onRefresh'>
       <van-cell-group>
         <van-swipe-cell v-for='(item, index) in dataSource' :before-close='beforeClose' :key="index">
-          <van-cell :title="item.id" :key='index' is-link
-            :to='{ path: "/finance/shopFinance/shopFinanceDetail", query: { id: item.id } }'>
+          <van-cell :title-class="item.isValid == '1' ? 'validClass' : 'notValidClass'" 
+          :title="'货物' + item.shopName + (item?.shopCode ? '(' + item.shopCode + ')' : '')" 
+          :key="index" is-link :to="{path: '/finance/shopFinance/shopFinanceDetail', query: { id: item.id }, }">
             <template #label>
-              <div class="iconClass">
-                <div class='icon' style='background-color: #ffcc00'>
-                  {{item.shopName }}
+              <div class="svgInfo">
+                <div class="svgDiv" v-for="(fromSource, index) in fromSourceTransferList" :key="index">
+                  <svgIcon v-if="item.payWay.indexOf(fromSource.value) >= 0 && fromSource.value != ''"
+                    :name="fromSource.label" class="svg"></svgIcon>
                 </div>
               </div>
             </template>
             <template #right-icon>
-              <div class='text-right'>
-                <div style='display: flex'>
-                  <div class='van-ellipsis'>
-                    {{item.shopCode }}
+              <div class="text-right">
+                <div style="display: flex">
+                  <div class="van-ellipsis">
+                    {{
+                      item?.saleDate
+                      ? String(item.saleDate).substring(0, 10)
+                      : "--"
+                    }}
                   </div>
                 </div>
-                <div :class="true ? 'rightDiv' : 'rightRedDiv'">
-                    item.isValid+item.saleDate+;
+                <div :class="item.incomeAndExpenses === 'income'
+                      ? 'rightGreenDiv'
+                      : 'rightRedDiv'
+                    ">
+                  {{
+                    item.saleAmount
+                    ? (item.incomeAndExpenses === "income"
+                      ? item.saleAmount
+                      : -item.saleAmount) + "元"
+                    : "--"
+                  }}
                 </div>
               </div>
             </template>
           </van-cell>
           <template #right>
-            <van-button class='right_info' @click='delShopFinance(item.id)' square type='danger' text='删除' />
+            <van-button class="right_info" @click="delFinance(item.id)" square type="danger" text="删除" />
           </template>
-          <van-divider class="dividerClass"></van-divider>
+          <van-divider :style="{
+            color: '#1989fa',
+            borderColor: 'grey',
+            padding: '0 16px',
+            'margin-top': '0px',
+            'margin-bottom': '0px',
+          }">
+          </van-divider>
         </van-swipe-cell>
       </van-cell-group>
     </van-list>
@@ -57,21 +77,21 @@
 </template>
 <script lang='ts' setup>
 import {
-    getShopFinancePage,
-    deleteShopFinance,
+  getShopFinancePage,
+  deleteShopFinance,
 } from '@/api/finance/shopFinance/shopFinanceTs';
-import { getUserManagerList, } from '@/api/user/userManager';
 import {
   SearchInfo,
   pagination,
   pageInfo,
+  fromSourceTransferList,
 } from './shopFinanceTs';
 import { showSuccessToast, showFailToast } from 'vant';
 
 let router = useRouter();
 let route = useRoute();
 const info = ref<any>({
-  title: route?.meta?.title || '财务管理11',
+  title: route?.meta?.title || '店财务管理',
   rightButton: '新增',
   leftPath: "/",
 })
@@ -103,8 +123,8 @@ function query(param: SearchInfo, cur: pageInfo) {
         pagination.value.current = res.data.current + 1;
         pagination.value.pageSize = res.data.size;
         pagination.value.total = res.data.total;
-        if ((pagination.value.total|| 0) <
-              (pagination.value.current || 1) * (pagination.value.pageSize || 10)) {
+        if ((pagination.value.total || 0) <
+          (pagination.value.current || 1) * (pagination.value.pageSize || 10)) {
           finished.value = true;
         }
       } else {
@@ -119,21 +139,6 @@ function query(param: SearchInfo, cur: pageInfo) {
 
 const addShopFinance = () => {
   router.push({ path: '/finance/shopFinance/shopFinanceDetail' });
-}
-
-let userMap = {};
-function getUserInfoList() {
-  getUserManagerList({}).then((res: any) => {
-    if (res?.code == '200') {
-      if (res?.data) {
-        res.data.forEach((user: { id: string | number; nickName: any; }) => {
-          userMap[user.id] = user.nickName;
-        });
-      }
-    } else {
-      showFailToast((res?.message) || '查询列表失败！');
-    }
-  });
 }
 
 const refresh = () => {
@@ -165,8 +170,6 @@ function init() {
   dataSource.value = [];
   pagination.value.current = 0;
   query(searchInfo.value, pagination.value);
-  //获取用户信息
-  getUserInfoList();
 }
 
 init();
@@ -177,31 +180,61 @@ init();
   height: 100%;
 }
 
+.svgInfo {
+  margin-top: 10px; 
+  display: flex;
+  .svgDiv {
+    height: 30px;
+    .svgClass {
+      height: 100%;
+    }
+    .svg {
+      width: 1.5em;
+      height: 1.5em;
+      font-size: 18px;
+      cursor: pointer;
+      vertical-align: middle;
+    }
+  }
+}
+
+.van-ellipsis {
+  width: 130px; 
+  text-align: right;
+}
+
 .rightDiv {
   margin-top: 10px;
   text-align: right;
 }
 
+.rightGreenDiv {
+  margin-top: 10px;
+  text-align: right;
+  color: green;
+}
+
 .rightRedDiv {
   margin-top: 10px;
   text-align: right;
-  color:red
+  color: red
 }
 
 .iconClass {
-   margin-top: 10px;
-   display: flex;
+  margin-top: 10px;
+  display: flex;
 }
+
 .van-ellipsis {
-    width: 130px;
-    text-align:right;
+  width: 130px;
+  text-align: right;
 }
 
 .dividerClass {
-    color: #1989fa;
-    border-color: grey;
-    padding: 0 16px;
-    margin-top: 0px;
-    margin-bottom: 0px;
+  color: #1989fa;
+  border-color: grey;
+  padding: 0 16px;
+  margin-top: 0px;
+  margin-bottom: 0px;
 }
 </style>

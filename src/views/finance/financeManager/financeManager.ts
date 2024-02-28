@@ -9,7 +9,7 @@ export interface SearchInfo {
   belongTo?: number;
   infoDateStart?: string | null;
   infoDateEnd?: string | null;
-  bigTypeCode?: string | null;
+  bigTypeCode?: string;
 }
 
 export interface pageInfo {

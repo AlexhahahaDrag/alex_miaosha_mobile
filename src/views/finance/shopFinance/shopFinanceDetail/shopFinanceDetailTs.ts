@@ -4,6 +4,8 @@ export const label = reactive({
     saleAmount: '售价',
     isValid: '是否有效',
     saleDate: '销售日期',
+    incomeAndExpenses: '收支类型',
+    payWay: '支付方式',
 });
 
 export const rulesRef = reactive({
@@ -35,6 +37,18 @@ export const rulesRef = reactive({
         {
             required: true,
             message: label.saleDate + '不能为空！',
+        },
+    ],
+    payWay: [
+        {
+            required: true,
+            message: label.payWay + '不能为空！',
+        },
+    ],
+    incomeAndExpenses: [
+        {
+            required: true,
+            message: label.incomeAndExpenses + '不能为空！',
         },
     ],
 });
