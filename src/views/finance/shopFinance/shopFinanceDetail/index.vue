@@ -8,6 +8,8 @@
                 :placeholder="'请输入' + label.shopCode" :maxlength="255" />
             <van-field v-model="formInfo.saleAmount" name="saleAmount" :label="label.saleAmount + '：'"
                 :placeholder="'请输入' + label.saleAmount" :rules="rulesRef.saleAmount" :maxlength="10" />
+            <van-field v-model="formInfo.saleNum" name="saleNum" :label="label.saleNum + '：'"
+                :placeholder="'请输入' + label.saleNum" :rules="rulesRef.saleNum" :maxlength="10" />
             <van-field v-model="payWayName" name="payWay" :label="label.payWay + '：'" :placeholder="'请输入' + label.payWay"
                 :rules="rulesRef.payWay" @click="choose('payWay')" readonly />
             <van-field v-model="incomeAndExpensesName" name="incomeAndExpenses" :label="label.incomeAndExpenses + '：'"
@@ -204,7 +206,7 @@ function getDictInfoList(res: any) {
         isValidInfo.value.list = res.data.filter(
             (item: { belongTo: string }) => item.belongTo == "is_valid"
         );
-        payWayName.value = getListName(payWayInfo.value.list || [], formInfo.value.payWayInfo, 'typeCode', 'typeName');
+        payWayName.value = getListName(payWayInfo.value.list || [], formInfo.value.payWay, 'typeCode', 'typeName');
         incomeAndExpensesName.value = getListName(incomeAndExpensesInfo.value.list || [], formInfo.value.incomeAndExpenses, 'typeCode', 'typeName');
         isValidName.value = getListName(isValidInfo.value.list || [], formInfo.value.isValid, 'typeCode', 'typeName');
     } else {
@@ -244,8 +246,13 @@ function init() {
             showFailToast('系统问题，请联系管理员！')
         });
     } else {
+        getDictList('pay_way,income_expense_type,is_valid').then((res: any) => { getDictInfoList(res) });
         formInfo.value = {
             saleDate: dayjs(),
+            isValid: '1',
+            incomeAndExpenses: "income",
+            payWay: 'wx',
+            saleNum: 1,
         };
         initSaleDate(formInfo.value.saleDate, 'saleDate');
     }

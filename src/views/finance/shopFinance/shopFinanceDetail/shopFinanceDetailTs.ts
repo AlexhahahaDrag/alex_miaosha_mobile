@@ -6,6 +6,7 @@ export const label = reactive({
     saleDate: '销售日期',
     incomeAndExpenses: '收支类型',
     payWay: '支付方式',
+    saleNum: '销售件数',
 });
 
 export const rulesRef = reactive({
@@ -26,6 +27,7 @@ export const rulesRef = reactive({
             required: true,
             message: label.saleAmount + '不能为空！',
         },
+        { pattern: /^\d+(\.\d+)?$/, message: '请输入正确的价格' }
     ],
     isValid: [
         {
@@ -50,5 +52,12 @@ export const rulesRef = reactive({
             required: true,
             message: label.incomeAndExpenses + '不能为空！',
         },
+    ],
+    saleNum: [
+        {
+            required: true,
+            message: label.saleNum + '不能为空！',
+        },
+        { pattern: /^\d+(\.\d+)?$/, message: '请输入正确的数量' }
     ],
 });

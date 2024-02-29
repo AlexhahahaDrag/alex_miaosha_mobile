@@ -19,6 +19,12 @@ const errorHandler = (error: AxiosError): Promise<any> => {
     // 403 无权限
     if (status === 403) {
       router.push('/Login');
+      return Promise.reject(error);
+    }
+    const { data } = error.response as any;
+    if (data) {
+      let resData = decrypt(data);
+      error.response.data = resData;
     }
   }
   return Promise.reject(error);

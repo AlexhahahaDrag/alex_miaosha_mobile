@@ -21,7 +21,6 @@ let homeList = ref<any>([]);
 
 const getHomeList = (arr: any[] | null) => {
   if (arr?.length) {
-    homeList.value = [];
     arr.forEach((item: any) => {
       if (item) {
         if(item?.meta?.showInHome) {
@@ -36,7 +35,12 @@ const getHomeList = (arr: any[] | null) => {
   }
 };
 
-getHomeList(router?.options?.routes || []);
+const init = () => {
+  homeList.value = [];
+  getHomeList(router?.options?.routes || []);
+}
+
+init();
 
 const useTabBar = reactive([
   {

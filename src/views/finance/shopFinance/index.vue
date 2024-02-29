@@ -22,7 +22,7 @@
       <van-cell-group>
         <van-swipe-cell v-for='(item, index) in dataSource' :before-close='beforeClose' :key="index">
           <van-cell :title-class="item.isValid == '1' ? 'validClass' : 'notValidClass'" 
-          :title="'货物' + item.shopName + (item?.shopCode ? '(' + item.shopCode + ')' : '')" 
+          :title="'货物' + item.shopName + (item?.saleNum ? '(' + item.saleNum + '件)' : '')"
           :key="index" is-link :to="{path: '/finance/shopFinance/shopFinanceDetail', query: { id: item.id }, }">
             <template #label>
               <div class="svgInfo">
