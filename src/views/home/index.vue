@@ -8,7 +8,7 @@
       :to="item.path"
     >
       <svgIcon class="homeSvgClass" :name="item?.meta?.icon"></svgIcon>
-      <span class="homeFontClass">{{ item?.meta?.title || "null" }}{{ item.meta.title }}</span>
+      <span class="homeFontClass">{{ item?.meta?.title || "null" }}</span>
     </van-grid-item>
   </van-grid>
   <Tabbar :data="useTabBar"></Tabbar>

@@ -243,6 +243,7 @@ function init() {
             }
             getDictInfoList(res[1]);
         }).catch((_error: any) => {
+            console.log(`error:`, _error);
             showFailToast('系统问题，请联系管理员！')
         });
     } else {

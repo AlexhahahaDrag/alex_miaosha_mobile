@@ -102,7 +102,7 @@ router.beforeEach((to, _from, next) => {
   } else {
     next({ name: 'login' });
   }
-  console.log(`router`, router, routes)
+  console.log(`router:`, router, router.options.routes)
 });
 
 const addRouter = () => {
