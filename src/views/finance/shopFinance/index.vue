@@ -234,7 +234,7 @@ init();
   color: #1989fa;
   border-color: grey;
   padding: 0 16px;
-  margin-top: 0px;
-  margin-bottom: 0px;
+  margin-top: 1px;
+  margin-bottom: 1px;
 }
 </style>
