@@ -1,6 +1,6 @@
 <template>
   <navBar :info='info' @clickRight='addShopFinance'></navBar>
-  <van-pull-refresh pulling-text="加载中。。。" :style="{ height: 'calc(100% - 44px)' }" v-model='isRefresh' @refresh='refresh'
+  <van-pull-refresh pulling-text="加载中。。。" :style="{ height: 'calc(100% - 44px)' }" v-model:value="isRefresh" @refresh='refresh'
     ref='pullRefresh' immediate-check='false'>
     <form action='/'>
       <!--
@@ -38,7 +38,7 @@
                   <div class="van-ellipsis">
                     {{
                       item?.saleDate
-                      ? String(item.saleDate).substring(0, 10)
+                      ? String(item?.saleDate).substring(0, 10)
                       : "--"
                     }}
                   </div>
@@ -48,10 +48,10 @@
                       : 'rightRedDiv'
                     ">
                   {{
-                    item.saleAmount
-                    ? (item.incomeAndExpenses === "income"
-                      ? item.saleAmount
-                      : -item.saleAmount) + "元"
+                    item?.saleAmount
+                    ? (item?.incomeAndExpenses === "income"
+                      ? item?.saleAmount
+                      : -item?.saleAmount) + "元"
                     : "--"
                   }}
                 </div>
@@ -59,7 +59,7 @@
             </template>
           </van-cell>
           <template #right>
-            <van-button class="right_info" @click="delFinance(item.id)" square type="danger" text="删除" />
+            <van-button class="right_info" @click="delShopFinance(item.id)" square type="danger" text="删除" />
           </template>
           <van-divider :style="{
             color: '#1989fa',

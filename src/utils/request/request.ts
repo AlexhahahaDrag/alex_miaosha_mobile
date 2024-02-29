@@ -1,8 +1,8 @@
-import { useUserStore } from "@/store/modules/user/user";
-import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
-import { ResponseBody } from "@/api/typing";
-import  router from "@/router";
-import { decrypt } from '@/utils/crypto';
+import {useUserStore} from "@/store/modules/user/user";
+import axios, {AxiosError, AxiosResponse, InternalAxiosRequestConfig} from "axios";
+import {ResponseBody} from "@/api/typing";
+import router from "@/router";
+import {decrypt} from '@/utils/crypto';
 
 const request = axios.create({
   // baseURL: process.env.VUE_APP_API_BASE_URL,
@@ -23,8 +23,7 @@ const errorHandler = (error: AxiosError): Promise<any> => {
     }
     const { data } = error.response as any;
     if (data) {
-      let resData = decrypt(data);
-      error.response.data = resData;
+      error.response.data = decrypt(data);
     }
   }
   return Promise.reject(error);

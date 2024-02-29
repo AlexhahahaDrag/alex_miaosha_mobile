@@ -62,6 +62,21 @@ export const columns = [
     key: 'saleAmount',
   },
   {
+    title: '销售件数',
+    dataIndex: 'saleNum',
+    key: 'saleNum',
+  },
+  {
+    title: '收支类型',
+    dataIndex: 'incomeAndExpenses',
+    key: 'incomeAndExpenses',
+  },
+  {
+    title: '支付方式',
+    dataIndex: 'payWay',
+    key: 'payWay',
+  },
+  {
     title: '是否有效',
     dataIndex: 'isValid',
     key: 'isValid',
