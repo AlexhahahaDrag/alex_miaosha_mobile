@@ -19,7 +19,7 @@
 let router = useRouter();
 let homeList = ref<any>([]);
 
-const getHomeList = (arr: any[] | null) => {
+const getHomeList = (arr: readonly any[] | null) => {
   if (arr?.length) {
     arr.forEach((item: any) => {
       if (item) {
@@ -29,7 +29,6 @@ const getHomeList = (arr: any[] | null) => {
         if (item.children?.length) {
           getHomeList(item.children);
         }
-        console.log(`homeList:`, homeList.value);
       }
     });
   }

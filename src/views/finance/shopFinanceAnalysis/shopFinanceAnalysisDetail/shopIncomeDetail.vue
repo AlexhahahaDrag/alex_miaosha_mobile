@@ -20,9 +20,9 @@
 import type { barItem } from "./common";
 import { showNotify } from 'vant';
 import {
-    getDayExpense,
-    getMonthExpense,
-} from "@/api/finance/financeAnalysis";
+    getDayShopFinanceInfo,
+    getMonthShopFinanceInfo,
+} from "@/api/finance/shopFinanceAnalysis";
 
 interface Props {
     activeTab: number| string;
@@ -57,16 +57,19 @@ let monthConfig = ref<barItem>({
 
 let dayData = ref<any>([]);
 
-function getDayExpenseInfo(userId: number | null, dateStr: string) {
-    getDayExpense(userId, dateStr).then(
+function getDayExpenseInfo(dateStr: string) {
+    getDayShopFinanceInfo(dateStr).then(
         (res: { code: string; data: any[]; message: any }) => {
+            console.log(`dayyyyyyyyyyyyyyyyyyyyyyyyy:`, res);
             if (res.code == "200") {
                 if (res.data) {
                     let series = [] as any;
+                    let numSeries = [] as any;
                     let xAxis = [] as any;
                     res.data.forEach((item) => {
-                        series.push(item.amount);
-                        xAxis.push(item.infoDate);
+                        series.push(item.saleAmount);
+                        xAxis.push(item.infoDate.substring(8, 10));
+                        numSeries.push(item.saleNum);
                     });
                     dayConfig.value = {
                         xAxis: xAxis,
@@ -82,7 +85,7 @@ function getDayExpenseInfo(userId: number | null, dateStr: string) {
                             formatter(param: any) {
                                 let tip = "";
                                 let unit = "元";
-                                let name = "花费";
+                                let name = "收入";
                                 tip += `<p style="margin: 0;text-align: left">${param[0].axisValue}日</p>`;
                                 param.forEach(
                                     (element: {
@@ -108,15 +111,15 @@ function getDayExpenseInfo(userId: number | null, dateStr: string) {
     );
 }
 
-function getMonthExpenseInfo(userId: number | null, dateStr: string) {
-    getMonthExpense(userId, dateStr).then(
+function getMonthExpenseInfo(dateStr: string) {
+    getMonthShopFinanceInfo(dateStr).then(
         (res: { code: string; data: any[]; message: any }) => {
             if (res.code == "200") {
                 if (res.data) {
                     let series = [] as any;
                     let xAxis = [] as any;
                     res.data.forEach((item) => {
-                        series.push(item.amount);
+                        series.push(item.saleAmount);
                         xAxis.push(item.infoDate);
                     });
                     monthConfig.value = {
@@ -133,7 +136,7 @@ function getMonthExpenseInfo(userId: number | null, dateStr: string) {
                             formatter(param: any) {
                                 let tip = "";
                                 let unit = "元";
-                                let name = "花费";
+                                let name = "收入";
                                 tip += `<p style="margin: 0;text-align: left">${param[0].axisValue}月</p>`;
                                 param.forEach(
                                     (element: {
@@ -159,16 +162,16 @@ function getMonthExpenseInfo(userId: number | null, dateStr: string) {
     );
 }
 
-const init = (dateStr: string, belongTo: number | null) => {
-    getDayExpenseInfo(belongTo, dateStr);
-    getMonthExpenseInfo(belongTo, dateStr);
+const init = (dateStr: string) => {
+    getDayExpenseInfo(dateStr);
+    getMonthExpenseInfo(dateStr);
 };
 
 watch(
     () => [props.activeTab, props.dateStr, props.belongTo],
     () => {
         if (props.activeTab === '3') {
-            init(props.dateStr, props.belongTo || null);
+            init(props.dateStr);
         }
     },
     { immediate: true },
