@@ -33,9 +33,9 @@ let props = defineProps<Props>();
 
 let dayConfig = ref<barItem>({
     xAxis: [],
-    series: [],
+    series: [[]],
     xTile: "天数",
-    yTitle: "金钱(元)",
+    yTitle: ["金钱(元)"],
     yNameGap: 30,
     tooltip: {},
     legend: [],
@@ -46,9 +46,9 @@ let monthData = ref<any>([]);
 
 let monthConfig = ref<barItem>({
     xAxis: [],
-    series: [],
+    series: [[]],
     xTile: "月份",
-    yTitle: "金钱(元)",
+    yTitle: ["金钱(元)"],
     yNameGap: 30,
     tooltip: {},
     legend: [],
@@ -68,11 +68,13 @@ function getDayExpenseInfo(userId: number | null, dateStr: string) {
                         series.push(item.amount);
                         xAxis.push(item.infoDate);
                     });
+                    let seriesAll = [] as any[];
+                    seriesAll[0] = series;
                     dayConfig.value = {
                         xAxis: xAxis,
-                        series: series,
+                        series: seriesAll,
                         xTile: "天数",
-                        yTitle: "金钱(元)",
+                        yTitle: ["金钱(元)"],
                         yNameGap: 50,
                         tooltip: {
                             trigger: "axis",
@@ -99,7 +101,7 @@ function getDayExpenseInfo(userId: number | null, dateStr: string) {
                         },
                         color: "#aa55ff",
                     };
-                    dayData.value = series;
+                    dayData.value = seriesAll;
                 }
             } else {
                 showNotify({ type: 'danger', message: (res && res.message) || '查询列表失败！' });
@@ -119,10 +121,12 @@ function getMonthExpenseInfo(userId: number | null, dateStr: string) {
                         series.push(item.amount);
                         xAxis.push(item.infoDate);
                     });
+                    let seriesAll = [] as any[];
+                    seriesAll[0] = series;
                     monthConfig.value = {
                         xAxis: xAxis,
-                        series: series,
-                        yTitle: "金钱(元)",
+                        series: seriesAll,
+                        yTitle: ["金钱(元)"],
                         xTile: "月份",
                         yNameGap: 50,
                         tooltip: {
@@ -150,7 +154,7 @@ function getMonthExpenseInfo(userId: number | null, dateStr: string) {
                         },
                         color: "#5555ff",
                     };
-                    monthData.value = series;
+                    monthData.value = seriesAll;
                 }
             } else {
                 showNotify({ type: 'danger', message: (res && res.message) || '查询列表失败！' });

@@ -1,8 +1,82 @@
 <template>
     <van-grid :column-num="2">
-        <van-grid-item :center="false">
-            总金额:{{ sum }}
-        </van-grid-item>
+        <!-- <div class="box-content-show">
+            <div class="show-left">
+                <div class="content-title">
+                    <img src="@/assets/one.svg" />
+                    <span>日供水量</span>
+                </div>
+                <div class="content-value">
+                    <span>
+                        {{
+                            curSupplyWater.thisValue == null
+                            ? '--'
+                            : curSupplyWater.thisValue
+                        }}
+                    </span>
+                    万m³
+                </div>
+                <div class="content-percent">
+                    <div>
+                        <span>同比</span>
+                        <span>
+                            {{
+                                curSupplyWater.yearOnYear == null
+                                ? '--'
+                                : curSupplyWater.yearOnYear + '&nbsp;%'
+                            }}
+                        </span>
+                        <img v-if="judgeUpOrDown(curSupplyWater.yearOnYear) == 1" src="@/assets/up.svg" />
+                        <img v-if="judgeUpOrDown(curSupplyWater.yearOnYear) == -1" src="@/assets/down.svg"
+                            style="transform: rotate(180deg)" />
+                    </div>
+                    <div>
+                        <span>环比</span>
+                        <span>
+                            {{
+                                curSupplyWater.chain == null
+                                ? '--'
+                                : curSupplyWater.chain + '&nbsp;%'
+                            }}
+                        </span>
+                        <img v-if="judgeUpOrDown(curSupplyWater.chain) == 1" src="@/assets/up.svg" />
+                        <img v-if="judgeUpOrDown(curSupplyWater.chain) == -1" src="@/assets/down.svg"
+                            style="transform: rotate(180deg)" />
+                    </div>
+                </div>
+            </div>
+            <div class="show-right">
+                <div class="content-title">
+                    <img src="@/assets/one.svg" />
+                    <span>本年累计水量</span>
+                </div>
+                <div class="content-value">
+                    <span>
+                        {{
+                            sumSupplyWater.thisValue == null
+                            ? '--'
+                            : sumSupplyWater.thisValue
+                        }}
+                    </span>
+                    万m³
+                </div>
+                <div class="content-percent">
+                    <div>
+                        <span>同比</span>
+                        <span>
+                            {{
+                                sumSupplyWater.yearOnYear == null
+                                ? '--'
+                                : sumSupplyWater.yearOnYear + '&nbsp;%'
+                            }}
+                        </span>
+                        <img v-if="judgeUpOrDown(sumSupplyWater.yearOnYear) == 1" src="@/assets/up.svg" />
+                        <img v-if="judgeUpOrDown(sumSupplyWater.yearOnYear) == -1" src="@/assets/down.svg"
+                            style="transform: rotate(180deg)" />
+                    </div>
+                </div>
+            </div>
+        </div> -->
     </van-grid>
     <van-grid :column-num="2">
         <van-grid-item v-for="item in balanceList" :key="item.typeCode"

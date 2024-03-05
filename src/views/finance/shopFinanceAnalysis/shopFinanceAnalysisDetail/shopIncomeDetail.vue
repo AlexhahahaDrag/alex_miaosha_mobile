@@ -33,26 +33,24 @@ let props = defineProps<Props>();
 
 let dayConfig = ref<barItem>({
     xAxis: [],
-    series: [],
+    series: [[]],
     xTile: "天数",
-    yTitle: "金钱(元)",
+    yTitle: ['销售额', '件数'],
     yNameGap: 30,
-    tooltip: {},
+    dataType: ['bar', 'line',],
     legend: [],
-    color: "#aa55ff",
 });
 
 let monthData = ref<any>([]);
 
 let monthConfig = ref<barItem>({
     xAxis: [],
-    series: [],
+    series: [[]],
     xTile: "月份",
-    yTitle: "金钱(元)",
+    yTitle: ['销售额', '件数'],
     yNameGap: 30,
-    tooltip: {},
+    dataType: ['bar', 'line',],
     legend: [],
-    color: '#5555ff',
 });
 
 let dayData = ref<any>([]);
@@ -60,7 +58,6 @@ let dayData = ref<any>([]);
 function getDayExpenseInfo(dateStr: string) {
     getDayShopFinanceInfo(dateStr).then(
         (res: { code: string; data: any[]; message: any }) => {
-            console.log(`dayyyyyyyyyyyyyyyyyyyyyyyyy:`, res);
             if (res.code == "200") {
                 if (res.data) {
                     let series = [] as any;
@@ -71,21 +68,26 @@ function getDayExpenseInfo(dateStr: string) {
                         xAxis.push(item.infoDate.substring(8, 10));
                         numSeries.push(item.saleNum);
                     });
+                    let seriesAll = [] as any[];
+                    seriesAll[0] = series;
+                    seriesAll[1] = numSeries;
+                    console.log(`seriesAll:`, seriesAll);
                     dayConfig.value = {
                         xAxis: xAxis,
-                        series: series,
+                        series: seriesAll,
                         xTile: "天数",
-                        yTitle: "金钱(元)",
+                        yTitle: ['销售额', '件数'],
                         yNameGap: 50,
+                        dataType: ['bar', 'line',],
+                        color: "#aa55ff",
                         tooltip: {
                             trigger: "axis",
                             axisPointer: {
                                 type: "shadow",
                             },
                             formatter(param: any) {
+                                console.log(`param: `, param)
                                 let tip = "";
-                                let unit = "元";
-                                let name = "收入";
                                 tip += `<p style="margin: 0;text-align: left">${param[0].axisValue}日</p>`;
                                 param.forEach(
                                     (element: {
@@ -94,15 +96,14 @@ function getDayExpenseInfo(dateStr: string) {
                                         value: any;
                                         seriesName: any;
                                     }) => {
-                                        tip += `<p style="margin: 0;text-align: left">${element.marker}${name}: ${element.value ? element.value : 0.00}${unit}</p>`;
+                                        tip += `<p style="margin: 0;text-align: left">${element.marker}${element.seriesName}: ${element.value ? element.value : 0.00}${element.seriesName === '销售额' ? '元' : '件'}</p>`;
                                     }
                                 );
                                 return tip;
                             },
                         },
-                        color: "#aa55ff",
                     };
-                    dayData.value = series;
+                    dayData.value = seriesAll;
                 }
             } else {
                 showNotify({ type: 'danger', message: (res && res.message) || '查询列表失败！' });
@@ -117,27 +118,33 @@ function getMonthExpenseInfo(dateStr: string) {
             if (res.code == "200") {
                 if (res.data) {
                     let series = [] as any;
+                    let numSeries = [] as any;
                     let xAxis = [] as any;
                     res.data.forEach((item) => {
                         series.push(item.saleAmount);
                         xAxis.push(item.infoDate);
+                        numSeries.push(item.saleNum);
                     });
+                    let seriesAll = [] as any[];
+                    seriesAll[0] = series;
+                    seriesAll[1] = numSeries;
                     monthConfig.value = {
                         xAxis: xAxis,
-                        series: series,
-                        yTitle: "金钱(元)",
+                        series: seriesAll,
+                        yTitle: ['销售额', '件数'],
                         xTile: "月份",
                         yNameGap: 50,
+                        dataType: ['bar', 'line',],
+                        color: "#5555ff",
                         tooltip: {
                             trigger: "axis",
                             axisPointer: {
                                 type: "shadow",
                             },
                             formatter(param: any) {
+                                console.log(`param: `, param)
                                 let tip = "";
-                                let unit = "元";
-                                let name = "收入";
-                                tip += `<p style="margin: 0;text-align: left">${param[0].axisValue}月</p>`;
+                                tip += `<p style="margin: 0;text-align: left">${param[0].axisValue}日</p>`;
                                 param.forEach(
                                     (element: {
                                         axisValue: any;
@@ -145,15 +152,14 @@ function getMonthExpenseInfo(dateStr: string) {
                                         value: any;
                                         seriesName: any;
                                     }) => {
-                                        tip += `<p style="margin: 0;text-align: left">${element.marker}${name}: ${element.value ? element.value : 0.00}${unit}</p>`;
+                                        tip += `<p style="margin: 0;text-align: left">${element.marker}${element.seriesName}: ${element.value ? element.value : 0.00}${element.seriesName === '销售额' ? '元' : '件'}</p>`;
                                     }
                                 );
                                 return tip;
                             },
                         },
-                        color: "#5555ff",
                     };
-                    monthData.value = series;
+                    monthData.value = seriesAll;
                 }
             } else {
                 showNotify({ type: 'danger', message: (res && res.message) || '查询列表失败！' });
@@ -192,9 +198,9 @@ watch(
         line-height: 100%;
         color: blue;
         background-color: white;
-        margin-left: 10px;
-        margin-right: 10px;
         border-radius: 5px;
+        padding-left: 10px;
+        padding-right: 10px;
         /*--调节圆周程度*/
     }
 
@@ -208,6 +214,8 @@ watch(
         color: aliceblue;
         background-color: white;
         margin-right: 10px;
+        padding-left: 10px;
+        padding-right: 10px;
         border-radius: 5px;
         /*--调节圆周程度*/
     }

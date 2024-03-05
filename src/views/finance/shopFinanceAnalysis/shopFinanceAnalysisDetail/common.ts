@@ -8,9 +8,10 @@ export interface ItemInfo {
 export interface barItem {
     xAxis?: string[];
     series?: string[][];
-    yTitle?: string;
+    yTitle?: string[];
     xTile: string,
     yNameGap?: number;
+    dataType?: string[],
     tooltip?: {};
     legend?: [];
     color?: string;

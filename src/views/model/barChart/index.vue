@@ -20,7 +20,7 @@ const props = defineProps({
   },
   data: {
     type: Array,
-    default: [],
+    default: [[]],
   },
   width: {
     type: String,
@@ -32,9 +32,31 @@ const props = defineProps({
   },
 });
 
+
 const setOption = (data: any[]) => {
-  let { xAxis, yTitle, yNameGap, tooltip, color, xTile } = props.config;
-  if (data) {
+  let { xAxis, yTitle, tooltip, xTile, dataType } = props.config;
+  if (data?.length) {
+    let yAxis = [] as any[];
+    let series = [] as any[];
+    for (let i = 0; i < data.length; i++) {
+      let max = getMax(Math.max(...data[i]));
+      yAxis.push({
+        type: "value",
+        name: yTitle ? yTitle[i] : '',
+        min: 0,
+        max: max ,
+        nameLocation:'center',
+        nameGap: 25,
+        interval: max / 5,
+      });
+      series.push({
+        type: dataType ? dataType[i] : 'bar',
+        data: data[i],
+        name: yTitle ? yTitle[i] : '',
+        yAxisIndex: i,
+        showSymbol: 0,
+      });
+    }
     options.value = {
       title: {
         text: props.title,
@@ -66,57 +88,22 @@ const setOption = (data: any[]) => {
         },
         name: xTile ? xTile : '',
       },
-      // legend: {
-      //   data: legend || [1],
-      //   icon: "roundRect",
-      //   left: "right",
-      //   itemHeight: 6,
-      //   itemWidth: 18,
-      //   textStyle: {
-      //     fontSize: 14,
-      //     lineHeight: 14,
-      //     rich: {
-      //       a: {
-      //         verticalAlign: "middle",
-      //       },
-      //     },
-      //     padding: [0, 0, -2, 0], //[上、右、下、左]
-      //   },
-      // },
-      yAxis: {
-        type: "value",
-        name: yTitle ? yTitle : "",
-        nameLocation: "center",
-        nameGap: yNameGap ? yNameGap : 28,
-        axisTick: {
-          show: false,
-        },
-        axisLine: {
-          show: false,
-        },
-        splitNumber: 4,
-        lineStyle: {
-          type: "dashed",
-        },
-      },
-      series: [
-        {
-          type: "bar",
-          data: data,
-          smooth: true,
-          showSymbol: 0,
-          itemStyle: {
-            color: color,
-              lineStyle: {
-                type: "line",
-                color: color,
-              },
-          },
-        }
-      ],
+      yAxis,
+      series,
     };
   }
 };
+
+const getMax = (num: number) => {
+  if (num <= 5) {
+    return 5;
+  } else if (num <= 10) {
+    return 10;
+  } else if (num <= 100) {
+    return Math.ceil(num / 5) * 5;
+  }
+  return getMax(num / 10) * 10;
+}
 
 const chartOption = {
   title: {
@@ -134,24 +121,29 @@ const chartOption = {
     },
     name: '',
   },
-  yAxis: {
-    type: "value",
-    name: "",
-    nameLocation: "center",
-    nameGap: 28,
-    axisTick: {
-      show: false,
-    },
-    axisLine: {
-      show: false,
-    },
-    splitNumber: 4,
-    lineStyle: {
-      type: "dashed",
+  legend: {
+    data: [] as any[],
+    icon: "roundRect",
+    left: "right",
+    itemHeight: 6,
+    itemWidth: 18,
+    textStyle: {
+      fontSize: 14,
+      lineHeight: 14,
+      rich: {
+        a: {
+          verticalAlign: "middle",
+        },
+      },
+      padding: [0, 0, -2, 0], //[上、右、下、左]
     },
   },
+  yAxis: [{
+    type: "value",
+    name: "",
+  }],
   series: [] as any,
-};
+} as any;
 
 const options = ref(chartOption);
 
