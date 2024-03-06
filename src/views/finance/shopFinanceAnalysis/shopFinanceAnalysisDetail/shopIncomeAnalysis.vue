@@ -2,14 +2,14 @@
     <van-row gutter="20">
         <div class="mainGrid">
             <div class="div2">
-                <pieChart title="当月收入分析" height="100%" width="100%" :data="pieIncomeData" :tooltip="tooltip">
+                <pieChart title="当月销售商品类别" height="100%" width="100%" :data="pieShopData" :tooltip="tooltip">
                 </pieChart>
             </div>
         </div>
         <van-divider />
         <div class="mainGrid">
             <div class="div2">
-                <pieChart title="当月支出分析" height="100%" width="100%" :data="pieExpenseData" :tooltip="tooltip">
+                <pieChart title="当月收入支付方式" height="100%" width="100%" :data="piePayWayData" :tooltip="tooltip">
                 </pieChart>
             </div>
         </div>
@@ -17,11 +17,9 @@
 </template>
 
 <script lang="ts" setup>
-import { getDayShopFinanceInfo } from '@/api/finance/shopFinanceAnalysis';
+import { getShopNameInfo, getPayWayInfo } from '@/api/finance/shopFinanceAnalysis';
 import { showNotify } from 'vant';
 import { ItemInfo } from "./common";
-
-let pieExpenseData = ref<object[]>([]);
 
 interface Props {
     activeTab: number | string;
@@ -29,29 +27,21 @@ interface Props {
     belongTo?: number | null,
 }
 
-let pieIncomeData = ref<object[]>([]);
-
 let props = defineProps<Props>();
 
-const getIncomeAndExpenseInfo = (dateStr: string) => {
-    getDayShopFinanceInfo(dateStr).then(
+let pieShopData = ref<object[]>([]);
+
+const getShopNameInfoInfo = (dateStr: string) => {
+    getShopNameInfo(dateStr).then(
         (res: { code: string; data: any[]; message: any }) => {
             if (res.code == "200") {
                 if (res.data) {
-                    let dd: ItemInfo[] = [];
+                    let shop: ItemInfo[] = [];
                     res.data
-                        .filter((item) => item.incomeAndExpenses == "income")
-                        .forEach((item: { typeCode: any; amount: any }) => {
-                            dd.push({ name: item.typeCode, value: item.amount });
+                        .forEach((item: { shopName: any; saleAmount: any }) => {
+                            shop.push({ name: item.shopName, value: item.saleAmount });
                         });
-                    pieIncomeData.value = dd;
-                    let expense: ItemInfo[] = [];
-                    res.data
-                        .filter((item) => item.incomeAndExpenses == "expense")
-                        .forEach((item: { typeCode: any; amount: any }) => {
-                            expense.push({ name: item.typeCode, value: item.amount });
-                        });
-                    pieExpenseData.value = expense;
+                    pieShopData.value = shop;
                 }
             } else {
                 showNotify({ type: 'danger', message: (res && res.message) || '查询列表失败！' });
@@ -60,13 +50,37 @@ const getIncomeAndExpenseInfo = (dateStr: string) => {
     );
 };
 
+let piePayWayData = ref<object[]>([]);
+
+const getPayWayInfoInfo = (dateStr: string) => {
+    getPayWayInfo(dateStr).then(
+        (res: { code: string; data: any[]; message: any }) => {
+            console.log(`res:`, res);
+            if (res.code == "200") {
+                if (res.data) {
+                    let shop: ItemInfo[] = [];
+                    res.data
+                        .forEach((item: { payWayName: any; saleAmount: any }) => {
+                            shop.push({ name: item.payWayName, value: item.saleAmount });
+                        });
+                    piePayWayData.value = shop;
+                }
+            } else {
+                showNotify({ type: 'danger', message: (res && res.message) || '查询列表失败！' });
+            }
+        }
+    );
+};
+
+
 const tooltip = ref({
     trigger: "item",
     formatter: "{b} : {c}元({d}%)",
 });
 
 const init = (dateStr: string) => {
-    getIncomeAndExpenseInfo(dateStr);
+    getShopNameInfoInfo(dateStr);
+    getPayWayInfoInfo(dateStr);
 };
 
 watch(

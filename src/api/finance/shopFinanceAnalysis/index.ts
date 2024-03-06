@@ -8,6 +8,8 @@ import {
   const financeAnalysisUrl = {
     getDayShopFinanceInfo: "/getDayShopFinanceInfo",
     getMonthShopFinanceInfo: "/getMonthShopFinanceInfo",
+    getShopNameInfo: "/getShopNameInfo",
+    getPayWayInfo: "/getPayWayInfo",
   };
 
 export function getDayShopFinanceInfo(searchDate?: string): Promise<any> {
@@ -17,5 +19,15 @@ export function getDayShopFinanceInfo(searchDate?: string): Promise<any> {
 
 export function getMonthShopFinanceInfo(searchDate?: string): Promise<any> {
   let url = baseService.finance + baseFinanceAnalysis + financeAnalysisUrl.getMonthShopFinanceInfo + '?searchDate=' + searchDate;
+  return getDataOne(url);
+}
+
+export function getShopNameInfo(searchDate?: string): Promise<any> {
+  let url = baseService.finance + baseFinanceAnalysis + financeAnalysisUrl.getShopNameInfo + '?searchDate=' + searchDate;
+  return getDataOne(url);
+}
+
+export function getPayWayInfo(searchDate?: string): Promise<any> {
+  let url = baseService.finance + baseFinanceAnalysis + financeAnalysisUrl.getPayWayInfo + '?searchDate=' + searchDate;
   return getDataOne(url);
 }
