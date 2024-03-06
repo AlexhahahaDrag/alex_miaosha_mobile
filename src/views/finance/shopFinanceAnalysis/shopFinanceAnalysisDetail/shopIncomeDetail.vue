@@ -2,14 +2,14 @@
     <van-row gutter="20">
         <div class="mainGrid">
             <div class="div1">
-                <bar-chart height="100%" width="100%" title="日消费" :data="dayData" :config="dayConfig">
+                <bar-chart height="100%" width="100%" title="日销售" :data="dayData" :config="dayConfig">
                 </bar-chart>
             </div>
         </div>
         <van-divider />
         <div class="mainGrid">
             <div class="div2">
-                <bar-chart height="100%" width="100%" title="月消费" :data="monthData" :config="monthConfig">
+                <bar-chart height="100%" width="100%" title="月销售" :data="monthData" :config="monthConfig">
                 </bar-chart>
             </div>
         </div>
@@ -71,7 +71,6 @@ function getDayExpenseInfo(dateStr: string) {
                     let seriesAll = [] as any[];
                     seriesAll[0] = series;
                     seriesAll[1] = numSeries;
-                    console.log(`seriesAll:`, seriesAll);
                     dayConfig.value = {
                         xAxis: xAxis,
                         series: seriesAll,
@@ -86,7 +85,6 @@ function getDayExpenseInfo(dateStr: string) {
                                 type: "shadow",
                             },
                             formatter(param: any) {
-                                console.log(`param: `, param)
                                 let tip = "";
                                 tip += `<p style="margin: 0;text-align: left">${param[0].axisValue}日</p>`;
                                 param.forEach(
@@ -142,9 +140,8 @@ function getMonthExpenseInfo(dateStr: string) {
                                 type: "shadow",
                             },
                             formatter(param: any) {
-                                console.log(`param: `, param)
                                 let tip = "";
-                                tip += `<p style="margin: 0;text-align: left">${param[0].axisValue}日</p>`;
+                                tip += `<p style="margin: 0;text-align: left">${param[0].axisValue}月</p>`;
                                 param.forEach(
                                     (element: {
                                         axisValue: any;

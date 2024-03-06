@@ -34,20 +34,21 @@ const props = defineProps({
 
 
 const setOption = (data: any[]) => {
-  let { xAxis, yTitle, tooltip, xTile, dataType } = props.config;
+  let { xAxis, yTitle, color, tooltip, xTile, dataType } = props.config;
   if (data?.length) {
     let yAxis = [] as any[];
     let series = [] as any[];
     for (let i = 0; i < data.length; i++) {
       let max = getMax(Math.max(...data[i]));
+      let min = getMin(Math.min(...data[i]));
       yAxis.push({
         type: "value",
         name: yTitle ? yTitle[i] : '',
-        min: 0,
+        min: min,
         max: max ,
         nameLocation:'center',
         nameGap: 25,
-        interval: max / 5,
+        interval: (max - min) / 5,
       });
       series.push({
         type: dataType ? dataType[i] : 'bar',
@@ -103,6 +104,20 @@ const getMax = (num: number) => {
     return Math.ceil(num / 5) * 5;
   }
   return getMax(num / 10) * 10;
+}
+
+const getMin = (num: number) => {
+  if (num < 0) {
+    return - getMax(-num);
+  }
+  if (num <= 5) {
+    return 0;
+  } else if (num <= 10) {
+    return 5;
+  } else if (num <= 100) {
+    return Math.floor(num / 5) * 5;
+  }
+  return getMin(num / 10) * 10;
 }
 
 const chartOption = {
