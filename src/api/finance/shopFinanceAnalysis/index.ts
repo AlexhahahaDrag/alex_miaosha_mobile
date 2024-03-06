@@ -10,6 +10,7 @@ import {
     getMonthShopFinanceInfo: "/getMonthShopFinanceInfo",
     getShopNameInfo: "/getShopNameInfo",
     getPayWayInfo: "/getPayWayInfo",
+    getChainAndYear: "/getChainAndYear",
   };
 
 export function getDayShopFinanceInfo(searchDate?: string): Promise<any> {
@@ -29,5 +30,10 @@ export function getShopNameInfo(searchDate?: string): Promise<any> {
 
 export function getPayWayInfo(searchDate?: string): Promise<any> {
   let url = baseService.finance + baseFinanceAnalysis + financeAnalysisUrl.getPayWayInfo + '?searchDate=' + searchDate;
+  return getDataOne(url);
+}
+
+export function getChainAndYear(searchDate?: string): Promise<any> {
+  let url = baseService.finance + baseFinanceAnalysis + financeAnalysisUrl.getChainAndYear + '?searchDate=' + searchDate;
   return getDataOne(url);
 }

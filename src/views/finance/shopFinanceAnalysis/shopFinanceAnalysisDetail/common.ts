@@ -29,3 +29,17 @@ export interface FinanceDetail {
   incomeAndExpenses?: string;
   belongTo?: string;
 }
+
+export interface ShopFinanceChainYear {
+  infoDate?: string;
+  saleAmount?: number;
+  saleNum?: number;
+  monthSaleAmount?: number;
+  monthSaleNum?: number;
+  yearSaleAmount?: number;
+  yearSaleNum?: number;
+  saleAmountChain?: number;
+  saleNumChain?: number;
+  saleAmountYear?: number;
+  saleNumYear?: number;
+}

@@ -49,7 +49,7 @@ export default defineConfig({
       less: {
         javascriptEnabled: true,
       },
-   },
+    },
   },
   resolve: {
     alias: alias,
