@@ -89,6 +89,7 @@ let dynamicRouter = [] as any[];
 
 router.beforeEach((to, _from, next) => {
   const userStore = useUserStore();
+  console.log(`1111111111111`, userStore.getToken, to.path)
   if (to.path == '/login') {
     next();
   } else if (userStore.getToken) {

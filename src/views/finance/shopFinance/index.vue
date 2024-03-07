@@ -3,15 +3,8 @@
   <van-pull-refresh pulling-text="加载中。。。" :style="{ height: 'calc(100% - 44px)' }" v-model="isRefresh" @refresh='refresh'
     ref='pullRefresh' immediate-check='false'>
     <form action='/'>
-      <!--
-    <van-search
-        v-model='searchInfo.typeCode'
-        show-action
-        placeholder='请输入搜索关键词'
-        @search='onSearch'
-        @cancel='onCancel'
-        action-text="清空"/>
-    -->
+      <van-search v-model='searchInfo.shopName' show-action placeholder='请输入商品名称' @change="onSearch" @search='onSearch'
+        @cancel='onCancel' action-text="清空" />
     </form>
     <van-divider :style="{
       color: '#1989fa',
@@ -21,9 +14,9 @@
     <van-list v-else v-model:loading='loading' :finished='finished' finished-text='没有更多了' @load='onRefresh'>
       <van-cell-group>
         <van-swipe-cell v-for='(item, index) in dataSource' :before-close='beforeClose' :key="index">
-          <van-cell :title-class="item.isValid == '1' ? 'validClass' : 'notValidClass'" 
-          :title="'货物' + item.shopName + (item?.saleNum ? '(' + item.saleNum + '件)' : '')"
-          :key="index" is-link :to="{path: '/finance/shopFinance/shopFinanceDetail', query: { id: item.id }, }">
+          <van-cell :title-class="item.isValid == '1' ? 'validClass' : 'notValidClass'"
+            :title="item.shopName + (item?.saleNum ? '(' + item.saleNum + '件)' : '')" :key="index" is-link
+            :to="{ path: '/finance/shopFinance/shopFinanceDetail', query: { id: item.id }, }">
             <template #label>
               <div class="svgInfo">
                 <div class="svgDiv" v-for="(fromSource, index) in fromSourceTransferList" :key="index">
@@ -102,17 +95,18 @@ let searchInfo = ref<SearchInfo>({});
 let finished = ref<boolean>(false); //加载是否已经没有更多数据
 let isRefresh = ref<boolean>(false); //是否下拉刷新
 
-// const onSearch = () => {
-//  pagination.value.current = 1;
-//  dataSource.value = []
-//  onRefresh();
-// };
-// const onCancel = () => {
-//   searchInfo.value.typeCode = '';
-//   pagination.value.current = 0;
-//   dataSource.value = [];
-//   getFinancePage(searchInfo.value, pagination.value);
-// };
+const onSearch = () => {
+  pagination.value.current = 1;
+  dataSource.value = []
+  onRefresh();
+};
+
+const onCancel = () => {
+  searchInfo.value.shopName = '';
+  pagination.value.current = 0;
+  dataSource.value = [];
+  query(searchInfo.value, pagination.value);
+};
 
 function query(param: SearchInfo, cur: pageInfo) {
   loading.value = true;
@@ -181,13 +175,16 @@ init();
 }
 
 .svgInfo {
-  margin-top: 10px; 
+  margin-top: 10px;
   display: flex;
+
   .svgDiv {
     height: 30px;
+
     .svgClass {
       height: 100%;
     }
+
     .svg {
       width: 1.5em;
       height: 1.5em;
@@ -199,7 +196,7 @@ init();
 }
 
 .van-ellipsis {
-  width: 130px; 
+  width: 130px;
   text-align: right;
 }
 
