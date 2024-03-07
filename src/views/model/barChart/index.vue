@@ -34,7 +34,7 @@ const props = defineProps({
 
 
 const setOption = (data: any[]) => {
-  let { xAxis, yTitle, color, tooltip, xTile, dataType } = props.config;
+  let { xAxis, yTitle, tooltip, xTile, dataType } = props.config;
   if (data?.length) {
     let yAxis = [] as any[];
     let series = [] as any[];

@@ -49,3 +49,11 @@ export interface MenuInfo {
   children: MenuInfo[];
   permissionCode: string;
 }
+
+export function getAuthInfo (type: string) {
+  let infoStr = localStorage.getItem(type);
+  if (infoStr) {
+    return JSON.parse(infoStr);
+  }
+  return null;
+}
