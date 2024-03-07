@@ -50,7 +50,7 @@ export const routes: MenuDataItem[] = [
   {
     path: "/myself",
     component: Layout,
-    redirect: "/myself",
+    redirect: "/myself/about",
     name: "myself",
     meta: { title: "我的", icon: "myself", hiedInMenu: false, showInHome: false, },
     children: [

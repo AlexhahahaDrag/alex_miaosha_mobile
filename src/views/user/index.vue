@@ -12,7 +12,7 @@
     </van-cell-group>
   </div>
   <Logout :visible="showLogoutFlag" @select="logout"></Logout>
-  <Tabbar :data="useTabBar"></Tabbar>
+  <!-- <Tabbar :data="useTabBar"></Tabbar> -->
 </template>
 
 <script lang="ts" setup>
