@@ -12,12 +12,11 @@
     </van-cell-group>
   </div>
   <Logout :visible="showLogoutFlag" @select="logout"></Logout>
-  <Tabbar :data="useTabBar"></Tabbar>
+  <!-- <Tabbar :data="useTabBar"></Tabbar> -->
 </template>
 
 <script lang="ts" setup>
 import Logout from './logout/index.vue'
-import Tabbar from '@/views/home/tabbar/index.vue';
 
 let showLogoutFlag = ref<boolean>(false);
 

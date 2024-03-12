@@ -55,6 +55,8 @@ declare module 'vue' {
     ShopIncomeAnalysis: typeof import('./src/views/finance/shopFinanceAnalysis/shopFinanceAnalysisDetail/shopIncomeAnalysis.vue')['default']
     ShopIncomeDetail: typeof import('./src/views/finance/shopFinanceAnalysis/shopFinanceAnalysisDetail/shopIncomeDetail.vue')['default']
     ShopOverview: typeof import('./src/views/finance/shopFinanceAnalysis/shopFinanceAnalysisDetail/shopOverview.vue')['default']
+    ShopStock: typeof import('./src/views/finance/shopStock/index.vue')['default']
+    ShopStockDetail: typeof import('./src/views/finance/shopStock/shopStockDetail/index.vue')['default']
     SvgIcon: typeof import('./src/views/common/icons/svgIcon.vue')['default']
     Tabbar: typeof import('./src/views/home/tabbar/index.vue')['default']
     Test: typeof import('./src/views/finance/test/index.vue')['default']

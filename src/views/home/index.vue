@@ -36,6 +36,7 @@ const getHomeList = (arr: readonly any[] | null) => {
 
 const init = () => {
   homeList.value = [];
+  console.log(`homeList.value: `, homeList.value, router?.options?.routes);
   getHomeList(router?.options?.routes || []);
 }
 
