@@ -1,78 +1,37 @@
 <template>
   <navBar :info='info' @clickRight='addShopStock'></navBar>
-  <van-pull-refresh pulling-text="加载中。。。" :style="{ height: 'calc(100% - 44px)' }" v-model='isRefresh' @refresh='refresh'
-    ref='pullRefresh' immediate-check='false'>
+  <van-pull-refresh pulling-text="加载中。。。" :style="{ height: 'calc(100% - 44px)' }" v-model='isRefresh'
+    @refresh='refresh' ref='pullRefresh' immediate-check='false'>
     <form action='/'>
-    <!--
-    <van-search
-        v-model='searchInfo.typeCode'
-        show-action
-        placeholder='请输入搜索关键词'
-        @search='onSearch'
-        @cancel='onCancel'
-        action-text="清空"/>
-    -->
+      <van-search v-model='searchInfo.shopName' show-action placeholder='请输入搜索关键词' @search='onSearch' @cancel='onCancel'
+        action-text="清空" />
     </form>
-    <van-divider
-      :style="{
-        color: '#1989fa',
-        borderColor: 'grey',
-      }"
-    ></van-divider>
+    <van-divider :style="{
+    color: '#1989fa',
+    borderColor: 'grey',
+  }"></van-divider>
     <van-empty v-if='dataSource.length == 0' description='暂无数据' />
     <van-list v-else v-model:loading='loading' :finished='finished' finished-text='没有更多了' @load='onRefresh'>
       <van-cell-group>
         <van-swipe-cell v-for='(item, index) in dataSource' :before-close='beforeClose' :key="index">
           <van-cell :title="item.shopName + '(' + item.shopCode + ')'" :key='index' is-link
             :to='{ path: "/finance/shopStock/shopStockDetail", query: { id: item.id } }'>
-            <!-- <template #label>
-              <div class="iconClass">
-                <div class='icon' style='background-color: #ffcc00'>
-                  {{item.shopName }}
+            <template #label>
+              <div class="upAndDown" style="display: flex; justify-content: space-around;">
+                <div class="upAndDown" style="display: flex;">
+                  {{ formatAmount(item.costAmount, 2, '元') }}
+                  <br />
+                  成本价
                 </div>
-              </div>
-            </template>
-            <template #right-icon>
-              <div class='text-right'>
-                <div style='display: flex'>
-                  <div class='van-ellipsis'>
-                    {{item.shopCode }}
-                  </div>
+                <div class="upAndDown" style="display: flex;">
+                  {{ formatAmount(item.saleAmount, 2, '元') }}
+                  <br />
+                  销售价
                 </div>
-                <div :class="true ? 'rightDiv' : 'rightRedDiv'">
-                    item.saleAmount+item.isValid+item.saleDate+item.category+item.purchasePlace+item.saleNum+;
-                </div>
-              </div>
-            </template> -->
-            <!-- <div class="svgInfo">
-                <div class="svgDiv" v-for="(fromSource, index) in fromSourceTransferList" :key="index">
-                  <svgIcon v-if="item.payWay.indexOf(fromSource.value) >= 0 && fromSource.value != ''"
-                    :name="fromSource.label" class="svg"></svgIcon>
-                </div>
-              </div>
-            </template> -->
-            <template #right-icon>
-              <div class="text-right">
-                <div style="display: flex">
-                  <div class="van-ellipsis">
-                    {{
-                      item?.saleDate
-                      ? String(item?.saleDate).substring(0, 10)
-                      : "--"
-                    }}
-                  </div>
-                </div>
-                <div :class="item.incomeAndExpenses === 'income'
-                      ? 'rightGreenDiv'
-                      : 'rightRedDiv'
-                    ">
-                  {{
-                    item?.saleAmount
-                    ? (item?.incomeAndExpenses === "income"
-                      ? item?.saleAmount
-                      : -item?.saleAmount) + "元"
-                    : "--"
-                  }}
+                <div class="upAndDown">
+                    {{ formatAmount(item.saleNum, 0, '件') }}
+                  <br />
+                  库存
                 </div>
               </div>
             </template>
@@ -89,8 +48,8 @@
 </template>
 <script lang='ts' setup>
 import {
-    getShopStockPage,
-    deleteShopStock,
+  getShopStockPage,
+  deleteShopStock,
 } from '@/api/finance/shopStock/shopStockTs';
 import { getUserManagerList, } from '@/api/user/userManager';
 import {
@@ -114,17 +73,17 @@ let searchInfo = ref<SearchInfo>({});
 let finished = ref<boolean>(false); //加载是否已经没有更多数据
 let isRefresh = ref<boolean>(false); //是否下拉刷新
 
-// const onSearch = () => {
-//  pagination.value.current = 1;
-//  dataSource.value = []
-//  onRefresh();
-// };
-// const onCancel = () => {
-//   searchInfo.value.typeCode = '';
-//   pagination.value.current = 0;
-//   dataSource.value = [];
-//   getFinancePage(searchInfo.value, pagination.value);
-// };
+const onSearch = () => {
+  pagination.value.current = 1;
+  dataSource.value = []
+  onRefresh();
+};
+const onCancel = () => {
+  searchInfo.value.shopName = '';
+  pagination.value.current = 0;
+  dataSource.value = [];
+  query(searchInfo.value, pagination.value);
+};
 
 function query(param: SearchInfo, cur: pageInfo) {
   loading.value = true;
@@ -135,8 +94,8 @@ function query(param: SearchInfo, cur: pageInfo) {
         pagination.value.current = res.data.current + 1;
         pagination.value.pageSize = res.data.size;
         pagination.value.total = res.data.total;
-        if ((pagination.value.total|| 0) <
-              (pagination.value.current || 1) * (pagination.value.pageSize || 10)) {
+        if ((pagination.value.total || 0) <
+          (pagination.value.current || 1) * (pagination.value.pageSize || 10)) {
           finished.value = true;
         }
       } else {
@@ -193,6 +152,11 @@ const delShopStock = (id: number) => {
   })
 };
 
+const formatAmount = (amount: number, digit: number, unit: string) => {
+  return String(amount.toFixed(digit)).replace(/(?<!\.\d*)\B(?=(\d{3})+(?!\d)) /g, ','
+  ).replace(/^(\-)*(\d+)\.(\d\d).*$/, '$1$2.$3') + unit;
+}
+
 function init() {
   dataSource.value = [];
   pagination.value.current = 0;
@@ -217,23 +181,24 @@ init();
 .rightRedDiv {
   margin-top: 10px;
   text-align: right;
-  color:red
+  color: red
 }
 
 .iconClass {
-   margin-top: 10px;
-   display: flex;
+  margin-top: 10px;
+  display: flex;
 }
+
 .van-ellipsis {
-    width: 130px;
-    text-align:right;
+  width: 130px;
+  text-align: right;
 }
 
 .dividerClass {
-    color: #1989fa;
-    border-color: grey;
-    padding: 0 16px;
-    margin-top: 0px;
-    margin-bottom: 0px;
+  color: #1989fa;
+  border-color: grey;
+  padding: 0 16px;
+  margin-top: 0px;
+  margin-bottom: 0px;
 }
 </style>

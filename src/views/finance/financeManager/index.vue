@@ -59,7 +59,7 @@
                   :key="index"
                 >
                   <svgIcon v-if="item.fromSource.indexOf(fromSource.value) >= 0 && fromSource.value != ''"
-                           :name="fromSource.label" class="svg"></svgIcon>
+                          :name="fromSource.label" class="svg"></svgIcon>
                 </div>
               </div>
             </template>
