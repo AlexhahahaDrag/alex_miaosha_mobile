@@ -12,18 +12,41 @@
     }"></van-divider>
     <van-empty v-if='dataSource.length == 0' description='暂无数据' />
     <van-list v-else v-model:loading='loading' :finished='finished' finished-text='没有更多了' @load='onRefresh'>
-      <van-cell-group>
-        <van-card :num="item.saleNum" :price="formatAmount(item.saleAmount, 2, '')" :desc="item.remarks"
-          :title="item.shopName" v-for='(item, index) in dataSource' :key="index" :thumb="item.url">
-          <template #tags>
-            <van-tag plain type="primary">{{ item.purchasePlace }}</van-tag>
-          </template>
-          <template #footer>
-            <van-button size="mini">加入购物车</van-button>
-            <van-button size="mini">直接购买</van-button>
-          </template>
-        </van-card>
-      </van-cell-group>
+      <van-cell v-for="item in dataSource" :key="item">
+        <template #title>
+          <span class="custom-title">{{ item.shopName }}</span>
+          <van-tag type="primary">{{ item.shopCode }}</van-tag>
+        </template>
+        <template #right-icon>
+          <div class="text-right">
+            <div style="display: flex">
+              <div class="van-ellipsis">
+                {{
+                  item?.saleDate
+                  ? String(item?.saleDate).substring(0, 10)
+                  : "--"
+                }}
+              </div>
+            </div>
+            <div :class="item.incomeAndExpenses !== 'income'
+                  ? 'rightGreenDiv'
+                  : 'rightRedDiv'
+                ">
+              {{
+                commonUtils.formatAmount(item?.saleAmount, 2, '')
+              }}
+            </div>
+          </div>
+        </template>
+        <template #value>
+          <div class="price" style="font-weight:900; font-size: medium; font-family:SimSun;">
+            {{ commonUtils.formatAmount(item.saleAmount, 2, '') }}
+          </div>
+        </template>
+        <template #label>
+          {{ item.shopCode }}
+        </template>
+      </van-cell>
     </van-list>
   </van-pull-refresh>
   <van-back-top />
@@ -39,6 +62,7 @@ import {
   pageInfo,
 } from './shopProductTs';
 import { showFailToast } from 'vant';
+import commonUtils from '@/utils/common/index'
 
 let router = useRouter();
 let route = useRoute();
@@ -167,5 +191,13 @@ init();
 .upAndDown {
   display: flex;
   justify-content: space-around;
+}
+
+.svg {
+  width: 1.5em;
+  height: 1.5em;
+  font-size: 18px;
+  cursor: pointer;
+  vertical-align: middle;
 }
 </style>
