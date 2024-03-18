@@ -14,6 +14,7 @@ axios.defaults.headers.post["Content-Type"] =
 
 //异常拦截处理器
 const errorHandler = (error: AxiosError): Promise<any> => {
+  console.log(`error response`, error.response)
   if (error.response) {
     const { status } = error.response;
     // 403 无权限
@@ -67,8 +68,9 @@ const responseHandler = (
 ): ResponseBody<any> | AxiosResponse<any> | Promise<any> | any => {
   const { data } = response;
   let resData = decrypt(data);
-  if (resData.code == 403) {
+  if (resData?.code == 403) {
     router.push('/Login');
+    console.log(` response11`, response, resData)
     return;
   }
   return resData;

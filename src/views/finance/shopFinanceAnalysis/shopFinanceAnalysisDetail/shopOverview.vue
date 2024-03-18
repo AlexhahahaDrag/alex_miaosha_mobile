@@ -3,11 +3,15 @@
         <div class="box-content-show">
             <div class="show-left">
                 <div class="content-title">
-                    <span>月销售额</span>
+                    <SvgIcon name="saleAmount" class="content-svg"></SvgIcon>
+                    <div class="content-title-desc">
+                        <span>月销售额</span>
+                    </div>
                 </div>
+
                 <div class="content-value">
                     <span>
-                        {{ chainAndYear.saleAmount || '--' }}
+                        {{ commonUtils.formatAmount(chainAndYear.saleAmount, 2, '') }}
                     </span>
                     元
                 </div>
@@ -77,6 +81,7 @@
 import { getChainAndYear, } from "@/api/finance/shopFinanceAnalysis";
 import { showNotify } from 'vant';
 import { ShopFinanceChainYear } from './common';
+import commonUtils from '@/utils/common/index';
 
 interface Props {
     activeTab: number | string;
@@ -115,3 +120,58 @@ watch(
     { immediate: true },
 );
 </script>
+
+<style lang="scss" scoped>
+.box-content-show {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+
+    .show-left {
+        width: 40%;
+        background: #00E5EE;
+        border-radius: 8%;
+        padding: 10px 0 0 10px;
+
+        .content-title {
+            display: flex;
+            align-items: center;
+
+            .content-svg {
+                width: 2em;
+                height: 2em;
+                font-size: 18px;
+                cursor: pointer;
+            }
+
+            .content-title-desc {
+                padding: 5px 0px 5px 5px;
+                vertical-align: bottom;
+
+                span {
+                    font-size: 15px;
+                    font-weight: 400;
+                    color: #FFFFFF;
+                    bottom: 0;
+                }
+            }
+        }
+
+        .content-value {
+            margin-top: 5px;
+            color: #FFFFFF;
+
+            span {
+                font-size: 25px;
+            }
+        }
+
+        .content-percent {
+            color: #FFFFFF;
+            span {
+                font-size: 10px;
+            }
+        }
+    }
+}
+</style>

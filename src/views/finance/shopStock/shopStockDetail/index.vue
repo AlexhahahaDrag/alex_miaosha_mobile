@@ -222,7 +222,7 @@ const initInfoDate = (infoDate: Dayjs, type: string) => {
     if (infoDate) {
         switch (type) {
             case 'saleDate':
-                saleDateName.value = dayjs(infoDate).format('YYYY-MM-DD');
+                saleDateName.value = dayjs(infoDate).format('YYYY年MM月DD');
                 saleDateInfo.value.selectValue = infoDate;
                 break;
         }
@@ -253,14 +253,9 @@ function init() {
         ]).then((res: any) => {
             if (res[0].code == '200') {
                 formInfo.value = res[0].data;
+                console.log(`res:`, res[0])
                 formInfo.value.saleDate = dayjs(formInfo.value.saleDate);
                 initInfoDate(formInfo.value.saleDate, 'saleDate');
-                saleDateName.value = getListName(
-                    saleDateInfo.value.list || [],
-                    formInfo.value.saleDate,
-                    "typeCode",
-                    "typeName"
-                );
             } else {
                 showFailToast(res?.message || '查询详情失败，请联系管理员!')
             }

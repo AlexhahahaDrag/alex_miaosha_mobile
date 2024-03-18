@@ -7,6 +7,7 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    '(2)': typeof import('./src/views/finance/shopStock (2)/index.vue')['default']
     404: typeof import('./src/views/common/error/404.vue')['default']
     AccountRecordInfo: typeof import('./src/views/finance/accountRecordInfo/index.vue')['default']
     AccountRecordInfoDetail: typeof import('./src/views/finance/accountRecordInfo/accountRecordInfoDetail/index.vue')['default']
@@ -55,8 +56,9 @@ declare module 'vue' {
     ShopIncomeAnalysis: typeof import('./src/views/finance/shopFinanceAnalysis/shopFinanceAnalysisDetail/shopIncomeAnalysis.vue')['default']
     ShopIncomeDetail: typeof import('./src/views/finance/shopFinanceAnalysis/shopFinanceAnalysisDetail/shopIncomeDetail.vue')['default']
     ShopOverview: typeof import('./src/views/finance/shopFinanceAnalysis/shopFinanceAnalysisDetail/shopOverview.vue')['default']
+    ShopProduct: typeof import('./src/views/finance/shopProduct/index.vue')['default']
     ShopStock: typeof import('./src/views/finance/shopStock/index.vue')['default']
-    ShopStockDetail: typeof import('./src/views/finance/shopStock/shopStockDetail/index.vue')['default']
+    ShopStockDetail: typeof import('./src/views/finance/shopProduct/shopStockDetail/index.vue')['default']
     SvgIcon: typeof import('./src/views/common/icons/svgIcon.vue')['default']
     Tabbar: typeof import('./src/views/home/tabbar/index.vue')['default']
     Test: typeof import('./src/views/finance/test/index.vue')['default']
@@ -70,6 +72,7 @@ declare module 'vue' {
     VanActionSheet: typeof import('vant/es')['ActionSheet']
     VanBackTop: typeof import('vant/es')['BackTop']
     VanButton: typeof import('vant/es')['Button']
+    VanCard: typeof import('vant/es')['Card']
     VanCell: typeof import('vant/es')['Cell']
     VanCellGroup: typeof import('vant/es')['CellGroup']
     VanCol: typeof import('vant/es')['Col']
@@ -93,6 +96,7 @@ declare module 'vue' {
     VanTabbar: typeof import('vant/es')['Tabbar']
     VanTabbarItem: typeof import('vant/es')['TabbarItem']
     VanTabs: typeof import('vant/es')['Tabs']
+    VanTag: typeof import('vant/es')['Tag']
     VanUploader: typeof import('vant/es')['Uploader']
   }
 }

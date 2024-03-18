@@ -20,8 +20,8 @@
             <template #label>
               <div class="svgInfo">
                 <div class="svgDiv" v-for="(fromSource, index) in fromSourceTransferList" :key="index">
-                  <svgIcon v-if="item.payWay.indexOf(fromSource.value) >= 0 && fromSource.value != ''"
-                    :name="fromSource.label" class="svg"></svgIcon>
+                  <SvgIcon v-if="item.payWay.indexOf(fromSource.value) >= 0 && fromSource.value != ''"
+                    :name="fromSource.label" class="svg"></SvgIcon>
                 </div>
               </div>
             </template>

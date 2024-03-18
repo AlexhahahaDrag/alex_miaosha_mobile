@@ -1,46 +1,28 @@
 <template>
-  <navBar :info='info' @clickRight='addShopStock'></navBar>
-  <van-pull-refresh pulling-text="加载中。。。" :style="{ height: 'calc(100% - 44px)' }" v-model='isRefresh'
-    @refresh='refresh' ref='pullRefresh' immediate-check='false'>
+  <navBar :info='info'></navBar>
+  <van-pull-refresh pulling-text="加载中。。。" :style="{ height: 'calc(100% - 44px)' }" v-model='isRefresh' @refresh='refresh'
+    ref='pullRefresh' immediate-check='false'>
     <form action='/'>
       <van-search v-model='searchInfo.shopName' show-action placeholder='请输入搜索关键词' @search='onSearch' @cancel='onCancel'
         action-text="清空" />
     </form>
     <van-divider :style="{
-    color: '#1989fa',
-    borderColor: 'grey',
-  }"></van-divider>
+      color: '#1989fa',
+      borderColor: 'grey',
+    }"></van-divider>
     <van-empty v-if='dataSource.length == 0' description='暂无数据' />
     <van-list v-else v-model:loading='loading' :finished='finished' finished-text='没有更多了' @load='onRefresh'>
       <van-cell-group>
-        <van-swipe-cell v-for='(item, index) in dataSource' :before-close='beforeClose' :key="index">
-          <van-cell :title="item.shopName + '(' + item.shopCode + ')'" :key='index' is-link
-            :to='{ path: "/finance/shopStock/shopStockDetail", query: { id: item.id } }'>
-            <template #label>
-              <div class="upAndDown">
-                <div style="display: flex;">
-                  {{ commonUtils.formatAmount(item.costAmount, 2, '元') }}
-                  <br />
-                  成本价
-                </div>
-                <div>
-                  {{ commonUtils.formatAmount(item.saleAmount, 2, '元') }}
-                  <br />
-                  销售价
-                </div>
-                <div>
-                    {{ commonUtils.formatAmount(item.saleNum, 0, '件') }}
-                  <br />
-                  库存
-                </div>
-              </div>
-            </template>
-          </van-cell>
-          <template #right>
-            <van-button class='right_info' @click='delShopStock(item.id)' square type='danger' text='删除' />
+        <van-card :num="item.saleNum" :price="formatAmount(item.saleAmount, 2, '')" :desc="item.remarks"
+          :title="item.shopName" v-for='(item, index) in dataSource' :key="index" :thumb="item.url">
+          <template #tags>
+            <van-tag plain type="primary">{{ item.purchasePlace }}</van-tag>
           </template>
-          <van-divider class="dividerClass"></van-divider>
-        </van-swipe-cell>
+          <template #footer>
+            <van-button size="mini">加入购物车</van-button>
+            <van-button size="mini">直接购买</van-button>
+          </template>
+        </van-card>
       </van-cell-group>
     </van-list>
   </van-pull-refresh>
@@ -49,22 +31,20 @@
 <script lang='ts' setup>
 import {
   getShopStockPage,
-  deleteShopStock,
 } from '@/api/finance/shopStock/shopStockTs';
 import { getUserManagerList, } from '@/api/user/userManager';
 import {
   SearchInfo,
   pagination,
   pageInfo,
-} from './shopStockTs';
-import { showSuccessToast, showFailToast } from 'vant';
-import commonUtils from '@/utils/common/index';
+} from './shopProductTs';
+import { showFailToast } from 'vant';
 
 let router = useRouter();
 let route = useRoute();
 const info = ref<any>({
-  title: route?.meta?.title || '财务管理11',
-  rightButton: '新增',
+  title: route?.meta?.title || '商品详情',
+  rightButton: '详情',
   leftPath: "/",
 })
 let loading = ref<boolean>(false);
@@ -109,10 +89,6 @@ function query(param: SearchInfo, cur: pageInfo) {
     });
 }
 
-const addShopStock = () => {
-  router.push({ path: '/finance/shopStock/shopStockDetail' });
-}
-
 let userMap = {};
 function getUserInfoList() {
   getUserManagerList({}).then((res: any) => {
@@ -128,7 +104,7 @@ function getUserInfoList() {
   });
 }
 
-const refresh = () => {
+const refresh = (): void => {
   pagination.value.current = 0;
   dataSource.value = []
   query(searchInfo.value, pagination.value);
@@ -138,22 +114,12 @@ const onRefresh = () => {
   query(searchInfo.value, pagination.value);
 };
 
-const beforeClose = (e: any) => {
-  console.log(e);
-};
+const formatAmount = (amount: number, digit: number, unit: string): string => {
+  return String(amount.toFixed(digit)).replace(/(?<!\.\d*)\B(?=(\d{3})+(?!\d)) /g, ','
+  ).replace(/^(\-)*(\d+)\.(\d\d).*$/, '$1$2.$3') + unit;
+}
 
-const delShopStock = (id: number) => {
-  deleteShopStock(id + '').then((res: any) => {
-    if (res?.code == '200') {
-      refresh();
-      showSuccessToast((res?.message) || '删除成功！');
-    } else {
-      showFailToast((res?.message) || '删除失败，请联系管理员！');
-    }
-  })
-};
-
-function init() {
+function init(): void {
   dataSource.value = [];
   pagination.value.current = 0;
   query(searchInfo.value, pagination.value);
@@ -199,7 +165,7 @@ init();
 }
 
 .upAndDown {
-  display: flex; 
+  display: flex;
   justify-content: space-around;
 }
 </style>
