@@ -1,47 +1,38 @@
 <template>
   <navBar :info='info'></navBar>
-  <van-pull-refresh pulling-text="加载中。。。" :style="{ height: 'calc(100% - 44px)' }" v-model='isRefresh' @refresh='refresh'
-    ref='pullRefresh' immediate-check='false'>
+  <van-pull-refresh pulling-text="加载中。。。" :style="{ height: 'calc(100% - 44px)' }" v-model='isRefresh'
+    @refresh='refresh' ref='pullRefresh' immediate-check='false'>
     <form action='/'>
       <van-search v-model='searchInfo.shopName' show-action placeholder='请输入搜索关键词' @search='onSearch' @cancel='onCancel'
         action-text="清空" />
     </form>
     <van-divider :style="{
-      color: '#1989fa',
-      borderColor: 'grey',
-    }"></van-divider>
+    color: '#1989fa',
+    borderColor: 'grey',
+  }"></van-divider>
     <van-empty v-if='dataSource.length == 0' description='暂无数据' />
     <van-list v-else v-model:loading='loading' :finished='finished' finished-text='没有更多了' @load='onRefresh'>
       <van-cell v-for="item in dataSource" :key="item">
         <template #title>
+          <div class="text-left">
           <span class="custom-title">{{ item.shopName }}</span>
-          <van-tag type="primary">{{ item.shopCode }}</van-tag>
+          <van-tag type="primary">{{ item.oldCode }}</van-tag>
+        </div>
         </template>
         <template #right-icon>
           <div class="text-right">
             <div style="display: flex">
               <div class="van-ellipsis">
-                {{
-                  item?.saleDate
-                  ? String(item?.saleDate).substring(0, 10)
-                  : "--"
-                }}
+                {{ item?.saleDate ? String(item?.saleDate).substring(0, 10) : "--" }}
               </div>
             </div>
-            <div :class="item.incomeAndExpenses !== 'income'
-                  ? 'rightGreenDiv'
-                  : 'rightRedDiv'
-                ">
-              {{
-                commonUtils.formatAmount(item?.saleAmount, 2, '')
-              }}
+            <div class="rightRedDiv">
+              {{ commonUtils.formatAmount(item?.saleAmount, 2, '') }}
             </div>
           </div>
         </template>
         <template #value>
-          <div class="price" style="font-weight:900; font-size: medium; font-family:SimSun;">
-            {{ commonUtils.formatAmount(item.saleAmount, 2, '') }}
-          </div>
+            {{ item.shopCode }}
         </template>
         <template #label>
           {{ item.shopCode }}
@@ -138,11 +129,6 @@ const onRefresh = () => {
   query(searchInfo.value, pagination.value);
 };
 
-const formatAmount = (amount: number, digit: number, unit: string): string => {
-  return String(amount.toFixed(digit)).replace(/(?<!\.\d*)\B(?=(\d{3})+(?!\d)) /g, ','
-  ).replace(/^(\-)*(\d+)\.(\d\d).*$/, '$1$2.$3') + unit;
-}
-
 function init(): void {
   dataSource.value = [];
   pagination.value.current = 0;
@@ -164,10 +150,15 @@ init();
   text-align: right;
 }
 
+.text-left{
+font-size: 20px;
+}
+
 .rightRedDiv {
   margin-top: 10px;
   text-align: right;
-  color: red
+  color: green;
+  font-size: 20px;
 }
 
 .iconClass {

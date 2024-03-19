@@ -68,6 +68,7 @@ const responseHandler = (
 ): ResponseBody<any> | AxiosResponse<any> | Promise<any> | any => {
   const { data } = response;
   let resData = decrypt(data);
+  console.log(`resData:`, resData);
   if (resData?.code == 403) {
     router.push('/Login');
     console.log(` response11`, response, resData)
