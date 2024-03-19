@@ -86,9 +86,7 @@ export const useUserStore = defineStore({
         const data = await loginApi(loginParams);
         if (data?.code == '200') {
           const { token, admin } = data.data;
-          // save userInfo
           this.setUserInfo(admin);
-          // save token
           this.setToken(token);
           this.setMenuInfo(admin.menuInfoVoList);
           this.setRoleInfo(admin.roleInfoVo);

@@ -1,8 +1,8 @@
-import {useUserStore} from "@/store/modules/user/user";
-import axios, {AxiosError, AxiosResponse, InternalAxiosRequestConfig} from "axios";
-import {ResponseBody} from "@/api/typing";
+import { useUserStore } from "@/store/modules/user/user";
+import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
+import { ResponseBody } from "@/api/typing";
 import router from "@/router";
-import {decrypt} from '@/utils/crypto';
+import { decrypt } from '@/utils/crypto';
 
 const request = axios.create({
   // baseURL: process.env.VUE_APP_API_BASE_URL,
@@ -14,7 +14,6 @@ axios.defaults.headers.post["Content-Type"] =
 
 //异常拦截处理器
 const errorHandler = (error: AxiosError): Promise<any> => {
-  console.log(`error response`, error.response)
   if (error.response) {
     const { status } = error.response;
     // 403 无权限
@@ -68,10 +67,8 @@ const responseHandler = (
 ): ResponseBody<any> | AxiosResponse<any> | Promise<any> | any => {
   const { data } = response;
   let resData = decrypt(data);
-  console.log(`resData:`, resData);
-  if (resData?.code == 403) {
+  if (resData.code == 403) {
     router.push('/Login');
-    console.log(` response11`, response, resData)
     return;
   }
   return resData;

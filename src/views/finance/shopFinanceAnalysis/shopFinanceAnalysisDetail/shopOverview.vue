@@ -96,7 +96,6 @@ let chainAndYear = ref<any>({});
 const getChainAndYearInfo = (dateStr: string) => {
     getChainAndYear(dateStr).then(
         (res: { code: string; data: ShopFinanceChainYear; message: any }) => {
-            console.log(`res:`, res);
             if (res.code == "200") {
                 chainAndYear.value = res.data;
             } else {

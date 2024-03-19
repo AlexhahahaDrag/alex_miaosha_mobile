@@ -42,7 +42,6 @@ const onSubmit = async () => {
         isRememberMe: true,
     };
     const res = await userStore.login(param);
-    console.log("login res:", res);
     if (res) {
         router.push("/");
     }

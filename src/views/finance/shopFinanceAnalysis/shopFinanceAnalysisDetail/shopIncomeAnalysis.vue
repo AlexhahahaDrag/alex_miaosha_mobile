@@ -55,7 +55,6 @@ let piePayWayData = ref<object[]>([]);
 const getPayWayInfoInfo = (dateStr: string) => {
     getPayWayInfo(dateStr).then(
         (res: { code: string; data: any[]; message: any }) => {
-            console.log(`res:`, res);
             if (res.code == "200") {
                 if (res.data) {
                     let shop: ItemInfo[] = [];

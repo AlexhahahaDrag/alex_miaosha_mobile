@@ -7,7 +7,7 @@
       :text="item?.meta?.title"
       :to="item.path"
     >
-      <svgIcon class="homeSvgClass" :name="item?.meta?.icon"></svgIcon>
+      <SvgIcon class="homeSvgClass" :name="item?.meta?.icon"></SvgIcon>
       <span class="homeFontClass">{{ item?.meta?.title || "null" }}</span>
     </van-grid-item>
   </van-grid>
@@ -36,7 +36,6 @@ const getHomeList = (arr: readonly any[] | null) => {
 
 const init = () => {
   homeList.value = [];
-  console.log(`homeList.value: `, homeList.value, router?.options?.routes);
   getHomeList(router?.options?.routes || []);
 }
 

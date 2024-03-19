@@ -116,7 +116,6 @@ function init() {
         ]).then((res: any) => {
             if (res[0].code == '200') {
                 formInfo.value = res[0].data;
-                console.log(`res:`, res[0])
                 formInfo.value.saleDate = dayjs(formInfo.value.saleDate);
                 initInfoDate(formInfo.value.saleDate, 'saleDate');
             } else {

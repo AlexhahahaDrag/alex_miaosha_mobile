@@ -1,41 +1,42 @@
 <template>
   <navBar :info='info'></navBar>
-  <van-pull-refresh pulling-text="加载中。。。" :style="{ height: 'calc(100% - 44px)' }" v-model='isRefresh'
-    @refresh='refresh' ref='pullRefresh' immediate-check='false'>
+  <van-pull-refresh pulling-text="加载中。。。" :style="{ height: 'calc(100% - 44px)' }" v-model='isRefresh' @refresh='refresh'
+    ref='pullRefresh' immediate-check='false'>
     <form action='/'>
       <van-search v-model='searchInfo.shopName' show-action placeholder='请输入搜索关键词' @search='onSearch' @cancel='onCancel'
         action-text="清空" />
     </form>
     <van-divider :style="{
-    color: '#1989fa',
-    borderColor: 'grey',
-  }"></van-divider>
+      color: '#515151',
+      borderColor: '#515151',
+    }"></van-divider>
     <van-empty v-if='dataSource.length == 0' description='暂无数据' />
     <van-list v-else v-model:loading='loading' :finished='finished' finished-text='没有更多了' @load='onRefresh'>
       <van-cell v-for="item in dataSource" :key="item">
         <template #title>
           <div class="text-left">
-          <span class="custom-title">{{ item.shopName }}</span>
-          <van-tag type="primary">{{ item.oldCode }}</van-tag>
-        </div>
+            <span class="custom-title">{{ item.shopName }}</span>
+            <van-tag type="primary">{{ item.oldCode }}</van-tag>
+          </div>
         </template>
         <template #right-icon>
           <div class="text-right">
             <div style="display: flex">
               <div class="van-ellipsis">
-                {{ item?.saleDate ? String(item?.saleDate).substring(0, 10) : "--" }}
+                ￥{{ commonUtils.formatAmount(item?.saleAmount, 2, '') }}
               </div>
             </div>
             <div class="rightRedDiv">
-              {{ commonUtils.formatAmount(item?.saleAmount, 2, '') }}
+              <div>
+                <SvgIcon name="shoppingCart" class="svg"></SvgIcon>
+                <SvgIcon name="shoppingBuy" class="svg"></SvgIcon>
+              </div>
             </div>
           </div>
         </template>
-        <template #value>
-            {{ item.shopCode }}
-        </template>
+        <template #value></template>
         <template #label>
-          {{ item.shopCode }}
+          2222222222{{ item.shopCode }}
         </template>
       </van-cell>
     </van-list>
@@ -141,24 +142,26 @@ init();
 </script>
 
 <style lang='scss' scoped>
-.right_info {
-  height: 100%;
-}
 
-.rightDiv {
-  margin-top: 10px;
-  text-align: right;
-}
-
-.text-left{
-font-size: 20px;
+.text-left {
+  font-size: 17px;
+  width: 100%;
+  padding-bottom: 15px;
 }
 
 .rightRedDiv {
   margin-top: 10px;
   text-align: right;
-  color: green;
-  font-size: 20px;
+  height: 20px;
+
+  .svg {
+    width: 1.5em;
+    height: 1.5em;
+    font-size: 18px;
+    cursor: pointer;
+    vertical-align: middle;
+    padding-left: 5px;
+  }
 }
 
 .iconClass {
@@ -169,6 +172,8 @@ font-size: 20px;
 .van-ellipsis {
   width: 130px;
   text-align: right;
+  color: black;
+  font-size: 20px;
 }
 
 .dividerClass {
