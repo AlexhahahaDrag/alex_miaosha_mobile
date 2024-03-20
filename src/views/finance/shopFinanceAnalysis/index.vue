@@ -1,5 +1,5 @@
 <template>
-    <navBar :info="info"></navBar>
+    <NavBar :info="info"></NavBar>
     <van-row class="topRow">
         <van-col offset="14" span="10">
             <span name="infoDate" @click="chooseDate()">

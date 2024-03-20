@@ -1,5 +1,5 @@
 <template>
-    <navBar :info="info"></navBar>
+    <NavBar :info="info"></NavBar>
     <van-form @submit="onSubmit" :rules="rulesRef" required="auto">
         <van-cell-group>
             <van-field v-model="formInfo.attrName" name="attrName" :label="label.attrName + '：'"

@@ -1,5 +1,5 @@
 <template>
-  <navBar :info='info' @clickRight='addShopFinance'></navBar>
+  <NavBar :info='info' @clickRight='addShopFinance'></NavBar>
   <van-pull-refresh pulling-text="加载中。。。" :style="{ height: 'calc(100% - 44px)' }" v-model="isRefresh" @refresh='refresh'
     ref='pullRefresh' immediate-check='false'>
     <form action='/'>

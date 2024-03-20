@@ -1,5 +1,5 @@
 <template>
-    <navBar :info="info"></navBar>
+    <NavBar :info="info"></NavBar>
     <van-form @submit="onSubmit" :rules="rulesRef" required="auto">
         <van-cell-group inset>
             <van-field v-model="formInfo.name" name="name" :label="label.name + '：'" :placeholder="'请输入' + label.name"

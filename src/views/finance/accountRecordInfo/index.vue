@@ -1,5 +1,5 @@
 <template>
-  <navBar :info="info" @clickRight="addAccountRecordInfo"></navBar>
+  <NavBar :info="info" @clickRight="addAccountRecordInfo"></NavBar>
   <van-pull-refresh
     pulling-text="加载中。。。"
     :style="{ height: 'calc(100% - 44px)' }"

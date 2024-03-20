@@ -1,5 +1,5 @@
 <template>
-  <navBar :info="info"></navBar>
+  <NavBar :info="info"></NavBar>
   <van-grid :column-num="3" :square="true">
     <van-grid-item
       v-for="item in homeList"

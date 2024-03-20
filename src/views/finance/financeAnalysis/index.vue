@@ -1,5 +1,5 @@
 <template>
-    <navBar :info="info"></navBar>
+    <NavBar :info="info"></NavBar>
     <van-row class="topRow">
         <van-col offset="10" span="5">
             <span name="belongTo" @click="choose()">
