@@ -11,6 +11,7 @@ const baseShopStock = '/api/v1//shop-stock';
 const ShopStockUrl = {
   page: '/page',
   url: '',
+  getShopList: '/getShopList',
 };
 
 export function getShopStockPage(params: any, pageNo: number | null | undefined, pageSize : number | null| undefined): Promise<any> {
@@ -35,4 +36,8 @@ export function addOrEditShopStock(
   } else {
     return postData(baseService.finance + baseShopStock +  ShopStockUrl.url, params);
   }
+}
+
+export function getShopList(ids: string): Promise<any> {
+  return getDataOne(baseService.finance + baseShopStock + ShopStockUrl.getShopList + '?ids=' + ids);
 }

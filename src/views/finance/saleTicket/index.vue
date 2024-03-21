@@ -5,11 +5,36 @@
     </div>
     <div class="container">
         <div class="content">
-            <!-- 页面主要内容 -->
+            <van-cell v-for="item in dataSource" :key="item">
+                <template #title>
+                    <div class="text-left">
+                        <span class="custom-title">{{ item.shopName }}</span>
+                        <van-tag type="primary">{{ item.oldShopCode }}</van-tag>
+                    </div>
+                </template>
+                <template #right-icon>
+                    <div class="text-right">
+                        <div class="rightRedDiv">
+                            <van-stepper v-model="item.saleNum" @change="getSumAmount" min="1" />
+                        </div>
+                    </div>
+                </template>
+                <template #label>
+                    <div class="amountInfo">
+                        ￥{{ commonUtils.formatAmount(item?.saleAmount, 2, '') }}
+                    </div>
+                </template>
+            </van-cell>
         </div>
         <div class="footer-container">
             <div class="footer">
-                <div class="amount-info">¥{{ commonUtils.formatAmount(sumAmount, 2, '') }}</div>
+                <div class="amount-info">
+                    <van-field v-model="finalSumAmount" type="number" @change="changeSumAmount" label="￥"
+                        placeholder="请输入用户名" />
+                    <div class="old-info" v-if="showOldAmount">
+                        ￥{{ commonUtils.formatAmount(sumAmount, 2, '') }}
+                    </div>
+                </div>
                 <div class="checkout-button">
                     <van-button @click="submitOrder" :loading="submitLoading" round type="danger"
                         loading-text="提交中...">提交订单</van-button>
@@ -17,34 +42,71 @@
             </div>
         </div>
     </div>
-
-    <!-- <van-submit-bar :price="3050" button-text="提交订单" @submit="onSubmit">
-        <van-checkbox v-model="selectAll">全选</van-checkbox>
-        <template #price>
-
-        </template>
-        <template #tip>
-            你的收货地址不支持配送, <span @click="onClickLink">修改地址</span>
-        </template>
-    </van-submit-bar> -->
 </template>
   
 <script setup lang="ts">
-import { showToast } from 'vant';
-import commonUtils from '@/utils/common/index'
+import { showFailToast } from 'vant';
+import commonUtils from '@/utils/common/index';
+import { getShopList } from '@/api/finance/shopStock/shopStockTs';
+import { ShopStockInfo } from '@/views/finance/shopStock/shopStockTs';
 
 let route = useRoute();
 
 const info = ref<any>({
     title: route?.meta?.title || "订单提交",
-    leftPath: "/",
 });
 
 let sumAmount = ref<number>(0);
+let finalSumAmount = ref<number>(0);
 let submitLoading = ref<boolean>(false);
+let showOldAmount = ref<boolean>(false);
 const submitOrder = () => {
     submitLoading.value = true;
 };
+
+const getSumAmount = (): void => {
+    console.log(22222222222)
+    if (!dataSource.value?.length) {
+        sumAmount.value = 0;
+        return;
+    }
+    sumAmount.value = 0;
+    // todo 修改为购物车对应的样式
+    dataSource.value.forEach((item: any) => {
+        sumAmount.value = commonUtils.plus(sumAmount.value,
+            commonUtils.multiply(item.saleAmount, item.saleNum));
+    });
+    finalSumAmount.value = sumAmount.value;
+    showOldAmount.value = false;
+}
+
+const changeSumAmount = () => {
+    showOldAmount.value = finalSumAmount.value < sumAmount.value;
+}
+
+let dataSource = ref<any>([]);
+
+const getShopListInfo = async(ids: string) => {
+    await getShopList(ids).then((res: any) => {
+        console.log(111111111111111)
+        if (res?.code == "200") {
+            dataSource.value = res.data;
+            if (dataSource.value?.length) {
+                dataSource.value.forEach((item: ShopStockInfo) => {
+                    item.saleNum = 1;
+                });
+            } else {
+                showFailToast("获取订单失败，请联系管理员！");
+            }
+        }
+    });
+}
+
+onMounted(async () => {
+    let ids: any = route.query.ids;
+    await getShopListInfo(ids);
+    getSumAmount();
+});
 </script>
   
 <style>
@@ -65,11 +127,19 @@ const submitOrder = () => {
 .container {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
-}
 
-.content {
-    flex: 1;
+    .content {
+        .text-left {
+            font-size: 17px;
+            width: 100%;
+            padding-bottom: 15px;
+        }
+
+        .amountInfo {
+            font-size: 15px;
+            color: red;
+        }
+    }
 }
 
 .footer {
@@ -92,9 +162,26 @@ const submitOrder = () => {
 }
 
 .amount-info {
-    font-size: 25px;
-    color: red;
     padding-left: 15px;
+    display: flex;
+    align-items: center;
+
+    .van-field {
+        --van-field-label-width: 5%;
+        --van-field-label-color: red;
+        --van-field-input-text-color: red;
+
+        .van-field__control {
+            font-size: 25px;
+            width: 100px;
+        }
+    }
+
+    .old-info {
+        font-size: 15px;
+        color: gray;
+        text-decoration: line-through;
+    }
 }
 
 .checkout-button {

@@ -104,7 +104,8 @@ export const columns = [
 ];
 
 
-export interface DataItem {
+export interface ShopStockInfo {
+  id?: number;
   shopName: string;
   shopCode: string;
   costAmount: number;

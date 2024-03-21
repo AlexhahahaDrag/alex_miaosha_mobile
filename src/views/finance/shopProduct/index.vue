@@ -29,7 +29,7 @@
             <div class="rightRedDiv">
               <div>
                 <SvgIcon name="shoppingCart" class="svg"></SvgIcon>
-                <SvgIcon name="shoppingBuy" class="svg"></SvgIcon>
+                <SvgIcon name="shoppingBuy" class="svg" @click="shoppingBuy(item)"></SvgIcon>
               </div>
             </div>
           </div>
@@ -52,6 +52,7 @@ import {
   SearchInfo,
   pagination,
   pageInfo,
+  ShopStockInfo,
 } from './shopProductTs';
 import { showFailToast } from 'vant';
 import commonUtils from '@/utils/common/index'
@@ -61,7 +62,7 @@ let route = useRoute();
 const info = ref<any>({
   title: route?.meta?.title || '商品详情',
   rightButton: '详情',
-  leftPath: "/",
+  leftPath: "-1",
 })
 let loading = ref<boolean>(false);
 let dataSource = ref<any[]>([]);
@@ -130,6 +131,10 @@ const onRefresh = () => {
   query(searchInfo.value, pagination.value);
 };
 
+const shoppingBuy = (item: ShopStockInfo): void => {
+  router.push({ name: 'saleTicket', query: { ids: item.id } });
+}
+
 function init(): void {
   dataSource.value = [];
   pagination.value.current = 0;
@@ -142,7 +147,6 @@ init();
 </script>
 
 <style lang='scss' scoped>
-
 .text-left {
   font-size: 17px;
   width: 100%;
