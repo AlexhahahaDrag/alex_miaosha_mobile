@@ -1,4 +1,58 @@
-const formatAmount = (amount: number, digit: number, unit: string) => {
+import { Decimal } from 'decimal.js';
+
+// 加
+const plus = (x: number | string, y: number | string) => {
+    if (!x) {
+        x = 0
+    }
+    if (!y) {
+        y = 0
+    }
+    const xx = new Decimal(x)
+    const yy = new Decimal(y)
+    return xx.plus(yy).toNumber()
+}
+
+// 减
+const minus = (x: number | string, y: number | string) => {
+    if (!x) {
+        x = 0
+    }
+    if (!y) {
+        y = 0
+    }
+    const xx = new Decimal(x)
+    const yy = new Decimal(y)
+    return xx.minus(yy).toNumber()
+}
+
+// 乘
+const multiply = (x: number | string, y: number | string) => {
+    if (!x) {
+        x = 0
+    }
+    if (!y) {
+        y = 0
+    }
+    const xx = new Decimal(x)
+    const yy = new Decimal(y)
+    return xx.mul(yy).toNumber()
+}
+
+// 除
+const divide = (x: number | string, y: number | string) => {
+    if (!x) {
+        x = 0
+    }
+    if (!y) {
+        y = 0
+    }
+    const xx = new Decimal(x)
+    const yy = new Decimal(y)
+    return xx.div(yy).toNumber()
+}
+
+const formatAmount = (amount: number | Decimal, digit: number, unit: string) => {
     if (amount == null || amount == undefined) {
         return '--';
     }
@@ -8,4 +62,8 @@ const formatAmount = (amount: number, digit: number, unit: string) => {
 
 export default {
     formatAmount: formatAmount,
+    plus: plus,
+    minus: minus,
+    multiply: multiply,
+    divide: divide,
 }

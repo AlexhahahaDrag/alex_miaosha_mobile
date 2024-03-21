@@ -1,15 +1,15 @@
 <template>
-  <navBar :info='info'></navBar>
-  <van-pull-refresh pulling-text="加载中。。。" :style="{ height: 'calc(100% - 44px)' }" v-model='isRefresh'
-    @refresh='refresh' ref='pullRefresh' immediate-check='false'>
+  <NavBar :info='info'></NavBar>
+  <van-pull-refresh pulling-text="加载中。。。" :style="{ height: 'calc(100% - 44px)' }" v-model='isRefresh' @refresh='refresh'
+    ref='pullRefresh' immediate-check='false'>
     <form action='/'>
       <van-search v-model='searchInfo.shopName' show-action placeholder='请输入搜索关键词' @search='onSearch' @cancel='onCancel'
         action-text="清空" />
     </form>
     <van-divider :style="{
-    color: '#515151',
-    borderColor: '#515151',
-  }"></van-divider>
+      color: '#515151',
+      borderColor: '#515151',
+    }"></van-divider>
     <van-empty v-if='dataSource.length == 0' description='暂无数据' />
     <van-list v-else v-model:loading='loading' :finished='finished' finished-text='没有更多了' @load='onRefresh'>
       <van-cell v-for="item in dataSource" :key="item">
@@ -29,7 +29,7 @@
             <div class="rightRedDiv">
               <div>
                 <SvgIcon name="shoppingCart" class="svg"></SvgIcon>
-                <SvgIcon name="shoppingBuy" class="svg"></SvgIcon>
+                <SvgIcon name="shoppingBuy" class="svg" @click="shoppingBuy(item)"></SvgIcon>
               </div>
             </div>
           </div>
@@ -52,6 +52,7 @@ import {
   SearchInfo,
   pagination,
   pageInfo,
+  ShopStockInfo,
 } from './shopProductTs';
 import { showFailToast } from 'vant';
 import commonUtils from '@/utils/common/index'
@@ -61,7 +62,6 @@ let route = useRoute();
 const info = ref<any>({
   title: route?.meta?.title || '商品详情',
   rightButton: '详情',
-  leftPath: "/",
 })
 let loading = ref<boolean>(false);
 let dataSource = ref<any[]>([]);
@@ -130,6 +130,10 @@ const onRefresh = () => {
   query(searchInfo.value, pagination.value);
 };
 
+const shoppingBuy = (item: ShopStockInfo): void => {
+  router.push({ name: 'saleTicket', query: { ids: item.id } });
+}
+
 function init(): void {
   dataSource.value = [];
   pagination.value.current = 0;
@@ -142,6 +146,7 @@ init();
 </script>
 
 <style lang='scss' scoped>
+
 .text-left {
   font-size: 17px;
   width: 100%;
