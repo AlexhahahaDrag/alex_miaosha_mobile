@@ -1,22 +1,22 @@
 <template>
   <navBar :info='info'></navBar>
-  <van-pull-refresh pulling-text="加载中。。。" :style="{ height: 'calc(100% - 44px)' }" v-model='isRefresh' @refresh='refresh'
-    ref='pullRefresh' immediate-check='false'>
+  <van-pull-refresh pulling-text="加载中。。。" :style="{ height: 'calc(100% - 44px)' }" v-model='isRefresh'
+    @refresh='refresh' ref='pullRefresh' immediate-check='false'>
     <form action='/'>
       <van-search v-model='searchInfo.shopName' show-action placeholder='请输入搜索关键词' @search='onSearch' @cancel='onCancel'
         action-text="清空" />
     </form>
     <van-divider :style="{
-      color: '#515151',
-      borderColor: '#515151',
-    }"></van-divider>
+    color: '#515151',
+    borderColor: '#515151',
+  }"></van-divider>
     <van-empty v-if='dataSource.length == 0' description='暂无数据' />
     <van-list v-else v-model:loading='loading' :finished='finished' finished-text='没有更多了' @load='onRefresh'>
       <van-cell v-for="item in dataSource" :key="item">
         <template #title>
           <div class="text-left">
             <span class="custom-title">{{ item.shopName }}</span>
-            <van-tag type="primary">{{ item.oldCode }}</van-tag>
+            <van-tag type="primary">{{ item.oldShopCode }}</van-tag>
           </div>
         </template>
         <template #right-icon>
@@ -36,7 +36,7 @@
         </template>
         <template #value></template>
         <template #label>
-          2222222222{{ item.shopCode }}
+          {{ item.description }}
         </template>
       </van-cell>
     </van-list>
@@ -142,7 +142,6 @@ init();
 </script>
 
 <style lang='scss' scoped>
-
 .text-left {
   font-size: 17px;
   width: 100%;
