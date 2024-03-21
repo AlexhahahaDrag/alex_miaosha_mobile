@@ -102,7 +102,6 @@ router.beforeEach((to, _from, next) => {
   } else {
     next({ name: 'login' });
   }
-  console.log('router:', router.options.routes)
 });
 
 const addRouter = () => {
@@ -115,9 +114,11 @@ const addRouter = () => {
     userStore.menuInfo.forEach((item: MenuInfo) => {
       if (judgePermission(roleInfo?.permissionList, item?.permissionCode, roleInfo.roleCode)) {
         let newRouter = getChildren(item, roleInfo?.permissionList, roleInfo.roleCode);
-        router.addRoute(newRouter);
-        dynamicRouter.push(newRouter);
-        routes.push(newRouter);
+        if (!router.hasRoute(newRouter.name)) {
+          router.addRoute(newRouter);
+          dynamicRouter.push(newRouter);
+          routes.push(newRouter);
+        }
       }
     });
     userStore.changeRouteStatus(true);
@@ -145,7 +146,10 @@ const getChildren = (item: MenuInfo, permissionList: any[], roleCode: string): a
   if (item?.children?.length) {
     item.children.forEach((childItem: any) => {
       if (judgePermission(permissionList, childItem?.permissionCode, roleCode)) {
-        routeInfo.children?.push(getChildren(childItem, permissionList, roleCode));
+        let cur = getChildren(childItem, permissionList, roleCode);
+        if (!router.hasRoute(routeInfo?.name|| '')) {
+          routeInfo.children?.push(cur);
+        }
       }
     });
   }
@@ -174,7 +178,9 @@ export const refreshRouter = () => {
   dynamicRouter.forEach(route => {
     router.removeRoute(route.name);
     let index = routes.findIndex(item => item.name === route.name);
-    routes.splice(index);
+    if(index >-1) {
+      routes.splice(index);
+    }
   });
   dynamicRouter = []; // 清空引用
 }

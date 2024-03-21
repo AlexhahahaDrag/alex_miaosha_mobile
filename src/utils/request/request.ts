@@ -18,7 +18,7 @@ const errorHandler = (error: AxiosError): Promise<any> => {
     const { status } = error.response;
     // 403 无权限
     if (status === 403) {
-      router.push('/Login');
+      router.push({name: 'login'});
       return Promise.reject(error);
     }
     const { data } = error.response as any;
@@ -38,7 +38,8 @@ const requestHandler = (
   if (token) {
     config.headers["Authorization"] = token;
   } else {
-    router.push('/Login');
+    console.log('token不存在')
+    router.push({name: 'login'});
   }
   return config;
 };
@@ -53,7 +54,8 @@ const requestHandlerFile = (
     config.headers["Authorization"] = token;
     config.headers['Content-Type'] = 'multipart/form-data';
   } else {
-    router.push('/Login');
+    console.log('请求拦截器, token不存在')
+    router.push({name : 'login'});
   }
   return config;
 };
@@ -68,7 +70,8 @@ const responseHandler = (
   const { data } = response;
   let resData = decrypt(data);
   if (resData.code == 403) {
-    router.push('/Login');
+    console.log('响应拦截器 token过期');
+    router.push({name: 'login'});
     return;
   }
   return resData;
