@@ -14,6 +14,7 @@ axios.defaults.headers.post["Content-Type"] =
 
 //异常拦截处理器
 const errorHandler = (error: AxiosError): Promise<any> => {
+  let response = null;
   if (error.response) {
     const { status } = error.response;
     // 403 无权限
@@ -23,10 +24,10 @@ const errorHandler = (error: AxiosError): Promise<any> => {
     }
     const { data } = error.response as any;
     if (data) {
-      error.response.data = decrypt(data);
+      response = decrypt(data);
     }
   }
-  return Promise.reject(error);
+  return Promise.reject(response);
 };
 
 //请求拦截器

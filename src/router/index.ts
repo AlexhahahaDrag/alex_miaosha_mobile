@@ -126,8 +126,8 @@ const addRouter = () => {
 };
 
 const getChildren = (item: MenuInfo, permissionList: any[], roleCode: string): any => {
-  let component = item.component == null ? Error404 : 
-    ("Layout" === item.component ? Layout : 
+  let component = item.component == null ? Error404 :
+    ("Layout" === item.component ? Layout :
       modules[item.component]);
   let routeInfo: RouteRecordRaw = {
     path: item.path,
@@ -147,7 +147,7 @@ const getChildren = (item: MenuInfo, permissionList: any[], roleCode: string): a
     item.children.forEach((childItem: any) => {
       if (judgePermission(permissionList, childItem?.permissionCode, roleCode)) {
         let cur = getChildren(childItem, permissionList, roleCode);
-        if (!router.hasRoute(routeInfo?.name|| '')) {
+        if (!router.hasRoute(routeInfo?.name || '')) {
           routeInfo.children?.push(cur);
         }
       }
@@ -159,7 +159,7 @@ const getChildren = (item: MenuInfo, permissionList: any[], roleCode: string): a
 router.afterEach(() => {
 });
 
-const judgePermission = (permissionList: any[], permissionCode: string,  roleCode: string) => {
+const judgePermission = (permissionList: any[], permissionCode: string, roleCode: string) => {
   if (roleCode === 'super_super') {
     return true;
   }
@@ -168,7 +168,7 @@ const judgePermission = (permissionList: any[], permissionCode: string,  roleCod
   }
   for (const item of permissionList) {
     if (item?.permissionCode === permissionCode) {
-        return true;
+      return true;
     }
   }
   return false;
@@ -178,7 +178,7 @@ export const refreshRouter = () => {
   dynamicRouter.forEach(route => {
     router.removeRoute(route.name);
     let index = routes.findIndex(item => item.name === route.name);
-    if(index >-1) {
+    if (index > -1) {
       routes.splice(index);
     }
   });

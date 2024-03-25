@@ -9,6 +9,7 @@ export interface SearchInfo {
   category?: string;
   purchasePlace?: string;
   saleNum?: number;
+  isShopping?: boolean;
 }
 
 export interface pageInfo {

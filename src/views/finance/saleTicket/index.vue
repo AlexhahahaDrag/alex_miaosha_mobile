@@ -5,7 +5,7 @@
     </div>
     <div class="container">
         <div class="content">
-            <van-cell v-for="item in dataSource" :key="item">
+            <van-cell v-if="saleOrderInfo.shopStockVoList?.length" v-for="item in saleOrderInfo.shopStockVoList" :key="item?.id">
                 <template #title>
                     <div class="text-left">
                         <span class="custom-title">{{ item.shopName }}</span>
@@ -29,14 +29,14 @@
         <div class="footer-container">
             <div class="footer">
                 <div class="amount-info">
-                    <van-field v-model="finalSumAmount" type="number" @change="changeSumAmount" label="￥"
+                    <van-field v-model="saleOrderInfo.sumSaleAmount" type="number" @change="changeSumAmount" label="￥"
                         placeholder="请输入用户名" />
                     <div class="old-info" v-if="showOldAmount">
                         ￥{{ commonUtils.formatAmount(sumAmount, 2, '') }}
                     </div>
                 </div>
                 <div class="checkout-button">
-                    <van-button @click="submitOrder" :loading="submitLoading" round type="danger"
+                    <van-button @click="submitOrderInfo" :loading="submitLoading" round type="danger"
                         loading-text="提交中...">提交订单</van-button>
                 </div>
             </div>
@@ -47,60 +47,75 @@
 <script setup lang="ts">
 import { showFailToast } from 'vant';
 import commonUtils from '@/utils/common/index';
-import { getShopList } from '@/api/finance/shopStock/shopStockTs';
+import { getShopList, submitOrder } from '@/api/finance/shopStock/shopStockTs';
 import { ShopStockInfo } from '@/views/finance/shopStock/shopStockTs';
+import { SaleOrderInfo } from '@/views/finance/saleTicket/saleTicketTs';
 
 let route = useRoute();
+let router = useRouter();
 
 const info = ref<any>({
     title: route?.meta?.title || "订单提交",
 });
 
 let sumAmount = ref<number>(0);
-let finalSumAmount = ref<number>(0);
 let submitLoading = ref<boolean>(false);
 let showOldAmount = ref<boolean>(false);
-const submitOrder = () => {
+let saleOrderInfo = ref<SaleOrderInfo>({
+    sumSaleAmount: 0,
+});
+const submitOrderInfo = () => {
     submitLoading.value = true;
+    // todo添加结果类型
+    submitOrder(saleOrderInfo.value).then((res: any) => {
+        console.log(`submitOrder:`, res);
+        if (res?.code == '200') {
+            console.log(`router:`, router.options.routes)
+            router.push({ name: 'shopProduct' });
+        } else {
+            showFailToast(res?.message || '提交订单失败，请联系管理员！');
+        }
+    }).catch((error) => {
+        console.log(error);
+        showFailToast(error?.message || '系统异常，请联系管理员！');
+    }).finally(() => {
+        submitLoading.value = false;
+    });
 };
 
 const getSumAmount = (): void => {
-    console.log(22222222222)
-    if (!dataSource.value?.length) {
+    if (!saleOrderInfo.value?.shopStockVoList?.length) {
         sumAmount.value = 0;
         return;
     }
     sumAmount.value = 0;
     // todo 修改为购物车对应的样式
-    dataSource.value.forEach((item: any) => {
+    saleOrderInfo.value.shopStockVoList.forEach((item: any) => {
         sumAmount.value = commonUtils.plus(sumAmount.value,
             commonUtils.multiply(item.saleAmount, item.saleNum));
     });
-    finalSumAmount.value = sumAmount.value;
+    saleOrderInfo.value.sumSaleAmount = sumAmount.value;
     showOldAmount.value = false;
 }
 
 const changeSumAmount = () => {
-    showOldAmount.value = finalSumAmount.value < sumAmount.value;
+    showOldAmount.value = (saleOrderInfo.value.sumSaleAmount || 0) < sumAmount.value;
 }
 
-let dataSource = ref<any>([]);
-
-const getShopListInfo = async(ids: string) => {
+const getShopListInfo = async (ids: string) => {
     await getShopList(ids).then((res: any) => {
-        console.log(111111111111111)
         if (res?.code == "200") {
-            dataSource.value = res.data;
-            if (dataSource.value?.length) {
-                dataSource.value.forEach((item: ShopStockInfo) => {
+            if (res?.data?.length) {
+                res.data.forEach((item: ShopStockInfo) => {
                     item.saleNum = 1;
                 });
+                saleOrderInfo.value.shopStockVoList = res.data;
             } else {
                 showFailToast("获取订单失败，请联系管理员！");
             }
         }
     });
-}
+};
 
 onMounted(async () => {
     let ids: any = route.query.ids;

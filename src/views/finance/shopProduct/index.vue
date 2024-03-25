@@ -62,10 +62,11 @@ let route = useRoute();
 const info = ref<any>({
   title: route?.meta?.title || '商品详情',
   rightButton: '详情',
+  leftPath: "/",
 })
 let loading = ref<boolean>(false);
 let dataSource = ref<any[]>([]);
-let searchInfo = ref<SearchInfo>({});
+let searchInfo = ref<SearchInfo>({isShopping: true});
 
 let finished = ref<boolean>(false); //加载是否已经没有更多数据
 let isRefresh = ref<boolean>(false); //是否下拉刷新

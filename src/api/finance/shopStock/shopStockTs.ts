@@ -12,6 +12,7 @@ const ShopStockUrl = {
   page: '/page',
   url: '',
   getShopList: '/getShopList',
+  submitOrder: '/submitOrder',
 };
 
 export function getShopStockPage(params: any, pageNo: number | null | undefined, pageSize : number | null| undefined): Promise<any> {
@@ -40,4 +41,8 @@ export function addOrEditShopStock(
 
 export function getShopList(ids: string): Promise<any> {
   return getDataOne(baseService.finance + baseShopStock + ShopStockUrl.getShopList + '?ids=' + ids);
+}
+
+export function submitOrder(data: any): Promise<any> {
+  return postData(baseService.finance + baseShopStock + ShopStockUrl.submitOrder, data);
 }
