@@ -37,8 +37,9 @@ steps: # 定义流水线执行步骤，这些步骤将顺序执行
         from_secret: ssh_password
       script:
         - cd /usr/local/soft/alex_miaosha/drone/alex_miaosha/front
-        - docker build  -t alex_miaosha_front:latest .
         - docker rm -f alex_front
+        - docker rmi -f alex_miaosha_front:latest
+        - docker build  -t alex_miaosha_front:latest .
         - docker run -p 80:3000 -p 443:443 --network=alex_miaosha_net --memory=256m --name=alex_front -d alex_miaosha_front:latest
 
   - name: notify      # 步骤4 部署完成，邮件通知

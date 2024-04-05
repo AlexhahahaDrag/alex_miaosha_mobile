@@ -28,7 +28,7 @@
             </div>
             <div class="rightRedDiv">
               <div>
-                <SvgIcon name="shoppingCart" class="svg"></SvgIcon>
+                <SvgIcon name="shoppingCart" class="svg" @click="shoppingCart(item)"></SvgIcon>
                 <SvgIcon name="shoppingBuy" class="svg" @click="shoppingBuy(item)"></SvgIcon>
               </div>
             </div>
@@ -42,6 +42,7 @@
     </van-list>
   </van-pull-refresh>
   <van-back-top />
+  <Tabbar :data="useTabBar"></Tabbar>
 </template>
 <script lang='ts' setup>
 import {
@@ -56,9 +57,24 @@ import {
 } from './shopProductTs';
 import { showFailToast } from 'vant';
 import commonUtils from '@/utils/common/index'
+import { useCartStore } from "@/store/modules/shopping/cart";
+
+const useTabBar = reactive([
+  {
+    title: "商品",
+    to: "/finance/shopProduct",
+    icon: "shop-o",
+  },
+  {
+    title: "购物车",
+    to: "/finance/shoppingCart",
+    icon: "shopping-cart-o",
+  },
+]);
 
 let router = useRouter();
 let route = useRoute();
+let cartInfo = useCartStore();
 const info = ref<any>({
   title: route?.meta?.title || '商品详情',
   rightButton: '详情',
@@ -133,7 +149,11 @@ const onRefresh = () => {
 
 const shoppingBuy = (item: ShopStockInfo): void => {
   router.push({ name: 'saleTicket', query: { ids: item.id } });
-}
+};
+
+const shoppingCart = (item: ShopStockInfo) => {
+  cartInfo.addShoppingCart(item);
+};
 
 function init(): void {
   dataSource.value = [];
@@ -165,7 +185,7 @@ init();
     font-size: 18px;
     cursor: pointer;
     vertical-align: middle;
-    padding-left: 5px;
+    padding-left: 15px;
   }
 }
 
@@ -196,7 +216,7 @@ init();
 
 .svg {
   width: 1.5em;
-  height: 1.5em;
+  height: 1em;
   font-size: 18px;
   cursor: pointer;
   vertical-align: middle;

@@ -1,13 +1,7 @@
 import { MenuDataItem } from './typing'
-import Message from '@/views/message/index.vue';
 import Layout from '@/layouts/index.vue';
-import Home from '@/views/home/index.vue';
-import User from '@/views/user/index.vue';
-import Login from '@/views/login/index.vue'
-import UserManager from '@/views/user/userManager/index.vue';
 import { useUserStore } from "@/store/modules/user/user";
 import type { MenuInfo } from "@/store/modules/user/typing";
-import Error404 from '@/views/common/error/404.vue';
 import { RouteRecordRaw, createRouter, createWebHashHistory } from 'vue-router';
 
 const modules = import.meta.glob("@/views/**/**.vue");
@@ -27,7 +21,7 @@ export const routes: MenuDataItem[] = [
       {
         name: "dashboard",
         path: "/dashboard",
-        component: Home,
+        component: modules['/src/views/home/index.vue'],
         meta: { title: "仪表盘", icon: "dashboard" },
       },
     ],
@@ -42,7 +36,7 @@ export const routes: MenuDataItem[] = [
       {
         path: "/message/messageManager",
         name: "messageManager",
-        component: Message,
+        component: modules['/src/views/message/index.vue'],
         meta: { title: "消息管理", icon: "message", hiedInMenu: false },
       },
     ],
@@ -57,26 +51,26 @@ export const routes: MenuDataItem[] = [
       {
         path: "/myself/about",
         name: "about",
-        component: User,
+        component: modules['/src/views/user/index.vue'],
         meta: { title: "我的", icon: "about", hiedInMenu: false },
       },
       {
         path: "/myself/info",
         name: "myselfInfo",
-        component: UserManager,
+        component: modules['/src/views/user/userManager/index.vue'],
         meta: { title: "个人信息", icon: "userManager", hiedInMenu: false },
       },
     ],
   },
   {
     path: "/login",
-    component: Login,
+    component: modules['/src/views/login/index.vue'],
     name: "login",
     meta: { title: "登录", icon: "login", hiedInMenu: false, showInHome: false, },
   },
   {
     path: '/:catchAll(.*)',
-    component: () => import("@/views/common/error/404.vue")
+    component: modules['/src/views/common/error/404.vue'],
   }
 ];
 
@@ -102,16 +96,17 @@ router.beforeEach((to, _from, next) => {
   } else {
     next({ name: 'login' });
   }
+  console.log(`router:`, router.options.routes)
 });
 
 const addRouter = () => {
   const userStore = useUserStore();
-  if (userStore.menuInfo?.length) {
+  if (userStore.getMenuInfo?.length) {
     let roleInfo = userStore.getRoleInfo;
     if (roleInfo?.roleCode !== 'super_super' && !roleInfo?.permissionList?.length) {
       return;
     }
-    userStore.menuInfo.forEach((item: MenuInfo) => {
+    userStore.getMenuInfo.forEach((item: MenuInfo) => {
       if (judgePermission(roleInfo?.permissionList, item?.permissionCode, roleInfo.roleCode)) {
         let newRouter = getChildren(item, roleInfo?.permissionList, roleInfo.roleCode);
         if (!router.hasRoute(newRouter.name)) {
@@ -126,7 +121,7 @@ const addRouter = () => {
 };
 
 const getChildren = (item: MenuInfo, permissionList: any[], roleCode: string): any => {
-  let component = item.component == null ? Error404 :
+  let component = item.component == null ? modules['/src/views/common/error/404.vue'] :
     ("Layout" === item.component ? Layout :
       modules[item.component]);
   let routeInfo: RouteRecordRaw = {
