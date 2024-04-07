@@ -16,11 +16,6 @@ export const useCartStore = defineStore({
         },
     },
     actions: {
-        addShoppingCart(shopping: ShopStockInfo) {
-            this.shoppingCart.push(shopping);
-            console.log(`set shoppingCart`, this.shoppingCart)
-            localStorage.setItem("shoppingCart", JSON.stringify(this.shoppingCart));
-        },
         setShoppingCart(shoppings: ShopStockInfo[]) {
             this.shoppingCart = shoppings;
             localStorage.setItem("shoppingCart", JSON.stringify(this.shoppingCart));

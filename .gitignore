@@ -30,3 +30,4 @@ coverage
 .vscode
 yarn.lock
 stats.html
+components.d.ts

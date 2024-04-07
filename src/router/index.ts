@@ -6,6 +6,15 @@ import { RouteRecordRaw, createRouter, createWebHashHistory } from 'vue-router';
 
 const modules = import.meta.glob("@/views/**/**.vue");
 
+const pageInfo = {
+  dashboard: '/src/views/home/index.vue',
+  message: '/src/views/message/index.vue',
+  about: '/src/views/user/index.vue',
+myself: '/src/views/user/userManager/index.vue',
+login: '/src/views/login/index.vue',
+'404': '/src/views/common/error/404.vue',
+}
+
 export const routes: MenuDataItem[] = [
   {
     name: "home",
@@ -21,7 +30,7 @@ export const routes: MenuDataItem[] = [
       {
         name: "dashboard",
         path: "/dashboard",
-        component: modules['/src/views/home/index.vue'],
+        component: modules[pageInfo.dashboard],
         meta: { title: "仪表盘", icon: "dashboard" },
       },
     ],
@@ -36,7 +45,7 @@ export const routes: MenuDataItem[] = [
       {
         path: "/message/messageManager",
         name: "messageManager",
-        component: modules['/src/views/message/index.vue'],
+        component: modules[pageInfo.message],
         meta: { title: "消息管理", icon: "message", hiedInMenu: false },
       },
     ],
@@ -51,26 +60,26 @@ export const routes: MenuDataItem[] = [
       {
         path: "/myself/about",
         name: "about",
-        component: modules['/src/views/user/index.vue'],
+        component: modules[pageInfo.about],
         meta: { title: "我的", icon: "about", hiedInMenu: false },
       },
       {
         path: "/myself/info",
         name: "myselfInfo",
-        component: modules['/src/views/user/userManager/index.vue'],
+        component: modules[pageInfo.myself],
         meta: { title: "个人信息", icon: "userManager", hiedInMenu: false },
       },
     ],
   },
   {
     path: "/login",
-    component: modules['/src/views/login/index.vue'],
+    component: modules[pageInfo.login],
     name: "login",
     meta: { title: "登录", icon: "login", hiedInMenu: false, showInHome: false, },
   },
   {
     path: '/:catchAll(.*)',
-    component: modules['/src/views/common/error/404.vue'],
+    component: modules[pageInfo[404]],
   }
 ];
 
@@ -121,7 +130,7 @@ const addRouter = () => {
 };
 
 const getChildren = (item: MenuInfo, permissionList: any[], roleCode: string): any => {
-  let component = item.component == null ? modules['/src/views/common/error/404.vue'] :
+  let component = item.component == null ? modules[pageInfo[404]] :
     ("Layout" === item.component ? Layout :
       modules[item.component]);
   let routeInfo: RouteRecordRaw = {
