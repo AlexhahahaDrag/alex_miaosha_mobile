@@ -5,7 +5,8 @@
     </div>
     <div class="container">
         <div class="content">
-            <van-cell v-if="saleOrderInfo.shopStockVoList?.length" v-for="item in saleOrderInfo.shopStockVoList" :key="item?.id">
+            <van-cell v-if="saleOrderInfo.shopOrderDetailVoList?.length" v-for="item in saleOrderInfo.shopOrderDetailVoList"
+                :key="item?.id">
                 <template #title>
                     <div class="text-left">
                         <span class="custom-title">{{ item.shopName }}</span>
@@ -21,7 +22,7 @@
                 </template>
                 <template #label>
                     <div class="amountInfo">
-                        ￥{{ commonUtils.formatAmount(item?.saleAmount, 2, '') }}
+                        ￥{{ commonUtils.formatAmount(item?.saleAmount || 0, 2, '') }}
                     </div>
                 </template>
             </van-cell>
@@ -29,10 +30,10 @@
         <div class="footer-container">
             <div class="footer">
                 <div class="amount-info">
-                    <van-field v-model="saleOrderInfo.sumSaleAmount" type="number" @change="changeSumAmount" label="￥"
-                        placeholder="请输入用户名" />
+                    <van-field v-model="saleOrderInfo.saleAmount" type="number" @change="changeSumAmount" label="￥"
+                        placeholder="请输入金额" />
                     <div class="old-info" v-if="showOldAmount">
-                        ￥{{ commonUtils.formatAmount(sumAmount, 2, '') }}
+                        ￥{{ commonUtils.formatAmount(sumAmount || 0, 2, '') }}
                     </div>
                 </div>
                 <div class="checkout-button">
@@ -47,9 +48,15 @@
 <script setup lang="ts">
 import { showFailToast } from 'vant';
 import commonUtils from '@/utils/common/index';
-import { getShopList, submitOrder } from '@/api/finance/shopStock/shopStockTs';
+import { getShopList } from '@/api/finance/shopStock/shopStockTs';
+import { submitOrder } from '@/api/finance/shopOrder/shopOrderTs';
 import { ShopStockInfo } from '@/views/finance/shopStock/shopStockTs';
 import { SaleOrderInfo } from '@/views/finance/saleTicket/saleTicketTs';
+import {
+    getShopCartList,
+} from '@/api/finance/shopCart/shopCartTs';
+import dayjs from 'dayjs';
+import { ShopCartInfo } from '@/views/finance/shoppingCart/shoppingCartTs';
 
 let route = useRoute();
 let router = useRouter();
@@ -62,7 +69,7 @@ let sumAmount = ref<number>(0);
 let submitLoading = ref<boolean>(false);
 let showOldAmount = ref<boolean>(false);
 let saleOrderInfo = ref<SaleOrderInfo>({
-    sumSaleAmount: 0,
+    saleAmount: 0,
 });
 const submitOrderInfo = () => {
     submitLoading.value = true;
@@ -70,7 +77,6 @@ const submitOrderInfo = () => {
     submitOrder(saleOrderInfo.value).then((res: any) => {
         console.log(`submitOrder:`, res);
         if (res?.code == '200') {
-            console.log(`router:`, router.options.routes)
             router.push({ name: 'shopProduct' });
         } else {
             showFailToast(res?.message || '提交订单失败，请联系管理员！');
@@ -84,32 +90,58 @@ const submitOrderInfo = () => {
 };
 
 const getSumAmount = (): void => {
-    if (!saleOrderInfo.value?.shopStockVoList?.length) {
+    if (!saleOrderInfo.value?.shopOrderDetailVoList?.length) {
         sumAmount.value = 0;
         return;
     }
     sumAmount.value = 0;
-    // todo 修改为购物车对应的样式
-    saleOrderInfo.value.shopStockVoList.forEach((item: any) => {
+    saleOrderInfo.value.shopOrderDetailVoList.forEach((item: any) => {
         sumAmount.value = commonUtils.plus(sumAmount.value,
             commonUtils.multiply(item.saleAmount, item.saleNum));
     });
-    saleOrderInfo.value.sumSaleAmount = sumAmount.value;
+    saleOrderInfo.value.saleAmount = sumAmount.value;
     showOldAmount.value = false;
 }
 
 const changeSumAmount = () => {
-    showOldAmount.value = (saleOrderInfo.value.sumSaleAmount || 0) < sumAmount.value;
+    showOldAmount.value = (saleOrderInfo.value.saleAmount || 0) < sumAmount.value;
 }
 
 const getShopListInfo = async (ids: string) => {
     await getShopList(ids).then((res: any) => {
         if (res?.code == "200") {
             if (res?.data?.length) {
-                res.data.forEach((item: ShopStockInfo) => {
-                    item.saleNum = 1;
-                });
-                saleOrderInfo.value.shopStockVoList = res.data;
+                saleOrderInfo.value.shopOrderDetailVoList = res.data.map((item: ShopStockInfo) => ({
+                    shopName: item.shopName,
+                    shopCode: item.shopCode,
+                    oldShopCode: item.oldShopCode,
+                    saleAmount: item.saleAmount,
+                    saleDate: dayjs(),
+                    saleNum: 1,
+                    shopStockId: item.id,
+                }));
+            } else {
+                showFailToast("获取订单失败，请联系管理员！");
+            }
+        }
+    });
+};
+
+const getShopCartListInfo = async (ids: string) => {
+    await getShopCartList(ids).then((res: any) => {
+        if (res?.code == "200") {
+            console.log(`res cart:`, res.data)
+            if (res?.data?.length) {
+                saleOrderInfo.value.shopOrderDetailVoList = res.data.map((item: ShopCartInfo) => ({
+                    shopName: item.shopName,
+                    shopCode: item.shopCode,
+                    oldShopCode: item.oldShopCode,
+                    saleAmount: item.saleAmount,
+                    saleDate: dayjs(),
+                    saleNum: item.saleNum,
+                    shopStockId: item.shopId,
+                    shopCartId: item.id,
+                }));
             } else {
                 showFailToast("获取订单失败，请联系管理员！");
             }
@@ -118,8 +150,15 @@ const getShopListInfo = async (ids: string) => {
 };
 
 onMounted(async () => {
-    let ids: any = route.query.ids;
-    await getShopListInfo(ids);
+    let params: any = route.query;
+    switch (params.type) {
+        case 'shopCart':
+            await getShopCartListInfo(params.ids);
+            break;
+        case 'shopProduct':
+            await getShopListInfo(params.ids);
+            break;
+    }
     getSumAmount();
 });
 </script>

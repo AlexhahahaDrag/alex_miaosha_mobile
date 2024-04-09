@@ -1,10 +1,14 @@
 import { Dayjs } from 'dayjs';
 export interface SearchInfo {
-  shopId?: number;
-  userId?: number;
-  customerId?: number;
+  orderId?: number;
+  shopName?: string;
+  shopCode?: string;
+  saleAmount?: number;
   isValid?: string;
+  saleDate?: Dayjs | string;
+  payWay?: string;
   saleNum?: number;
+  shopStockId?: number;
 }
 
 export interface pageInfo {
@@ -47,19 +51,24 @@ export let pagination = ref<pageInfo>({
 
 export const columns = [
   {
-    title: '商品id',
-    dataIndex: 'shopId',
-    key: 'shopId',
+    title: '订单id',
+    dataIndex: 'orderId',
+    key: 'orderId',
   },
   {
-    title: '人员id',
-    dataIndex: 'userId',
-    key: 'userId',
+    title: '商品名称',
+    dataIndex: 'shopName',
+    key: 'shopName',
   },
   {
-    title: '客户id',
-    dataIndex: 'customerId',
-    key: 'customerId',
+    title: '商品编码',
+    dataIndex: 'shopCode',
+    key: 'shopCode',
+  },
+  {
+    title: '售价',
+    dataIndex: 'saleAmount',
+    key: 'saleAmount',
   },
   {
     title: '是否有效',
@@ -67,9 +76,24 @@ export const columns = [
     key: 'isValid',
   },
   {
-    title: '数量',
+    title: '销售日期',
+    dataIndex: 'saleDate',
+    key: 'saleDate',
+  },
+  {
+    title: '支付方式',
+    dataIndex: 'payWay',
+    key: 'payWay',
+  },
+  {
+    title: '个数',
     dataIndex: 'saleNum',
     key: 'saleNum',
+  },
+  {
+    title: '商品库存id',
+    dataIndex: 'shopStockId',
+    key: 'shopStockId',
   },
   {
     title: '操作',
@@ -81,11 +105,15 @@ export const columns = [
 
 
 export interface DataItem {
-  shopId: number;
-  userId: number;
-  customerId: number;
+  orderId: number;
+  shopName: string;
+  shopCode: string;
+  saleAmount: number;
   isValid: string;
+  saleDate?: Dayjs | string;
+  payWay: string;
   saleNum: number;
+  shopStockId: number;
 }
 
 export interface ModelInfo {

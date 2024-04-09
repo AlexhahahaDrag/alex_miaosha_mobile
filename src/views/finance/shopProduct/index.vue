@@ -1,15 +1,15 @@
 <template>
   <NavBar :info='info'></NavBar>
-  <van-pull-refresh pulling-text="加载中。。。" :style="{ height: 'calc(100% - 44px)' }" v-model='isRefresh'
-    @refresh='refresh' ref='pullRefresh' immediate-check='false'>
+  <van-pull-refresh pulling-text="加载中。。。" :style="{ height: 'calc(100% - 44px)' }" v-model='isRefresh' @refresh='refresh'
+    ref='pullRefresh' immediate-check='false'>
     <form action='/'>
       <van-search v-model='searchInfo.shopName' show-action placeholder='请输入搜索关键词' @search='onSearch' @cancel='onCancel'
         action-text="清空" />
     </form>
     <van-divider :style="{
-    color: '#515151',
-    borderColor: '#515151',
-  }"></van-divider>
+      color: '#515151',
+      borderColor: '#515151',
+    }"></van-divider>
     <van-empty v-if='dataSource.length == 0' description='暂无数据' />
     <van-list v-else v-model:loading='loading' :finished='finished' finished-text='没有更多了' @load='onRefresh'>
       <van-cell v-for="item in dataSource" :key="item">
@@ -151,18 +151,26 @@ const onRefresh = () => {
 };
 
 const shoppingBuy = (item: ShopStockInfo): void => {
-  router.push({ name: 'saleTicket', query: { ids: item.id } });
+  router.push({ name: 'saleTicket', query: { ids: item.id, type: 'shopProduct' } });
 };
 
 const shoppingCart = (item: ShopStockInfo) => {
   let info = {
     shopId: item.id,
     userId: userInfo.id,
-    customId: null,
+    customerId: null,
     isValid: '1',
     saleNum: 1,
   };
-  addOrEditShopCart('post', info);
+  addOrEditShopCart('post', info).then((res: any) => {
+    if (res?.code === '200') {
+
+    } else {
+      showFailToast(res?.message || '加入购物车失败，请联系管理员!');
+    }
+  }).catch((error: any) => {
+    showFailToast(error?.message || '加入购物车失败，请联系管理员!');
+  });
 };
 
 function init(): void {

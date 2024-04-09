@@ -10,5 +10,7 @@
 <script setup lang="ts">
 import uploadImage from '@/views/common/upload/uploadImage.vue'
 
+let aa    = 2;
+console.log(aa)
 const value = ref('');
 </script>

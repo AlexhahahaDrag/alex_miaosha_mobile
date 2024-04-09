@@ -6,11 +6,12 @@ import {
   baseService,
 } from '@/api/common/index';
 
-const baseShopCart = '/api/v1//shop-cart';
+const baseShopCart = '/api/v1/shop-cart';
 
 const ShopCartUrl = {
   page: '/page',
   url: '',
+  list: '/list',
 };
 
 export function getShopCartPage(params: any, pageNo: number | null | undefined, pageSize : number | null| undefined): Promise<any> {
@@ -35,4 +36,9 @@ export function addOrEditShopCart(
   } else {
     return postData(baseService.finance + baseShopCart +  ShopCartUrl.url, params);
   }
+}
+
+export function getShopCartList(ids?: string): Promise<any> {
+  let url = baseService.finance + baseShopCart + ShopCartUrl.list + (ids ? '?ids=' + ids : '');
+  return postData(url, {});
 }

@@ -1,14 +1,13 @@
 import { Dayjs } from 'dayjs';
 export interface SearchInfo {
-  shopName?: string;
-  shopCode?: string;
-  costAmount?: number;
+  saleOrderCode?: string;
+  saleOrderName?: string;
   saleAmount?: number;
   isValid?: string;
   saleDate?: Dayjs | string;
-  category?: string;
-  purchasePlace?: string;
-  saleNum?: number;
+  description?: string;
+  payWay?: string;
+  saleCount?: number;
 }
 
 export interface pageInfo {
@@ -51,22 +50,17 @@ export let pagination = ref<pageInfo>({
 
 export const columns = [
   {
-    title: '商品名称',
-    dataIndex: 'shopName',
-    key: 'shopName',
+    title: '订单编码',
+    dataIndex: 'saleOrderCode',
+    key: 'saleOrderCode',
   },
   {
-    title: '商品编码',
-    dataIndex: 'shopCode',
-    key: 'shopCode',
+    title: '订单名称',
+    dataIndex: 'saleOrderName',
+    key: 'saleOrderName',
   },
   {
-    title: '成本价',
-    dataIndex: 'costAmount',
-    key: 'costAmount',
-  },
-  {
-    title: '零售价',
+    title: '总销售金额',
     dataIndex: 'saleAmount',
     key: 'saleAmount',
   },
@@ -76,24 +70,24 @@ export const columns = [
     key: 'isValid',
   },
   {
-    title: '进货日期',
+    title: '销售日期',
     dataIndex: 'saleDate',
     key: 'saleDate',
   },
   {
-    title: '类别',
-    dataIndex: 'category',
-    key: 'category',
+    title: '描述',
+    dataIndex: 'description',
+    key: 'description',
   },
   {
-    title: '进货地点',
-    dataIndex: 'purchasePlace',
-    key: 'purchasePlace',
+    title: '支付方式',
+    dataIndex: 'payWay',
+    key: 'payWay',
   },
   {
-    title: '数量',
-    dataIndex: 'saleNum',
-    key: 'saleNum',
+    title: '销售数量',
+    dataIndex: 'saleCount',
+    key: 'saleCount',
   },
   {
     title: '操作',
@@ -104,19 +98,15 @@ export const columns = [
 ];
 
 
-export interface ShopStockInfo {
-  id?: number;
-  shopName: string;
-  oldShopCode?: string;
-  shopCode: string;
-  costAmount: number;
+export interface DataItem {
+  saleOrderCode: string;
+  saleOrderName: string;
   saleAmount: number;
   isValid: string;
   saleDate?: Dayjs | string;
-  category: string;
-  purchasePlace: string;
-  saleNum: number;
-  checked?: boolean;
+  description: string;
+  payWay: string;
+  saleCount: number;
 }
 
 export interface ModelInfo {

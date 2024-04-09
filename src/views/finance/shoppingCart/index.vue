@@ -2,35 +2,50 @@
     <NavBar :info="info"></NavBar>
     <div class="container">
         <div class="content">
-            <van-cell v-if="saleOrderInfo.shopStockVoList?.length" v-for="item in saleOrderInfo.shopStockVoList" :key="item?.id">
-                <template #title>
-                    <div class="text-left">
-                        <span class="custom-title">{{ item.shopName }}</span>
-                        <van-tag type="primary">{{ item.oldShopCode }}</van-tag>
+            <van-cell-group>
+                <van-swipe-cell :key="index" v-if="shopCartList?.length" v-for="(item, index) in shopCartList">
+                    <div class="cell-info">
+                        <van-checkbox v-if="item?.stockNum || 0 > 0" v-model="item.checked" icon-size="18px" @change="changeCheck"></van-checkbox>
+                        <van-cell center :key="item?.id" @click="selectProduct(item)">
+                            <template #title>
+                                <div class="text-left">
+                                    <span class="custom-title">{{ item.shopName }}</span>
+                                    <van-tag type="primary">{{ item.oldShopCode }}</van-tag>
+                                </div>
+                            </template>
+                            <template #right-icon>
+                                <div class="text-right">
+                                    <div class="rightRedDiv" @click.stop>
+                                        <van-stepper v-model="item.saleNum" @change="changeCount(item)" min="1" />
+                                    </div>
+                                </div>
+                            </template>
+                            <template #label>
+                                <div class="amountInfo">
+                                    ￥{{ commonUtils.formatAmount(item.saleAmount || 0, 2, '') }}
+                                </div>
+                            </template>
+                        </van-cell>
                     </div>
-                </template>
-                <template #right-icon>
-                    <div class="text-right">
-                        <div class="rightRedDiv">
-                            <van-stepper v-model="item.saleNum" @change="getSumAmount" min="1" />
-                        </div>
-                    </div>
-                </template>
-                <template #label>
-                    <div class="amountInfo">
-                        ￥{{ commonUtils.formatAmount(item?.saleAmount, 2, '') }}
-                    </div>
-                </template>
-            </van-cell>
+                    <template #right>
+                        <van-button class="right_info" square type="danger" text="删除" />
+                        <!-- <van-button class="right_info" @click="delShopFinance(item.id)" square type="danger" text="删除" /> -->
+                    </template>
+                    <van-divider :style="{
+                        color: '#1989fa',
+                        borderColor: 'grey',
+                        padding: '0 16px',
+                        'margin-top': '0px',
+                        'margin-bottom': '0px',
+                    }">
+                    </van-divider>
+                </van-swipe-cell>
+            </van-cell-group>
         </div>
         <div class="footer-container">
             <div class="footer">
                 <div class="amount-info">
-                    <van-field v-model="saleOrderInfo.sumSaleAmount" type="number" @change="changeSumAmount" label="￥"
-                        placeholder="请输入用户名" />
-                    <div class="old-info" v-if="showOldAmount">
-                        ￥{{ commonUtils.formatAmount(sumAmount, 2, '') }}
-                    </div>
+                    <van-field v-model="sumAmount" type="number" label="￥" placeholder="请输入金额" :readonly="true" />
                 </div>
                 <div class="checkout-button">
                     <van-button @click="settlementAmount" :loading="submitLoading" round type="danger"
@@ -44,14 +59,14 @@
 <script setup lang="ts">
 import { showFailToast } from 'vant';
 import commonUtils from '@/utils/common/index';
-import { getShopList, submitOrder } from '@/api/finance/shopStock/shopStockTs';
-import { ShopStockInfo } from '@/views/finance/shopStock/shopStockTs';
-import { SaleOrderInfo } from '@/views/finance/saleTicket/saleTicketTs';
-import { useCartStore } from "@/store/modules/shopping/cart";
+import { ShopCartInfo } from '@/views/finance/shoppingCart/shoppingCartTs';
+import {
+    getShopCartList,
+    addOrEditShopCart,
+} from '@/api/finance/shopCart/shopCartTs';
 
 let route = useRoute();
 let router = useRouter();
-let cartInfo = useCartStore();
 
 const info = ref<any>({
     title: route?.meta?.title || "购物车",
@@ -59,41 +74,42 @@ const info = ref<any>({
 
 let sumAmount = ref<number>(0);
 let submitLoading = ref<boolean>(false);
-let showOldAmount = ref<boolean>(false);
-let saleOrderInfo = ref<SaleOrderInfo>({
-    sumSaleAmount: 0,
-});
+let shopCartList = ref<ShopCartInfo[]>([]);
 const settlementAmount = () => {
-    router.push({ name: 'shopProduct', query: {ids: []} });
+    let ids = shopCartList.value.filter((item: ShopCartInfo) => item.checked).map((item: ShopCartInfo) => item.id);
+    router.push({ name: 'saleTicket', query: { type: 'shopCart', ids: ids } });
 };
 
 const getSumAmount = (): void => {
-    if (!saleOrderInfo.value?.shopStockVoList?.length) {
+    if (!shopCartList.value?.length) {
         sumAmount.value = 0;
         return;
     }
     sumAmount.value = 0;
-    // todo 修改为购物车对应的样式
-    saleOrderInfo.value.shopStockVoList.forEach((item: any) => {
-        sumAmount.value = commonUtils.plus(sumAmount.value,
-            commonUtils.multiply(item.saleAmount, item.saleNum));
+    shopCartList.value.forEach((item: any) => {
+        if (item?.checked) {
+            sumAmount.value = commonUtils.plus(sumAmount.value,
+                commonUtils.multiply(item.saleAmount, item.saleNum));
+        }
     });
-    saleOrderInfo.value.sumSaleAmount = sumAmount.value;
-    showOldAmount.value = false;
 }
 
-const changeSumAmount = () => {
-    showOldAmount.value = (saleOrderInfo.value.sumSaleAmount || 0) < sumAmount.value;
+const changeCount = (item: ShopCartInfo): void => {
+    // 保存购物车信息
+    addOrEditShopCart('put', {
+        id: item.id,
+        saleNum: item.saleNum,
+    });
+    // 求和选中商品金额
+    getSumAmount();
 }
 
-const getShopListInfo = async (ids: string) => {
-    await getShopList(ids).then((res: any) => {
+const getShopCartListInfo = async () => {
+    await getShopCartList().then((res: any) => {
         if (res?.code == "200") {
+            console.log(`res shop cart:`, res.data);
             if (res?.data?.length) {
-                res.data.forEach((item: ShopStockInfo) => {
-                    item.saleNum = 1;
-                });
-                saleOrderInfo.value.shopStockVoList = res.data;
+                shopCartList.value = res.data;
             } else {
                 showFailToast("获取订单失败，请联系管理员！");
             }
@@ -101,17 +117,30 @@ const getShopListInfo = async (ids: string) => {
     });
 };
 
-onMounted( () => {
-    saleOrderInfo.value.saleOrderInfo = cartInfo.getShoppingCart();
-    getSumAmount(); 
+const selectProduct = (info: ShopCartInfo) => {
+    shopCartList.value.forEach((item: ShopCartInfo) => {
+        if (item.id === info.id) {
+            item.checked = !info.checked;
+        }
+    });
+    getSumAmount();
+}
+
+const changeCheck = (): void => {
+    getSumAmount();
+};
+
+onMounted(async () => {
+    await getShopCartListInfo();
+    getSumAmount();
 });
 </script>
   
 <style>
-
 .container {
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
 
     .content {
         .text-left {
@@ -123,6 +152,23 @@ onMounted( () => {
         .amountInfo {
             font-size: 15px;
             color: red;
+        }
+
+        .cell-info {
+            display: flex;
+            justify-content: space-between;
+            /* 使子元素分别对齐到容器的两端 */
+            align-items: center;
+            /* 纵向居中对齐 */
+            left: 0;
+            width: 100%;
+            padding: 10px;
+            /* 根据需要调整 */
+            box-sizing: border-box;
+        }
+
+        .right_info {
+            height: 100%;
         }
     }
 }
@@ -167,10 +213,6 @@ onMounted( () => {
         color: gray;
         text-decoration: line-through;
     }
-}
-
-.checkout-button {
-    /* 可以根据需要添加样式 */
 }
 </style>
   

@@ -1,5 +1,5 @@
 <template>
-  <navBar :info='info' @clickRight='addShopCart'></navBar>
+  <navBar :info='info' @clickRight='addShopOrderDetail'></navBar>
   <van-pull-refresh pulling-text="加载中。。。" :style="{ height: 'calc(100% - 44px)' }" v-model='isRefresh' @refresh='refresh'
     ref='pullRefresh' immediate-check='false'>
     <form action='/'>
@@ -24,11 +24,11 @@
       <van-cell-group>
         <van-swipe-cell v-for='(item, index) in dataSource' :before-close='beforeClose' :key="index">
           <van-cell :title="item.id" :key='index' is-link
-            :to='{ path: "/finance/shopCart/shopCartDetail", query: { id: item.id } }'>
+            :to='{ path: "/finance/shopOrderDetail/shopOrderDetailDetail", query: { id: item.id } }'>
             <template #label>
               <div class="iconClass">
                 <div class='icon' style='background-color: #ffcc00'>
-                  {{item.shopId }}
+                  {{item.orderId }}
                 </div>
               </div>
             </template>
@@ -36,17 +36,17 @@
               <div class='text-right'>
                 <div style='display: flex'>
                   <div class='van-ellipsis'>
-                    {{item.userId }}
+                    {{item.shopName }}
                   </div>
                 </div>
                 <div :class="true ? 'rightDiv' : 'rightRedDiv'">
-                    item.isValid+item.saleNum+;
+                    item.saleAmount+item.isValid+item.saleDate+item.payWay+item.saleNum+item.shopStockId+;
                 </div>
               </div>
             </template>
           </van-cell>
           <template #right>
-            <van-button class='right_info' @click='delShopCart(item.id)' square type='danger' text='删除' />
+            <van-button class='right_info' @click='delShopOrderDetail(item.id)' square type='danger' text='删除' />
           </template>
           <van-divider class="dividerClass"></van-divider>
         </van-swipe-cell>
@@ -57,15 +57,15 @@
 </template>
 <script lang='ts' setup>
 import {
-    getShopCartPage,
-    deleteShopCart,
-} from '@/api/finance/shopCart/shopCartTs';
+    getShopOrderDetailPage,
+    deleteShopOrderDetail,
+} from '@/api/finance/shopOrderDetail/shopOrderDetailTs';
 import { getUserManagerList, } from '@/api/user/userManager';
 import {
   SearchInfo,
   pagination,
   pageInfo,
-} from './shopCartTs';
+} from './shopOrderDetailTs';
 import { showSuccessToast, showFailToast } from 'vant';
 
 let router = useRouter();
@@ -96,7 +96,7 @@ let isRefresh = ref<boolean>(false); //是否下拉刷新
 
 const query = (param: SearchInfo, cur: pageInfo): void => {
   loading.value = true;
-  getShopCartPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
+  getShopOrderDetailPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
     .then((res: any) => {
       if (res?.code == '200') {
         dataSource.value = [...dataSource.value, ...res.data.records];
@@ -117,8 +117,8 @@ const query = (param: SearchInfo, cur: pageInfo): void => {
     });
 }
 
-const addShopCart = (): void => {
-  router.push({ path: '/finance/shopCart/shopCartDetail' });
+const addShopOrderDetail = (): void => {
+  router.push({ path: '/finance/shopOrderDetail/shopOrderDetailDetail' });
 }
 
 let userMap = {};
@@ -150,8 +150,8 @@ const beforeClose = (e: any): void => {
   console.log(e);
 };
 
-const delShopCart = (id: number): void => {
-  deleteShopCart(id + '').then((res: any) => {
+const delShopOrderDetail = (id: number): void => {
+  deleteShopOrderDetail(id + '').then((res: any) => {
     if (res?.code == '200') {
       refresh();
       showSuccessToast((res?.message) || '删除成功！');
