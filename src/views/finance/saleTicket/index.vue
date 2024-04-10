@@ -6,7 +6,7 @@
     <div class="container">
         <div class="content">
             <van-cell v-if="saleOrderInfo.shopOrderDetailVoList?.length"
-                v-for="item in saleOrderInfo.shopOrderDetailVoList" :key="item?.id">
+                v-for="item in saleOrderInfo.shopOrderDetailVoList" :key="item?.id" center>
                 <template #title>
                     <div class="text-left">
                         <span class="custom-title">{{ item.shopName }}</span>
@@ -15,13 +15,11 @@
                 </template>
                 <template #right-icon>
                     <div class="text-right">
-                        <div class="rightRedDiv">
-                            <van-stepper v-model="item.saleNum" @change="getSumAmount" min="1" />
-                        </div>
+                      <van-stepper v-model="item.saleNum" @change="getSumAmount" min="1" theme="round" button-size="20px"></van-stepper>
                     </div>
                 </template>
                 <template #label>
-                    <div class="amountInfo">
+                    <div class="amount-cell-info">
                         ￥{{ commonUtils.formatAmount(item?.saleAmount || 0, 2, '') }}
                     </div>
                 </template>
@@ -31,7 +29,7 @@
             <div class="footer">
                 <div class="amount-info">
                     <van-field v-model="saleOrderInfo.saleAmount" type="number" @change="changeSumAmount" label="￥"
-                        placeholder="请输入金额" />
+                               placeholder="请输入金额"></van-field>
                     <div class="old-info" v-if="showOldAmount">
                         ￥{{ commonUtils.formatAmount(sumAmount || 0, 2, '') }}
                     </div>
@@ -189,7 +187,7 @@ onMounted(async () => {
             padding-bottom: 15px;
         }
 
-        .amountInfo {
+        .amount-cell-info {
             font-size: 15px;
             color: red;
         }

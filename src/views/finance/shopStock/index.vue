@@ -10,7 +10,7 @@
       color: '#1989fa',
       borderColor: 'grey',
     }"></van-divider>
-    <van-empty v-if='dataSource.length == 0' description='暂无数据' />
+    <van-empty v-if='dataSource.length == 0' description='暂无数据'></van-empty>
     <van-list v-else v-model:loading='loading' :finished='finished' finished-text='没有更多了' @load='onRefresh'>
       <van-cell-group>
         <van-swipe-cell v-for='(item, index) in dataSource' :before-close='beforeClose' :key="index">
@@ -20,17 +20,17 @@
               <div class="upAndDown">
                 <div style="display: flex;">
                   {{ commonUtils.formatAmount(item.costAmount, 2, '元') }}
-                  <br />
+                  <br>
                   成本价
                 </div>
                 <div>
                   {{ commonUtils.formatAmount(item.saleAmount, 2, '元') }}
-                  <br />
+                  <br>
                   销售价
                 </div>
                 <div>
                   {{ commonUtils.formatAmount(item.saleNum, 0, '件') }}
-                  <br />
+                  <br>
                   库存
                 </div>
               </div>
@@ -44,7 +44,7 @@
       </van-cell-group>
     </van-list>
   </van-pull-refresh>
-  <van-back-top />
+  <van-back-top></van-back-top>
 </template>
 <script lang='ts' setup>
 import {

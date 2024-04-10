@@ -1,7 +1,7 @@
 <template>
     <div class="login-container">
         <!--引入粒子特效-->
-        <Particles id="tsparticles" :options="options" />
+      <Particles id="tsparticles" :options="options"></Particles>
         <div style="height:100vh;">
             <div style="height:35vh;line-height:35vh;text-align:center;">
                 <span style="font-size:3.5rem;margin-bottom:15vh;color:#fff;"><b>alex系统管理平台</b></span>

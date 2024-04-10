@@ -19,7 +19,7 @@
                                 <div class="text-right">
                                     <div class="rightRedDiv" @click.stop>
                                         <van-stepper v-model="item.saleNum" @change="changeCount(item)" min="1"
-                                            theme="round" button-size="20px" :disabled="(item?.stockNum || 0) === 0" />
+                                            theme="round" button-size="20px" :disabled="(item?.stockNum || 0) === 0"></van-stepper>
                                     </div>
                                 </div>
                             </template>
@@ -31,7 +31,7 @@
                         </van-cell>
                     </div>
                     <template #right>
-                        <van-button class="right_info" square type="danger" text="删除" />
+                        <van-button class="right_info" square type="danger" text="删除"></van-button>
                         <!-- <van-button class="right_info" @click="delShopFinance(item.id)" square type="danger" text="删除" /> -->
                     </template>
                     <van-divider :style="{
