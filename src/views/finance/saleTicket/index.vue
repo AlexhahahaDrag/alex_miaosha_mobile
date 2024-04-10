@@ -5,8 +5,8 @@
     </div>
     <div class="container">
         <div class="content">
-            <van-cell v-if="saleOrderInfo.shopOrderDetailVoList?.length" v-for="item in saleOrderInfo.shopOrderDetailVoList"
-                :key="item?.id">
+            <van-cell v-if="saleOrderInfo.shopOrderDetailVoList?.length"
+                v-for="item in saleOrderInfo.shopOrderDetailVoList" :key="item?.id">
                 <template #title>
                     <div class="text-left">
                         <span class="custom-title">{{ item.shopName }}</span>
@@ -37,14 +37,14 @@
                     </div>
                 </div>
                 <div class="checkout-button">
-                    <van-button @click="submitOrderInfo" :loading="submitLoading" round type="danger"
+                    <van-button @click="submitOrderInfo" style="width: 100%;" :loading="submitLoading" round type="danger"
                         loading-text="提交中...">提交订单</van-button>
                 </div>
             </div>
         </div>
     </div>
 </template>
-  
+
 <script setup lang="ts">
 import { showFailToast } from 'vant';
 import commonUtils from '@/utils/common/index';
@@ -162,7 +162,7 @@ onMounted(async () => {
     getSumAmount();
 });
 </script>
-  
+
 <style>
 .header-container {
     height: 100px;
@@ -240,6 +240,6 @@ onMounted(async () => {
 
 .checkout-button {
     /* 可以根据需要添加样式 */
+    width: 30%;
 }
 </style>
-  

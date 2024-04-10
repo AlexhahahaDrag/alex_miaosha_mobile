@@ -20,7 +20,7 @@
             <template #label>
               <div class="svgInfo">
                 <div class="svgDiv" v-for="(fromSource, index) in fromSourceTransferList" :key="index">
-                  <SvgIcon v-if="item.payWay.indexOf(fromSource.value) >= 0 && fromSource.value != ''"
+                  <SvgIcon v-if="item.payWay?.indexOf(fromSource.value) >= 0 && fromSource.value != ''"
                     :name="fromSource.label" class="svg"></SvgIcon>
                 </div>
               </div>
@@ -112,6 +112,7 @@ function query(param: SearchInfo, cur: pageInfo) {
   loading.value = true;
   getShopFinancePage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
     .then((res: any) => {
+      console.log(`shop finance:`, res.data)
       if (res?.code == '200') {
         dataSource.value = [...dataSource.value, ...res.data.records];
         pagination.value.current = res.data.current + 1;

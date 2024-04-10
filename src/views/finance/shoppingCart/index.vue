@@ -5,18 +5,21 @@
             <van-cell-group>
                 <van-swipe-cell :key="index" v-if="shopCartList?.length" v-for="(item, index) in shopCartList">
                     <div class="cell-info">
-                        <van-checkbox v-if="item?.stockNum || 0 > 0" v-model="item.checked" icon-size="18px" @change="changeCheck"></van-checkbox>
+                        <van-tag style="width: 10px;" v-if="(item?.stockNum || 0) === 0" color="grey" text-color="#ffffff">无货</van-tag>
+                        <van-checkbox v-if="item?.stockNum || 0 > 0" v-model="item.checked" icon-size="18px"
+                            @change="changeCheck"></van-checkbox>
                         <van-cell center :key="item?.id" @click="selectProduct(item)">
                             <template #title>
                                 <div class="text-left">
-                                    <span class="custom-title">{{ item.shopName }}</span>
+                                    <span :class="item?.stockNum || 0 > 0 ? '' : 'font-grey'">{{ item.shopName }}</span>
                                     <van-tag type="primary">{{ item.oldShopCode }}</van-tag>
                                 </div>
                             </template>
                             <template #right-icon>
                                 <div class="text-right">
                                     <div class="rightRedDiv" @click.stop>
-                                        <van-stepper v-model="item.saleNum" @change="changeCount(item)" min="1" />
+                                        <van-stepper v-model="item.saleNum" @change="changeCount(item)" min="1"
+                                            theme="round" button-size="20px" :disabled="(item?.stockNum || 0) === 0" />
                                     </div>
                                 </div>
                             </template>
@@ -32,12 +35,12 @@
                         <!-- <van-button class="right_info" @click="delShopFinance(item.id)" square type="danger" text="删除" /> -->
                     </template>
                     <van-divider :style="{
-                        color: '#1989fa',
-                        borderColor: 'grey',
-                        padding: '0 16px',
-                        'margin-top': '0px',
-                        'margin-bottom': '0px',
-                    }">
+        color: '#1989fa',
+        borderColor: 'grey',
+        padding: '0 16px',
+        'margin-top': '0px',
+        'margin-bottom': '0px',
+    }">
                     </van-divider>
                 </van-swipe-cell>
             </van-cell-group>
@@ -45,17 +48,17 @@
         <div class="footer-container">
             <div class="footer">
                 <div class="amount-info">
-                    <van-field v-model="sumAmount" type="number" label="￥" placeholder="请输入金额" :readonly="true" />
+                    ￥{{ commonUtils.formatAmount(sumAmount || 0, 2, '') }}
                 </div>
                 <div class="checkout-button">
-                    <van-button @click="settlementAmount" :loading="submitLoading" round type="danger"
-                        loading-text="结算中...">结算</van-button>
+                    <van-button @click="settlementAmount" style="width: 100%" :loading="submitLoading" round
+                        type="danger" loading-text="结算中...">结 算</van-button>
                 </div>
             </div>
         </div>
     </div>
 </template>
-  
+
 <script setup lang="ts">
 import { showFailToast } from 'vant';
 import commonUtils from '@/utils/common/index';
@@ -135,7 +138,7 @@ onMounted(async () => {
     getSumAmount();
 });
 </script>
-  
+
 <style>
 .container {
     display: flex;
@@ -196,17 +199,8 @@ onMounted(async () => {
     padding-left: 15px;
     display: flex;
     align-items: center;
-
-    .van-field {
-        --van-field-label-width: 5%;
-        --van-field-label-color: red;
-        --van-field-input-text-color: red;
-
-        .van-field__control {
-            font-size: 25px;
-            width: 100px;
-        }
-    }
+    color: red;
+    font-size: 28px;
 
     .old-info {
         font-size: 15px;
@@ -214,5 +208,12 @@ onMounted(async () => {
         text-decoration: line-through;
     }
 }
+
+.checkout-button {
+    width: 25%;
+}
+
+.font-grey {
+    color: gray;
+}
 </style>
-  
