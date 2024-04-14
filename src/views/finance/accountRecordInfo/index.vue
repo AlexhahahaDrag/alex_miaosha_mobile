@@ -90,7 +90,7 @@
       </van-cell-group>
     </van-list>
   </van-pull-refresh>
-  <van-back-top />
+  <van-back-top></van-back-top>
 </template>
 <script lang="ts" setup>
 import {

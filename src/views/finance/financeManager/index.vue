@@ -20,7 +20,7 @@
     </form>
     <van-divider :style="{ color: '#1989fa', borderColor: 'grey' }">
     </van-divider>
-    <van-empty v-if="dataSource.length == 0" description="暂无数据" />
+    <van-empty v-if="dataSource.length == 0" description="暂无数据"></van-empty>
     <van-list
       v-else
       v-model:loading="loading"
@@ -115,7 +115,7 @@
       </van-cell-group>
     </van-list>
   </van-pull-refresh>
-  <van-back-top />
+  <van-back-top></van-back-top>
 </template>
 <script lang="ts" setup>
 import {

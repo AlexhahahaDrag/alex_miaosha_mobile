@@ -20,7 +20,7 @@
                                 <div class="text-right">
                                     <div class="rightRedDiv" @click.stop>
                                         <van-stepper v-model="item.saleNum" @change="changeCount(item)" min="1"
-                                            theme="round" button-size="20px" :disabled="(item?.stockNum || 0) === 0" />
+                                            theme="round" button-size="20px" :disabled="(item?.stockNum || 0) === 0"></van-stepper>
                                     </div>
                                 </div>
                             </template>

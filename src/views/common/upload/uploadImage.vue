@@ -1,5 +1,5 @@
 <template>
-    <van-uploader v-model="fileList" multiple :max-count="1" />
+  <van-uploader v-model="fileList" multiple :max-count="1"></van-uploader>
 </template>
 
 <script setup lang="ts">

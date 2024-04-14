@@ -24,6 +24,7 @@ export default defineConfig({
     plugins: [
         vue(),
         AutoImport({
+            resolvers: [VantResolver()],
             // 指定需要自动导入的库
             imports: ['vue', 'vue-router', 'pinia'],
             // Vite特定的配置
