@@ -5,7 +5,8 @@
             <van-cell-group>
                 <van-swipe-cell :key="index" v-if="shopCartList?.length" v-for="(item, index) in shopCartList">
                     <div class="cell-info">
-                        <van-tag style="width: 10px;" v-if="(item?.stockNum || 0) === 0" color="grey" text-color="#ffffff">无货</van-tag>
+                        <van-tag style="width: 10px;" v-if="(item?.stockNum || 0) === 0" color="grey"
+                            text-color="#ffffff">无货</van-tag>
                         <van-checkbox v-if="item?.stockNum || 0 > 0" v-model="item.checked" icon-size="18px"
                             @change="changeCheck"></van-checkbox>
                         <van-cell center :key="item?.id" @click="selectProduct(item)">
@@ -31,8 +32,8 @@
                         </van-cell>
                     </div>
                     <template #right>
-                        <van-button class="right_info" square type="danger" text="删除" />
-                        <!-- <van-button class="right_info" @click="delShopFinance(item.id)" square type="danger" text="删除" /> -->
+                        <van-button class="right_info" @click="delShopCartInfo(item.id)" square type="danger"
+                            text="删除" />
                     </template>
                     <van-divider :style="{
         color: '#1989fa',
@@ -60,12 +61,13 @@
 </template>
 
 <script setup lang="ts">
-import { showFailToast } from 'vant';
+import { showFailToast, showSuccessToast } from 'vant';
 import commonUtils from '@/utils/common/index';
 import { ShopCartInfo } from '@/views/finance/shoppingCart/shoppingCartTs';
 import {
     getShopCartList,
     addOrEditShopCart,
+    deleteShopCart,
 } from '@/api/finance/shopCart/shopCartTs';
 
 let route = useRoute();
@@ -110,14 +112,15 @@ const changeCount = (item: ShopCartInfo): void => {
 const getShopCartListInfo = async () => {
     await getShopCartList().then((res: any) => {
         if (res?.code == "200") {
-            console.log(`res shop cart:`, res.data);
-            if (res?.data?.length) {
+            if (res?.data) {
                 shopCartList.value = res.data;
             } else {
-                showFailToast("获取订单失败，请联系管理员！");
+                showFailToast(res?.message || "获取购物车失败，请联系管理员！");
             }
         }
-    });
+    }).catch((err: any) => {
+        showFailToast(err?.message || "删除失败，请联系管理员！");
+    });;
 };
 
 const selectProduct = (info: ShopCartInfo) => {
@@ -133,9 +136,28 @@ const changeCheck = (): void => {
     getSumAmount();
 };
 
-onMounted(async () => {
+const delShopCartInfo = (id: number): void => {
+    deleteShopCart(id + '').then((res: any) => {
+        if (res?.code == "200") {
+            showSuccessToast("删除成功！");
+            init()
+        } else {
+            showFailToast(res?.message || "删除失败，请联系管理员！");
+        }
+    }).catch((err: any) => {
+        showFailToast(err?.message || "删除失败，请联系管理员！");
+    });
+};
+
+const init = async () => {
     await getShopCartListInfo();
     getSumAmount();
+};
+
+init();
+
+onMounted(async () => {
+    init();
 });
 </script>
 

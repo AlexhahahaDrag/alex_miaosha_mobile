@@ -36,13 +36,16 @@
                         ￥{{ commonUtils.formatAmount(sumAmount || 0, 2, '') }}
                     </div>
                 </div>
+                <van-field style="width: 20%;" v-model="payWayName" name="payWay" placeholder="请输入支付方式"
+                    @click="choose('payWay')" readonly />
                 <div class="checkout-button">
-                    <van-button @click="submitOrderInfo" style="width: 100%;" :loading="submitLoading" round type="danger"
-                        loading-text="提交中...">提交订单</van-button>
+                    <van-button @click="submitOrderInfo" style="width: 100%;" :loading="submitLoading" round
+                        type="danger" loading-text="提交中...">提交订单</van-button>
                 </div>
             </div>
         </div>
     </div>
+    <SelectPop :info="popInfo" @selectInfo="selectInfo" @cancelInfo="cancelInfo"></SelectPop>
 </template>
 
 <script setup lang="ts">
@@ -57,6 +60,9 @@ import {
 } from '@/api/finance/shopCart/shopCartTs';
 import dayjs from 'dayjs';
 import { ShopCartInfo } from '@/views/finance/shoppingCart/shoppingCartTs';
+import { Info } from '@/views/common/pop/selectPop.vue';
+import { getDictList } from "@/api/finance/dict/dictManager";
+import CommonUtils from '@/utils/common/index';
 
 let route = useRoute();
 let router = useRouter();
@@ -70,7 +76,49 @@ let submitLoading = ref<boolean>(false);
 let showOldAmount = ref<boolean>(false);
 let saleOrderInfo = ref<SaleOrderInfo>({
     saleAmount: 0,
+    payWay: 'wx',
 });
+let payWayName = ref<string>('');
+let popInfo = ref<Info>({ showFlag: false });
+let payWayInfo = ref<Info>({
+    label: 'payWay',
+    labelName: '支付方式',
+    customFieldName: {
+        text: 'typeName',
+        value: 'typeCode',
+    },
+    rule: [
+        {
+            required: true,
+            message: '不能为空！',
+        },
+    ],
+    selectValue: [saleOrderInfo.value.payWay],
+});
+
+const choose = (type: string) => {
+    switch (type) {
+        case 'payWay':
+            console.log(`payWayInfo: `, payWayInfo.value)
+            popInfo.value = payWayInfo.value;
+            break;
+    }
+    popInfo.value.showFlag = true;
+};
+
+const cancelInfo = () => {
+    popInfo.value.showFlag = false;
+};
+
+const selectInfo = (type: string, value: any, name: string) => {
+    popInfo.value.showFlag = false;
+    switch (type) {
+        case 'payWay':
+            saleOrderInfo.value.payWay = value;
+            payWayName.value = name;
+            break;
+    }
+};
 const submitOrderInfo = () => {
     submitLoading.value = true;
     // todo添加结果类型
@@ -149,8 +197,24 @@ const getShopCartListInfo = async (ids: string) => {
     });
 };
 
+const getDictInfoList = (res: any) => {
+    if (res?.code == "200") {
+        payWayInfo.value.list = res.data.filter(
+            (item: { belongTo: string }) => item.belongTo == "shop_pay_way"
+        );
+        payWayName.value = CommonUtils.getListName(payWayInfo.value.list || [], saleOrderInfo.value.payWay, 'typeCode', 'typeName');
+    } else {
+        showFailToast(res?.message || '查询失败，请联系管理员!')
+    }
+}
+
 onMounted(async () => {
     let params: any = route.query;
+    getDictList('shop_pay_way').then((res: any) => {
+        if (res?.code == "200") {
+            getDictInfoList(res);
+        }
+    });
     switch (params.type) {
         case 'shopCart':
             await getShopCartListInfo(params.ids);
@@ -219,6 +283,7 @@ onMounted(async () => {
     padding-left: 15px;
     display: flex;
     align-items: center;
+    width: 30%;
 
     .van-field {
         --van-field-label-width: 5%;
@@ -227,7 +292,6 @@ onMounted(async () => {
 
         .van-field__control {
             font-size: 25px;
-            width: 100px;
         }
     }
 

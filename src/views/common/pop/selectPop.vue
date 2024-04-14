@@ -52,6 +52,7 @@ let cur = ref<Info>({});
 watch(
     () => props.info.showFlag,
     () => {
+        console.log(`1111111111111111:`, props.info)
         if (props.info.showFlag) {
             cur.value = props.info;
             showFlag.value = props.info.showFlag;

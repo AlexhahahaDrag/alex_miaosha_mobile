@@ -55,7 +55,7 @@
     "env.d.tssrc/main.tsn.ts",
     "components.d.ts",
     "src/auto-imports.d.ts"
-  ],
+, "src/postcss.config.js"  ],
   "references": [
     {
       "path": "./tsconfig.node.json"
