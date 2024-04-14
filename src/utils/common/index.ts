@@ -60,10 +60,25 @@ const formatAmount = (amount: number | Decimal, digit: number, unit: string) => 
     ).replace(/^(\-)*(\d+)\.(\d\d).*$/, '$1$2.$3') + unit;
 }
 
+const getListName = (list: any[], value: any, code: string, name: string) => {
+    if (!list?.length) {
+        return '';
+    }
+    let listName = '';
+    list.forEach(item => {
+        if (item[code] == value) {
+            listName = item[name];
+        }
+    });
+    return listName;
+};
+
 export default {
     formatAmount: formatAmount,
     plus: plus,
     minus: minus,
     multiply: multiply,
     divide: divide,
+    getListName:getListName,
 }
+

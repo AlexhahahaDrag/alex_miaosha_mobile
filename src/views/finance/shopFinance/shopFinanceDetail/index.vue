@@ -198,7 +198,7 @@ const onSubmit = () => {
 function getDictInfoList(res: any) {
     if (res?.code == "200") {
         payWayInfo.value.list = res.data.filter(
-            (item: { belongTo: string }) => item.belongTo == "pay_way"
+            (item: { belongTo: string }) => item.belongTo == "shop_pay_way"
         );
         incomeAndExpensesInfo.value.list = res.data.filter(
             (item: { belongTo: string }) => item.belongTo == "income_expense_type"
@@ -232,7 +232,7 @@ function init() {
     if (id) {
         Promise.all([
             getShopFinanceDetail(id || '-1'),
-            getDictList('pay_way,income_expense_type,is_valid'),
+            getDictList('shop_pay_way,income_expense_type,is_valid'),
         ]).then((res: any) => {
             if (res[0].code == '200') {
                 formInfo.value = res[0].data;
@@ -247,7 +247,7 @@ function init() {
             showFailToast('系统问题，请联系管理员！')
         });
     } else {
-        getDictList('pay_way,income_expense_type,is_valid').then((res: any) => { getDictInfoList(res) });
+        getDictList('shop_pay_way,income_expense_type,is_valid').then((res: any) => { getDictInfoList(res) });
         formInfo.value = {
             saleDate: dayjs(),
             isValid: '1',
