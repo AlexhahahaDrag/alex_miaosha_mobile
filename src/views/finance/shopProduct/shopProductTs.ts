@@ -10,6 +10,7 @@ export interface SearchInfo {
   purchasePlace?: string;
   saleNum?: number;
   isShopping?: boolean;
+  title?: string;
 }
 
 export interface pageInfo {

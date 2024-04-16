@@ -3,7 +3,7 @@
   <van-pull-refresh pulling-text="加载中。。。" :style="{ height: 'calc(100% - 44px)' }" v-model='isRefresh' @refresh='refresh'
     ref='pullRefresh' immediate-check='false'>
     <form action='/'>
-      <van-search v-model='searchInfo.shopName' show-action placeholder='请输入搜索关键词' @search='onSearch' @cancel='onCancel'
+      <van-search v-model='searchInfo.title' show-action placeholder='请输入搜索关键词' @search='onSearch' @cancel='onCancel'
         action-text="清空" />
     </form>
     <van-divider :style="{
