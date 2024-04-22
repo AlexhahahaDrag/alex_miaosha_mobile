@@ -8,7 +8,7 @@ import { barItem } from "@/views/model/chart/bar";
 const props = defineProps({
   config: {
     type: Object as PropType<barItem>,
-    default: () => { },
+    default: () => {},
   },
   title: {
     type: String,
@@ -40,6 +40,7 @@ const setOption = (data: any[]) => {
         text: props.title,
         left: "center",
       },
+      grid: { left: "50%" },
       color: [
         "#55aaff",
         "#ff9933",
@@ -64,29 +65,12 @@ const setOption = (data: any[]) => {
         axisTick: {
           alignWithLabel: true,
         },
-        name: xTile ? xTile : '',
+        name: xTile ? xTile : "",
       },
-      // legend: {
-      //   data: legend || [1],
-      //   icon: "roundRect",
-      //   left: "right",
-      //   itemHeight: 6,
-      //   itemWidth: 18,
-      //   textStyle: {
-      //     fontSize: 14,
-      //     lineHeight: 14,
-      //     rich: {
-      //       a: {
-      //         verticalAlign: "middle",
-      //       },
-      //     },
-      //     padding: [0, 0, -2, 0], //[上、右、下、左]
-      //   },
-      // },
       yAxis: {
         type: "value",
         name: yTitle ? yTitle : "",
-        nameLocation: "center",
+        nameLocation: "end",
         nameGap: yNameGap ? yNameGap : 28,
         axisTick: {
           show: false,
@@ -97,6 +81,9 @@ const setOption = (data: any[]) => {
         splitNumber: 4,
         lineStyle: {
           type: "dashed",
+        },
+        nameTextStyle: {
+          padding: [0, 0, 0, -40], // [上, 右, 下, 左] 调整位置
         },
       },
       series: [
@@ -114,7 +101,7 @@ const setOption = (data: any[]) => {
               },
             },
           },
-        }
+        },
       ],
     };
   }
@@ -134,12 +121,13 @@ const chartOption = {
     axisTick: {
       alignWithLabel: true,
     },
-    name: '',
+    name: "",
   },
+  grid: { left: "10%" },
   yAxis: {
     type: "value",
-    name: "",
-    nameLocation: "center",
+    name: [] as string | string[],
+    nameLocation: "end",
     nameGap: 28,
     axisTick: {
       show: false,
@@ -151,6 +139,7 @@ const chartOption = {
     lineStyle: {
       type: "dashed",
     },
+    nameTextStyle: {},
   },
   series: [] as any,
 };

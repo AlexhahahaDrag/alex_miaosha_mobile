@@ -3,7 +3,6 @@
 </template>
 
 <script setup lang="ts">
-
 const props = defineProps({
   title: {
     type: String,
@@ -37,7 +36,7 @@ const options = computed(() => {
       trigger: "item",
     },
     legend: {
-      bottom: 10,
+      bottom: 50,
       left: "center",
     },
     series: [
