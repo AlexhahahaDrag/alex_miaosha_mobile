@@ -17,6 +17,9 @@
           <div class="text-left">
             <span class="custom-title">{{ item.shopName }}</span>
             <van-tag type="primary">{{ item.oldShopCode }}</van-tag>
+            <van-tag color="#7232dd" v-if="item.style">{{ item.style }}</van-tag>
+            <van-tag type="success" v-if="item.color">{{ item.color }}</van-tag>
+            <van-tag type="warning" v-if="item.size">{{ item.size }}</van-tag>
           </div>
         </template>
         <template #right-icon>
