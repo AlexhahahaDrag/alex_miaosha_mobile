@@ -1,76 +1,51 @@
 <template>
-    <NavBar :info="info"></NavBar>
-    <van-pull-refresh
-        pulling-text="加载中。。。"
-        :style="{ height: 'calc(100% - 44px)' }"
-        v-model="isRefresh"
-        @refresh="refresh"
-        ref="pullRefresh"
-        immediate-check="false"
-    >
-        <form action="/">
-            <van-search
-                v-model="searchInfo.title"
-                show-action
-                placeholder="请输入搜索关键词"
-                @search="onSearch"
-                @cancel="onCancel"
-                action-text="清空"
-            />
-        </form>
-        <van-divider
-            :style="{
-                color: '#515151',
-                borderColor: '#515151',
-            }"
-        ></van-divider>
-        <van-empty v-if="dataSource.length == 0" description="暂无数据"></van-empty>
-        <van-list
-            v-else
-            v-model:loading="loading"
-            :finished="finished"
-            finished-text="没有更多了"
-            @load="onRefresh"
-        >
-            <van-cell v-for="item in dataSource" :key="item">
-                <template #title>
-                    <div class="text-left">
-                        <span class="custom-title">{{ item.shopName }}</span>
-                        <van-tag type="primary">{{ item.oldShopCode }}</van-tag>
-                    </div>
-                </template>
-                <template #right-icon>
-                    <div class="text-right">
-                        <div style="display: flex">
-                            <div class="van-ellipsis">
-                                ￥{{ commonUtils.formatAmount(item?.saleAmount, 2, '') }}
-                            </div>
-                        </div>
-                        <div class="rightRedDiv">
-                            <div>
-                                <SvgIcon
-                                    name="shoppingCart"
-                                    class="svg"
-                                    @click="shoppingCart(item)"
-                                ></SvgIcon>
-                                <SvgIcon
-                                    name="shoppingBuy"
-                                    class="svg"
-                                    @click="shoppingBuy(item)"
-                                ></SvgIcon>
-                            </div>
-                        </div>
-                    </div>
-                </template>
-                <template #value></template>
-                <template #label>
-                    {{ item.description }}
-                </template>
-            </van-cell>
-        </van-list>
-    </van-pull-refresh>
-    <van-back-top></van-back-top>
-    <Tabbar :data="useTabBar"></Tabbar>
+  <NavBar :info='info'></NavBar>
+  <van-pull-refresh pulling-text="加载中。。。" :style="{ height: 'calc(100% - 44px)' }" v-model='isRefresh' @refresh='refresh'
+    ref='pullRefresh' immediate-check='false'>
+    <form action='/'>
+      <van-search v-model='searchInfo.title' show-action placeholder='请输入搜索关键词' @search='onSearch' @cancel='onCancel'
+        action-text="清空" />
+    </form>
+    <van-divider :style="{
+      color: '#515151',
+      borderColor: '#515151',
+    }"></van-divider>
+    <van-empty v-if='dataSource.length == 0' description='暂无数据'></van-empty>
+    <van-list v-else v-model:loading='loading' :finished='finished' finished-text='没有更多了' @load='onRefresh'>
+      <van-cell v-for="item in dataSource" :key="item">
+        <template #title>
+          <div class="text-left">
+            <span class="custom-title">{{ item.shopName }}</span>
+            <van-tag type="primary">{{ item.oldShopCode }}</van-tag>
+            <van-tag color="#7232dd" v-if="item.style">{{ item.style }}</van-tag>
+            <van-tag type="success" v-if="item.color">{{ item.color }}</van-tag>
+            <van-tag type="warning" v-if="item.size">{{ item.size }}</van-tag>
+          </div>
+        </template>
+        <template #right-icon>
+          <div class="text-right">
+            <div style="display: flex">
+              <div class="van-ellipsis">
+                ￥{{ commonUtils.formatAmount(item?.saleAmount, 2, '') }}
+              </div>
+            </div>
+            <div class="rightRedDiv">
+              <div>
+                <SvgIcon name="shoppingCart" class="svg" @click="shoppingCart(item)"></SvgIcon>
+                <SvgIcon name="shoppingBuy" class="svg" @click="shoppingBuy(item)"></SvgIcon>
+              </div>
+            </div>
+          </div>
+        </template>
+        <template #value></template>
+        <template #label>
+          {{ item.description }}
+        </template>
+      </van-cell>
+    </van-list>
+  </van-pull-refresh>
+  <van-back-top></van-back-top>
+  <Tabbar :data="useTabBar"></Tabbar>
 </template>
 <script lang="ts" setup>
 import { getShopStockPage } from '@/api/finance/shopStock/shopStockTs';
