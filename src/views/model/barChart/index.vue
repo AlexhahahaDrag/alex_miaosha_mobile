@@ -8,7 +8,7 @@ import { barItem } from "@/views/model/chart/bar";
 const props = defineProps({
   config: {
     type: Object as PropType<barItem>,
-    default: () => { },
+    default: () => {},
   },
   title: {
     type: String,
@@ -32,7 +32,6 @@ const props = defineProps({
   },
 });
 
-
 const setOption = (data: any[]) => {
   let { xAxis, yTitle, tooltip, xTile, dataType } = props.config;
   if (data?.length) {
@@ -43,17 +42,27 @@ const setOption = (data: any[]) => {
       let min = getMin(Math.min(...data[i]));
       yAxis.push({
         type: "value",
-        name: yTitle ? yTitle[i] : '',
+        name: yTitle ? yTitle[i] : "",
         min: min,
-        max: max ,
-        nameLocation:'center',
+        max: max,
+        nameLocation: "center",
         nameGap: 25,
         interval: (max - min) / 5,
+        axisLabel: {
+          // 使用formatter来定义如何显示标签
+          formatter: function (value: number) {
+            if (value >= 10000) {
+              return (value / 1000).toFixed(1) + "k";
+            } else {
+              return value;
+            }
+          },
+        },
       });
       series.push({
-        type: dataType ? dataType[i] : 'bar',
+        type: dataType ? dataType[i] : "bar",
         data: data[i],
-        name: yTitle ? yTitle[i] : '',
+        name: yTitle ? yTitle[i] : "",
         yAxisIndex: i,
         showSymbol: 0,
       });
@@ -87,7 +96,7 @@ const setOption = (data: any[]) => {
         axisTick: {
           alignWithLabel: true,
         },
-        name: xTile ? xTile : '',
+        name: xTile ? xTile : "",
       },
       yAxis,
       series,
@@ -104,11 +113,11 @@ const getMax = (num: number) => {
     return Math.ceil(num / 5) * 5;
   }
   return getMax(num / 10) * 10;
-}
+};
 
 const getMin = (num: number) => {
   if (num < 0) {
-    return - getMax(-num);
+    return -getMax(-num);
   }
   if (num <= 5) {
     return 0;
@@ -118,7 +127,7 @@ const getMin = (num: number) => {
     return Math.floor(num / 5) * 5;
   }
   return getMin(num / 10) * 10;
-}
+};
 
 const chartOption = {
   title: {
@@ -134,7 +143,7 @@ const chartOption = {
     axisTick: {
       alignWithLabel: true,
     },
-    name: '',
+    name: "",
   },
   legend: {
     data: [] as any[],
@@ -153,10 +162,12 @@ const chartOption = {
       padding: [0, 0, -2, 0], //[上、右、下、左]
     },
   },
-  yAxis: [{
-    type: "value",
-    name: "",
-  }],
+  yAxis: [
+    {
+      type: "value",
+      name: "",
+    },
+  ],
   series: [] as any,
 } as any;
 

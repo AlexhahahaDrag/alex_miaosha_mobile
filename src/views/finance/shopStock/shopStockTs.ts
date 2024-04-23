@@ -103,20 +103,22 @@ export const columns = [
   },
 ];
 
-
 export interface ShopStockInfo {
   id?: number;
-  shopName: string;
+  shopName?: string;
   oldShopCode?: string;
-  shopCode: string;
-  costAmount: number;
-  saleAmount: number;
-  isValid: string;
+  shopCode?: string;
+  costAmount?: number;
+  saleAmount?: number;
+  isValid?: string;
   saleDate?: Dayjs | string;
-  category: string;
-  purchasePlace: string;
-  saleNum: number;
+  category?: string;
+  purchasePlace?: string;
+  saleNum?: number;
   checked?: boolean;
+  color?: string;
+  size?: string;
+  style?: string;
 }
 
 export interface ModelInfo {
@@ -127,6 +129,6 @@ export interface ModelInfo {
 }
 
 export interface dictInfo {
-  typeCode?: string | number | undefined,
-  typeName?: string | undefined,
+  typeCode?: string | number | undefined;
+  typeName?: string | undefined;
 }
