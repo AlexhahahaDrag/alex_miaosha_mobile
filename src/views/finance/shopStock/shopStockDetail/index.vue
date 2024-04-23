@@ -317,6 +317,7 @@ function init() {
   if (id) {
     Promise.all([getShopStockDetail(id || '-1'), getDictList('is_valid,shop_category,stock_place')])
       .then((res: any) => {
+        console.log(`ressssssssssssssssssssssssssssssssssssssss:`, res[0]);
         if (res[0].code == '200') {
           formInfo.value = res[0].data;
           formInfo.value.saleDate = dayjs(formInfo.value.saleDate);
