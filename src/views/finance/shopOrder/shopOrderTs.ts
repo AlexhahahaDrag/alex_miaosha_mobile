@@ -1,6 +1,6 @@
 import { Dayjs } from 'dayjs';
 export interface SearchInfo {
-  saleOrderCode?: string;
+  saleOrderCode?: string | null;
   saleOrderName?: string;
   saleAmount?: number;
   isValid?: string;
@@ -97,7 +97,6 @@ export const columns = [
   },
 ];
 
-
 export interface DataItem {
   saleOrderCode: string;
   saleOrderName: string;
@@ -117,6 +116,6 @@ export interface ModelInfo {
 }
 
 export interface dictInfo {
-  typeCode?: string | number | undefined,
-  typeName?: string | undefined,
+  typeCode?: string | number | undefined;
+  typeName?: string | undefined;
 }

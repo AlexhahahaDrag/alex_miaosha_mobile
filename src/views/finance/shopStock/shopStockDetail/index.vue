@@ -49,15 +49,6 @@
         readonly
       />
       <van-field
-        v-model="saleDateName"
-        name="saleDate"
-        :label="label.saleDate + '：'"
-        :placeholder="'请输入' + label.saleDate"
-        :rules="rulesRef.saleDate"
-        @click="chooseDate('saleDate')"
-        readonly
-      />
-      <van-field
         v-model="categoryName"
         name="category"
         :label="label.category + '：'"
@@ -286,7 +277,7 @@ const cancelDateInfo = () => {
   chooseDateInfo.value.showFlag = false;
 };
 
-const initInfoDate = (infoDate: Dayjs, type: string) => {
+const initInfoDate = (infoDate: string | Dayjs, type: string) => {
   if (infoDate) {
     switch (type) {
       case 'saleDate':
@@ -317,7 +308,6 @@ function init() {
   if (id) {
     Promise.all([getShopStockDetail(id || '-1'), getDictList('is_valid,shop_category,stock_place')])
       .then((res: any) => {
-        console.log(`ressssssssssssssssssssssssssssssssssssssss:`, res[0]);
         if (res[0].code == '200') {
           formInfo.value = res[0].data;
           formInfo.value.saleDate = dayjs(formInfo.value.saleDate);
@@ -336,10 +326,10 @@ function init() {
     });
     formInfo.value = {
       saleDate: dayjs(),
-      isValid: 1,
+      isValid: '1',
       purchasePlace: 'sz',
     };
-    initInfoDate(formInfo.value.saleDate, 'saleDate');
+    initInfoDate(formInfo.value?.saleDate || dayjs(), 'saleDate');
   }
 }
 

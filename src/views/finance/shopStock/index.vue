@@ -10,7 +10,7 @@
   >
     <form action="/">
       <van-search
-        v-model="searchInfo.shopName"
+        v-model="searchInfo.title"
         show-action
         placeholder="请输入搜索关键词"
         @search="onSearch"
@@ -48,12 +48,12 @@
           >
             <template #title>
               <div class="text-left">
-                <span class="custom-title">{{ item.shopName }}</span>
                 <van-space size="4px">
+                  <span class="custom-title">{{ item.shopName }}</span>
                   <van-tag type="primary">{{ item.oldShopCode }}</van-tag>
-                  <van-tag type="primary">{{ item.color }}</van-tag>
-                  <van-tag type="primary">{{ item.size }}</van-tag>
-                  <van-tag type="primary">{{ item.style }}</van-tag>
+                  <van-tag color="#7232dd" v-if="item.style">{{ item.style }}</van-tag>
+                  <van-tag type="success" v-if="item.color">{{ item.color }}</van-tag>
+                  <van-tag type="warning" v-if="item.size">{{ item.size }}</van-tag>
                 </van-space>
               </div>
             </template>

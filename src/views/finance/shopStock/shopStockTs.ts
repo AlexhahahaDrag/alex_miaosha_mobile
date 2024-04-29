@@ -9,6 +9,7 @@ export interface SearchInfo {
   category?: string;
   purchasePlace?: string;
   saleNum?: number;
+  title?: string | null;
 }
 
 export interface pageInfo {
