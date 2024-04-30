@@ -114,7 +114,6 @@ const query = (param: SearchInfo, cur: pageInfo): void => {
   getShopOrderPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
     .then((res: any) => {
       if (res?.code == '200') {
-        console.log(`1111111111111111:`, res);
         dataSource.value = [...dataSource.value, ...res.data.records];
         pagination.value.current = res.data.current + 1;
         pagination.value.pageSize = res.data.size;
