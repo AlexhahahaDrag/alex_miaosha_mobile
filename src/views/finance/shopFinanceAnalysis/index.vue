@@ -10,13 +10,13 @@
     </van-row>
     <van-tabs v-model:active="activeTab" sticky swipeable @change="changeTab">
         <van-tab title="店总览" name="1">
-            <shopOverview v-bind="props"></shopOverview>
+            <ShopOverview v-bind="props"></ShopOverview>
         </van-tab>
         <van-tab title="店收支分析" name="2">
-            <shopIncomeAnalysis v-bind="props"></shopIncomeAnalysis>
+            <ShopIncomeAnalysis v-bind="props"></ShopIncomeAnalysis>
         </van-tab>
         <van-tab title="店收支明细" name="3">
-            <shopIncomeDetail v-bind="props"></shopIncomeDetail>
+            <ShopIncomeDetail v-bind="props"></ShopIncomeDetail>
         </van-tab>
     </van-tabs>
     <monthPop :info="chooseDateInfo" @selectInfo="selectDateInfo" @cancelInfo="cancelDateInfo"></monthPop>

@@ -3,7 +3,7 @@ export interface barItem {
   series?: string[][];
   yTitle?: string[];
   dataType?: string[];
-  xTile: string;
+  xTile?: string;
   yNameGap?: number;
   tooltip?: {};
   legend?: [];
