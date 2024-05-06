@@ -7,4 +7,5 @@ export interface Info {
   icon?: string;
   showYear?: boolean;
   showChain?: boolean;
+  color?: string;
 }

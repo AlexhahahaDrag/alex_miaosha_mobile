@@ -1,7 +1,20 @@
 <template>
   <van-grid :column-num="2">
-    <div class="box-content-show" >
-      <div :class="(index % 2) === 0 ? 'show-left' : 'show-right'" v-for="(item, index) in dataList" :key="index">
+    <div class="box-content-show">
+      <div
+        :class="index % 2 === 0 ? 'show-left' : 'show-right'"
+        v-for="(item, index) in saleList"
+        :key="index"
+      >
+        <BoardData :info="item"></BoardData>
+      </div>
+    </div>
+    <div class="box-content-show">
+      <div
+        :class="index % 2 === 0 ? 'show-left' : 'show-right'"
+        v-for="(item, index) in benefitList"
+        :key="index"
+      >
         <BoardData :info="item"></BoardData>
       </div>
     </div>
@@ -9,11 +22,14 @@
 </template>
 
 <script lang="ts" setup>
-import { getChainAndYear } from '@/api/finance/shopFinanceAnalysis';
+import { getChainAndYear, getBenefit } from '@/api/finance/shopFinanceAnalysis';
 import { showNotify } from 'vant';
 import { ShopFinanceChainYear } from './common';
 import commonUtils from '@/utils/common/index';
 import { Info } from '@/views/common/boardData/config';
+import dayjs from 'dayjs';
+
+const YYYYMMDD = 'YYYY-MM-DD';
 
 interface Props {
   activeTab: number | string;
@@ -23,17 +39,20 @@ interface Props {
 
 let props = defineProps<Props>();
 
-let dataList = ref<Info[]>([]);
+let saleList = ref<Info[]>([]);
+
+let searchType = ref<string>('month');
 
 const getChainAndYearInfo = (dateStr: string) => {
   let params = {
     startDate: dateStr + '-01',
     endDate: dateStr + '-01',
-  }
+    searchType: searchType.value,
+  };
   getChainAndYear(params).then(
     (res: { code: string; data: ShopFinanceChainYear; message: any }) => {
       if (res.code == '200') {
-        let arr:Info[] = [];
+        let arr: Info[] = [];
         arr.push({
           title: '月销售额',
           value:
@@ -46,6 +65,7 @@ const getChainAndYearInfo = (dateStr: string) => {
           unit: '元',
           showChain: true,
           showYear: true,
+          color: '#55aaff',
         });
         arr.push({
           title: '月销售量',
@@ -59,8 +79,9 @@ const getChainAndYearInfo = (dateStr: string) => {
           unit: '件',
           showChain: true,
           showYear: true,
+          color: '#55aaff',
         });
-        dataList.value = arr;
+        saleList.value = arr;
       } else {
         showNotify({ type: 'danger', message: (res && res.message) || '查询列表失败！' });
       }
@@ -68,8 +89,57 @@ const getChainAndYearInfo = (dateStr: string) => {
   );
 };
 
+let benefitList = ref<Info[]>([]);
+
+const getBenefitInfo = (dateStr: string) => {
+  let params = {
+    startDate: dateStr + '-01',
+    endDate: dayjs(dateStr + '-01')
+      .endOf('month')
+      .format(YYYYMMDD),
+    searchType: searchType.value,
+  };
+  getBenefit({ params }).then((res: { code: string; data: ShopFinanceChainYear; message: any }) => {
+    if (res.code == '200') {
+      let arr: Info[] = [];
+      arr.push({
+        title: '月利润',
+        value:
+          res.data?.saleAmount !== null
+            ? commonUtils.formatAmount(res.data.saleAmount || 0, 2, '')
+            : '--',
+        year: res.data.saleAmountYear,
+        chain: res.data.saleAmountChain,
+        icon: 'saleBenefit',
+        unit: '元',
+        showChain: true,
+        showYear: true,
+        color: '#ff9933',
+      });
+      arr.push({
+        title: '月成本',
+        value:
+          res.data?.saleNum !== null
+            ? commonUtils.formatAmount(res.data.saleNum || 0, 2, '')
+            : '--',
+        year: res.data.saleNumYear,
+        chain: res.data.saleNumChain,
+        icon: 'saleCost',
+        unit: '元',
+        showChain: true,
+        showYear: true,
+        color: '#ff9933',
+      });
+      benefitList.value = arr;
+    } else {
+      showNotify({ type: 'danger', message: (res && res.message) || '查询列表失败！' });
+    }
+  });
+};
+
 const init = (dateStr: string) => {
   getChainAndYearInfo(dateStr);
+  getBenefitInfo(dateStr);
 };
 
 watch(
@@ -90,19 +160,17 @@ watch(
   width: 100%;
   margin-left: 10px;
   margin-right: 10px;
-
+  margin-top: 10px;
   .show-left {
-    margin-top: 10px;
-    width: 48%;
-    background: #3b85f7;
-    border-radius: 5%;
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
   }
-
   .show-right {
-    margin-top: 10px;
-    width: 48%;
-    background: #3b85f7;
-    border-radius: 5%;
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin-left: 10px;
   }
 }
 </style>

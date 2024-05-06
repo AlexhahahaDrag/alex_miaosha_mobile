@@ -1,5 +1,5 @@
-import { Params } from "@/types/global";
-import request, { requestFile } from "@/utils/request/request";
+import { Params } from '@/types/global';
+import request, { requestFile } from '@/utils/request/request';
 
 export function postData(url: string, params: any): Promise<any> {
   return request.post<Params, any>(url, params);
@@ -13,8 +13,8 @@ export function getData(url: string, params: any): Promise<any> {
   return request.get<Params, any>(url, params);
 }
 
-export function getDataOne(url: string): Promise<any> {
-  return request.get<Params, any>(url);
+export function getDataOne(url: string, params?: any): Promise<any> {
+  return request.get<Params, any>(url, params);
 }
 
 export function deleteData(url: string): Promise<any> {
@@ -26,9 +26,9 @@ export function postFileData(url: string, params: any): Promise<any> {
 }
 
 export const baseService = {
-  finance: "/api/am-finance",
-  user: "/api/am-user",
-  mission: "/api/am-mission",
-  file: "/api/am-oss",
-  product: "/api/am-product",
-}
+  finance: '/api/am-finance',
+  user: '/api/am-user',
+  mission: '/api/am-mission',
+  file: '/api/am-oss',
+  product: '/api/am-product',
+};
