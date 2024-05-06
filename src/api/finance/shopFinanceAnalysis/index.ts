@@ -33,7 +33,9 @@ export function getPayWayInfo(searchDate?: string): Promise<any> {
   return getDataOne(url);
 }
 
-export function getChainAndYear(searchDate?: string): Promise<any> {
-  let url = baseService.finance + baseFinanceAnalysis + financeAnalysisUrl.getChainAndYear + '?searchDate=' + searchDate;
+export function getChainAndYear(params?: any): Promise<any> {
+  console.log(`params:`,params)
+  let url = baseService.finance + baseFinanceAnalysis + financeAnalysisUrl.getChainAndYear + '?' +
+    'startDate=' + params.startDate + '&endDate=' + params.endDate;
   return getDataOne(url);
 }

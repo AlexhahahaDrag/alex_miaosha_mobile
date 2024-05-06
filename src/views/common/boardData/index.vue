@@ -53,13 +53,14 @@ interface Props {
   info: Info;
 }
 
-const info = ref<Info>();
-
 const props = defineProps<Props>();
+
+const info = ref<Info>(props.info);
 
 watch(
   () => props.info,
   () => {
+    console.log('props.info', props.info);
     info.value = props.info;
   },
 );
