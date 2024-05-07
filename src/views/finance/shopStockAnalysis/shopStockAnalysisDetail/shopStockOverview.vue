@@ -3,7 +3,7 @@
     <div class="box-content-show">
       <div
         :class="index % 2 === 0 ? 'show-left' : 'show-right'"
-        v-for="(item, index) in saleList"
+        v-for="(item, index) in stockList"
         :key="index"
       >
         <BoardData :info="item"></BoardData>
@@ -41,16 +41,15 @@ let stockList = ref<Info[]>([]);
 const getAllStockInfo = () => {
   getAllStock().then((res: { code: string; data: ShopFinanceChainYear; message: any }) => {
     if (res.code == '200') {
+      console.log(`res:`, res)
       let arr: Info[] = [];
       arr.push({
         title: '库存金额',
         value:
-          res.data?.saleAmount !== null
-            ? commonUtils.formatAmount(res.data.saleAmount || 0, 2, '')
+          res.data?.costAmount !== null
+            ? commonUtils.formatAmount(res.data.costAmount || 0, 2, '')
             : '--',
-        year: res.data.saleAmountYear,
-        chain: res.data.saleAmountChain,
-        icon: 'saleAmount',
+        icon: 'stockAmount',
         unit: '元',
         showChain: false,
         showYear: false,
@@ -62,9 +61,7 @@ const getAllStockInfo = () => {
           res.data?.saleNum !== null
             ? commonUtils.formatAmount(res.data.saleNum || 0, 2, '')
             : '--',
-        year: res.data.saleNumYear,
-        chain: res.data.saleNumChain,
-        icon: 'saleNum',
+        icon: 'stockNum',
         unit: '件',
         showChain: false,
         showYear: false,
@@ -76,8 +73,6 @@ const getAllStockInfo = () => {
     }
   });
 };
-
-let benefitList = ref<Info[]>([]);
 
 const init = () => {
   getAllStockInfo();

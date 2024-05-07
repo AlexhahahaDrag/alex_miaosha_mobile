@@ -44,4 +44,5 @@ export interface ShopFinanceChainYear {
   saleNumChain?: number;
   saleAmountYear?: number;
   saleNumYear?: number;
+  costAmount?: number;
 }
