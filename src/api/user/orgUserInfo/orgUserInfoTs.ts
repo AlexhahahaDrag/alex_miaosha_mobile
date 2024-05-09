@@ -1,5 +1,5 @@
 import {
-  getDataOne,
+  getData,
   postData,
   putData,
   deleteData,
@@ -19,7 +19,7 @@ export function getOrgUserInfoPage(params: any, pageNo: number | null | undefine
 }
 
 export function getOrgUserInfoDetail(id: number): Promise<any> {
-  return getDataOne(baseService.user + baseOrgUserInfo + OrgUserInfoUrl.url + '?id=' + id);
+  return getData(baseService.user + baseOrgUserInfo + OrgUserInfoUrl.url + '?id=' + id);
 }
 
 export function deleteOrgUserInfo(ids: string) : Promise<any>{

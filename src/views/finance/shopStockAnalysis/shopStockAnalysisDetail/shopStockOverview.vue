@@ -9,20 +9,20 @@
         <BoardData :info="item"></BoardData>
       </div>
     </div>
-    <!-- <div class="box-content-show">
+    <div class="box-content-show">
       <div
         :class="index % 2 === 0 ? 'show-left' : 'show-right'"
-        v-for="(item, index) in benefitList"
+        v-for="(item, index) in crashList"
         :key="index"
       >
         <BoardData :info="item"></BoardData>
       </div>
-    </div> -->
+    </div>
   </van-grid>
 </template>
 
 <script lang="ts" setup>
-import { getAllStock } from '@/api/finance/shopStockAnalysis';
+import { getAllStock, getCashAmount } from '@/api/finance/shopStockAnalysis';
 import { showNotify } from 'vant';
 import { ShopFinanceChainYear } from './common';
 import commonUtils from '@/utils/common/index';
@@ -41,7 +41,7 @@ let stockList = ref<Info[]>([]);
 const getAllStockInfo = () => {
   getAllStock().then((res: { code: string; data: ShopFinanceChainYear; message: any }) => {
     if (res.code == '200') {
-      console.log(`res:`, res)
+      console.log(`res:`, res);
       let arr: Info[] = [];
       arr.push({
         title: '库存金额',
@@ -59,7 +59,7 @@ const getAllStockInfo = () => {
         title: '库存数量',
         value:
           res.data?.saleNum !== null
-            ? commonUtils.formatAmount(res.data.saleNum || 0, 2, '')
+            ? commonUtils.formatAmount(res.data.saleNum || 0, 0, '')
             : '--',
         icon: 'stockNum',
         unit: '件',
@@ -74,8 +74,34 @@ const getAllStockInfo = () => {
   });
 };
 
+let crashList = ref<Info[]>([]);
+
+const getCashAmountInfo = () => {
+  getCashAmount().then((res: any) => {
+    if (res.code == '200') {
+      console.log(`res:`, res);
+      let arr: Info[] = [];
+      arr.push({
+        title: '流动资金',
+        value:
+          res.data?.amount !== null ? commonUtils.formatAmount(res.data.amount || 0, 2, '') : '--',
+        icon: 'stockAmount',
+        unit: '元',
+        showChain: false,
+        showYear: false,
+        color: '#1c54aa',
+      });
+      arr.push({});
+      crashList.value = arr;
+    } else {
+      showNotify({ type: 'danger', message: (res && res.message) || '查询列表失败！' });
+    }
+  });
+};
+
 const init = () => {
   getAllStockInfo();
+  getCashAmountInfo();
 };
 
 watch(

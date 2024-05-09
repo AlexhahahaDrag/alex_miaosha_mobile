@@ -1,5 +1,5 @@
 import {
-  getDataOne,
+  getData,
   postData,
   putData,
   deleteData,
@@ -26,7 +26,7 @@ export function getNewestPmsShopProductPage(params: any, pageNo: number | null |
 }
 
 export function getPmsShopProductDetail(id: number): Promise<any> {
-  return getDataOne(baseService.product + basePmsShopProduct + PmsShopProductUrl.url + "?id=" + id);
+  return getData(baseService.product + basePmsShopProduct + PmsShopProductUrl.url + "?id=" + id);
 }
 
 export function deletePmsShopProduct(ids: string) : Promise<any>{
@@ -34,7 +34,7 @@ export function deletePmsShopProduct(ids: string) : Promise<any>{
 }
 
 export function getProductHisInfo(skuId: string, startTime: string | null): Promise<any> {
-  return getDataOne(baseService.product + basePmsShopProduct + PmsShopProductUrl.hisInfo + "?skuId=" + skuId + (startTime ? "&startTime=" + startTime : ''));
+  return getData(baseService.product + basePmsShopProduct + PmsShopProductUrl.hisInfo + "?skuId=" + skuId + (startTime ? "&startTime=" + startTime : ''));
 }
 
 export function addOrEditPmsShopProduct(

@@ -1,5 +1,5 @@
 import {
-  getDataOne,
+  getData,
   postData,
   putData,
   deleteData,
@@ -19,7 +19,7 @@ export function getPmsSkuInfoPage(params: any, pageNo: number | null | undefined
 }
 
 export function getPmsSkuInfoDetail(id: number): Promise<any> {
-  return getDataOne(baseService.product + basePmsSkuInfo + PmsSkuInfoUrl.url + "?id=" + id);
+  return getData(baseService.product + basePmsSkuInfo + PmsSkuInfoUrl.url + "?id=" + id);
 }
 
 export function deletePmsSkuInfo(ids: string) : Promise<any>{

@@ -305,12 +305,19 @@ const onSubmit = () => {
 
 function init() {
   let id: any = route?.query?.id;
+  let type: any = route?.query?.type;
   if (id) {
     Promise.all([getShopStockDetail(id || '-1'), getDictList('is_valid,shop_category,stock_place')])
       .then((res: any) => {
         if (res[0].code == '200') {
           formInfo.value = res[0].data;
           formInfo.value.saleDate = dayjs(formInfo.value.saleDate);
+          // 如果是复制，则删除id
+          // TODO: 测试
+          // FIXME
+          if (type === 'copy') {
+            formInfo.value.id = null;
+          }
           initInfoDate(formInfo.value.saleDate, 'saleDate');
         } else {
           showFailToast(res?.message || '查询详情失败，请联系管理员!');

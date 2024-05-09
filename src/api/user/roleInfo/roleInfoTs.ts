@@ -1,5 +1,5 @@
 import {
-  getDataOne,
+  getData,
   postData,
   putData,
   deleteData,
@@ -19,7 +19,7 @@ export function getRoleInfoPage(params: any, pageNo: number | null | undefined, 
 }
 
 export function getRoleInfoDetail(id: number): Promise<any> {
-  return getDataOne(baseService.user + baseRoleInfo + RoleInfoUrl.url + '?id=' + id);
+  return getData(baseService.user + baseRoleInfo + RoleInfoUrl.url + '?id=' + id);
 }
 
 export function deleteRoleInfo(ids: string) : Promise<any>{

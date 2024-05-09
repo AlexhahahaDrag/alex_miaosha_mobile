@@ -1,5 +1,5 @@
 import {
-    getDataOne,
+    getData,
     postData,
     putData,
     deleteData,
@@ -20,7 +20,7 @@ import {
   }
   
   export function getUserManagerDetail(id: number): Promise<any> {
-    return getDataOne(baseService.user + baseUserManager + userMangerUrl.url + "?id=" + id);
+    return getData(baseService.user + baseUserManager + userMangerUrl.url + "?id=" + id);
   }
   
   export function deleteUserManager(ids: string) : Promise<any>{

@@ -1,22 +1,14 @@
 <template>
   <NavBar :info="info"></NavBar>
-  <van-row class="topRow">
-    <van-col offset="14" span="10">
-      <span name="infoDate" @click="chooseDate()">
-        <a>{{ infoDateName }}</a>
-      </span>
-      账单
-    </van-col>
-  </van-row>
   <van-tabs v-model:active="activeTab" sticky swipeable @change="changeTab">
     <van-tab title="店总览" name="1">
       <ShopStockOverview v-bind="props"></ShopStockOverview>
     </van-tab>
     <van-tab title="店收支分析" name="2">
-      <ShopStockAnalysis v-bind="props"></ShopStockAnalysis>
+      <ShopStockInfoAnalysis v-bind="props"></ShopStockInfoAnalysis>
     </van-tab>
     <van-tab title="店收支明细" name="3">
-      <ShopStockDetail v-bind="props"></ShopStockDetail>
+      <ShopStockAnalysisDetail v-bind="props"></ShopStockAnalysisDetail>
     </van-tab>
   </van-tabs>
   <monthPop

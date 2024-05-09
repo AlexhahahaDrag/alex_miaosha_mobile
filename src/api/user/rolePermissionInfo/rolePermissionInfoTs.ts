@@ -1,5 +1,5 @@
 import {
-  getDataOne,
+  getData,
   postData,
   putData,
   deleteData,
@@ -19,7 +19,7 @@ export function getRolePermissionInfoPage(params: any, pageNo: number | null | u
 }
 
 export function getRolePermissionInfoDetail(id: number): Promise<any> {
-  return getDataOne(baseService.user + baseRolePermissionInfo + RolePermissionInfoUrl.url + '?id=' + id);
+  return getData(baseService.user + baseRolePermissionInfo + RolePermissionInfoUrl.url + '?id=' + id);
 }
 
 export function deleteRolePermissionInfo(ids: string) : Promise<any>{

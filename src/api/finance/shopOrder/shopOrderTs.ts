@@ -1,5 +1,5 @@
 import {
-  getDataOne,
+  getData,
   postData,
   putData,
   deleteData,
@@ -20,7 +20,7 @@ export function getShopOrderPage(params: any, pageNo: number | null | undefined,
 }
 
 export function getShopOrderDetail(id: number): Promise<any> {
-  return getDataOne(baseService.finance + baseShopOrder + ShopOrderUrl.url + '?id=' + id);
+  return getData(baseService.finance + baseShopOrder + ShopOrderUrl.url + '?id=' + id);
 }
 
 export function deleteShopOrder(ids: string) : Promise<any>{

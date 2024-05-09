@@ -1,5 +1,5 @@
 import {
-  getDataOne,
+  getData,
   postData,
   putData,
   deleteData,
@@ -19,7 +19,7 @@ export function getShopStockAttrsPage(params: any, pageNo: number | null | undef
 }
 
 export function getShopStockAttrsDetail(id: number): Promise<any> {
-  return getDataOne(baseService.finance + baseShopStockAttrs + ShopStockAttrsUrl.url + '?id=' + id);
+  return getData(baseService.finance + baseShopStockAttrs + ShopStockAttrsUrl.url + '?id=' + id);
 }
 
 export function deleteShopStockAttrs(ids: string) : Promise<any>{

@@ -1,5 +1,5 @@
 import {
-  getDataOne,
+  getData,
   postData,
   putData,
   deleteData,
@@ -20,7 +20,7 @@ export function getShopStockPage(params: any, pageNo: number | null | undefined,
 }
 
 export function getShopStockDetail(id: number): Promise<any> {
-  return getDataOne(baseService.finance + baseShopStock + ShopStockUrl.url + '?id=' + id);
+  return getData(baseService.finance + baseShopStock + ShopStockUrl.url + '?id=' + id);
 }
 
 export function deleteShopStock(ids: string) : Promise<any>{
@@ -39,5 +39,5 @@ export function addOrEditShopStock(
 }
 
 export function getShopList(ids: string): Promise<any> {
-  return getDataOne(baseService.finance + baseShopStock + ShopStockUrl.getShopList + '?ids=' + ids);
+  return getData(baseService.finance + baseShopStock + ShopStockUrl.getShopList + '?ids=' + ids);
 }

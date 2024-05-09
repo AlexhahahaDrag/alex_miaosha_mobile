@@ -1,5 +1,5 @@
 import {
-  getDataOne,
+  getData,
   postData,
   putData,
   deleteData,
@@ -19,7 +19,7 @@ export function getFinanceMangerPage(params: any, pageNo: number | null | undefi
 }
 
 export function getFinanceMangerDetail(id: string): Promise<any> {
-  return getDataOne(baseService.finance + baseFinanceManager + financeMangerUrl.url + "?id=" + id);
+  return getData(baseService.finance + baseFinanceManager + financeMangerUrl.url + "?id=" + id);
 }
 
 export function deleteFinanceManager(ids: string) : Promise<any>{

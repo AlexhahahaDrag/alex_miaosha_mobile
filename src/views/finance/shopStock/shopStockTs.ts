@@ -105,7 +105,7 @@ export const columns = [
 ];
 
 export interface ShopStockInfo {
-  id?: number;
+  id?: number | null;
   shopName?: string;
   oldShopCode?: string;
   shopCode?: string;

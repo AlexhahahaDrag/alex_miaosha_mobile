@@ -1,5 +1,5 @@
 <template>
-  <navBar :info="info" @clickRight="addShopStock"></navBar>
+  <navBar :info="info" @clickRight="addShopStock(null, 'add')"></navBar>
   <van-pull-refresh
     pulling-text="加载中。。。"
     :style="{ height: 'calc(100% - 44px)' }"
@@ -10,7 +10,7 @@
   >
     <form action="/">
       <van-search
-        v-model="searchInfo.title"
+        v-model="searchInfo?.title || ''"
         show-action
         placeholder="请输入搜索关键词"
         @search="onSearch"
@@ -43,7 +43,7 @@
             is-link
             :to="{
               path: '/finance/shopStock/shopStockDetail',
-              query: { id: item.id },
+              query: { id: item.id, type: 'update' },
             }"
           >
             <template #title>
@@ -78,6 +78,13 @@
             </template>
           </van-cell>
           <template #right>
+            <van-button
+              class="right_info"
+              @click="addShopStock(item?.id || 0, 'copy')"
+              square
+              type="primary"
+              text="复制"
+            />
             <van-button
               class="right_info"
               @click="delShopStock(item?.id || 0)"
@@ -151,8 +158,8 @@ function query(param: SearchInfo, cur: pageInfo) {
     });
 }
 
-const addShopStock = () => {
-  router.push({ path: '/finance/shopStock/shopStockDetail' });
+const addShopStock = (id: number | null, type: string) => {
+  router.push({ path: '/finance/shopStock/shopStockDetail', params: { id, type } });
 };
 
 let userMap = {};

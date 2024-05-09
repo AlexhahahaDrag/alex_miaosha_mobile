@@ -1,4 +1,4 @@
-import { getDataOne, baseService } from '@/api/common/index';
+import { getData, baseService } from '@/api/common/index';
 
 const baseFinanceAnalysis = '/api/v1/shop-finance-analysis';
 
@@ -18,7 +18,7 @@ export function getDayShopFinanceInfo(searchDate?: string): Promise<any> {
     financeAnalysisUrl.getDayShopFinanceInfo +
     '?searchDate=' +
     searchDate;
-  return getDataOne(url);
+  return getData(url);
 }
 
 export function getMonthShopFinanceInfo(searchDate?: string): Promise<any> {
@@ -28,7 +28,7 @@ export function getMonthShopFinanceInfo(searchDate?: string): Promise<any> {
     financeAnalysisUrl.getMonthShopFinanceInfo +
     '?searchDate=' +
     searchDate;
-  return getDataOne(url);
+  return getData(url);
 }
 
 export function getShopNameInfo(searchDate?: string): Promise<any> {
@@ -38,7 +38,7 @@ export function getShopNameInfo(searchDate?: string): Promise<any> {
     financeAnalysisUrl.getShopNameInfo +
     '?searchDate=' +
     searchDate;
-  return getDataOne(url);
+  return getData(url);
 }
 
 export function getPayWayInfo(searchDate?: string): Promise<any> {
@@ -48,7 +48,7 @@ export function getPayWayInfo(searchDate?: string): Promise<any> {
     financeAnalysisUrl.getPayWayInfo +
     '?searchDate=' +
     searchDate;
-  return getDataOne(url);
+  return getData(url);
 }
 
 export function getChainAndYear(params?: any): Promise<any> {
@@ -62,10 +62,10 @@ export function getChainAndYear(params?: any): Promise<any> {
     params.startDate +
     '&endDate=' +
     params.endDate;
-  return getDataOne(url);
+  return getData(url);
 }
 
 export function getBenefit(params?: any): Promise<any> {
   let url = baseService.finance + baseFinanceAnalysis + financeAnalysisUrl.getBenefitInfo;
-  return getDataOne(url, params);
+  return getData(url, params);
 }

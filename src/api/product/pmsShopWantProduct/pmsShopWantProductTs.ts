@@ -1,5 +1,5 @@
 import {
-  getDataOne,
+  getData,
   postData,
   putData,
   deleteData,
@@ -19,7 +19,7 @@ export function getPmsShopWantProductPage(params: any, pageNo: number | null | u
 }
 
 export function getPmsShopWantProductDetail(id: number): Promise<any> {
-  return getDataOne(baseService.product + basePmsShopWantProduct + PmsShopWantProductUrl.url + "?id=" + id);
+  return getData(baseService.product + basePmsShopWantProduct + PmsShopWantProductUrl.url + "?id=" + id);
 }
 
 export function deletePmsShopWantProduct(ids: string) : Promise<any>{

@@ -1,5 +1,5 @@
 import {
-  getDataOne,
+  getData,
   postData,
   putData,
   deleteData,
@@ -19,7 +19,7 @@ export function getPmsCategoryPage(params: any, pageNo: number | null | undefine
 }
 
 export function getPmsCategoryDetail(id: number): Promise<any> {
-  return getDataOne(baseService.product + basePmsCategory + PmsCategoryUrl.url + "?id=" + id);
+  return getData(baseService.product + basePmsCategory + PmsCategoryUrl.url + "?id=" + id);
 }
 
 export function deletePmsCategory(ids: string) : Promise<any>{
