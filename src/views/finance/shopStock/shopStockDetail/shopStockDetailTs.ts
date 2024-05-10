@@ -12,6 +12,7 @@ export const label = reactive({
   size: '尺码',
   style: '款式',
   color: '颜色',
+  stockBatch: '批次',
 });
 
 export const rulesRef = reactive({
@@ -65,5 +66,11 @@ export const rulesRef = reactive({
       message: label.saleNum + '不能为空！',
     },
     { pattern: /^\d+(\.\d+)?$/, message: `请输入正确的数量` },
+  ],
+  stockBatch: [
+    {
+      required: true,
+      message: label.stockBatch + '不能为空！',
+    },
   ],
 });

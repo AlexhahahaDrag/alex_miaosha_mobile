@@ -77,6 +77,15 @@
       <van-field v-model="formInfo.size" name="size" :label="label.size + '：'"></van-field>
       <van-field v-model="formInfo.color" name="color" :label="label.color + '：'"></van-field>
       <van-field v-model="formInfo.style" name="style" :label="label.style + '：'"></van-field>
+      <van-field
+        v-model="stockBatchName"
+        name="stockBatch"
+        :label="label.stockBatch + '：'"
+        :placeholder="'请输入' + label.stockBatch"
+        :rules="rulesRef.stockBatch"
+        @click="choose('stockBatch')"
+        readonly
+      />
       <selectPop :info="popInfo" @selectInfo="selectInfo" @cancelInfo="cancelInfo"></selectPop>
       <datePop
         :info="chooseDateInfo"
@@ -147,6 +156,19 @@ let purchasePlaceInfo = ref<Info>({
   selectValue: formInfo.value.purchasePlace,
 });
 
+let stockBatchName = ref<string>('');
+
+let stockBatchInfo = ref<Info>({
+  label: 'stockBatch',
+  labelName: label.stockBatch,
+  rule: rulesRef.stockBatch,
+  customFieldName: {
+    text: 'typeName',
+    value: 'typeCode',
+  },
+  selectValue: formInfo.value.stockBatch,
+});
+
 const choose = (type: string) => {
   switch (type) {
     case 'isValid':
@@ -157,6 +179,9 @@ const choose = (type: string) => {
       break;
     case 'purchasePlace':
       popInfo.value = purchasePlaceInfo.value;
+      break;
+    case 'stockBatch':
+      popInfo.value = stockBatchInfo.value;
       break;
   }
   popInfo.value.showFlag = true;
@@ -176,6 +201,10 @@ const selectInfo = (type: string, value: any, name: string) => {
     case 'purchasePlace':
       formInfo.value.purchasePlace = value;
       purchasePlaceName.value = name;
+      break;
+    case 'stockBatch':
+      formInfo.value.stockBatch = value;
+      stockBatchName.value = name;
       break;
   }
 };
@@ -313,8 +342,6 @@ function init() {
           formInfo.value = res[0].data;
           formInfo.value.saleDate = dayjs(formInfo.value.saleDate);
           // 如果是复制，则删除id
-          // TODO: 测试
-          // FIXME
           if (type === 'copy') {
             formInfo.value.id = null;
           }

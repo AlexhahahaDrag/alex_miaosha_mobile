@@ -1,5 +1,5 @@
 <template>
-  <NavBar :info="info" @clickRight="addShopFinance"></NavBar>
+  <navBar :info="info" @clickRight="addShopStockBatch"></navBar>
   <van-pull-refresh
     pulling-text="加载中。。。"
     :style="{ height: 'calc(100% - 44px)' }"
@@ -10,14 +10,14 @@
   >
     <form action="/">
       <van-search
-        v-model="searchInfo.shopName"
+        v-model="searchInfo.title"
         show-action
-        placeholder="请输入商品名称"
-        @change="onSearch"
+        placeholder="请输入搜索关键词"
         @search="onSearch"
         @cancel="onCancel"
+        @change="onSearch"
         action-text="清空"
-      ></van-search>
+      />
     </form>
     <van-divider
       :style="{
@@ -25,7 +25,7 @@
         borderColor: 'grey',
       }"
     ></van-divider>
-    <van-empty v-if="dataSource.length == 0" description="暂无数据"></van-empty>
+    <van-empty v-if="dataSource.length == 0" description="暂无数据" />
     <van-list
       v-else
       v-model:loading="loading"
@@ -40,79 +40,51 @@
           :key="index"
         >
           <van-cell
-            :title-class="item.isValid == '1' ? 'validClass' : 'notValidClass'"
-            :title="item.shopName + (item?.saleNum ? '(' + item.saleNum + '件)' : '')"
+            :title="item.batchCode"
             :key="index"
             is-link
-            :to="{ path: '/finance/shopFinance/shopFinanceDetail', query: { id: item.id } }"
+            :to="{ path: '/finance/shopStockBatch/shopStockBatchDetail', query: { id: item.id } }"
           >
-            <template #label>
-              <div class="svgInfo">
-                <div
-                  class="svgDiv"
-                  v-for="(fromSource, index) in fromSourceTransferList"
-                  :key="index"
-                >
-                  <SvgIcon
-                    v-if="item.payWay?.indexOf(fromSource.value) >= 0 && fromSource.value != ''"
-                    :name="fromSource.label"
-                    class="svg"
-                  ></SvgIcon>
-                </div>
-              </div>
-            </template>
             <template #right-icon>
               <div class="text-right">
                 <div style="display: flex">
                   <div class="van-ellipsis">
-                    {{ item?.saleDate ? String(item?.saleDate).substring(0, 10) : '--' }}
+                    {{ item.batchName }}
                   </div>
                 </div>
-                <div :class="item.incomeAndExpenses === 'income' ? 'rightGreenDiv' : 'rightRedDiv'">
-                  {{
-                    item?.saleAmount
-                      ? (item?.incomeAndExpenses === 'income'
-                          ? item?.saleAmount
-                          : -item?.saleAmount) + '元'
-                      : '--'
-                  }}
-                </div>
+                <div :class="true ? 'rightDiv' : 'rightRedDiv'">{{ item.description }}</div>
               </div>
             </template>
           </van-cell>
           <template #right>
             <van-button
               class="right_info"
-              @click="delShopFinance(item.id)"
+              @click="delShopStockBatch(item.id)"
               square
               type="danger"
               text="删除"
             />
           </template>
-          <van-divider
-            :style="{
-              color: '#1989fa',
-              borderColor: 'grey',
-              padding: '0 16px',
-              'margin-top': '0px',
-              'margin-bottom': '0px',
-            }"
-          ></van-divider>
+          <van-divider class="dividerClass"></van-divider>
         </van-swipe-cell>
       </van-cell-group>
     </van-list>
   </van-pull-refresh>
-  <van-back-top></van-back-top>
+  <van-back-top />
 </template>
 <script lang="ts" setup>
-import { getShopFinancePage, deleteShopFinance } from '@/api/finance/shopFinance/shopFinanceTs';
-import { SearchInfo, pagination, pageInfo, fromSourceTransferList } from './shopFinanceTs';
+import {
+  getShopStockBatchPage,
+  deleteShopStockBatch,
+} from '@/api/finance/shopStockBatch/shopStockBatchTs';
+import { getUserManagerList } from '@/api/user/userManager';
+import { SearchInfo, pagination, pageInfo } from './shopStockBatchTs';
 import { showSuccessToast, showFailToast } from 'vant';
 
 let router = useRouter();
 let route = useRoute();
 const info = ref<any>({
-  title: route?.meta?.title || '店财务管理',
+  title: route?.meta?.title || '财务管理11',
   rightButton: '新增',
   leftPath: '/',
 });
@@ -128,17 +100,16 @@ const onSearch = () => {
   dataSource.value = [];
   onRefresh();
 };
-
 const onCancel = () => {
-  searchInfo.value.shopName = '';
+  searchInfo.value.title = '';
   pagination.value.current = 0;
   dataSource.value = [];
   query(searchInfo.value, pagination.value);
 };
 
-function query(param: SearchInfo, cur: pageInfo) {
+const query = (param: SearchInfo, cur: pageInfo): void => {
   loading.value = true;
-  getShopFinancePage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
+  getShopStockBatchPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
     .then((res: any) => {
       if (res?.code == '200') {
         dataSource.value = [...dataSource.value, ...res.data.records];
@@ -159,28 +130,43 @@ function query(param: SearchInfo, cur: pageInfo) {
       isRefresh.value = false;
       loading.value = false;
     });
-}
-
-const addShopFinance = () => {
-  router.push({ path: '/finance/shopFinance/shopFinanceDetail' });
 };
 
-const refresh = () => {
+const addShopStockBatch = (): void => {
+  router.push({ path: '/finance/shopStockBatch/shopStockBatchDetail' });
+};
+
+let userMap = {};
+const getUserInfoList = (): void => {
+  getUserManagerList({}).then((res: any) => {
+    if (res?.code == '200') {
+      if (res?.data) {
+        res.data.forEach((user: { id: string | number; nickName: any }) => {
+          userMap[user.id] = user.nickName;
+        });
+      }
+    } else {
+      showFailToast(res?.message || '查询列表失败！');
+    }
+  });
+};
+
+const refresh = (): void => {
   pagination.value.current = 0;
   dataSource.value = [];
   query(searchInfo.value, pagination.value);
 };
 
-const onRefresh = () => {
+const onRefresh = (): void => {
   query(searchInfo.value, pagination.value);
 };
 
-const beforeClose = (e: any) => {
+const beforeClose = (e: any): void => {
   console.log(e);
 };
 
-const delShopFinance = (id: number) => {
-  deleteShopFinance(id + '').then((res: any) => {
+const delShopStockBatch = (id: number): void => {
+  deleteShopStockBatch(id + '').then((res: any) => {
     if (res?.code == '200') {
       refresh();
       showSuccessToast(res?.message || '删除成功！');
@@ -190,11 +176,13 @@ const delShopFinance = (id: number) => {
   });
 };
 
-function init() {
+const init = (): void => {
   dataSource.value = [];
   pagination.value.current = 0;
   query(searchInfo.value, pagination.value);
-}
+  //获取用户信息
+  getUserInfoList();
+};
 
 init();
 </script>
@@ -204,41 +192,9 @@ init();
   height: 100%;
 }
 
-.svgInfo {
-  margin-top: 10px;
-  display: flex;
-
-  .svgDiv {
-    height: 30px;
-
-    .svgClass {
-      height: 100%;
-    }
-
-    .svg {
-      width: 1.5em;
-      height: 1.5em;
-      font-size: 18px;
-      cursor: pointer;
-      vertical-align: middle;
-    }
-  }
-}
-
-.van-ellipsis {
-  width: 130px;
-  text-align: right;
-}
-
 .rightDiv {
   margin-top: 10px;
   text-align: right;
-}
-
-.rightGreenDiv {
-  margin-top: 10px;
-  text-align: right;
-  color: green;
 }
 
 .rightRedDiv {
@@ -251,7 +207,6 @@ init();
   margin-top: 10px;
   display: flex;
 }
-
 .van-ellipsis {
   width: 130px;
   text-align: right;
@@ -261,7 +216,7 @@ init();
   color: #1989fa;
   border-color: grey;
   padding: 0 16px;
-  margin-top: 1px;
-  margin-bottom: 1px;
+  margin-top: 0px;
+  margin-bottom: 0px;
 }
 </style>

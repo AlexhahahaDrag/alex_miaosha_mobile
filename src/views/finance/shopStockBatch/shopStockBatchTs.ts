@@ -1,14 +1,8 @@
-import { Dayjs } from 'dayjs';
 export interface SearchInfo {
-  shopName?: string;
-  shopCode?: string;
-  costAmount?: number;
-  saleAmount?: number;
+  batchCode?: string;
+  batchName?: string;
   isValid?: string;
-  saleDate?: Dayjs | string;
-  category?: string;
-  purchasePlace?: string;
-  saleNum?: number;
+  description?: string;
   title?: string;
 }
 
@@ -52,24 +46,14 @@ export let pagination = ref<pageInfo>({
 
 export const columns = [
   {
-    title: '商品名称',
-    dataIndex: 'shopName',
-    key: 'shopName',
+    title: '订单编码',
+    dataIndex: 'batchCode',
+    key: 'batchCode',
   },
   {
-    title: '商品编码',
-    dataIndex: 'shopCode',
-    key: 'shopCode',
-  },
-  {
-    title: '成本价',
-    dataIndex: 'costAmount',
-    key: 'costAmount',
-  },
-  {
-    title: '零售价',
-    dataIndex: 'saleAmount',
-    key: 'saleAmount',
+    title: '订单名称',
+    dataIndex: 'batchName',
+    key: 'batchName',
   },
   {
     title: '状态',
@@ -77,24 +61,9 @@ export const columns = [
     key: 'isValid',
   },
   {
-    title: '进货日期',
-    dataIndex: 'saleDate',
-    key: 'saleDate',
-  },
-  {
-    title: '类别',
-    dataIndex: 'category',
-    key: 'category',
-  },
-  {
-    title: '进货地点',
-    dataIndex: 'purchasePlace',
-    key: 'purchasePlace',
-  },
-  {
-    title: '数量',
-    dataIndex: 'saleNum',
-    key: 'saleNum',
+    title: '描述',
+    dataIndex: 'description',
+    key: 'description',
   },
   {
     title: '操作',
@@ -104,23 +73,11 @@ export const columns = [
   },
 ];
 
-export interface ShopStockInfo {
-  id?: number | null;
-  shopName?: string;
-  oldShopCode?: string;
-  shopCode?: string;
-  costAmount?: number;
-  saleAmount?: number;
-  isValid?: string;
-  saleDate?: Dayjs | string;
-  category?: string;
-  purchasePlace?: string;
-  saleNum?: number;
-  checked?: boolean;
-  color?: string;
-  size?: string;
-  style?: string;
-  stockBatch?: string;
+export interface DataItem {
+  batchCode: string;
+  batchName: string;
+  isValid: string;
+  description: string;
 }
 
 export interface ModelInfo {

@@ -52,17 +52,8 @@ export function getPayWayInfo(searchDate?: string): Promise<any> {
 }
 
 export function getChainAndYear(params?: any): Promise<any> {
-  console.log(`params:`, params);
-  let url =
-    baseService.finance +
-    baseFinanceAnalysis +
-    financeAnalysisUrl.getChainAndYear +
-    '?' +
-    'startDate=' +
-    params.startDate +
-    '&endDate=' +
-    params.endDate;
-  return getData(url);
+  let url = baseService.finance + baseFinanceAnalysis + financeAnalysisUrl.getChainAndYear;
+  return getData(url, { params: params });
 }
 
 export function getBenefit(params?: any): Promise<any> {

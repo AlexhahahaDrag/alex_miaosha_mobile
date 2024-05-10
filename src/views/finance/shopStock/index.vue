@@ -10,10 +10,11 @@
   >
     <form action="/">
       <van-search
-        v-model="searchInfo?.title || ''"
+        v-model="searchInfo.title"
         show-action
         placeholder="请输入搜索关键词"
         @search="onSearch"
+        @change="onSearch"
         @cancel="onCancel"
         action-text="清空"
       />
@@ -159,7 +160,7 @@ function query(param: SearchInfo, cur: pageInfo) {
 }
 
 const addShopStock = (id: number | null, type: string) => {
-  router.push({ path: '/finance/shopStock/shopStockDetail', params: { id, type } });
+  router.push({ path: '/finance/shopStock/shopStockDetail', query: { id, type } });
 };
 
 let userMap = {};
