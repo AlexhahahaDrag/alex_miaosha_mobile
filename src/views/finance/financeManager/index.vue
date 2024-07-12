@@ -190,7 +190,7 @@ function getFinancePage(param: SearchInfo, cur: pageInfo) {
 }
 
 const addFinance = () => {
-  router.push({ path: "/selfFinancefinance/financeManager/financeManagerDetail" });
+  router.push({ path: "/selfFinance/financeManager/financeManagerDetail" });
 };
 
 let userMap = {};
