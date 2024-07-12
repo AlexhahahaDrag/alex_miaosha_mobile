@@ -10,7 +10,7 @@ const request = axios.create({
 });
 
 axios.defaults.headers.post["Content-Type"] =
-  "application/x-www-form-urlencoded";
+  "application/json";
 
 //异常拦截处理器
 const errorHandler = (error: AxiosError): Promise<any> => {

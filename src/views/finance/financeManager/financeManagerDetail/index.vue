@@ -45,7 +45,7 @@ let router = useRouter();
 let userInfo = useUserStore()?.getUserInfo;
 const info = ref<any>({
     title: route?.meta?.title || '财务明细',
-    leftPath: '/finance/financeManager',
+    leftPath: '/selfFinance/financeManager',
 });
 let formInfo = ref<any>({});
 
@@ -251,7 +251,7 @@ const onSubmit = () => {
         if (res?.code == '200') {
             showSuccessToast(res?.message || '保存成功!');
             // todo 是否修改成返回列表对应的位置
-            router.push({ path: '/finance/financeManager' });
+            router.push({ path: '/selfFinance/financeManager' });
         } else {
             showFailToast(res?.message || '保存失败，请联系管理员!');
         }

@@ -47,7 +47,7 @@
             :key="index"
             is-link
             :to="{
-              path: '/finance/financeManager/financeManagerDetail',
+              path: '/selfFinance/financeManager/financeManagerDetail',
               query: { id: item.id },
             }"
           >
@@ -190,7 +190,7 @@ function getFinancePage(param: SearchInfo, cur: pageInfo) {
 }
 
 const addFinance = () => {
-  router.push({ path: "/finance/financeManager/financeManagerDetail" });
+  router.push({ path: "/selfFinancefinance/financeManager/financeManagerDetail" });
 };
 
 let userMap = {};

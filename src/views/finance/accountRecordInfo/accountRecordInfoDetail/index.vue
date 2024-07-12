@@ -66,7 +66,7 @@ let route = useRoute();
 let router = useRouter();
 const info = ref<any>({
   title: route?.meta?.title || "",
-  leftPath: "/finance/accountRecordInfo",
+  leftPath: "/selfFinance/accountRecordInfo",
 });
 
 let formInfo = ref<any>({});
@@ -209,7 +209,7 @@ const onSubmit = () => {
   addOrEditAccountRecordInfo(method, formInfo.value).then((res: any) => {
     if (res?.code == "200") {
       showSuccessToast(res?.message || "保存成功!");
-      router.push({ path: "/finance/accountRecordInfo" });
+      router.push({ path: "/selfFinance/accountRecordInfo" });
     } else {
       showFailToast(res?.message || "保存失败，请联系管理员!");
     }
