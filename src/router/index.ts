@@ -9,6 +9,7 @@ const modules = import.meta.glob("@/views/**/**.vue");
 const pageInfo = {
   dashboard: '/src/views/home/index.vue',
   message: '/src/views/message/index.vue',
+  test: '/src/views/finance/test/index.vue',
   about: '/src/views/user/index.vue',
 myself: '/src/views/user/userManager/index.vue',
 login: '/src/views/login/index.vue',
@@ -45,7 +46,7 @@ export const routes: MenuDataItem[] = [
       {
         path: "/message/messageManager",
         name: "messageManager",
-        component: modules[pageInfo.message],
+        component: modules[pageInfo.test],
         meta: { title: "消息管理", icon: "message", hiedInMenu: false },
       },
     ],

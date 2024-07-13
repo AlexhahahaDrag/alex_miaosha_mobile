@@ -25,9 +25,9 @@ import {
 } from "@/api/finance/financeAnalysis";
 
 interface Props {
-    activeTab: number| string;
+    activeTab: number | string;
     dateStr: string;
-    belongTo?: number | null,
+    belongTo?: number | string | null,
 }
 let props = defineProps<Props>();
 

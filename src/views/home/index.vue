@@ -1,16 +1,15 @@
 <template>
-  <NavBar :info="info"></NavBar>
-  <van-grid :column-num="3" :square="true">
-    <van-grid-item
-      v-for="item in homeList"
-      :key="item.id"
-      :text="item?.meta?.title"
-      :to="item.path"
-    >
-      <SvgIcon class="homeSvgClass" :name="item?.meta?.icon"></SvgIcon>
-      <span class="homeFontClass">{{ item?.meta?.title || "null" }}</span>
-    </van-grid-item>
-  </van-grid>
+  <div style="height: calc(100vh - 50px); ">
+    <NavBar :info="info"></NavBar>
+    <div style="overflow-y: auto;  height: calc(100% - 46px);">
+      <van-grid :column-num="3" :square="true">
+        <van-grid-item v-for="item in homeList" :key="item.id" :text="item?.meta?.title" :to="item.path">
+          <SvgIcon class="homeSvgClass" :name="item?.meta?.icon"></SvgIcon>
+          <span class="homeFontClass">{{ item?.meta?.title || "null" }}</span>
+        </van-grid-item>
+      </van-grid>
+    </div>
+  </div>
   <Tabbar :data="useTabBar"></Tabbar>
 </template>
 
@@ -23,8 +22,8 @@ const getHomeList = (arr: readonly any[] | null) => {
   if (arr?.length) {
     arr.forEach((item: any) => {
       if (item) {
-        if(item?.meta?.showInHome) {
-            homeList.value.push(item);
+        if (item?.meta?.showInHome) {
+          homeList.value.push(item);
         }
         if (item.children?.length) {
           getHomeList(item.children);

@@ -34,24 +34,10 @@ export const rulesRef = reactive({
             message: label.eventTime + '不能为空！',
         },
     ],
-    remarks: [
-        {
-            required: true,
-            message: label.remarks + '不能为空！',
-        },
-    ],
     action: [
         {
             required: true,
             message: label.action + '不能为空！',
         },
-        { pattern: /^\d+?$/, message: `请输入正确的动作,字典(gift_action) 1：给予,2:随礼)` }
-    ],
-    noticeNum: [
-        {
-            required: true,
-            message: label.noticeNum + '不能为空！',
-        },
-        { pattern: /^\d+?$/, message: `请输入正确的通知次数` }
     ],
 });

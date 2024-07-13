@@ -9,7 +9,8 @@
             <van-field v-model="formInfo.otherPerson" name="otherPerson" :label="label.otherPerson + '：'"
                 :placeholder="'请输入' + label.otherPerson" :rules="rulesRef.otherPerson" :maxlength="255" />
             <van-field v-model="eventTimeName" name="eventTime" :label="label.eventTime + '：'"
-                :placeholder="'请输入' + label.eventTime" :rules="rulesRef.eventTime" @click="chooseDate('eventTime')" readonly />
+                :placeholder="'请输入' + label.eventTime" :rules="rulesRef.eventTime" @click="chooseDate('eventTime')"
+                readonly />
             <van-field v-model="formInfo.remarks" name="remarks" :label="label.remarks + '：'"
                 :placeholder="'请输入' + label.remarks" :rules="rulesRef.remarks" :maxlength="65535" />
             <van-field v-model="actionName" name="action" :label="label.action + '：'"
@@ -72,9 +73,9 @@ const selectInfo = (type: string, value: any, name: string): void => {
     popInfo.value.showFlag = false;
     switch (type) {
         case 'action':
-           formInfo.value.action = value;
-           actionName.value = name;
-           break;
+            formInfo.value.action = value;
+            actionName.value = name;
+            break;
     }
 };
 
@@ -82,33 +83,33 @@ const cancelInfo = () => {
     popInfo.value.showFlag = false;
 };
 
-const getListName = (list: any[], value: any, code: string, name: string): void => {
-   if (!list?.length) {
-    return "";
-   }
-   let listName = "";
-   list.forEach((item) => {
-     if (item[code] == value) {
-       listName = item[name];
-     }
-   });
-   return listName;
+const getListName = (list: any[], value: any, code: string, name: string): string => {
+    if (!list?.length) {
+        return "";
+    }
+    let listName = "";
+    list.forEach((item) => {
+        if (item[code] == value) {
+            listName = item[name];
+        }
+    });
+    return listName;
 };
 
 const getDictInfoList = (res: any): void => {
-   if (res?.code == "200") {
-     actionInfo.value.list = res.data.filter(
-       (item: { belongTo: string }) => item.belongTo == "gift_action"
-     );
-     actionName.value = getListName(
-         actionInfo.value.list || [],
-         formInfo.value.action,
-         "typeCode",
-         "typeName"
-     );
-   } else {
-     showFailToast(res?.message || "查询失败，请联系管理员!");
-   }
+    if (res?.code == "200") {
+        actionInfo.value.list = res.data.filter(
+            (item: { belongTo: string }) => item.belongTo == "gift_action"
+        );
+        actionName.value = getListName(
+            actionInfo.value.list || [],
+            formInfo.value.action,
+            "typeCode",
+            "typeName"
+        );
+    } else {
+        showFailToast(res?.message || "查询失败，请联系管理员!");
+    }
 }
 
 let eventTimeName = ref<string>('');
@@ -144,7 +145,7 @@ const chooseDate = (type: string): void => {
 };
 
 const selectDateInfo = (date: Dayjs, dateName: string, type: string): void => {
-    switch(type) {
+    switch (type) {
         case 'eventTime':
             formInfo.value.eventTime = date;
             eventTimeName.value = dateName;
@@ -159,7 +160,7 @@ const cancelDateInfo = (): void => {
 
 const initInfoDate = (infoDate: Dayjs, type: string): void => {
     if (infoDate) {
-        switch(type) {
+        switch (type) {
             case 'eventTime':
                 eventTimeName.value = dayjs(infoDate).format('YYYY-MM-DD');
                 eventTimeInfo.value.selectValue = infoDate;
@@ -178,7 +179,7 @@ const onSubmit = (): void => {
             showSuccessToast(res?.message || '保存成功!');
             router.push({ path: '/selfFinance/personalGift' });
         } else {
-            showFailToast (res?.message || '保存失败，请联系管理员!');
+            showFailToast(res?.message || '保存失败，请联系管理员!');
         }
     });
 };
@@ -216,6 +217,6 @@ init();
 </script>
 <style lang='scss' scoped>
 .subButton {
-   margin: 16px;
+    margin: 16px;
 }
 </style>

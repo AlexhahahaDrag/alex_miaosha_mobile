@@ -1,19 +1,15 @@
 <template>
     <NavBar :info="info"></NavBar>
-    <van-row class="topRow">
-        <van-col offset="10" span="5">
-            <span name="belongTo" @click="choose()">
+    <div class="check-title-info" style="display: flex; align-items: center; justify-content: flex-end;margin-right: 10px;">
+        <span name="belongTo" @click="choose()">
                 <a>{{ belongToName }}</a>
             </span>
         的
-        </van-col>
-        <van-col span="8">
-            <span name="infoDate" @click="chooseDate()">
+        <span name="infoDate" @click="chooseDate()">
                 <a> {{ infoDateName }}</a>
             </span>
             账单
-        </van-col>
-    </van-row>
+    </div>
     <van-tabs v-model:active="activeTab" sticky swipeable @change="changeTab">
         <van-tab title="总览" name="1">
             <overview v-bind="props"></overview>

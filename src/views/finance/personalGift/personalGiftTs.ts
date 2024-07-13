@@ -7,6 +7,7 @@ export interface SearchInfo {
   remarks?: string;
   action?: number;
   noticeNum?: number;
+  keyword?: string;
 }
 
 export interface pageInfo {

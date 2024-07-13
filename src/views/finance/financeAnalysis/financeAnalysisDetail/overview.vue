@@ -21,7 +21,7 @@ import * as math from 'mathjs';
 interface Props {
     activeTab: number | string;
     dateStr: string,
-    belongTo?: number | null,
+    belongTo?: number | string | null,
 }
 
 let props = defineProps<Props>();

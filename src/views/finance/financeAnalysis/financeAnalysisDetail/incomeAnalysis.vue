@@ -26,7 +26,7 @@ let pieExpenseData = ref<object[]>([]);
 interface Props {
     activeTab: number | string;
     dateStr: string,
-    belongTo?: number | null,
+    belongTo?: number | string | null,
 }
 
 let pieIncomeData = ref<object[]>([]);
