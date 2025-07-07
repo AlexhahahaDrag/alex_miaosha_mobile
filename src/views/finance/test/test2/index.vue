@@ -1,20 +1,19 @@
 <template>
-    {{ props.activeTab }}
+	{{ props.activeTab }}
 </template>
 
 <script setup lang="ts">
-
 interface Props {
-    activeTab: Number;
+	activeTab: Number;
 }
 
 let props = defineProps<Props>();
 
 watch(
-    () => [props.activeTab],
-    () => {
-        console.log(`test2`)
-    },
-    { immediate: true },
+	() => [props.activeTab],
+	() => {
+		console.log(`test2`);
+	},
+	{ immediate: true },
 );
 </script>

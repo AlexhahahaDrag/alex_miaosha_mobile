@@ -1,0 +1,30 @@
+# 忽略的文件和目录
+node_modules/
+dist/
+build/
+coverage/
+.git/
+.svn/
+*.min.js
+*.min.css
+package-lock.json
+yarn.lock
+.DS_Store
+.env*
+public/
+docker/
+Dockerfile
+README.md
+*.log
+*.tgz
+*.tar.gz
+.nyc_output/
+lib-cov/
+
+# 自动生成的文件
+src/auto-imports.d.ts
+src/env.d.ts
+src/types/
+
+# 忽略HTML文件
+*.html 

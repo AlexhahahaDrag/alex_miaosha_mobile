@@ -1,0 +1,13 @@
+/* 全局CSS变量定义 - 主题颜色 */
+:root {
+	--primary-color: #3399ff;
+	--danger-color: #ff6666;
+	--success-color: #4db280;
+	--purple-color: #cc66e5;
+	--blue-color: #268cf2;
+	--bg-color: #f7faff;
+	--text-color: #333333;
+	--text-secondary-color: #999999;
+	--card-bg: #ffffff;
+	--border-color: #f0f0f0;
+}

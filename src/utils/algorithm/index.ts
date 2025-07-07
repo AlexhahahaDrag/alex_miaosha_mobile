@@ -1,21 +1,22 @@
-import { MenuDataItem } from "@/router/typing";
+import { MenuDataItem } from '@/router/typing';
 
 interface ProxyAlgorithm {
-    increaseIndexes<T extends MenuDataItem>(val: Array<T>): Array<T>
+	increaseIndexes<T extends MenuDataItem>(val: Array<T>): Array<T>;
 }
 
 class algorithmProxy implements ProxyAlgorithm {
-    constructor() { }
+	constructor() {}
 
-    public increaseIndexes<T extends MenuDataItem>(val: T[]): T[] {
-        return Object.keys(val)
-            .map((v) => {
-                return {
-                    ...val[v],
-                    key: v,
-                }
-            }).filter((v) => v.meta && !v.meta.hiedInMenu);
-    }
+	public increaseIndexes<T extends MenuDataItem>(val: T[]): T[] {
+		return Object.keys(val)
+			.map((v) => {
+				return {
+					...val[v],
+					key: v,
+				};
+			})
+			.filter((v) => v.meta && !v.meta.hiedInMenu);
+	}
 }
 
-export const algorithm = new algorithmProxy()
+export const algorithm = new algorithmProxy();

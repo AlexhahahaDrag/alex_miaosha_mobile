@@ -1,5 +1,5 @@
-import { ShopStockInfo, } from '@/views/finance/shopStock/shopStockTs';
+import { ShopStockInfo } from '@/views/finance/shopStock/shopStockTs';
 
 export interface CartState {
-    shoppingCart: ShopStockInfo[],
+	shoppingCart: ShopStockInfo[];
 }

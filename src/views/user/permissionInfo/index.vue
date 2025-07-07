@@ -1,9 +1,15 @@
 <template>
-  <NavBar :info='info' @clickRight='addPermissionInfo'></NavBar>
-  <van-pull-refresh pulling-text="加载中。。。" :style="{ height: 'calc(100% - 44px)' }" v-model='isRefresh' @refresh='refresh'
-    ref='pullRefresh' immediate-check='false'>
-    <form action='/'>
-    <!--
+	<NavBar :info="info" @clickRight="addPermissionInfo"></NavBar>
+	<van-pull-refresh
+		pulling-text="加载中。。。"
+		:style="{ height: 'calc(100% - 44px)' }"
+		v-model="isRefresh"
+		@refresh="refresh"
+		ref="pullRefresh"
+		immediate-check="false"
+	>
+		<form action="/">
+			<!--
     <van-search
         v-model='searchInfo.typeCode'
         show-action
@@ -11,70 +17,88 @@
         @search='onSearch'
         @cancel='onCancel'
         action-text="清空"/>
-    -->
-    </form>
-    <van-divider
-      :style="{
-        color: '#1989fa',
-        borderColor: 'grey',
-      }"
-    ></van-divider>
-    <van-empty v-if='dataSource.length == 0' description='暂无数据'></van-empty>
-    <van-list v-else v-model:loading='loading' :finished='finished' finished-text='没有更多了' @load='onRefresh'>
-      <van-cell-group>
-        <van-swipe-cell v-for='(item, index) in dataSource' :before-close='beforeClose' :key="index">
-          <van-cell :title="item.id" :key='index' is-link
-            :to='{ path: "/user/permissionInfo/permissionInfoDetail", query: { id: item.id } }'>
-            <template #label>
-              <div class="iconClass">
-                <div class='icon' style='background-color: #ffcc00'>
-                  {{item.permissionCode }}
-                </div>
-              </div>
-            </template>
-            <template #right-icon>
-              <div class='text-right'>
-                <div style='display: flex'>
-                  <div class='van-ellipsis'>
-                    {{item.permissionName }}
-                  </div>
-                </div>
-                <div :class="true ? 'rightDiv' : 'rightRedDiv'">
-                    item.status+item.options+;
-                </div>
-              </div>
-            </template>
-          </van-cell>
-          <template #right>
-            <van-button class='right_info' @click='delPermissionInfo(item.id)' square type='danger' text='删除' />
-          </template>
-          <van-divider class="dividerClass"></van-divider>
-        </van-swipe-cell>
-      </van-cell-group>
-    </van-list>
-  </van-pull-refresh>
-  <van-back-top></van-back-top>
+    --></form>
+		<van-divider
+			:style="{
+				color: '#1989fa',
+				borderColor: 'grey',
+			}"
+		></van-divider>
+		<van-empty v-if="dataSource.length == 0" description="暂无数据"></van-empty>
+		<van-list
+			v-else
+			v-model:loading="loading"
+			:finished="finished"
+			finished-text="没有更多了"
+			@load="onRefresh"
+		>
+			<van-cell-group>
+				<van-swipe-cell
+					v-for="(item, index) in dataSource"
+					:before-close="beforeClose"
+					:key="index"
+				>
+					<van-cell
+						:title="item.id"
+						:key="index"
+						is-link
+						:to="{
+							path: '/user/permissionInfo/permissionInfoDetail',
+							query: { id: item.id },
+						}"
+					>
+						<template #label>
+							<div class="iconClass">
+								<div class="icon" style="background-color: #ffcc00">
+									{{ item.permissionCode }}
+								</div>
+							</div>
+						</template>
+						<template #right-icon>
+							<div class="text-right">
+								<div style="display: flex">
+									<div class="van-ellipsis">
+										{{ item.permissionName }}
+									</div>
+								</div>
+								<div :class="true ? 'rightDiv' : 'rightRedDiv'">
+									item.status+item.options+;
+								</div>
+							</div>
+						</template>
+					</van-cell>
+					<template #right>
+						<van-button
+							class="right_info"
+							@click="delPermissionInfo(item.id)"
+							square
+							type="danger"
+							text="删除"
+						/>
+					</template>
+					<van-divider class="dividerClass"></van-divider>
+				</van-swipe-cell>
+			</van-cell-group>
+		</van-list>
+	</van-pull-refresh>
+	<van-back-top></van-back-top>
 </template>
-<script lang='ts' setup>
+<script lang="ts" setup>
 import {
-    getPermissionInfoPage,
-    deletePermissionInfo,
+	getPermissionInfoPage,
+	deletePermissionInfo,
 } from '@/api/user/permissionInfo/permissionInfoTs';
-import { getUserManagerList, } from '@/api/user/userManager';
-import {
-  SearchInfo,
-  pagination,
-  pageInfo,
-} from './permissionInfoTs';
+import { getUserManagerList } from '@/api/user/userManager';
+import { SearchInfo, pagination, pageInfo } from './permissionInfoTs';
 import { showSuccessToast, showFailToast } from 'vant';
 
 let router = useRouter();
 let route = useRoute();
 const info = ref<any>({
-  title: route?.meta?.title || '财务管理11',
-  rightButton: '新增',
-  leftPath: "/",
-})
+	title: route?.meta?.title || '财务管理11',
+	rightButton: '新增',
+	leftPath: '/',
+});
 let loading = ref<boolean>(false);
 let dataSource = ref<any[]>([]);
 let searchInfo = ref<SearchInfo>({});
@@ -95,113 +119,119 @@ let isRefresh = ref<boolean>(false); //是否下拉刷新
 // };
 
 function query(param: SearchInfo, cur: pageInfo) {
-  loading.value = true;
-  getPermissionInfoPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
-    .then((res: any) => {
-      if (res?.code == '200') {
-        dataSource.value = [...dataSource.value, ...res.data.records];
-        pagination.value.current = res.data.current + 1;
-        pagination.value.pageSize = res.data.size;
-        pagination.value.total = res.data.total;
-        if ((pagination.value.total|| 0) <
-              (pagination.value.current || 1) * (pagination.value.pageSize || 10)) {
-          finished.value = true;
-        }
-      } else {
-        showFailToast((res?.message) || '查询列表失败！');
-      }
-    })
-    .finally(() => {
-      isRefresh.value = false;
-      loading.value = false;
-    });
+	loading.value = true;
+	getPermissionInfoPage(
+		param,
+		cur?.current ? cur.current : 1,
+		cur?.pageSize || 10,
+	)
+		.then((res: any) => {
+			if (res?.code == '200') {
+				dataSource.value = [...dataSource.value, ...res.data.records];
+				pagination.value.current = res.data.current + 1;
+				pagination.value.pageSize = res.data.size;
+				pagination.value.total = res.data.total;
+				if (
+					(pagination.value.total || 0) <
+					(pagination.value.current || 1) * (pagination.value.pageSize || 10)
+				) {
+					finished.value = true;
+				}
+			} else {
+				showFailToast(res?.message || '查询列表失败！');
+			}
+		})
+		.finally(() => {
+			isRefresh.value = false;
+			loading.value = false;
+		});
 }
 
 const addPermissionInfo = () => {
-  router.push({ path: '/user/permissionInfo/permissionInfoDetail' });
-}
+	router.push({ path: '/user/permissionInfo/permissionInfoDetail' });
+};
 
 let userMap = {};
 function getUserInfoList() {
-  getUserManagerList({}).then((res: any) => {
-    if (res?.code == '200') {
-      if (res?.data) {
-        res.data.forEach((user: { id: string | number; nickName: any; }) => {
-          userMap[user.id] = user.nickName;
-        });
-      }
-    } else {
-      showFailToast((res?.message) || '查询列表失败！');
-    }
-  });
+	getUserManagerList({}).then((res: any) => {
+		if (res?.code == '200') {
+			if (res?.data) {
+				res.data.forEach((user: { id: string | number; nickName: any }) => {
+					userMap[user.id] = user.nickName;
+				});
+			}
+		} else {
+			showFailToast(res?.message || '查询列表失败！');
+		}
+	});
 }
 
 const refresh = () => {
-  pagination.value.current = 0;
-  dataSource.value = []
-  query(searchInfo.value, pagination.value);
-}
+	pagination.value.current = 0;
+	dataSource.value = [];
+	query(searchInfo.value, pagination.value);
+};
 
 const onRefresh = () => {
-  query(searchInfo.value, pagination.value);
+	query(searchInfo.value, pagination.value);
 };
 
 const beforeClose = (e: any) => {
-  console.log(e);
+	console.log(e);
 };
 
 const delPermissionInfo = (id: number) => {
-  deletePermissionInfo(id + '').then((res: any) => {
-    if (res?.code == '200') {
-      refresh();
-      showSuccessToast((res?.message) || '删除成功！');
-    } else {
-      showFailToast((res?.message) || '删除失败，请联系管理员！');
-    }
-  })
+	deletePermissionInfo(id + '').then((res: any) => {
+		if (res?.code == '200') {
+			refresh();
+			showSuccessToast(res?.message || '删除成功！');
+		} else {
+			showFailToast(res?.message || '删除失败，请联系管理员！');
+		}
+	});
 };
 
 function init() {
-  dataSource.value = [];
-  pagination.value.current = 0;
-  query(searchInfo.value, pagination.value);
-  //获取用户信息
-  getUserInfoList();
+	dataSource.value = [];
+	pagination.value.current = 0;
+	query(searchInfo.value, pagination.value);
+	//获取用户信息
+	getUserInfoList();
 }
 
 init();
 </script>
 
-<style lang='scss' scoped>
+<style lang="scss" scoped>
 .right_info {
-  height: 100%;
+	height: 100%;
 }
 
 .rightDiv {
-  margin-top: 10px;
-  text-align: right;
+	margin-top: 10px;
+	text-align: right;
 }
 
 .rightRedDiv {
-  margin-top: 10px;
-  text-align: right;
-  color:red
+	margin-top: 10px;
+	text-align: right;
+	color: red;
 }
 
 .iconClass {
-   margin-top: 10px;
-   display: flex;
+	margin-top: 10px;
+	display: flex;
 }
 .van-ellipsis {
-    width: 130px;
-    text-align:right;
+	width: 130px;
+	text-align: right;
 }
 
 .dividerClass {
-    color: #1989fa;
-    border-color: grey;
-    padding: 0 16px;
-    margin-top: 0px;
-    margin-bottom: 0px;
+	color: #1989fa;
+	border-color: grey;
+	padding: 0 16px;
+	margin-top: 0px;
+	margin-bottom: 0px;
 }
 </style>

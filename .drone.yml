@@ -42,21 +42,21 @@ steps: # 定义流水线执行步骤，这些步骤将顺序执行
         - docker build  -t alex_miaosha_front:latest .
         - docker run -p 80:3000 -p 443:443 --network=alex_miaosha_net --memory=256m --name=alex_front -d alex_miaosha_front:latest
 
-  - name: notify      # 步骤4 部署完成，邮件通知
+  - name: notify # 步骤4 部署完成，邮件通知
     pull: if-not-exists # 如果镜像不存在则拉取,免去每次都要重新下载
     image: drillster/drone-email
     settings:
       recipients_only: true # 只发送给指定邮件收件人，不默认发送给流水线创建人
-      host: smtp.qq.com      #SMTP服务器 例如 smtp.qq.com
-      port: 465   #SMTP服务端口  例如QQ邮箱端口465
-      subject: "Drone Build Complete!"
+      host: smtp.qq.com #SMTP服务器 例如 smtp.qq.com
+      port: 465 #SMTP服务端口  例如QQ邮箱端口465
+      subject: 'Drone Build Complete!'
       username:
         from_secret: ssh_email_username
       password:
         from_secret: ssh_email_password
       from:
         from_secret: ssh_email_username
-      recipients: 734663446@qq.com           #收件人邮箱
+      recipients: 734663446@qq.com #收件人邮箱
     when: #执行条件
       status:
         - success
@@ -66,7 +66,7 @@ steps: # 定义流水线执行步骤，这些步骤将顺序执行
 volumes: # 定义流水线挂载目录，用于共享数据
   - name: yarn-mobile-package
     host:
-      path: /usr/local/soft/alex_miaosha/drone/alex_miaosha/front   #jar包目录可以修改从宿主机中挂载的目录
+      path: /usr/local/soft/alex_miaosha/drone/alex_miaosha/front #jar包目录可以修改从宿主机中挂载的目录
 
 # 可限制哪些分支可以推送自动CICD
 trigger:
