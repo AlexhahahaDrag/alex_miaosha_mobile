@@ -22,7 +22,7 @@ const PrepaidConsumeRecordUrl = {
 };
 
 // 消费卡信息表相关接口
-export function getPrepaidCardInfoDetail(id: number): Promise<any> {
+export function getPrepaidCardInfoDetail(id: number|string): Promise<any> {
 	let url =
 		baseService.finance +
 		basePrepaidCardInfo +

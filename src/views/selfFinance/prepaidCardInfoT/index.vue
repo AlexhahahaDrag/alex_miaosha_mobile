@@ -53,7 +53,7 @@
 		<div class="quick-actions">
 			<van-button
 				class="action-btn consume-btn"
-				@click="handleConsume"
+				@click="handleAmount('consume')"
 				color="#ff6666"
 				block
 				round
@@ -62,7 +62,7 @@
 			</van-button>
 			<van-button
 				class="action-btn recharge-btn"
-				@click="handleRecharge"
+				@click="handleAmount('recharge')"
 				color="#4db280"
 				block
 				round
@@ -127,9 +127,13 @@ import { showToast, showLoadingToast, showFailToast, closeToast } from 'vant';
 import {
 	getPrepaidCardInfoList,
 	getPrepaidConsumeRecordPage,
-} from './ap/index';
+} from './api/index';
 import { type CardItem, type TransactionItem } from './config/index';
 import { formatTime, formatAmount } from '@/views/common/config';
+import { useRouter } from 'vue-router';
+
+// 路由实例
+const router = useRouter();
 
 // 加载状态
 const loading = ref<boolean>(true);
@@ -245,21 +249,15 @@ const handleCardChange = async (index: number) => {
 };
 
 // 消费按钮点击处理函数
-const handleConsume = () => {
+const handleAmount = (type: 'consume' | 'recharge') => {
 	if (!currentCard.value) {
 		showToast('请先选择一张卡片');
 		return;
 	}
-	emit('consume', currentCardIndex.value);
-};
-
-// 充值按钮点击处理函数
-const handleRecharge = () => {
-	if (!currentCard.value) {
-		showToast('请先选择一张卡片');
-		return;
-	}
-	emit('recharge', currentCardIndex.value);
+	router.push({
+		name: 'prepaidCardInfoTConsumeInfo',
+		params: { type, cardId: currentCard.value.id },
+	});
 };
 
 // 查看更多流水记录
