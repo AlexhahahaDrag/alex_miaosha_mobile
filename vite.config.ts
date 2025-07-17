@@ -75,6 +75,7 @@ export default defineConfig({
 		},
 	},
 	build: {
+		chunkSizeWarningLimit: 800, // 将警告阈值提高到800KB
 		minify: 'terser',
 		terserOptions: {
 			compress: {
@@ -91,6 +92,26 @@ export default defineConfig({
 				manualChunks(id: string) {
 					//静态资源分拆打包
 					if (id.includes('node_modules')) {
+						// 将大型库分别打包
+						if (id.includes('vue') || id.includes('@vue')) {
+							return 'vue-vendor';
+						}
+						if (id.includes('vant')) {
+							return 'vant-vendor';
+						}
+						if (id.includes('echarts')) {
+							return 'echarts-vendor';
+						}
+						if (id.includes('axios')) {
+							return 'axios-vendor';
+						}
+						if (
+							id.includes('dayjs') ||
+							id.includes('crypto-js') ||
+							id.includes('mathjs')
+						) {
+							return 'utils-vendor';
+						}
 						return id
 							.toString()
 							.split('node_modules/')[1]

@@ -9,8 +9,9 @@ const financeAnalysisUrl = {
 	getMonthExpense: '/getMonthExpense',
 };
 
+// 获取财务分析总览
 export function getBalance(
-	belongTo?: number | null,
+	belongTo?: number | string | null,
 	searchDate?: string,
 ): Promise<any> {
 	let url =
@@ -25,8 +26,9 @@ export function getBalance(
 	return getData(url);
 }
 
+// 获取财务分析收支分析
 export function getIncomeAndExpense(
-	belongTo?: number | null,
+	belongTo?: number | string | null,
 	searchDate?: string,
 	type?: string,
 ): Promise<any> {
@@ -47,8 +49,9 @@ export function getIncomeAndExpense(
 	return getData(url);
 }
 
+// 获取财务分析日支出
 export function getDayExpense(
-	belongTo?: number | null,
+	belongTo?: number | string | null,
 	searchDate?: string,
 ): Promise<any> {
 	let url =
@@ -63,8 +66,9 @@ export function getDayExpense(
 	return getData(url);
 }
 
+// 获取财务分析月支出
 export function getMonthExpense(
-	belongTo?: number | null,
+	belongTo?: number | string | null,
 	searchDate?: string,
 ): Promise<any> {
 	let url =

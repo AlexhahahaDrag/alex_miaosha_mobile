@@ -1,0 +1,356 @@
+// Enhanced SCSS Mixins for Finance Manager UI Optimization
+
+// ===== RESPONSIVE MIXINS =====
+@mixin respond-to($breakpoint) {
+	@if $breakpoint == xs {
+		@media (min-width: $breakpoint-xs) {
+			@content;
+		}
+	}
+	@if $breakpoint == sm {
+		@media (min-width: $breakpoint-sm) {
+			@content;
+		}
+	}
+	@if $breakpoint == md {
+		@media (min-width: $breakpoint-md) {
+			@content;
+		}
+	}
+	@if $breakpoint == lg {
+		@media (min-width: $breakpoint-lg) {
+			@content;
+		}
+	}
+	@if $breakpoint == xl {
+		@media (min-width: $breakpoint-xl) {
+			@content;
+		}
+	}
+	@if $breakpoint == 2xl {
+		@media (min-width: $breakpoint-2xl) {
+			@content;
+		}
+	}
+}
+
+@mixin respond-below($breakpoint) {
+	@if $breakpoint == xs {
+		@media (max-width: $breakpoint-xs - 1px) {
+			@content;
+		}
+	}
+	@if $breakpoint == sm {
+		@media (max-width: $breakpoint-sm - 1px) {
+			@content;
+		}
+	}
+	@if $breakpoint == md {
+		@media (max-width: $breakpoint-md - 1px) {
+			@content;
+		}
+	}
+	@if $breakpoint == lg {
+		@media (max-width: $breakpoint-lg - 1px) {
+			@content;
+		}
+	}
+	@if $breakpoint == xl {
+		@media (max-width: $breakpoint-xl - 1px) {
+			@content;
+		}
+	}
+	@if $breakpoint == 2xl {
+		@media (max-width: $breakpoint-2xl - 1px) {
+			@content;
+		}
+	}
+}
+
+// ===== CARD MIXINS =====
+@mixin card-base {
+	background: $finance-card-bg;
+	border: 1px solid $finance-card-border;
+	border-radius: $finance-card-border-radius;
+	box-shadow: $finance-card-shadow;
+	transition: $card-transition;
+}
+
+@mixin card-hover {
+	box-shadow: $finance-card-shadow-hover;
+	transform: translateY(-1px);
+}
+
+@mixin card-padding($size: md) {
+	@if $size == sm {
+		padding: $spacing-sm $spacing-md;
+	} @else if $size == md {
+		padding: $spacing-md $spacing-lg;
+	} @else if $size == lg {
+		padding: $spacing-lg $spacing-xl;
+	}
+}
+
+// ===== TYPOGRAPHY MIXINS =====
+@mixin text-truncate {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+@mixin text-clamp($lines: 2) {
+	display: -webkit-box;
+	-webkit-line-clamp: $lines;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+@mixin font-size(
+	$size,
+	$weight: $font-weight-normal,
+	$line-height: $line-height-md
+) {
+	font-size: $size;
+	font-weight: $weight;
+	line-height: $line-height;
+}
+
+// Typography Presets
+@mixin heading-1 {
+	@include font-size($font-size-4xl, $font-weight-bold, $line-height-sm);
+}
+
+@mixin heading-2 {
+	@include font-size($font-size-3xl, $font-weight-semibold, $line-height-sm);
+}
+
+@mixin heading-3 {
+	@include font-size($font-size-2xl, $font-weight-semibold, $line-height-md);
+}
+
+@mixin body-large {
+	@include font-size($font-size-lg, $font-weight-normal, $line-height-md);
+}
+
+@mixin body-medium {
+	@include font-size($font-size-md, $font-weight-normal, $line-height-md);
+}
+
+@mixin body-small {
+	@include font-size($font-size-sm, $font-weight-normal, $line-height-sm);
+}
+
+@mixin caption {
+	@include font-size($font-size-xs, $font-weight-normal, $line-height-sm);
+}
+
+// ===== BUTTON MIXINS =====
+@mixin button-base {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border: none;
+	border-radius: $button-border-radius;
+	cursor: pointer;
+	transition: $button-transition;
+	text-decoration: none;
+	font-family: $font-family-base;
+
+	&:focus {
+		outline: none;
+		box-shadow: $focus-ring;
+	}
+
+	&:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+}
+
+@mixin button-size($size: md) {
+	@if $size == sm {
+		padding: $spacing-xs $spacing-md;
+		@include font-size($font-size-sm);
+		min-height: 32px;
+	} @else if $size == md {
+		padding: $spacing-sm $spacing-lg;
+		@include font-size($font-size-md);
+		min-height: 40px;
+	} @else if $size == lg {
+		padding: $spacing-md $spacing-xl;
+		@include font-size($font-size-lg);
+		min-height: 48px;
+	}
+}
+
+// ===== FLEXBOX MIXINS =====
+@mixin flex-center {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+@mixin flex-between {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+@mixin flex-start {
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+}
+
+@mixin flex-end {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+}
+
+@mixin flex-column {
+	display: flex;
+	flex-direction: column;
+}
+
+@mixin flex-column-center {
+	@include flex-column;
+	align-items: center;
+	justify-content: center;
+}
+
+// ===== SPACING MIXINS =====
+@mixin margin($top: 0, $right: $top, $bottom: $top, $left: $right) {
+	margin: $top $right $bottom $left;
+}
+
+@mixin padding($top: 0, $right: $top, $bottom: $top, $left: $right) {
+	padding: $top $right $bottom $left;
+}
+
+// ===== ANIMATION MIXINS =====
+@mixin fade-in($duration: $transition-duration-base) {
+	animation: fadeIn $duration $transition-timing-ease;
+}
+
+@mixin slide-up($duration: $transition-duration-base) {
+	animation: slideUp $duration $transition-timing-ease-out;
+}
+
+@mixin bounce-in($duration: $transition-duration-slow) {
+	animation: bounceIn $duration $ease-out-quart;
+}
+
+// ===== UTILITY MIXINS =====
+@mixin clearfix {
+	&::after {
+		content: '';
+		display: table;
+		clear: both;
+	}
+}
+
+@mixin visually-hidden {
+	position: absolute !important;
+	width: 1px !important;
+	height: 1px !important;
+	padding: 0 !important;
+	margin: -1px !important;
+	overflow: hidden !important;
+	clip: rect(0, 0, 0, 0) !important;
+	white-space: nowrap !important;
+	border: 0 !important;
+}
+
+@mixin aspect-ratio($width, $height) {
+	position: relative;
+
+	&::before {
+		content: '';
+		display: block;
+		padding-top: percentage($height / $width);
+	}
+
+	> * {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+	}
+}
+
+// ===== FINANCE SPECIFIC MIXINS =====
+@mixin finance-amount($type: neutral) {
+	@include font-size($font-size-lg, $font-weight-semibold);
+
+	@if $type == income {
+		color: $income-color;
+	} @else if $type == expense {
+		color: $expense-color;
+	} @else {
+		color: $text-primary;
+	}
+}
+
+@mixin finance-card {
+	@include card-base;
+	@include card-padding(md);
+	margin-bottom: $finance-card-margin;
+
+	&:hover {
+		@include card-hover;
+	}
+}
+
+@mixin finance-badge($type: neutral) {
+	display: inline-flex;
+	align-items: center;
+	padding: $spacing-xs $spacing-sm;
+	border-radius: $border-radius-full;
+	@include font-size($font-size-xs, $font-weight-medium);
+
+	@if $type == income {
+		background: $income-bg;
+		color: $income-color;
+		border: 1px solid $income-border;
+	} @else if $type == expense {
+		background: $expense-bg;
+		color: $expense-color;
+		border: 1px solid $expense-border;
+	} @else {
+		background: $gray-2;
+		color: $text-secondary;
+		border: 1px solid $border-light;
+	}
+}
+
+// ===== SEARCH MIXINS =====
+@mixin search-container {
+	background: $search-bg;
+	border: 1px solid $search-border;
+	border-radius: $search-border-radius;
+	box-shadow: $search-shadow;
+	padding: $search-padding;
+	margin: $search-margin 0;
+}
+
+// ===== ACCESSIBILITY MIXINS =====
+@mixin focus-visible {
+	&:focus-visible {
+		outline: 2px solid $primary-color;
+		outline-offset: 2px;
+	}
+}
+
+@mixin high-contrast {
+	@media (prefers-contrast: high) {
+		@content;
+	}
+}
+
+@mixin reduced-motion {
+	@media (prefers-reduced-motion: reduce) {
+		@content;
+	}
+}

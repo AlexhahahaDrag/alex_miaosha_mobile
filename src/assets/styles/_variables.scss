@@ -1,0 +1,230 @@
+// Enhanced SCSS Variables and Design Tokens for Finance Manager UI Optimization
+
+// ===== COLOR PALETTE =====
+// Primary Colors
+$primary-color: #1989fa;
+$primary-light: #4ba3ff;
+$primary-dark: #0066cc;
+
+// Status Colors
+$success-color: #07c160;
+$success-light: #39d374;
+$success-dark: #059a4c;
+$success-bg: rgba(7, 193, 96, 0.08);
+
+$danger-color: #ee0a24;
+$danger-light: #f44336;
+$danger-dark: #c5001a;
+$danger-bg: rgba(238, 10, 36, 0.08);
+
+$warning-color: #ff976a;
+$warning-light: #ffb088;
+$warning-dark: #e6804d;
+
+$info-color: #268cf2;
+$info-light: #4da3f5;
+$info-dark: #1a6bb8;
+
+// Neutral Colors
+$white: #ffffff;
+$black: #000000;
+
+// Gray Scale
+$gray-1: #f7f8fa;
+$gray-2: #f2f3f5;
+$gray-3: #ebedf0;
+$gray-4: #dcdee0;
+$gray-5: #c8c9cc;
+$gray-6: #969799;
+$gray-7: #646566;
+$gray-8: #323233;
+
+// Text Colors
+$text-primary: #323233;
+$text-secondary: #646566;
+$text-tertiary: #969799;
+$text-disabled: #c8c9cc;
+$text-white: #ffffff;
+
+// Background Colors
+$bg-primary: #ffffff;
+$bg-secondary: #f7f8fa;
+$bg-tertiary: #f2f3f5;
+$bg-overlay: rgba(0, 0, 0, 0.5);
+
+// Border Colors
+$border-light: #ebedf0;
+$border-medium: #dcdee0;
+$border-dark: #c8c9cc;
+
+// ===== SPACING SYSTEM =====
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 12px;
+$spacing-lg: 16px;
+$spacing-xl: 20px;
+$spacing-2xl: 24px;
+$spacing-3xl: 32px;
+$spacing-4xl: 40px;
+$spacing-5xl: 48px;
+
+// Component Specific Spacing
+$card-padding: $spacing-lg;
+$card-margin: $spacing-md;
+$section-padding: $spacing-2xl;
+
+// ===== TYPOGRAPHY =====
+// Font Families
+$font-family-base:
+	-apple-system,
+	BlinkMacSystemFont,
+	'Helvetica Neue',
+	Helvetica,
+	Segoe UI,
+	Arial,
+	Roboto,
+	'PingFang SC',
+	'miui',
+	'Hiragino Sans GB',
+	'Microsoft Yahei',
+	sans-serif;
+$font-family-mono:
+	'SF Mono', Monaco, Inconsolata, 'Roboto Mono', 'Source Code Pro', monospace;
+
+// Font Sizes
+$font-size-xs: 10px;
+$font-size-sm: 12px;
+$font-size-md: 14px;
+$font-size-lg: 16px;
+$font-size-xl: 18px;
+$font-size-2xl: 20px;
+$font-size-3xl: 24px;
+$font-size-4xl: 28px;
+
+// Font Weights
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+// Line Heights
+$line-height-xs: 1.2;
+$line-height-sm: 1.4;
+$line-height-md: 1.5;
+$line-height-lg: 1.6;
+$line-height-xl: 1.8;
+
+// ===== SHADOWS =====
+$shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+$shadow-sm:
+	0 1px 3px rgba(0, 0, 0, 0.1),
+	0 1px 2px rgba(0, 0, 0, 0.06);
+$shadow-md:
+	0 4px 6px rgba(0, 0, 0, 0.07),
+	0 2px 4px rgba(0, 0, 0, 0.06);
+$shadow-lg:
+	0 10px 15px rgba(0, 0, 0, 0.1),
+	0 4px 6px rgba(0, 0, 0, 0.05);
+$shadow-xl:
+	0 20px 25px rgba(0, 0, 0, 0.1),
+	0 10px 10px rgba(0, 0, 0, 0.04);
+
+// Component Specific Shadows
+$card-shadow: $shadow-sm;
+$card-shadow-hover: $shadow-md;
+$search-shadow: $shadow-xs;
+
+// ===== BORDER RADIUS =====
+$border-radius-xs: 2px;
+$border-radius-sm: 4px;
+$border-radius-md: 6px;
+$border-radius-lg: 8px;
+$border-radius-xl: 12px;
+$border-radius-2xl: 16px;
+$border-radius-full: 50%;
+
+// Component Specific Border Radius
+$card-border-radius: $border-radius-lg;
+$button-border-radius: $border-radius-md;
+$search-border-radius: $border-radius-lg;
+
+// ===== TRANSITIONS =====
+$transition-duration-fast: 0.15s;
+$transition-duration-base: 0.2s;
+$transition-duration-slow: 0.3s;
+$transition-duration-slower: 0.5s;
+
+$transition-timing-ease: ease;
+$transition-timing-ease-in: ease-in;
+$transition-timing-ease-out: ease-out;
+$transition-timing-ease-in-out: ease-in-out;
+
+// Common Transitions
+$transition-base: all $transition-duration-base $transition-timing-ease;
+$transition-fast: all $transition-duration-fast $transition-timing-ease;
+$transition-slow: all $transition-duration-slow $transition-timing-ease;
+
+// Component Specific Transitions
+$card-transition:
+	transform $transition-duration-base $transition-timing-ease,
+	box-shadow $transition-duration-base $transition-timing-ease;
+$button-transition:
+	background-color $transition-duration-fast $transition-timing-ease,
+	border-color $transition-duration-fast $transition-timing-ease;
+
+// ===== RESPONSIVE BREAKPOINTS =====
+$breakpoint-xs: 320px;
+$breakpoint-sm: 375px;
+$breakpoint-md: 414px;
+$breakpoint-lg: 768px;
+$breakpoint-xl: 1024px;
+$breakpoint-2xl: 1200px;
+
+// ===== Z-INDEX SCALE =====
+$z-index-dropdown: 1000;
+$z-index-sticky: 1020;
+$z-index-fixed: 1030;
+$z-index-modal-backdrop: 1040;
+$z-index-modal: 1050;
+$z-index-popover: 1060;
+$z-index-tooltip: 1070;
+$z-index-toast: 1080;
+
+// ===== COMPONENT SPECIFIC TOKENS =====
+
+// Finance Record Cards
+$finance-card-bg: $bg-primary;
+$finance-card-border: $border-light;
+$finance-card-padding: $spacing-lg;
+$finance-card-margin: $spacing-sm;
+$finance-card-border-radius: $card-border-radius;
+$finance-card-shadow: $card-shadow;
+$finance-card-shadow-hover: $card-shadow-hover;
+
+// Income/Expense Colors
+$income-color: $success-color;
+$income-bg: $success-bg;
+$income-border: rgba($success-color, 0.2);
+
+$expense-color: $danger-color;
+$expense-bg: $danger-bg;
+$expense-border: rgba($danger-color, 0.2);
+
+// Search Section
+$search-bg: $bg-primary;
+$search-border: $border-light;
+$search-padding: $spacing-md;
+$search-margin: $spacing-lg;
+$search-border-radius: $search-border-radius;
+$search-shadow: $search-shadow;
+
+// Interactive Elements
+$hover-bg: rgba($primary-color, 0.04);
+$active-bg: rgba($primary-color, 0.08);
+$focus-ring: 0 0 0 3px rgba($primary-color, 0.1);
+
+// Animation Curves
+$ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+$ease-in-quart: cubic-bezier(0.5, 0, 0.75, 0);
+$ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);

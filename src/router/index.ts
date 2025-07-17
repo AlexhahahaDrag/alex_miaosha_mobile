@@ -10,6 +10,7 @@ const pageInfo = {
 	dashboard: '/src/views/home/index.vue',
 	message: '/src/views/message/index.vue',
 	test: '/src/views/finance/test/index.vue',
+	testInfo: '/src/views/test/index.vue',
 	consumptionCard: '/src/views/test/index.vue',
 	about: '/src/views/user/index.vue',
 	myself: '/src/views/user/userManager/index.vue',
@@ -54,6 +55,26 @@ export const routes: MenuDataItem[] = [
 				name: 'messageManager',
 				component: modules[pageInfo.test],
 				meta: { title: '消息管理', icon: 'message', hiedInMenu: false },
+			},
+		],
+	},
+	{
+		path: '/test',
+		component: Layout,
+		redirect: '/test/testIndex',
+		name: 'test',
+		meta: {
+			title: '测试',
+			icon: 'messageManager',
+			hiedInMenu: false,
+			showInHome: false,
+		},
+		children: [
+			{
+				path: '/test/testIndex',
+				name: 'testIndex',
+				component: modules[pageInfo.testInfo],
+				meta: { title: '测试', icon: 'message', hiedInMenu: false },
 			},
 		],
 	},
@@ -112,7 +133,7 @@ router.beforeEach((to, _from, next) => {
 	if (to.path == '/login') {
 		next();
 	} else if (userStore.getToken) {
-		if (!userStore.getRouteStatus || routes.length <= 5) {
+		if (!userStore.getRouteStatus || routes.length <= 6) {
 			dynamicRouter = [];
 			addRouter();
 			next({ ...to, replace: true });

@@ -3,11 +3,31 @@
 </template>
 
 <script setup lang="ts">
-import * as echarts from 'echarts';
+// 按需导入ECharts组件，减少包体积
+import * as echarts from 'echarts/core';
+import { BarChart, LineChart, PieChart } from 'echarts/charts';
+import {
+	TitleComponent,
+	TooltipComponent,
+	GridComponent,
+	LegendComponent,
+	ToolboxComponent,
+} from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
 import { nanoid } from 'nanoid';
-//import dark from './dark';
-//主题
-import 'echarts/theme/infographic';
+
+// 注册必要的组件
+echarts.use([
+	TitleComponent,
+	TooltipComponent,
+	GridComponent,
+	LegendComponent,
+	ToolboxComponent,
+	BarChart,
+	LineChart,
+	PieChart,
+	CanvasRenderer,
+]);
 
 const props = defineProps({
 	options: {

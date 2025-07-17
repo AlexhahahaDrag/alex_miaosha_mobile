@@ -130,7 +130,6 @@ import {
 } from './api/index';
 import { type CardItem, type TransactionItem } from './config/index';
 import { formatTime, formatAmount } from '@/views/common/config';
-import { useRouter } from 'vue-router';
 
 // 路由实例
 const router = useRouter();
@@ -256,7 +255,7 @@ const handleAmount = (type: 'consume' | 'recharge') => {
 	}
 	router.push({
 		name: 'prepaidCardInfoTConsumeInfo',
-		params: { type, cardId: currentCard.value.id },
+		query: { type, cardId: currentCard.value.id },
 	});
 };
 

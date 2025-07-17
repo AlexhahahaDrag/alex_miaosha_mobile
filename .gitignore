@@ -19,8 +19,8 @@ coverage
 
 # Editor directories and files
 .vscode/*
-!.vscode/extensions.json
 .idea
+.kiro
 *.suo
 *.ntvs*
 *.njsproj
@@ -31,3 +31,4 @@ coverage
 yarn.lock
 stats.html
 components.d.ts
+/src/auto-imports.d.ts

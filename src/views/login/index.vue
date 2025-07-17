@@ -40,6 +40,12 @@
 import { LoginForm } from './login';
 import { LoginParams } from '@/api/user/login';
 import { useUserStore } from '@/store/modules/user/user';
+import { useNavBar } from '@/composables/useNavBar';
+
+// 登录页面不显示NavBar
+useNavBar({
+	visible: false,
+});
 
 const router = useRouter();
 const userStore = useUserStore();

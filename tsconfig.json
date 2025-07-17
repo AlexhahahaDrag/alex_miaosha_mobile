@@ -41,10 +41,11 @@
 		"build/**/*.d.ts",
 		"mock/**/*.ts",
 		"vite.config.ts",
-		"env.d.tssrc/main.tsn.ts",
+		"env.d.ts",
+		"src/main.ts",
 		"components.d.ts",
 		"src/auto-imports.d.ts",
-		"src/postcss.config.js"
+		"postcss.config.js"
 	],
 	"references": [
 		{

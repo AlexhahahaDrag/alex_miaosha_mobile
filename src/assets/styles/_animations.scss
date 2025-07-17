@@ -1,0 +1,339 @@
+// Enhanced Animations for Finance Manager UI Optimization
+
+// ===== FADE ANIMATIONS =====
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes fadeOut {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+
+@keyframes fadeInUp {
+	from {
+		opacity: 0;
+		transform: translateY(20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes fadeInDown {
+	from {
+		opacity: 0;
+		transform: translateY(-20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+// ===== SLIDE ANIMATIONS =====
+@keyframes slideUp {
+	from {
+		transform: translateY(100%);
+	}
+	to {
+		transform: translateY(0);
+	}
+}
+
+@keyframes slideDown {
+	from {
+		transform: translateY(-100%);
+	}
+	to {
+		transform: translateY(0);
+	}
+}
+
+@keyframes slideLeft {
+	from {
+		transform: translateX(100%);
+	}
+	to {
+		transform: translateX(0);
+	}
+}
+
+@keyframes slideRight {
+	from {
+		transform: translateX(-100%);
+	}
+	to {
+		transform: translateX(0);
+	}
+}
+
+// ===== SCALE ANIMATIONS =====
+@keyframes scaleIn {
+	from {
+		opacity: 0;
+		transform: scale(0.8);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+@keyframes scaleOut {
+	from {
+		opacity: 1;
+		transform: scale(1);
+	}
+	to {
+		opacity: 0;
+		transform: scale(0.8);
+	}
+}
+
+// ===== BOUNCE ANIMATIONS =====
+@keyframes bounceIn {
+	0% {
+		opacity: 0;
+		transform: scale(0.3);
+	}
+	50% {
+		opacity: 1;
+		transform: scale(1.05);
+	}
+	70% {
+		transform: scale(0.9);
+	}
+	100% {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+@keyframes bounceOut {
+	20% {
+		transform: scale(0.9);
+	}
+	50%,
+	55% {
+		opacity: 1;
+		transform: scale(1.1);
+	}
+	100% {
+		opacity: 0;
+		transform: scale(0.3);
+	}
+}
+
+// ===== ROTATION ANIMATIONS =====
+@keyframes spin {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@keyframes pulse {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.5;
+	}
+}
+
+// ===== LOADING ANIMATIONS =====
+@keyframes shimmer {
+	0% {
+		background-position: -200px 0;
+	}
+	100% {
+		background-position: calc(200px + 100%) 0;
+	}
+}
+
+@keyframes dots {
+	0%,
+	20% {
+		color: transparent;
+		text-shadow:
+			0.25em 0 0 transparent,
+			0.5em 0 0 transparent;
+	}
+	40% {
+		color: $text-primary;
+		text-shadow:
+			0.25em 0 0 transparent,
+			0.5em 0 0 transparent;
+	}
+	60% {
+		text-shadow:
+			0.25em 0 0 $text-primary,
+			0.5em 0 0 transparent;
+	}
+	80%,
+	100% {
+		text-shadow:
+			0.25em 0 0 $text-primary,
+			0.5em 0 0 $text-primary;
+	}
+}
+
+// ===== CARD SPECIFIC ANIMATIONS =====
+@keyframes cardHover {
+	from {
+		transform: translateY(0);
+		box-shadow: $finance-card-shadow;
+	}
+	to {
+		transform: translateY(-2px);
+		box-shadow: $finance-card-shadow-hover;
+	}
+}
+
+@keyframes cardPress {
+	from {
+		transform: scale(1);
+	}
+	to {
+		transform: scale(0.98);
+	}
+}
+
+// ===== SWIPE ANIMATIONS =====
+@keyframes swipeReveal {
+	from {
+		transform: translateX(100%);
+		opacity: 0;
+	}
+	to {
+		transform: translateX(0);
+		opacity: 1;
+	}
+}
+
+@keyframes swipeHide {
+	from {
+		transform: translateX(0);
+		opacity: 1;
+	}
+	to {
+		transform: translateX(100%);
+		opacity: 0;
+	}
+}
+
+// ===== UTILITY ANIMATION CLASSES =====
+.animate-fade-in {
+	animation: fadeIn $transition-duration-base $transition-timing-ease;
+}
+
+.animate-fade-in-up {
+	animation: fadeInUp $transition-duration-base $transition-timing-ease-out;
+}
+
+.animate-slide-up {
+	animation: slideUp $transition-duration-base $transition-timing-ease-out;
+}
+
+.animate-scale-in {
+	animation: scaleIn $transition-duration-base $transition-timing-ease-out;
+}
+
+.animate-bounce-in {
+	animation: bounceIn $transition-duration-slow $ease-out-quart;
+}
+
+.animate-pulse {
+	animation: pulse 2s $transition-timing-ease-in-out infinite;
+}
+
+.animate-spin {
+	animation: spin 1s linear infinite;
+}
+
+// ===== LOADING STATES =====
+.loading-shimmer {
+	background: linear-gradient(90deg, $gray-2 0%, $gray-3 50%, $gray-2 100%);
+	background-size: 200px 100%;
+	animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.loading-dots::after {
+	content: '...';
+	animation: dots 1.5s steps(5, end) infinite;
+}
+
+// ===== HOVER EFFECTS =====
+.hover-lift {
+	transition: $card-transition;
+
+	&:hover {
+		transform: translateY(-2px);
+		box-shadow: $shadow-lg;
+	}
+}
+
+.hover-scale {
+	transition: transform $transition-duration-fast $transition-timing-ease;
+
+	&:hover {
+		transform: scale(1.02);
+	}
+}
+
+.hover-glow {
+	transition: box-shadow $transition-duration-base $transition-timing-ease;
+
+	&:hover {
+		box-shadow: 0 0 20px rgba($primary-color, 0.3);
+	}
+}
+
+// ===== STAGGER ANIMATIONS =====
+.stagger-fade-in {
+	.stagger-item {
+		opacity: 0;
+		animation: fadeInUp $transition-duration-base $transition-timing-ease-out;
+		animation-fill-mode: forwards;
+
+		@for $i from 1 through 10 {
+			&:nth-child(#{$i}) {
+				animation-delay: #{$i * 0.1}s;
+			}
+		}
+	}
+}
+
+// ===== REDUCED MOTION SUPPORT =====
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+
+	.animate-pulse {
+		animation: none;
+	}
+
+	.animate-spin {
+		animation: none;
+	}
+}

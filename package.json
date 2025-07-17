@@ -46,7 +46,7 @@
 		"eslint-plugin-promise": "^6.0.0",
 		"eslint-plugin-vue": "^9.24.0",
 		"globals": "^15.0.0",
-		"postcss-px-to-viewport": "^1.1.1",
+		"postcss-px-to-viewport-8-plugin": "^1.2.5",
 		"prettier": "^3.6.2",
 		"prettier-plugin-vue": "^1.1.6",
 		"typescript-eslint": "^7.5.0",

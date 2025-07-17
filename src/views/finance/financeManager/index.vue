@@ -1,5 +1,4 @@
 <template>
-	<navBar :info="info" @clickRight="addFinance"></navBar>
 	<van-pull-refresh
 		pulling-text="加载中。。。"
 		:style="{ height: 'calc(100% - 44px)' }"
@@ -136,18 +135,25 @@ import {
 	fromSourceTransferList,
 } from './financeManager';
 import { showSuccessToast, showFailToast } from 'vant';
-
-// window.onpopstate = function(event) {
-//   alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
-// };
+import { useNavBar } from '@/composables/useNavBar';
 
 let router = useRouter();
 let route = useRoute();
-const info = ref<any>({
-	title: route?.meta?.title || '财务管理',
+
+// 定义addFinance函数
+const addFinance = () => {
+	router.push({ path: '/selfFinance/financeManager/financeManagerDetail' });
+};
+
+// 使用新的NavBar系统
+useNavBar({
+	title: (route?.meta?.title as string) || '财务管理',
 	rightButton: '新增',
 	leftPath: '/',
+	visible: true,
+	onRightClick: addFinance,
 });
+
 let loading = ref<boolean>(false);
 let dataSource = ref<any[]>([]);
 let searchInfo = ref<SearchInfo>({});
@@ -195,10 +201,6 @@ function getFinancePage(param: SearchInfo, cur: pageInfo) {
 			loading.value = false;
 		});
 }
-
-const addFinance = () => {
-	router.push({ path: '/selfFinance/financeManager/financeManagerDetail' });
-};
 
 let userMap = {};
 function getUserInfoList() {

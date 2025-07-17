@@ -31,32 +31,32 @@ let props = defineProps<Props>();
 let balanceList = ref<FinanceDetail | any>([]);
 let sum = ref<any>(0);
 
-const getBalanceInfo = (userId: number | null, dateStr: string) => {
-	getBalance(userId, dateStr).then(
-		(res: { code: string; data: FinanceDetail[]; message: any }) => {
-			if (res.code == '200') {
-				sum.value = 0;
-				balanceList.value = res.data;
-				if (res.data && res.data.length) {
-					res.data.forEach(
-						(item) =>
-							(sum.value = math.add(
-								sum.value,
-								math.bignumber(item.amount ? item.amount : 0),
-							)),
-					);
-				}
-			} else {
-				showNotify({
-					type: 'danger',
-					message: (res && res.message) || '查询列表失败！',
-				});
-			}
-		},
-	);
+const getBalanceInfo = async (
+	userId: number | string | null,
+	dateStr: string,
+) => {
+	const { code, data, message } = await getBalance(userId, dateStr);
+	if (code == '200') {
+		sum.value = 0;
+		balanceList.value = data || [];
+		if (data?.length) {
+			data.forEach(
+				(item: any) =>
+					(sum.value = math.add(
+						sum.value,
+						math.bignumber(item.amount ? item.amount : 0),
+					)),
+			);
+		}
+	} else {
+		showNotify({
+			type: 'danger',
+			message: message || '查询列表失败！',
+		});
+	}
 };
 
-const init = (dateStr: string, belongTo: number | null) => {
+const init = (dateStr: string, belongTo: number | string | null) => {
 	getBalanceInfo(belongTo, dateStr);
 };
 

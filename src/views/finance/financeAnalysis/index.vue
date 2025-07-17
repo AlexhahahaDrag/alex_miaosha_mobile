@@ -1,5 +1,4 @@
 <template>
-	<NavBar :info="info"></NavBar>
 	<div
 		class="check-title-info"
 		style="
@@ -47,12 +46,15 @@ import { Info } from '@/views/common/pop/selectPop.vue';
 import { useUserStore } from '@/store/modules/user/user';
 import { getUserManagerList } from '@/api/user/userManager';
 import { showFailToast } from 'vant';
+import { useNavBar } from '@/composables/useNavBar';
 
 let route = useRoute();
 
-const info = ref<any>({
-	title: route?.meta?.title || '财务分析',
+// 使用新的NavBar系统
+useNavBar({
+	title: (route?.meta?.title as string) || '财务分析',
 	leftPath: '/',
+	visible: true,
 });
 
 let userInfo = useUserStore()?.getUserInfo;

@@ -1,6 +1,6 @@
 module.exports = {
 	plugins: {
-		'postcss-px-to-viewport': {
+		'postcss-px-to-viewport-8-plugin': {
 			viewportWidth: 375, // 视窗的宽度，对应的是我们设计稿的宽度
 			viewportHeight: 667, // 视窗的高度，根据750设备的宽度来指定，一般指定1334，也可以不配置
 			unitPrecision: 5, // 指定`px`转换为视窗单位值的小数位数

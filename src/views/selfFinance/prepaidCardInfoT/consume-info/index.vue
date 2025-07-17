@@ -102,8 +102,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
 import { showToast, showSuccessToast, showConfirmDialog } from 'vant';
 import { getPrepaidCardInfoDetail } from '../api/index';
 
@@ -133,9 +131,9 @@ const consumeTimeDisplay = computed(() => {
 });
 
 // 加载状态
-const loading = ref(false);
+const loading = ref<boolean>(false);
 // 金额输入聚焦状态
-const isAmountFocused = ref(false);
+const isAmountFocused = ref<boolean>(false);
 
 // 格式化日期时间显示
 function formatDateTime(date: Date) {

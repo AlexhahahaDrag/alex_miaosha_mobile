@@ -1,5 +1,4 @@
 <template>
-	<navBar :info="info" @clickRight="addPersonalGift"></navBar>
 	<van-pull-refresh
 		pulling-text="加载中。。。"
 		:style="{ height: 'calc(100% - 44px)' }"
@@ -102,13 +101,21 @@ import { getUserManagerList } from '@/api/user/userManager';
 import { SearchInfo, pagination, pageInfo } from './personalGiftTs';
 import { showSuccessToast, showFailToast } from 'vant';
 import dayjs from 'dayjs';
+import { useNavBar } from '@/composables/useNavBar';
 
 let router = useRouter();
 let route = useRoute();
-const info = ref<any>({
-	title: route?.meta?.title || '财务管理11',
+
+const addPersonalGift = (): void => {
+	router.push({ path: '/selfFinance/personalGift/personalGiftDetail' });
+};
+
+useNavBar({
+	title: (route?.meta?.title as string) || '个人随礼',
 	rightButton: '新增',
 	leftPath: '/',
+	visible: true,
+	onRightClick: addPersonalGift,
 });
 let loading = ref<boolean>(false);
 let dataSource = ref<any[]>([]);
@@ -156,10 +163,6 @@ const query = (param: SearchInfo, cur: pageInfo): void => {
 			isRefresh.value = false;
 			loading.value = false;
 		});
-};
-
-const addPersonalGift = (): void => {
-	router.push({ path: '/selfFinance/personalGift/personalGiftDetail' });
 };
 
 let userMap = {};
