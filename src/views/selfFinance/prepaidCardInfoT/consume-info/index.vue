@@ -1,47 +1,25 @@
 <template>
 	<div class="consume-page">
-		<!-- 消费页面标题栏 -->
-		<van-nav-bar
-			title="消费"
-			left-text="返回"
-			left-arrow
-			right-text="确认"
-			@click-left="goBack"
-			@click-right="confirmConsume"
-			class="nav-bar"
-		/>
-
-		<!-- 余额展示区域 -->
-		<div class="balance-section">
-			<div class="balance-card">
-				<div class="balance-label">可用余额</div>
-				<div class="balance-amount">
-					¥ {{ formatBalance(formData.balance) }}
-				</div>
-			</div>
-		</div>
-
 		<!-- 消费金额输入区域 -->
 		<div class="amount-section">
 			<div class="amount-card">
-				<div class="card-title">消费金额</div>
 				<div class="amount-display">
-					<span class="currency">¥</span>
+					<span class="currency" :class="formData.type">¥</span>
 					<van-field
 						v-model="formData.amount"
 						placeholder="0.00"
 						type="number"
 						class="amount-input"
+						:class="formData.type"
 						@input="validateAmount"
 						@focus="onAmountFocus"
 						@blur="onAmountBlur"
 					/>
 				</div>
-				<div
-					class="balance-after"
-					v-if="formData.amount && parseFloat(formData.amount) > 0"
-				>
-					<div class="balance-after-label">消费后余额</div>
+				<div class="balance-after">
+					<div class="balance-after-label">
+						{{ formData.type === 'recharge' ? '充值' : '消费' }}后余额
+					</div>
 					<div
 						class="balance-after-amount"
 						:class="{ insufficient: balanceAfter < 0 }"
@@ -99,30 +77,66 @@
 			</van-button>
 		</div>
 	</div>
+	<datePop
+		:info="chooseDateInfo"
+		@selectInfo="selectDateInfo"
+		@cancelInfo="cancelDateInfo"
+	></datePop>
 </template>
 
 <script setup lang="ts">
-import { showToast, showSuccessToast, showConfirmDialog } from 'vant';
-import { getPrepaidCardInfoDetail } from '../api/index';
+import { showToast, showSuccessToast, showFailToast } from 'vant';
+import {
+	getPrepaidCardInfoDetail,
+	prepaidCardConsumeAndRecharge,
+} from '../api/index';
+import { type Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
+import { useRoute } from 'vue-router';
+import { useNavBar } from '@/composables/useNavBar';
+import { useUserStore } from '@/store/modules/user/user';
 
 const route = useRoute();
 const router = useRouter();
 
+let userInfo = useUserStore()?.getUserInfo;
+
+const formData = reactive<any>({});
+
+// 使用新的NavBar系统
+useNavBar({
+	title: formData.type === 'recharge' ? '充值' : '消费',
+	leftPath: `/selfFinance/prepaidCardInfoT?cardId=${route.query.cardId}`,
+	visible: true,
+});
+
 // 表单数据对象
-const formData = reactive({
-	amount: '', // 消费金额
-	balance: 117.23, // 当前余额
-	cardName: '', // 消费卡名称
-	remark: '', // 备注信息
-	consumeTime: new Date(), // 消费时间
-	type: 'consume', // 消费类型
-	cardId: '', // 消费卡ID
+
+let chooseDateInfo = ref<any>({
+	label: 'infoDate',
+	labelName: '消费时间',
+	selectValue: dayjs(),
+	showFlag: false,
+	formatter: (type: string, option: any) => {
+		if (type === 'year') {
+			option.text += '年';
+		}
+		if (type === 'month') {
+			option.text += '月';
+		}
+		if (type === 'day') {
+			option.text += '日';
+		}
+		return option;
+	},
 });
 
 // 计算属性：消费后余额
 const balanceAfter = computed(() => {
 	const amountValue = parseFloat(formData.amount) || 0;
-	return formData.balance - amountValue;
+	return formData.type === 'recharge' ?
+			formData.balance + amountValue
+		:	formData.balance - amountValue;
 });
 
 // 显示的消费时间文本
@@ -136,18 +150,29 @@ const loading = ref<boolean>(false);
 const isAmountFocused = ref<boolean>(false);
 
 // 格式化日期时间显示
-function formatDateTime(date: Date) {
-	const month = String(date.getMonth() + 1).padStart(2, '0');
-	const day = String(date.getDate()).padStart(2, '0');
-	const hours = String(date.getHours()).padStart(2, '0');
-	const minutes = String(date.getMinutes()).padStart(2, '0');
-	return `${month}月${day}日 ${hours}:${minutes}`;
+function formatDateTime(date: Dayjs) {
+	date = dayjs(date);
+	const now = dayjs().local();
+	const today = now.startOf('day').local();
+	const yesterday = today.subtract(1, 'day').local();
+	const targetDate = date.startOf('day').local();
+	// 今天
+	if (targetDate.isSame(today, 'day')) {
+		return `今天`;
+	}
+	// 昨天
+	else if (targetDate.isSame(yesterday, 'day')) {
+		return `昨天`;
+	}
+	// 昨天之前
+	else {
+		return date.format('YYYY-MM-DD');
+	}
 }
 
 // 更新当前时间
 const updateCurrentTime = () => {
-	formData.consumeTime = new Date();
-	showToast('已更新为当前时间');
+	chooseDateInfo.value.showFlag = true;
 };
 
 // 金额输入聚焦
@@ -176,49 +201,60 @@ const formatBalance = (value: number) => {
 	return value.toFixed(2);
 };
 
-// 返回上一页
-const goBack = () => {
-	router.back();
+// 选择日期
+const selectDateInfo = (date: Dayjs, _dateName: string) => {
+	formData.consumeTime = date;
+	chooseDateInfo.value.showFlag = false;
+};
+
+// 取消日期
+const cancelDateInfo = () => {
+	chooseDateInfo.value.showFlag = false;
 };
 
 // 确认消费
 const confirmConsume = async () => {
 	// 验证必填字段
 	if (!formData.amount || parseFloat(formData.amount) <= 0) {
-		showToast('请输入有效的消费金额');
+		const actionText = formData.type === 'recharge' ? '充值' : '消费';
+		showToast(`请输入有效的${actionText}金额`);
 		return;
 	}
 	if (!formData.cardName.trim()) {
 		showToast('请输入消费卡名称');
 		return;
 	}
-	if (parseFloat(formData.amount) > formData.balance) {
-		showToast('余额不足，无法完成消费');
-		return;
+
+	// 根据操作类型进行不同的校验
+	if (formData.type === 'consume') {
+		// 消费校验：余额不足
+		if (parseFloat(formData.amount) > formData.balance) {
+			showToast('余额不足，无法完成消费');
+			return;
+		}
+	} else if (formData.type === 'recharge') {
+		// 充值校验：可以添加充值相关的校验逻辑
+		// 例如：充值金额上限等
 	}
-
 	try {
-		await showConfirmDialog({
-			title: '确认消费',
-			message: `确认消费 ¥${formData.amount}？`,
-		});
-
-		loading.value = true;
-
-		// 模拟API调用
-		setTimeout(() => {
-			console.log('确认消费', {
-				amount: formData.amount,
-				cardName: formData.cardName,
-				consumeTime: formData.consumeTime,
-				remark: formData.remark,
-				balanceAfter: balanceAfter.value,
-			});
-
-			loading.value = false;
-			showSuccessToast('消费成功');
-			router.back();
-		}, 1500);
+		let params = {
+			id: formData.id,
+			cardName: formData.cardName,
+			userId: userInfo.id,
+			consumeAmount: parseFloat(formData.amount),
+			type: formData.type,
+			consumeTime: formData.consumeTime,
+			description: formData.remark,
+		};
+		const { code, message } = await prepaidCardConsumeAndRecharge(params);
+		if (code === '200') {
+			showSuccessToast(
+				(formData.type === 'recharge' ? '充值' : '消费') + '成功!',
+			);
+			router.push({ name: 'prepaidCardInfoT', query: { cardId: formData.id } });
+		} else {
+			showFailToast(message || '失败，请联系管理员!');
+		}
 	} catch {
 		// 用户取消消费
 	}
@@ -226,20 +262,17 @@ const confirmConsume = async () => {
 
 // 获取预付卡信息
 const getPrepaidCardInfoDetailInfo = async () => {
-	console.log(`getPrepaidCardInfoList`);
 	try {
 		const {
 			code,
 			data,
 			message: messageInfo,
-		} = await getPrepaidCardInfoDetail(formData.cardId);
-
+		} = await getPrepaidCardInfoDetail(formData.id);
 		if (code === '200') {
 			// 取第一张卡片的信息
 			const cardInfo = data;
-			console.log(`data: ${JSON.stringify(data)}`, data);
 			formData.cardName = cardInfo.cardName;
-			formData.balance = cardInfo.currentBalance || cardInfo.balance;
+			formData.balance = cardInfo.currentBalance ?? 0;
 			formData.cardId = cardInfo.id;
 		} else {
 			showToast(messageInfo?.description || '获取信息失败，请联系管理员！');
@@ -254,8 +287,9 @@ const getPrepaidCardInfoDetailInfo = async () => {
 const init = () => {
 	// 获取路由参数
 	const { cardId, type } = route.query;
-	formData.cardId = cardId as string;
+	formData.id = cardId as string;
 	formData.type = type as string;
+	formData.consumeTime = dayjs();
 	// 获取预付卡信息
 	getPrepaidCardInfoDetailInfo();
 };
@@ -299,6 +333,7 @@ init();
 
 .amount-section {
 	padding: 0 16px 16px;
+	padding-top: 16px;
 
 	.amount-card {
 		background: white;
@@ -332,8 +367,16 @@ init();
 			.currency {
 				font-size: 36px;
 				font-weight: 700;
-				color: #ff6b6b;
 				margin-right: 8px;
+				transition: color 0.3s ease;
+
+				&.recharge {
+					color: #52c41a;
+				}
+
+				&.consume {
+					color: #ff6b6b;
+				}
 			}
 
 			.amount-input {
@@ -342,11 +385,24 @@ init();
 				:deep(.van-field__control) {
 					background: transparent;
 					border: none;
-					color: #ff6b6b;
 					font-size: 36px;
 					font-weight: 700;
 					padding: 0;
 					text-align: left;
+					transition: color 0.3s ease;
+				}
+
+				&.recharge :deep(.van-field__control) {
+					color: #52c41a;
+
+					&::placeholder {
+						color: #b3e5b3;
+						font-weight: 400;
+					}
+				}
+
+				&.consume :deep(.van-field__control) {
+					color: #ff6b6b;
 
 					&::placeholder {
 						color: #ffb3b3;

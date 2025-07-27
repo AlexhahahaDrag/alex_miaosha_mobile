@@ -26,6 +26,7 @@
 			<van-swipe
 				:loop="false"
 				:show-indicators="true"
+				:initial-swipe="currentCardIndex"
 				@change="handleCardChange"
 				v-if="!cardsLoading && cardList.length > 0"
 			>
@@ -133,6 +134,7 @@ import { formatTime, formatAmount } from '@/views/common/config';
 
 // 路由实例
 const router = useRouter();
+const route = useRoute();
 
 // 加载状态
 const loading = ref<boolean>(true);
@@ -153,6 +155,18 @@ const currentCard = computed(() => {
 // 交易记录列表
 const transactionList = ref<TransactionItem[]>([]);
 
+// 根据路由的cardId设置当前选中的index
+const setCurrentCardIndexByRouteCardId = () => {
+	const { cardId } = route.query;
+	if (cardId && cardList.value.length > 0) {
+		const index = cardList.value.findIndex((card) => card.id === cardId);
+		console.log('1111111111111111111111111111', index, cardList.value);
+		if (index !== -1) {
+			currentCardIndex.value = index;
+		}
+	}
+};
+
 // 获取消费卡列表
 const getCardList = async () => {
 	// 获取消费卡信息列表
@@ -166,6 +180,9 @@ const getCardList = async () => {
 			id: card.id,
 			...card,
 		}));
+
+		// 根据路由的cardId设置当前选中的index
+		setCurrentCardIndexByRouteCardId();
 	} else {
 		cardList.value = [];
 		showFailToast(message || '查询失败，请联系管理员!');

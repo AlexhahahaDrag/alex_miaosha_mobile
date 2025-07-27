@@ -27,7 +27,18 @@ const emit = defineEmits(['clickRight']);
 const router = useRouter();
 const onClickLeft = () => {
 	if (props.info?.leftPath) {
-		router.push({ path: props.info.leftPath });
+		let leftArr = props.info.leftPath.split('?');
+		let query: Record<string, any> = {};
+		if (leftArr?.length > 1) {
+			const params = new URLSearchParams(leftArr[1]);
+			params.forEach((value, key) => {
+				query[key] = value;
+			});
+		}
+		router.push({
+			path: leftArr[0],
+			query,
+		});
 	} else {
 		router.go(-1);
 	}

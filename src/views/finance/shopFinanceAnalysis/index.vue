@@ -2,7 +2,7 @@
 	<NavBar :info="info"></NavBar>
 	<van-row class="topRow">
 		<van-col offset="14" span="10">
-			<span name="infoDate" @click="chooseDate()">
+			<span @click="chooseDate()">
 				<a> {{ infoDateName }}</a>
 			</span>
 			账单
@@ -28,7 +28,6 @@
 
 <script lang="ts" setup>
 import dayjs, { Dayjs } from 'dayjs';
-import { isTypeOnlyExportDeclaration } from 'typescript';
 
 let route = useRoute();
 
