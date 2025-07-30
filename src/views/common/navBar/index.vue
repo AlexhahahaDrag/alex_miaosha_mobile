@@ -22,7 +22,10 @@ interface Props {
 	info: Info;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+	info: () => ({ noShowLeft: false, showRight: false }),
+});
+
 const emit = defineEmits(['clickRight']);
 const router = useRouter();
 const onClickLeft = () => {

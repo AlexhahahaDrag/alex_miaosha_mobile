@@ -107,7 +107,6 @@ let userInfo = useUserStore()?.getUserInfo;
 // 使用新的NavBar系统
 useNavBar({
 	title: (route?.meta?.title as string) || '财务明细',
-	rightButton: '新增',
 	leftPath: '/selfFinance/financeManager',
 	visible: true,
 });
