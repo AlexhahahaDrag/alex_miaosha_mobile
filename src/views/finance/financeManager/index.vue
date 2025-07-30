@@ -1,124 +1,133 @@
 <template>
+	<form action="/">
+		<van-search
+			v-model="searchInfo.bigTypeCode"
+			show-action
+			placeholder="请输入搜索关键词"
+			@search="onSearch"
+			@cancel="onCancel"
+			action-text="清空"
+		/>
+	</form>
+	<van-divider
+		:style="{ color: '#1989fa', borderColor: 'grey', margin: '0 0 10px 0' }"
+	/>
 	<van-pull-refresh
 		pulling-text="加载中。。。"
-		:style="{ height: 'calc(100% - 44px)' }"
+		:style="{}"
+		class="refresh-info"
 		v-model="isRefresh"
 		@refresh="refresh"
 		ref="pullRefresh"
 		immediate-check="false"
 	>
-		<form action="/">
-			<van-search
-				v-model="searchInfo.bigTypeCode"
-				show-action
-				placeholder="请输入搜索关键词"
-				@search="onSearch"
-				@cancel="onCancel"
-				action-text="清空"
-			/>
-		</form>
-		<van-divider :style="{ color: '#1989fa', borderColor: 'grey' }">
-		</van-divider>
-		<van-empty v-if="dataSource.length == 0" description="暂无数据"></van-empty>
-		<van-list
-			v-else
-			v-model:loading="loading"
-			:finished="finished"
-			finished-text="没有更多了"
-			@load="onRefresh"
-		>
-			<van-cell-group>
-				<van-swipe-cell
-					v-for="(item, index) in dataSource"
-					:before-close="beforeClose"
-					:key="index"
-				>
-					<van-cell
-						:title-class="item.isValid == '1' ? 'validClass' : 'notValidClass'"
-						:title="
-							userMap[item.belongTo] +
-							'的' +
-							item.name +
-							'(' +
-							item.typeCode +
-							')'
-						"
+		<div style="height: 100%; overflow-y: auto">
+			<van-empty
+				v-if="dataSource.length == 0"
+				description="暂无数据"
+			></van-empty>
+			<van-list
+				v-else
+				v-model:loading="loading"
+				:finished="finished"
+				finished-text="没有更多了"
+				@load="onRefresh"
+			>
+				<van-cell-group>
+					<van-swipe-cell
+						v-for="(item, index) in dataSource"
+						:before-close="beforeClose"
 						:key="index"
-						is-link
-						:to="{
-							path: '/selfFinance/financeManager/financeManagerDetail',
-							query: { id: item.id },
-						}"
 					>
-						<template #label>
-							<div class="svgInfo">
-								<div
-									class="svgDiv"
-									v-for="(fromSource, index) in fromSourceTransferList"
-									:key="index"
-								>
-									<SvgIcon
-										v-if="
-											item.fromSource.indexOf(fromSource.value) >= 0 &&
-											fromSource.value != ''
-										"
-										:name="fromSource.label"
-										class="svg"
-									></SvgIcon>
+						<van-cell
+							:title-class="
+								item.isValid == '1' ? 'validClass' : 'notValidClass'
+							"
+							:title="
+								userMap[item.belongTo] +
+								'的' +
+								item.name +
+								'(' +
+								item.typeCode +
+								')'
+							"
+							:key="index"
+							is-link
+							:to="{
+								path: '/selfFinance/financeManager/financeManagerDetail',
+								query: { id: item.id },
+							}"
+						>
+							<template #label>
+								<div class="svgInfo">
+									<div
+										class="svgDiv"
+										v-for="(fromSource, index) in fromSourceTransferList"
+										:key="index"
+									>
+										<SvgIcon
+											v-if="
+												item.fromSource.indexOf(fromSource.value) >= 0 &&
+												fromSource.value != ''
+											"
+											:name="fromSource.label"
+											class="svg"
+										></SvgIcon>
+									</div>
 								</div>
-							</div>
-						</template>
-						<template #right-icon>
-							<div class="text-right">
-								<div style="display: flex">
-									<div class="van-ellipsis">
+							</template>
+							<template #right-icon>
+								<div class="text-right">
+									<div style="display: flex">
+										<div class="van-ellipsis">
+											{{
+												item?.infoDate ?
+													String(item.infoDate).substring(0, 10)
+												:	'--'
+											}}
+										</div>
+									</div>
+									<div
+										:class="
+											item.incomeAndExpenses === 'income' ?
+												'rightGreenDiv'
+											:	'rightRedDiv'
+										"
+									>
 										{{
-											item?.infoDate ?
-												String(item.infoDate).substring(0, 10)
+											item.amount ?
+												(item.incomeAndExpenses === 'income' ?
+													item.amount
+												:	-item.amount) + '元'
 											:	'--'
 										}}
 									</div>
 								</div>
-								<div
-									:class="
-										item.incomeAndExpenses === 'income' ?
-											'rightGreenDiv'
-										:	'rightRedDiv'
-									"
-								>
-									{{
-										item.amount ?
-											(item.incomeAndExpenses === 'income' ?
-												item.amount
-											:	-item.amount) + '元'
-										:	'--'
-									}}
-								</div>
-							</div>
+							</template>
+						</van-cell>
+						<template #right>
+							<van-button
+								class="right_info"
+								@click="delFinance(item.id)"
+								square
+								type="danger"
+								text="删除"
+							/>
 						</template>
-					</van-cell>
-					<template #right>
-						<van-button
-							class="right_info"
-							@click="delFinance(item.id)"
-							square
-							type="danger"
-							text="删除"
-						/>
-					</template>
-					<van-divider
-						:style="{
-							color: '#1989fa',
-							borderColor: 'grey',
-							padding: '0 16px',
-							'margin-top': '0px',
-							'margin-bottom': '0px',
-						}"
-					>
-					</van-divider>
-				</van-swipe-cell>
-			</van-cell-group>
-		</van-list>
+						<van-divider
+							:style="{
+								color: '#1989fa',
+								borderColor: 'grey',
+								padding: '0 16px',
+								'margin-top': '0px',
+								'margin-bottom': '0px',
+							}"
+						>
+						</van-divider>
+					</van-swipe-cell>
+				</van-cell-group>
+			</van-list>
+		</div>
 	</van-pull-refresh>
 	<van-back-top></van-back-top>
 </template>
@@ -255,6 +264,9 @@ init();
 </script>
 
 <style lang="scss" scoped>
+.refresh-info {
+	height: calc(100% - 64px);
+}
 .right_info {
 	height: 100%;
 }

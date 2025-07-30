@@ -41,9 +41,12 @@ const handleRightClick = () => {
 .content-container {
 	flex: 1;
 	overflow-y: auto;
+	/* 确保有明确的高度限制 */
+	height: 0;
 }
 
 .content-container.with-navbar {
-	height: calc(100vh - 46px); /* 减去NavBar的高度 */
+	/* NavBar存在时，内容区域高度需要减去NavBar高度 */
+	height: calc(100vh - 46px);
 }
 </style>

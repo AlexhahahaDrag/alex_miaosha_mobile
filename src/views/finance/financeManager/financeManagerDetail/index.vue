@@ -1,5 +1,4 @@
 <template>
-	<NavBar :info="info"></NavBar>
 	<van-form @submit="onSubmit" :rules="rulesRef" required="auto">
 		<van-cell-group inset>
 			<van-field
@@ -99,14 +98,20 @@ import {
 	addOrEditFinanceManger,
 	getFinanceMangerDetail,
 } from '@/api/finance/financeManager';
+import { useNavBar } from '@/composables/useNavBar';
 
 let route = useRoute();
 let router = useRouter();
 let userInfo = useUserStore()?.getUserInfo;
-const info = ref<any>({
-	title: route?.meta?.title || '财务明细',
+
+// 使用新的NavBar系统
+useNavBar({
+	title: (route?.meta?.title as string) || '财务明细',
+	rightButton: '新增',
 	leftPath: '/selfFinance/financeManager',
+	visible: true,
 });
+
 let formInfo = ref<any>({});
 
 const label = reactive({

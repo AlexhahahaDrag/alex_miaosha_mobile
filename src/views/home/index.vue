@@ -1,6 +1,5 @@
 <template>
 	<div style="height: calc(100vh - 50px)">
-		<NavBar :info="info"></NavBar>
 		<div style="overflow-y: auto; height: calc(100% - 46px)">
 			<van-grid :column-num="3" :square="true">
 				<van-grid-item
@@ -19,8 +18,18 @@
 </template>
 
 <script setup lang="ts">
+import { useNavBar } from '@/composables/useNavBar';
+
+let route = useRoute();
 let router = useRouter();
 let homeList = ref<any>([]);
+
+// 使用新的NavBar系统
+useNavBar({
+	title: (route?.meta?.title as string) || '财务明细',
+	noShowLeft: true,
+	visible: true,
+});
 
 const getHomeList = (arr: readonly any[] | null) => {
 	if (arr?.length) {
