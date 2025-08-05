@@ -16,6 +16,13 @@ export function useNavBar(config?: NavBarConfig) {
 	const navBarStore = useNavBarStore();
 
 	const setNavBar = (newConfig: NavBarConfig) => {
+		// 如果没有传值则默认为true
+		if (newConfig.noShowLeft === undefined) {
+			newConfig.noShowLeft = false;
+		}
+		if (newConfig.rightButton === undefined) {
+			newConfig.rightButton = '';
+		}
 		// 设置NavBar信息
 		if (newConfig.onRightClick) {
 			navBarStore.setRightClickHandler(newConfig.onRightClick);

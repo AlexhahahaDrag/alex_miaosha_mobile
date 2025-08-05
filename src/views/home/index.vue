@@ -28,6 +28,7 @@ let homeList = ref<any>([]);
 useNavBar({
 	title: (route?.meta?.title as string) || '财务明细',
 	noShowLeft: true,
+	showRight: false,
 	visible: true,
 });
 

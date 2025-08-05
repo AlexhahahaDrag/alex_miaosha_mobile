@@ -131,10 +131,19 @@ import {
 } from './api/index';
 import { type CardItem, type TransactionItem } from './config/index';
 import { formatTime, formatAmount } from '@/views/common/config';
+import { useNavBar } from '@/composables/useNavBar';
 
 // 路由实例
 const router = useRouter();
 const route = useRoute();
+
+// 使用新的NavBar系统
+useNavBar({
+	title: (route?.meta?.title as string) || '财务明细',
+	leftPath: '/',
+	showRight: false,
+	visible: true,
+});
 
 // 加载状态
 const loading = ref<boolean>(true);
