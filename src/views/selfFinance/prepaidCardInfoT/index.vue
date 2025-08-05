@@ -160,7 +160,6 @@ const setCurrentCardIndexByRouteCardId = () => {
 	const { cardId } = route.query;
 	if (cardId && cardList.value.length > 0) {
 		const index = cardList.value.findIndex((card) => card.id === cardId);
-		console.log('1111111111111111111111111111', index, cardList.value);
 		if (index !== -1) {
 			currentCardIndex.value = index;
 		}
@@ -278,9 +277,10 @@ const handleAmount = (type: 'consume' | 'recharge') => {
 
 // 查看更多流水记录
 const handleViewMore = () => {
-	// 除了触发父组件事件，也提供刷新数据的功能
-	refreshData();
-	emit('viewMore');
+	router.push({
+		name: 'prepaidCardInfoTConsumeWaterInfo',
+		query: { cardId: currentCard.value.id },
+	});
 };
 
 // 查看交易详情
