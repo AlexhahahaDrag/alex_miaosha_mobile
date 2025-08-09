@@ -42,3 +42,9 @@ export const formatAmount = (amount: number, type: string): string => {
 		return amount >= 0 ? `+￥${formattedAmount}` : `-￥${formattedAmount}`;
 	}
 };
+
+export interface Pagination {
+	pageNum?: number;
+	pageSize?: number;
+	total?: number;
+}

@@ -1,633 +1,776 @@
 <template>
-	<div class="consume-water-info">
-		<!-- 顶部导航栏 -->
-		<van-nav-bar
-			title="流水记录"
-			left-arrow
-			@click-left="onBack"
-			class="nav-bar"
-		/>
-
-		<!-- 主要内容区域 -->
+	<div class="transaction-history">
+		<!-- Main Content -->
 		<div class="main-content">
-			<!-- 筛选按钮区域 -->
+			<!-- Filter Section -->
 			<div class="filter-section">
-				<div class="filter-buttons">
-					<van-button
-						v-for="(filter, index) in filterOptions"
-						:key="index"
-						:type="activeFilter === filter.value ? 'primary' : 'default'"
-						size="small"
-						round
-						@click="setActiveFilter(filter.value)"
-						class="filter-btn"
-					>
-						{{ filter.label }}
-					</van-button>
-				</div>
-
-				<van-button
-					size="small"
-					type="default"
-					@click="showFilterPopup"
-					class="filter-action-btn"
-				>
-					<van-icon name="filter-o" />
-					筛选
-				</van-button>
-			</div>
-
-			<!-- 交易记录列表 -->
-			<div class="transaction-list">
-				<!-- 空状态 -->
-				<div
-					v-if="!loading && allTransactions.length === 0"
-					class="empty-state"
-				>
-					<van-empty description="暂无交易记录" />
-				</div>
-
-				<!-- 交易记录 -->
-				<div v-else>
-					<div
-						v-for="(group, index) in transactionGroups"
-						:key="index"
-						class="transaction-group"
-					>
-						<div class="date-header">{{ group.date }}</div>
-
-						<div
-							v-for="transaction in group.transactions"
-							:key="transaction.id"
-							class="transaction-item"
+				<div class="filter-container">
+					<div class="filter-buttons">
+						<button
+							class="filter-btn"
+							:class="{ active: activeFilter === 'all' }"
+							@click="handleFilterClick('all')"
 						>
-							<div class="transaction-info">
-								<div class="icon-wrapper">
-									<img
-										:src="transaction.icon"
-										:alt="transaction.category"
-										class="category-icon"
-									/>
-								</div>
-
-								<div class="transaction-details">
-									<div class="merchant-name">{{ transaction.merchant }}</div>
-									<div class="category-info">
-										<van-icon name="location-o" />
-										{{ transaction.category }}
-									</div>
-								</div>
-							</div>
-
-							<div class="transaction-amount">
-								<div class="amount" :class="transaction.type">
-									{{ transaction.amount }}
-								</div>
-								<div class="time">{{ transaction.time }}</div>
-							</div>
-						</div>
+							全部
+						</button>
+						<button
+							class="filter-btn"
+							:class="{ active: activeFilter === 'income' }"
+							@click="handleFilterClick('income')"
+						>
+							收入
+						</button>
+						<button
+							class="filter-btn"
+							:class="{ active: activeFilter === 'expense' }"
+							@click="handleFilterClick('expense')"
+						>
+							支出
+						</button>
+					</div>
+					<div class="filter-icon-btn" @click="openFilterPopup">
+						<van-image :src="filterIcon" width="18" height="18" />
+						<span>筛选</span>
 					</div>
 				</div>
 			</div>
 
-			<!-- 加载更多按钮 -->
-			<div v-if="allTransactions.length > 0" class="load-more">
-				<van-button
-					type="default"
-					size="small"
-					:loading="loading"
-					:disabled="!pagination.hasMore"
-					@click="loadMore"
-					class="load-more-btn"
+			<!-- Vant下拉刷新 + 触底加载 -->
+			<van-pull-refresh v-model="refreshing" @refresh="onRefresh">
+				<van-list
+					v-model:loading="loadingMore"
+					:finished="finished"
+					finished-text="没有更多了"
+					@load="onLoad"
+					:immediate-check="false"
 				>
-					{{ pagination.hasMore ? '加载更多' : '没有更多了' }}
-					<van-icon v-if="!loading && pagination.hasMore" name="arrow-down" />
-				</van-button>
-			</div>
-		</div>
+					<!-- Loading State -->
+					<div v-if="loading" class="loading-container">
+						<div class="loading-text">加载中...</div>
+					</div>
 
-		<!-- 底部操作按钮 -->
-		<div class="bottom-actions">
-			<van-button
-				type="default"
-				size="large"
-				@click="exportBill"
-				class="export-btn"
-			>
-				<van-icon name="down" />
-				导出账单
-			</van-button>
+					<div
+						v-else-if="transactionList?.length === 0"
+						class="empty-container"
+					>
+						<div class="empty-text">暂无交易记录</div>
+					</div>
 
-			<van-button
-				type="primary"
-				size="large"
-				@click="addRecord"
-				class="add-btn"
-			>
-				<van-icon name="plus" />
-				记一笔
-			</van-button>
+					<div v-else class="transaction-list">
+						<div
+							v-for="(transactions, dateGroup) in groupedTransactions"
+							:key="dateGroup"
+							class="date-section"
+						>
+							<h3 class="date-title">{{ dateGroup }}</h3>
+
+							<div
+								v-for="transaction in transactions"
+								:key="transaction.id"
+								class="transaction-item"
+							>
+								<div class="transaction-content">
+									<div class="icon-container">
+										<van-image
+											:src="getCategoryIcon(transaction.cardName)"
+											:alt="transaction.cardName"
+											class="category-icon"
+										/>
+									</div>
+									<div class="transaction-info">
+										<h4 class="merchant-name">
+											{{ transaction.cardName }}
+										</h4>
+										<div class="category-info">
+											<i class="fas fa-circle"></i>
+											<span>{{ transaction.type }}</span>
+										</div>
+									</div>
+								</div>
+								<div class="transaction-amount">
+									<div
+										class="amount"
+										:class="getTransactionTypeClass(transaction.amount)"
+									>
+										{{ formatAmount(transaction.amount) }}
+									</div>
+									<div class="time">
+										{{ formatTime(transaction.consumeTime) }}
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</van-list>
+			</van-pull-refresh>
+
+			<!-- 筛选弹窗：卡片与日期范围 -->
+			<van-popup v-model:show="filterVisible" position="bottom" round>
+				<div class="filter-popup">
+					<van-cell-group inset>
+						<van-cell
+							title="选择卡片"
+							:value="selectedCardName || '全部卡片'"
+							is-link
+							@click="openCardPicker"
+						/>
+						<van-cell
+							title="日期范围"
+							:value="displayDateRange"
+							is-link
+							@click="calendarVisible = true"
+						/>
+					</van-cell-group>
+
+					<div class="filter-actions">
+						<van-button type="default" block class="mr8" @click="resetFilters"
+							>重置</van-button
+						>
+						<van-button type="primary" block @click="applyFilters"
+							>确定</van-button
+						>
+					</div>
+				</div>
+			</van-popup>
+
+			<!-- 卡片选择器 -->
+			<van-popup v-model:show="cardPickerVisible" position="bottom" round>
+				<van-picker
+					:columns="cardColumns"
+					@confirm="onCardConfirm"
+					@cancel="cardPickerVisible = false"
+				/>
+			</van-popup>
+
+			<!-- 日历（日期范围） -->
+			<van-calendar
+				v-model:show="calendarVisible"
+				type="range"
+				@confirm="onCalendarConfirm"
+			/>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue';
-import { showToast, showLoadingToast, closeToast, showFailToast } from 'vant';
-import { useRoute, useRouter } from 'vue-router';
-import { getPrepaidConsumeRecordPage } from '../api/index';
-import { formatTime } from '@/views/common/config';
+import { useNavBar } from '@/composables/useNavBar';
+import { Pagination } from '@/views/common/config';
+import { typeIconMap } from '../config/index';
+import {
+	getConsumeCardRecordPage,
+	type TransactionRecord,
+	type TransactionQueryParams,
+} from '@/api/finance/consumeCardRecord/index';
+import { showFailToast } from 'vant';
+import { getPrepaidCardInfoList } from '../api/index';
+import filterIcon from '@/assets/icons/shop/filter.svg';
 
-// 图标导入
-import cateringIcon from '@/assets/icons/finance/catering-56586a.png';
-import supermarketIcon from '@/assets/icons/finance/supermarket-56586a.png';
-import salaryIcon from '@/assets/icons/finance/salary-56586a.png';
-import transportIcon from '@/assets/icons/finance/transport-56586a.png';
-import onlineShoppingIcon from '@/assets/icons/finance/online-shopping-56586a.png';
-import movieIcon from '@/assets/icons/finance/movie-56586a.png';
-import transferIcon from '@/assets/icons/finance/transfer-56586a.png';
-
-// 路由实例
-const router = useRouter();
 const route = useRoute();
 
-// 定义交易类型
-interface Transaction {
-	id: number;
-	merchant: string;
-	category: string;
-	amount: string;
-	time: string;
-	type: 'income' | 'expense';
-	icon: string;
-	transactionType?: 'CONSUME' | 'RECHARGE';
-	description?: string;
-	createTime?: string;
-	transactionTime?: string;
-	cardId?: number;
-	cardName?: string;
-}
-
-// interface TransactionGroup {
-// 	date: string;
-// 	transactions: Transaction[];
-// }
-
-// 分页相关状态
-const loading = ref(false);
-const pagination = reactive({
-	pageNum: 1,
-	pageSize: 10,
-	total: 0,
-	hasMore: true,
+// 使用新的NavBar系统
+useNavBar({
+	title: (route?.meta?.title as string) || '消费流水记录',
+	leftPath: '/selfFinance/prepaidCardInfoT',
+	showRight: false,
+	visible: true,
 });
 
-// 筛选选项
-const filterOptions = ref([
-	{ label: '全部', value: 'all' },
-	{ label: '收入', value: 'RECHARGE' },
-	{ label: '支出', value: 'CONSUME' },
-]);
+// 响应式数据
+const loading = ref<boolean>(false);
+const loadingMore = ref<boolean>(false);
+const refreshing = ref<boolean>(false); // 下拉刷新状态
+const transactionList = ref<TransactionRecord[]>([]);
+const pagination = ref<Pagination>({ pageNum: 1, pageSize: 10, total: 0 });
+const hasMore = ref<boolean>(true);
+const finished = ref(false); // List组件的完成状态
 
+// 筛选参数
+const filterParams = reactive<TransactionQueryParams>({
+	type: 'all',
+});
+
+// 当前激活的筛选按钮
 const activeFilter = ref('all');
 
-// 原始交易记录数据
-const allTransactions = ref<Transaction[]>([]);
-
-// 根据图标名称获取对应的图标
-const getIconByCategory = (
-	category: string,
-	transactionType?: string,
-): string => {
-	if (transactionType === 'RECHARGE') {
-		return salaryIcon; // 充值统一使用收入图标
-	}
-
-	// 根据分类描述匹配图标
-	if (category?.includes('餐饮') || category?.includes('快餐'))
-		return cateringIcon;
-	if (category?.includes('超市') || category?.includes('购物'))
-		return supermarketIcon;
-	if (category?.includes('工资') || category?.includes('收入'))
-		return salaryIcon;
-	if (category?.includes('交通') || category?.includes('打车'))
-		return transportIcon;
-	if (category?.includes('网购') || category?.includes('淘宝'))
-		return onlineShoppingIcon;
-	if (category?.includes('电影') || category?.includes('娱乐'))
-		return movieIcon;
-	if (category?.includes('转账')) return transferIcon;
-
-	// 默认根据交易类型返回图标
-	return transactionType === 'CONSUME' ? cateringIcon : salaryIcon;
-};
-
-// 格式化金额显示
-const formatAmount = (
-	amount: number | string,
-	transactionType?: string,
-): string => {
-	const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
-	return transactionType === 'CONSUME' ?
-			`-￥${numAmount.toFixed(2)}`
-		:	`+￥${numAmount.toFixed(2)}`;
-};
-
 // 按日期分组的交易记录
-const transactionGroups = computed(() => {
-	// 按日期分组
-	const groups: { [key: string]: Transaction[] } = {};
-
-	allTransactions.value.forEach((transaction) => {
-		const date = transaction.time.split(' ')[0]; // 提取日期部分
+const groupedTransactions = computed(() => {
+	const groups: Record<string, TransactionRecord[]> = {};
+	transactionList.value.forEach((transaction) => {
+		const date = formatDateGroup(transaction.consumeTime);
 		if (!groups[date]) {
 			groups[date] = [];
 		}
 		groups[date].push(transaction);
 	});
-
-	// 转换为数组格式并按日期排序
-	const groupArray = Object.entries(groups).map(([date, transactions]) => ({
-		date: formatDateLabel(date),
-		transactions: transactions.sort(
-			(a, b) => new Date(b.time).getTime() - new Date(a.time).getTime(),
-		),
-	}));
-
-	// 按日期倒序排列
-	return groupArray.sort((a, b) => {
-		const dateA = new Date(a.transactions[0]?.time || '');
-		const dateB = new Date(b.transactions[0]?.time || '');
-		return dateB.getTime() - dateA.getTime();
-	});
+	return groups;
 });
 
-// 格式化日期标签
-const formatDateLabel = (dateStr: string): string => {
+// 格式化日期分组
+function formatDateGroup(dateStr: string): string {
 	const today = new Date();
 	const yesterday = new Date(today);
 	yesterday.setDate(yesterday.getDate() - 1);
-
-	const targetDate = new Date(dateStr);
-
-	if (targetDate.toDateString() === today.toDateString()) {
+	const transactionDate = new Date(dateStr);
+	if (transactionDate.toDateString() === today.toDateString()) {
 		return '今日';
-	} else if (targetDate.toDateString() === yesterday.toDateString()) {
+	} else if (transactionDate.toDateString() === yesterday.toDateString()) {
 		return '昨日';
 	} else {
-		// 返回 MM月DD日 格式
-		const month = targetDate.getMonth() + 1;
-		const day = targetDate.getDate();
-		return `${month.toString().padStart(2, '0')}月${day.toString().padStart(2, '0')}日`;
+		return (
+			transactionDate
+				.toLocaleDateString('zh-CN', {
+					month: '2-digit',
+					day: '2-digit',
+				})
+				.replace('/', '月') + '日'
+		);
 	}
-};
+}
+
+// 格式化金额显示
+function formatAmount(amount: number): string {
+	const prefix = amount >= 0 ? '+' : '-';
+	return `${prefix}￥${Math.abs(amount).toFixed(2)}`;
+}
+
+// 获取交易类型样式类
+function getTransactionTypeClass(amount: number): string {
+	return amount >= 0 ? 'income' : 'expense';
+}
+
+// 格式化时间显示
+function formatTime(dateTimeStr: string): string {
+	const date = new Date(dateTimeStr);
+	return date.toLocaleTimeString('zh-CN', {
+		hour: '2-digit',
+		minute: '2-digit',
+		hour12: false,
+	});
+}
+
+// 获取分类图标
+function getCategoryIcon(type: string): string {
+	return typeIconMap[type] || '';
+}
+
+// ========== 筛选弹窗（卡片与日期范围） ==========
+const filterVisible = ref(false);
+const cardPickerVisible = ref(false);
+const calendarVisible = ref(false);
+
+const cardColumns = ref<Array<{ text: string; value: string | number }>>([
+	{ text: '全部卡片', value: '' },
+]);
+const selectedCardId = ref<string | number | ''>('');
+const selectedCardName = ref<string>('');
+
+const dateRange = ref<{ start?: Date; end?: Date }>({});
+const displayDateRange = computed(() => {
+	if (dateRange.value.start && dateRange.value.end) {
+		return `${formatDate(dateRange.value.start)} 至 ${formatDate(dateRange.value.end)}`;
+	}
+	return '全部日期';
+});
+
+function formatDate(d: Date): string {
+	const y = d.getFullYear();
+	const m = String(d.getMonth() + 1).padStart(2, '0');
+	const day = String(d.getDate()).padStart(2, '0');
+	return `${y}-${m}-${day}`;
+}
+
+function openFilterPopup() {
+	filterVisible.value = true;
+}
+
+async function openCardPicker() {
+	// 懒加载卡片列表
+	if (cardColumns.value.length === 1) {
+		const { code, data, message } = await getPrepaidCardInfoList({});
+		if (code === '200') {
+			const options = (data || []).map((card: any) => ({
+				text: card.cardName || `卡片 ${card.id}`,
+				value: card.id,
+			}));
+			cardColumns.value = [{ text: '全部卡片', value: '' }, ...options];
+		} else {
+			showFailToast(message || '获取卡片列表失败');
+		}
+	}
+	cardPickerVisible.value = true;
+}
+
+function onCardConfirm(payload: any) {
+	const op = payload?.selectedOptions?.[0] || payload;
+	if (op) {
+		selectedCardId.value = op.value ?? '';
+		selectedCardName.value = op.text ?? '';
+	}
+	cardPickerVisible.value = false;
+}
+
+function onCalendarConfirm(values: Date[]) {
+	if (Array.isArray(values) && values.length === 2) {
+		dateRange.value = { start: values[0], end: values[1] };
+	}
+	calendarVisible.value = false;
+}
+
+function resetFilters() {
+	selectedCardId.value = '';
+	selectedCardName.value = '';
+	dateRange.value = {};
+}
+
+function applyFilters() {
+	// 应用筛选条件到查询参数
+	if (selectedCardId.value) {
+		filterParams.cardId = selectedCardId.value as any;
+	} else {
+		delete filterParams.cardId;
+	}
+
+	if (dateRange.value.start && dateRange.value.end) {
+		filterParams.startDate = formatDate(dateRange.value.start);
+		filterParams.endDate = formatDate(dateRange.value.end);
+	} else {
+		delete filterParams.startDate;
+		delete filterParams.endDate;
+	}
+
+	// 重置分页并刷新
+	pagination.value.pageNum = 1;
+	transactionList.value = [];
+	finished.value = false;
+	hasMore.value = true;
+	filterVisible.value = false;
+	fetchTransactionData();
+}
 
 // 获取交易记录数据
-const fetchTransactions = async (isLoadMore = false) => {
-	if (loading.value) return;
-
-	if (!isLoadMore) {
-		pagination.pageNum = 1;
-		pagination.hasMore = true;
-		showLoadingToast({
-			message: '加载中...',
-			forbidClick: true,
-		});
-	}
-
-	loading.value = true;
-
+async function fetchTransactionData(isLoadMore = false) {
 	try {
-		// 构建查询参数
-		const params: any = {};
-
-		// 从路由参数获取 cardId
-		if (route.query.cardId) {
-			params.cardId = route.query.cardId;
-		}
-
-		// 添加筛选条件
-		if (activeFilter.value !== 'all') {
-			params.transactionType = activeFilter.value;
-		}
-
-		const { code, data, message } = await getPrepaidConsumeRecordPage(
-			params,
-			pagination.pageNum,
-			pagination.pageSize,
-		);
-
-		if (code === '200') {
-			const records = data.records || [];
-
-			// 处理交易记录数据
-			const formattedRecords: Transaction[] = records.map((record: any) => ({
-				id: record.id,
-				merchant: record.cardName || record.description || '消费记录',
-				category: getTransactionCategory(record),
-				amount: formatAmount(record.amount, record.transactionType),
-				time: formatTime(record.createTime || record.transactionTime),
-				type: record.transactionType === 'CONSUME' ? 'expense' : 'income',
-				icon: getIconByCategory(record.description, record.transactionType),
-				transactionType: record.transactionType,
-				description: record.description,
-				createTime: record.createTime,
-				transactionTime: record.transactionTime,
-				cardId: record.cardId,
-				cardName: record.cardName,
-			}));
-
-			if (isLoadMore) {
-				allTransactions.value.push(...formattedRecords);
-			} else {
-				allTransactions.value = formattedRecords;
-			}
-
-			// 更新分页信息
-			pagination.total = data.total || 0;
-			pagination.hasMore =
-				records.length === pagination.pageSize &&
-				allTransactions.value.length < pagination.total;
-
-			if (isLoadMore) {
-				pagination.pageNum++;
-			}
+		if (isLoadMore) {
+			loadingMore.value = true;
 		} else {
-			showFailToast(message || '查询失败，请联系管理员!');
+			loading.value = true;
+			pagination.value.pageNum = 1;
+			finished.value = false; // 重置列表完成态，避免阻止后续加载
+		}
+		if (filterParams.type === 'all') {
+			delete filterParams.type;
+		}
+		const { code, data, message } = await getConsumeCardRecordPage(
+			filterParams,
+			pagination.value.pageNum,
+			pagination.value.pageSize,
+		);
+		if (code === '200') {
+			if (isLoadMore) {
+				transactionList.value.push(...data.records);
+			} else {
+				transactionList.value = data.records;
+			}
+			pagination.value.total = data.total || 0;
+			hasMore.value =
+				transactionList.value.length < (pagination.value.total || 0);
+			finished.value = !hasMore.value; // 同步finished，防止List误判一直加载
+		} else {
+			pagination.value.total = 0;
+			hasMore.value = false;
+			finished.value = true;
+			showFailToast(message || '查询失败，请联系管理员');
 		}
 	} catch (error) {
-		console.error('获取交易记录失败', error);
-		showFailToast('获取数据失败，请重试');
+		pagination.value.total = 0;
+		hasMore.value = false;
+		finished.value = true;
+		console.error('获取交易记录失败:', error);
 	} finally {
 		loading.value = false;
-		closeToast();
+		loadingMore.value = false;
 	}
-};
+}
 
-// 获取交易分类描述
-const getTransactionCategory = (record: any): string => {
-	if (record.transactionType === 'RECHARGE') {
-		return '收入 · 充值';
-	}
-
-	// 根据描述生成分类信息
-	const description = record.description || '';
-	if (description.includes('餐饮')) return '餐饮 · 快餐';
-	if (description.includes('超市')) return '购物 · 超市';
-	if (description.includes('交通')) return '交通 · 打车';
-	if (description.includes('网购')) return '购物 · 网购';
-	if (description.includes('电影')) return '娱乐 · 电影';
-	if (description.includes('转账')) return '收入 · 转账';
-
-	return record.transactionType === 'CONSUME' ? '支出 · 其他' : '收入 · 其他';
-};
-
-// 方法定义
-const onBack = () => {
-	router.back();
-};
-
-const setActiveFilter = (value: string) => {
-	activeFilter.value = value;
-	const label = filterOptions.value.find((f) => f.value === value)?.label;
-	showToast(`切换到${label}`);
-
+// 筛选按钮点击
+function handleFilterClick(type: 'all' | 'income' | 'expense') {
+	activeFilter.value = type;
+	filterParams.type = type;
+	// 重置状态
+	pagination.value.pageNum = 1;
+	finished.value = false;
+	transactionList.value = [];
 	// 重新加载数据
-	fetchTransactions(false);
-};
+	fetchTransactionData();
+}
 
-const showFilterPopup = () => {
-	showToast('显示筛选弹窗');
-};
-
-const loadMore = () => {
-	if (pagination.hasMore && !loading.value) {
-		fetchTransactions(true);
-	} else {
-		showToast('没有更多数据了');
+// 下拉刷新
+async function onRefresh() {
+	refreshing.value = true;
+	pagination.value.pageNum = 1;
+	finished.value = false;
+	try {
+		await fetchTransactionData(false);
+	} catch (error) {
+		console.error('刷新失败:', error);
+		showFailToast('刷新失败，请稍后重试');
+	} finally {
+		refreshing.value = false;
 	}
+}
+
+// 触底加载更多
+async function onLoad() {
+	// 标记开始加载更多
+	loadingMore.value = true;
+	if (!hasMore.value) {
+		finished.value = true;
+		loadingMore.value = false;
+		return;
+	}
+	pagination.value?.pageNum ? pagination.value.pageNum++ : 0;
+	try {
+		await fetchTransactionData(true);
+	} catch (error) {
+		console.error('加载更多失败:', error);
+		showFailToast('加载失败，请稍后重试');
+		pagination.value?.pageNum ? pagination.value.pageNum-- : 0; // 回退页码
+	} finally {
+		// 结束加载更多
+		loadingMore.value = false;
+	}
+}
+
+// 初始化
+const init = () => {
+	filterParams.cardId = route.query.cardId as string;
 };
 
-const exportBill = () => {
-	showToast('导出账单功能开发中');
-};
-
-const addRecord = () => {
-	// 跳转到记录添加页面，传递 cardId
-	router.push({
-		name: 'prepaidCardInfoTConsumeInfo',
-		query: {
-			type: 'consume',
-			cardId: route.query.cardId,
-		},
-	});
-};
+init();
 
 // 组件挂载时获取数据
 onMounted(() => {
-	fetchTransactions(false);
+	fetchTransactionData();
 });
 </script>
 
-<style lang="scss" scoped>
-.consume-water-info {
-	background: #f2f3f5;
+<style lang="less" scoped>
+.transaction-history {
+	width: 100%;
 	min-height: 100vh;
+	position: relative;
+}
 
-	.nav-bar {
-		background: #fff;
-		box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
-	}
+.header {
+	background: #ffffff;
+	box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
 
-	.main-content {
-		padding: 20px 16px 100px;
+	.header-container {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 12px 16px;
+		gap: 122px;
 
-		.filter-section {
-			background: #fff;
-			border-radius: 12px;
-			padding: 16px;
-			margin-bottom: 24px;
-			box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.05);
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			gap: 84px;
-
-			.filter-buttons {
-				display: flex;
-				gap: 8px;
-
-				.filter-btn {
-					&:deep(.van-button--primary) {
-						background: #ff7d00;
-						border-color: #ff7d00;
-						color: #fff;
-					}
-
-					&:deep(.van-button--default) {
-						background: #f2f3f5;
-						border-color: #f2f3f5;
-						color: #1d2129;
-					}
-				}
-			}
-
-			.filter-action-btn {
-				&:deep(.van-button) {
-					background: #f2f3f5;
-					border-color: #f2f3f5;
-					color: #1d2129;
-				}
-
-				.van-icon {
-					margin-right: 4px;
-				}
+		.back-button {
+			i {
+				font-size: 20px;
+				color: #1d2129;
 			}
 		}
 
-		.transaction-list {
-			display: flex;
-			flex-direction: column;
-			gap: 16px;
+		.title {
+			h1 {
+				font-family: Arial;
+				font-size: 18px;
+				font-weight: 400;
+				line-height: 1.56;
+				color: #1d2129;
+				margin: 0;
+			}
+		}
+	}
+}
 
-			.empty-state {
-				padding: 40px 0;
+.main-content {
+	padding: 10px;
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+	background: linear-gradient(to bottom, #f2f3f5, #f2f3f5);
+}
+
+.filter-section {
+	background: #ffffff;
+	border-radius: 12px;
+	padding: 16px;
+	box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.05);
+
+	.filter-container {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 4px;
+
+		.filter-buttons {
+			display: flex;
+			gap: 8px;
+
+			.filter-btn {
+				padding: 8px 16px;
+				border-radius: 8px;
+				border: none;
+				font-family: Arial;
+				font-size: 14px;
+				font-weight: 400;
+				line-height: 1.43;
 				text-align: center;
-			}
+				cursor: pointer;
 
-			.transaction-group {
-				.date-header {
-					font-size: 14px;
-					color: #86909c;
-					margin-bottom: 8px;
+				&.active {
+					background: #ff7d00;
+					color: #ffffff;
 				}
 
-				.transaction-item {
-					background: #fff;
-					border-radius: 12px;
-					padding: 16px;
-					margin-bottom: 8px;
-					box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.05);
-					display: flex;
-					justify-content: space-between;
-					align-items: center;
-
-					.transaction-info {
-						display: flex;
-						align-items: center;
-
-						.icon-wrapper {
-							margin-right: 12px;
-
-							.category-icon {
-								width: 40px;
-								height: 40px;
-								border-radius: 8px;
-							}
-						}
-
-						.transaction-details {
-							.merchant-name {
-								font-size: 16px;
-								color: #1d2129;
-								font-weight: 400;
-								line-height: 24px;
-							}
-
-							.category-info {
-								display: flex;
-								align-items: center;
-								font-size: 14px;
-								color: #86909c;
-								margin-top: 4px;
-
-								.van-icon {
-									margin-right: 4px;
-									font-size: 14px;
-								}
-							}
-						}
-					}
-
-					.transaction-amount {
-						text-align: right;
-
-						.amount {
-							font-size: 16px;
-							font-weight: 400;
-							line-height: 24px;
-
-							&.income {
-								color: #00b42a;
-							}
-
-							&.expense {
-								color: #f53f3f;
-							}
-						}
-
-						.time {
-							font-size: 12px;
-							color: #86909c;
-							margin-top: 4px;
-						}
-					}
+				&:not(.active) {
+					background: #f2f3f5;
+					color: #1d2129;
 				}
 			}
 		}
 
-		.load-more {
+		.filter-icon-btn {
 			display: flex;
-			justify-content: center;
-			padding-top: 8px;
+			align-items: center;
+			gap: 4px;
+			cursor: pointer;
 
-			.load-more-btn {
-				&:deep(.van-button) {
-					border: 1px solid #e5e7eb;
-					color: #1d2129;
-					background: transparent;
-				}
+			i {
+				font-size: 14px;
+				color: #1d2129;
+			}
 
-				.van-icon {
-					margin-left: 4px;
-				}
+			span {
+				font-family: Arial;
+				font-size: 14px;
+				font-weight: 400;
+				line-height: 1.43;
+				color: #1d2129;
 			}
 		}
 	}
+}
 
-	.bottom-actions {
-		position: fixed;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		background: #fff;
-		border-top: 1px solid #f3f4f6;
-		padding: 13px 16px 12px;
+.transaction-list {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.date-section {
+	.date-title {
+		font-family: Arial;
+		font-size: 14px;
+		font-weight: 400;
+		line-height: 1.43;
+		color: #86909c;
+		margin: 0 0 16px 0;
+	}
+
+	.transaction-item {
+		background: #ffffff;
+		border-radius: 12px;
+		padding: 16px;
+		margin-bottom: 6px;
+		box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.05);
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+
+		.transaction-content {
+			display: flex;
+			align-items: center;
+
+			.icon-container {
+				margin-right: 12px;
+
+				.category-icon {
+					width: 40px;
+					height: 40px;
+					border-radius: 8px;
+				}
+			}
+
+			.transaction-info {
+				.merchant-name {
+					font-family: Arial;
+					font-size: 16px;
+					font-weight: 400;
+					line-height: 1.5;
+					color: #1d2129;
+					margin: 0 0 4px 0;
+				}
+
+				.category-info {
+					display: flex;
+					align-items: center;
+					gap: 4px;
+
+					i {
+						font-size: 14px;
+						color: #86909c;
+					}
+
+					span {
+						font-family: Arial;
+						font-size: 14px;
+						font-weight: 400;
+						line-height: 1.43;
+						color: #86909c;
+					}
+				}
+			}
+		}
+
+		.transaction-amount {
+			text-align: right;
+
+			.amount {
+				font-family: Arial;
+				font-size: 16px;
+				font-weight: 400;
+				line-height: 1.5;
+				margin-bottom: 4px;
+
+				&.expense {
+					color: #f53f3f;
+				}
+
+				&.income {
+					color: #00b42a;
+				}
+			}
+
+			.time {
+				font-family: Arial;
+				font-size: 12px;
+				font-weight: 400;
+				line-height: 1.33;
+				color: #86909c;
+			}
+		}
+	}
+}
+
+.load-more-container {
+	display: flex;
+	justify-content: center;
+	padding-top: 8px;
+
+	.load-more-btn {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 9px 25px;
+		border: 1px solid #e5e7eb;
+		border-radius: 8px;
+		background: transparent;
+		cursor: pointer;
+
+		span {
+			font-family: Arial;
+			font-size: 14px;
+			font-weight: 400;
+			line-height: 1.43;
+			color: #1d2129;
+		}
+
+		i {
+			font-size: 12px;
+			color: #1d2129;
+		}
+	}
+}
+
+.loading-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 40px 0;
+
+	.loading-text {
+		font-family: Arial;
+		font-size: 14px;
+		color: #86909c;
+	}
+}
+
+.empty-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: calc(100vh - 200px);
+	padding: 60px 0;
+
+	.empty-text {
+		font-family: Arial;
+		font-size: 14px;
+		color: #86909c;
+	}
+}
+
+.load-more-btn {
+	&:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+}
+
+.bottom-actions {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background: #ffffff;
+	border-top: 1px solid #f3f4f6;
+	padding: 13px 16px 12px;
+
+	.action-container {
 		display: flex;
 		justify-content: space-between;
 		gap: 136px;
 
-		.export-btn {
-			&:deep(.van-button) {
+		.action-btn {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			padding: 8px 16px;
+			border-radius: 8px;
+			border: none;
+			cursor: pointer;
+
+			&.secondary {
 				background: #f2f3f5;
-				border-color: #f2f3f5;
 				color: #1d2129;
+				padding: 8px 16px;
 			}
 
-			.van-icon {
-				margin-right: 8px;
-			}
-		}
-
-		.add-btn {
-			&:deep(.van-button) {
+			&.primary {
 				background: #ff7d00;
-				border-color: #ff7d00;
+				color: #ffffff;
+				padding: 8px 24px;
 				box-shadow: 0px 2px 8px 0px rgba(245, 63, 63, 0.2);
 			}
 
-			.van-icon {
-				margin-right: 8px;
+			i {
+				font-size: 14px;
+			}
+
+			span {
+				font-family: Arial;
+				font-size: 14px;
+				font-weight: 400;
+				line-height: 1.43;
 			}
 		}
 	}
