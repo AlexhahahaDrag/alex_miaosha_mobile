@@ -1,10 +1,10 @@
 <template>
 	<div class="layout-container">
 		<!-- 全局NavBar -->
-		<NavBar
+		<nav-bar
 			v-if="navBarStore.getNavBarInfo.visible"
 			:info="navBarStore.getNavBarInfo"
-			@clickRight="handleRightClick"
+			@click-right="handleRightClick"
 		/>
 
 		<!-- 页面内容 -->

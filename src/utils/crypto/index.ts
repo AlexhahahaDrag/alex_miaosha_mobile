@@ -9,11 +9,11 @@ export function decrypt(word: string) {
 	const base64 = CryptoJS.enc.Base64.parse(word);
 	const src = CryptoJS.enc.Base64.stringify(base64);
 	const decrypt = CryptoJS.AES.decrypt(src, key, {
-		iv: iv,
+		iv,
 		mode: CryptoJS.mode.CBC,
 		padding: CryptoJS.pad.Pkcs7,
 	});
 
-	let decryptedStr = CryptoJS.enc.Utf8.stringify(decrypt).toString();
+	const decryptedStr = CryptoJS.enc.Utf8.stringify(decrypt).toString();
 	return JSON.parse(JSON.parse(decryptedStr));
 }

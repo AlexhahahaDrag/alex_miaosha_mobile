@@ -1,5 +1,8 @@
 <template>
-	<NavBar :info="info" @clickRight="addShopFinance"></NavBar>
+	<NavBar
+		:info="info"
+		@click-right="addShopFinance"
+	></NavBar>
 	<van-pull-refresh
 		pulling-text="加载中。。。"
 		:style="{ height: 'calc(100% - 44px)' }"
@@ -25,7 +28,10 @@
 				borderColor: 'grey',
 			}"
 		></van-divider>
-		<van-empty v-if="dataSource.length == 0" description="暂无数据"></van-empty>
+		<van-empty
+			v-if="dataSource.length == 0"
+			description="暂无数据"
+		></van-empty>
 		<van-list
 			v-else
 			v-model:loading="loading"
@@ -41,9 +47,7 @@
 				>
 					<van-cell
 						:title-class="item.isValid == '1' ? 'validClass' : 'notValidClass'"
-						:title="
-							item.shopName + (item?.saleNum ? '(' + item.saleNum + '件)' : '')
-						"
+						:title="item.shopName + (item?.saleNum ? '(' + item.saleNum + '件)' : '')"
 						:key="index"
 						is-link
 						:to="{
@@ -59,10 +63,7 @@
 									:key="index"
 								>
 									<SvgIcon
-										v-if="
-											item.payWay?.indexOf(fromSource.value) >= 0 &&
-											fromSource.value != ''
-										"
+										v-if="item.payWay?.indexOf(fromSource.value) >= 0 && fromSource.value != ''"
 										:name="fromSource.label"
 										class="svg"
 									></SvgIcon>
@@ -73,26 +74,12 @@
 							<div class="text-right">
 								<div style="display: flex">
 									<div class="van-ellipsis">
-										{{
-											item?.saleDate ?
-												String(item?.saleDate).substring(0, 10)
-											:	'--'
-										}}
+										{{ item?.saleDate ? String(item?.saleDate).substring(0, 10) : '--' }}
 									</div>
 								</div>
-								<div
-									:class="
-										item.incomeAndExpenses === 'income' ?
-											'rightGreenDiv'
-										:	'rightRedDiv'
-									"
-								>
+								<div :class="item.incomeAndExpenses === 'income' ? 'rightGreenDiv' : 'rightRedDiv'">
 									{{
-										item?.saleAmount ?
-											(item?.incomeAndExpenses === 'income' ?
-												item?.saleAmount
-											:	-item?.saleAmount) + '元'
-										:	'--'
+										item?.saleAmount ? (item?.incomeAndExpenses === 'income' ? item?.saleAmount : -item?.saleAmount) + '元' : '--'
 									}}
 								</div>
 							</div>
@@ -123,31 +110,26 @@
 	<van-back-top></van-back-top>
 </template>
 <script lang="ts" setup>
-import {
-	getShopFinancePage,
-	deleteShopFinance,
-} from '@/api/finance/shopFinance/shopFinanceTs';
-import {
-	SearchInfo,
-	pagination,
-	pageInfo,
-	fromSourceTransferList,
-} from './shopFinanceTs';
 import { showSuccessToast, showFailToast } from 'vant';
+import type { SearchInfo } from './shopFinanceTs';
+import { pagination, fromSourceTransferList } from './shopFinanceTs';
+import { getShopFinancePage, deleteShopFinance } from '@/api/finance/shopFinance/shopFinanceTs';
+import type { PageInfo } from '@/views/common/config/index';
 
-let router = useRouter();
-let route = useRoute();
+const router = useRouter();
+const route = useRoute();
 const info = ref<any>({
 	title: route?.meta?.title || '店财务管理',
 	rightButton: '新增',
 	leftPath: '/',
 });
-let loading = ref<boolean>(false);
-let dataSource = ref<any[]>([]);
-let searchInfo = ref<SearchInfo>({});
 
-let finished = ref<boolean>(false); //加载是否已经没有更多数据
-let isRefresh = ref<boolean>(false); //是否下拉刷新
+const loading = ref<boolean>(false);
+const dataSource = ref<any[]>([]);
+const searchInfo = ref<SearchInfo>({});
+
+const finished = ref<boolean>(false); //加载是否已经没有更多数据
+const isRefresh = ref<boolean>(false); //是否下拉刷新
 
 const onSearch = () => {
 	pagination.value.current = 1;
@@ -162,29 +144,25 @@ const onCancel = () => {
 	query(searchInfo.value, pagination.value);
 };
 
-function query(param: SearchInfo, cur: pageInfo) {
+async function query(param: SearchInfo, cur: PageInfo) {
 	loading.value = true;
-	getShopFinancePage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
-		.then((res: any) => {
-			if (res?.code == '200') {
-				dataSource.value = [...dataSource.value, ...res.data.records];
-				pagination.value.current = res.data.current + 1;
-				pagination.value.pageSize = res.data.size;
-				pagination.value.total = res.data.total;
-				if (
-					(pagination.value.total || 0) <
-					(pagination.value.current || 1) * (pagination.value.pageSize || 10)
-				) {
-					finished.value = true;
-				}
-			} else {
-				showFailToast(res?.message || '查询列表失败！');
-			}
-		})
-		.finally(() => {
-			isRefresh.value = false;
-			loading.value = false;
-		});
+	const { code, data, message } = await getShopFinancePage(
+		param,
+		cur?.current ? cur.current : 1,
+		cur?.pageSize || 10,
+	).finally(() => {
+		isRefresh.value = false;
+		loading.value = false;
+	});
+
+	if (code == '200') {
+		dataSource.value = [...dataSource.value, ...data.records];
+		pagination.value.current = data.current + 1;
+		pagination.value.pageSize = data.size;
+		pagination.value.total = data.total;
+	} else {
+		showFailToast(message || '查询列表失败！');
+	}
 }
 
 const addShopFinance = () => {
@@ -206,7 +184,7 @@ const beforeClose = (e: any) => {
 };
 
 const delShopFinance = (id: number) => {
-	deleteShopFinance(id + '').then((res: any) => {
+	deleteShopFinance(`${id}`).then((res: any) => {
 		if (res?.code == '200') {
 			refresh();
 			showSuccessToast(res?.message || '删除成功！');

@@ -2,8 +2,7 @@
 	<van-row gutter="20">
 		<div class="mainGrid">
 			<div class="div2">
-				<pie-chart
-					title="店铺资金分布"
+				<pie-chart title="店铺资金分布"
 					height="100%"
 					width="100%"
 					:data="pieShopData"
@@ -14,8 +13,7 @@
 		<van-divider />
 		<div class="mainGrid">
 			<div class="div2">
-				<pie-chart
-					title="当月收入支付方式"
+				<pie-chart title="当月收入支付方式"
 					height="100%"
 					width="100%"
 					:data="piePayWayData"
@@ -27,9 +25,11 @@
 </template>
 
 <script lang="ts" setup>
-import { getAllAmount } from '@/api/finance/shopStockAnalysis';
 import { showNotify } from 'vant';
-import { ItemInfo } from './common';
+
+import type { ItemInfo } from './common';
+
+import { getAllAmount } from '@/api/finance/shopStockAnalysis';
 
 interface Props {
 	activeTab: number | string;
@@ -37,15 +37,15 @@ interface Props {
 	belongTo?: number | null;
 }
 
-let props = defineProps<Props>();
+const props = defineProps<Props>();
 
-let pieShopData = ref<object[]>([]);
+const pieShopData = ref<object[]>([]);
 
 const getAllAmountInfo = () => {
 	getAllAmount().then((res: { code: string; data: any[]; message: any }) => {
 		if (res.code == '200') {
 			if (res.data) {
-				let shop: ItemInfo[] = [];
+				const shop: ItemInfo[] = [];
 				res.data.forEach((item: { typeName: any; amount: any }) => {
 					shop.push({ name: item.typeName, value: item.amount });
 				});
@@ -60,7 +60,7 @@ const getAllAmountInfo = () => {
 	});
 };
 
-let piePayWayData = ref<object[]>([]);
+const piePayWayData = ref<object[]>([]);
 
 // const getPayWayInfoInfo = (dateStr: string) => {
 //   getPayWayInfo(dateStr).then((res: { code: string; data: any[]; message: any }) => {

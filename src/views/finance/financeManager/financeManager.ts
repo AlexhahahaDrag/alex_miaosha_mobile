@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { type PageInfo } from '@/views/common/config/index';
 
 export interface SearchInfo {
 	name?: string;
@@ -14,20 +14,7 @@ export interface SearchInfo {
 	bigTypeCode?: string;
 }
 
-export interface pageInfo {
-	current?: number;
-	pageSize?: number;
-	total?: number;
-	showTotal: Function;
-	showSizeChanger: boolean;
-	pageSizeOptions: string[];
-	showSizeChange: Function;
-	size: string;
-	showQuickJumper: boolean;
-	defaultPageSize: number;
-}
-
-export let pagination = ref<pageInfo>({
+export const pagination = ref<PageInfo>({
 	// 数据总数
 	total: 50,
 	// 当前页数
@@ -52,72 +39,6 @@ export let pagination = ref<pageInfo>({
 	//默认条数
 	defaultPageSize: 10,
 });
-
-export const columns = [
-	// {
-	//   title: "id",
-	//   dataIndex: "id",
-	//   key: "id",
-	// },
-	{
-		title: '名称',
-		dataIndex: 'name',
-		key: 'name',
-		// width: '6',
-	},
-	{
-		title: '类别',
-		dataIndex: 'typeCode',
-		key: 'typeCode',
-		// width: '4',
-	},
-	{
-		title: '金额',
-		dataIndex: 'amount',
-		key: 'amount',
-		align: 'center',
-		// width: '4',
-	},
-	{
-		title: '支付方式',
-		dataIndex: 'fromSource',
-		align: 'center',
-		// width: '4',
-		key: 'fromSource',
-	},
-	{
-		title: '收支类型',
-		dataIndex: 'incomeAndExpenses',
-		align: 'center',
-		// width: '4',
-		key: 'incomeAndExpenses',
-	},
-	{
-		title: '属于',
-		dataIndex: 'belongToName',
-		// width: '4',
-		key: 'belongToName',
-	},
-	{
-		title: '状态',
-		dataIndex: 'isValid',
-		align: 'center',
-		// width: '4',
-		key: 'isValid',
-	},
-	{
-		title: '业务时间',
-		dataIndex: 'infoDate',
-		key: 'infoDate',
-		// width: '15',
-	},
-	{
-		title: '操作',
-		key: 'operation',
-		// fixed: 'right',
-		width: '8',
-	},
-];
 
 export interface DataItem {
 	name: string;

@@ -1,5 +1,9 @@
 <template>
-	<van-tabs v-model:active="activeTab" sticky swipeable @change="changeTab">
+	<van-tabs v-model:active="activeTab"
+		sticky
+		swipeable
+		@change="changeTab"
+	>
 		<van-tab title="test1" name="1">
 			<test1 v-bind="props"></test1>
 		</van-tab>
@@ -21,9 +25,9 @@ import test2 from './test2/index.vue';
 import test3 from './test3/index.vue';
 import test4 from './test4/index.vue';
 
-let activeTab = ref<number>(1);
+const activeTab = ref<number>(1);
 
-let props = reactive<any>({
+const props = reactive<any>({
 	activeTab: activeTab.value,
 });
 

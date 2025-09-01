@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { barItem } from '@/views/model/chart/bar';
+import type { barItem } from '@/views/model/chart/bar';
 
 const props = defineProps({
 	config: {
@@ -33,7 +33,7 @@ const props = defineProps({
 });
 
 const setOption = (data: any[]) => {
-	let { xAxis, yTitle, yNameGap, tooltip, color, xTile } = props.config;
+	const { xAxis, yTitle, yNameGap, tooltip, color, xTile } = props.config;
 	if (data) {
 		options.value = {
 			title: {
@@ -89,15 +89,15 @@ const setOption = (data: any[]) => {
 			series: [
 				{
 					type: 'line',
-					data: data,
+					data,
 					smooth: true,
 					showSymbol: 0,
 					itemStyle: {
 						normal: {
-							color: color,
+							color,
 							lineStyle: {
 								type: 'line',
-								color: color,
+								color,
 							},
 						},
 					},

@@ -1,5 +1,8 @@
 <template>
-	<NavBar :info="info" @clickRight="addAccountRecordInfo"></NavBar>
+	<NavBar
+		:info="info"
+		@click-right="addAccountRecordInfo"
+	></NavBar>
 	<van-pull-refresh
 		pulling-text="加载中。。。"
 		:style="{ height: 'calc(100% - 44px)' }"
@@ -18,7 +21,10 @@
 				borderColor: 'grey',
 			}"
 		></van-divider>
-		<van-empty v-if="dataSource.length == 0" description="暂无数据" />
+		<van-empty
+			v-if="dataSource.length == 0"
+			description="暂无数据"
+		/>
 		<van-list
 			v-else
 			v-model:loading="loading"
@@ -43,7 +49,10 @@
 					>
 						<template #label>
 							<div style="margin-top: 0px; display: flex">
-								<div class="icon" style="background-color: #ffcc00">
+								<div
+									class="icon"
+									style="background-color: #ffcc00"
+								>
 									{{ item.fromSource }}
 								</div>
 							</div>
@@ -55,11 +64,7 @@
 										class="van-ellipsis"
 										style="width: 130px; text-align: right"
 									>
-										{{
-											item?.avliDate ?
-												String(item.avliDate).substring(0, 10)
-											:	'--'
-										}}
+										{{ item?.avliDate ? String(item.avliDate).substring(0, 10) : '--' }}
 									</div>
 								</div>
 								<div class="rightRedDiv">
@@ -93,27 +98,26 @@
 	<van-back-top></van-back-top>
 </template>
 <script lang="ts" setup>
-import {
-	getAccountRecordInfoPage,
-	deleteAccountRecordInfo,
-} from '@/api/finance/accountRecordInfo/accountRecordInfoTs';
-import { getUserManagerList } from '@/api/user/userManager';
-import { SearchInfo, pagination, pageInfo } from './accountRecordInfoTs';
 import { showSuccessToast, showFailToast } from 'vant';
+import type { SearchInfo } from './accountRecordInfoTs';
+import { pagination } from './accountRecordInfoTs';
+import { getAccountRecordInfoPage, deleteAccountRecordInfo } from '@/api/finance/accountRecordInfo/accountRecordInfoTs';
+import { getUserManagerList } from '@/api/user/userManager';
+import type { PageInfo } from '@/views/common/config/index';
 
-let router = useRouter();
-let route = useRoute();
+const router = useRouter();
+const route = useRoute();
 const info = ref<any>({
 	title: route?.meta?.title || '账号管理',
 	rightButton: '新增',
 	leftPath: '/',
 });
-let loading = ref<boolean>(false);
-let dataSource = ref<any[]>([]);
-let searchInfo = ref<SearchInfo>({});
+const loading = ref<boolean>(false);
+const dataSource = ref<any[]>([]);
+const searchInfo = ref<SearchInfo>({});
 
-let finished = ref<boolean>(false); //加载是否已经没有更多数据
-let isRefresh = ref<boolean>(false); //是否下拉刷新
+const finished = ref<boolean>(false); //加载是否已经没有更多数据
+const isRefresh = ref<boolean>(false); //是否下拉刷新
 
 // const onSearch = () => {
 //  pagination.value.current = 1;
@@ -124,13 +128,9 @@ let isRefresh = ref<boolean>(false); //是否下拉刷新
 //   searchInfo.value.typeCode = '';
 // };
 
-function query(param: SearchInfo, cur: pageInfo) {
+async function query(param: SearchInfo, cur: PageInfo) {
 	loading.value = true;
-	getAccountRecordInfoPage(
-		param,
-		cur?.current ? cur.current : 1,
-		cur?.pageSize || 10,
-	)
+	getAccountRecordInfoPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
 		.then((res: any) => {
 			if (res.code == '200') {
 				dataSource.value = [...dataSource.value, ...res.data.records];
@@ -140,9 +140,7 @@ function query(param: SearchInfo, cur: pageInfo) {
 				if (
 					!pagination.value?.total ||
 					(pagination.value.total &&
-						pagination.value.total <
-							(pagination.value.current || 1) *
-								(pagination.value.pageSize || 10))
+						pagination.value.total < (pagination.value.current || 1) * (pagination.value.pageSize || 10))
 				) {
 					finished.value = true;
 				}
@@ -162,7 +160,7 @@ const addAccountRecordInfo = () => {
 	});
 };
 
-let userMap = {};
+const userMap = {};
 function getUserInfoList() {
 	getUserManagerList({}).then((res) => {
 		if (res.code == '200') {
@@ -192,7 +190,7 @@ const beforeClose = (e: any) => {
 };
 
 const delAccountRecordInfo = (id: number) => {
-	deleteAccountRecordInfo(id + '').then((res: any) => {
+	deleteAccountRecordInfo(`${id}`).then((res: any) => {
 		if (res?.code == '200') {
 			refresh();
 			showSuccessToast((res && res.message) || '删除成功！');

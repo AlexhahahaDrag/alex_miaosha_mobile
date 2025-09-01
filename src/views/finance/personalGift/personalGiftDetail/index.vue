@@ -1,6 +1,10 @@
 <template>
 	<navBar :info="info"></navBar>
-	<van-form @submit="onSubmit" :rules="rulesRef" required="auto">
+	<van-form
+		@submit="onSubmit"
+		:rules="rulesRef"
+		required="auto"
+	>
 		<van-cell-group>
 			<van-field
 				v-model="formInfo.eventName"
@@ -62,17 +66,22 @@
 			/>
 			<selectPop
 				:info="popInfo"
-				@selectInfo="selectInfo"
-				@cancelInfo="cancelInfo"
+				@select-info="selectInfo"
+				@cancel-info="cancelInfo"
 			></selectPop>
 			<datePop
 				:info="chooseDateInfo"
-				@selectInfo="selectDateInfo"
-				@cancelInfo="cancelDateInfo"
+				@select-info="selectDateInfo"
+				@cancel-info="cancelDateInfo"
 			></datePop>
 		</van-cell-group>
 		<div class="subButton">
-			<van-button round block type="primary" native-type="submit">
+			<van-button
+				round
+				block
+				type="primary"
+				native-type="submit"
+			>
 				提交
 			</van-button>
 		</div>
@@ -80,30 +89,27 @@
 </template>
 
 <script setup lang="ts">
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
-import {
-	addOrEditPersonalGift,
-	getPersonalGiftDetail,
-} from '@/api/finance/personalGift/personalGiftTs';
-import { Info } from '@/views/common/pop/selectPop.vue';
-import { getDictList } from '@/api/finance/dict/dictManager';
 import { label, rulesRef } from './personalGiftDetailTs';
+import { addOrEditPersonalGift, getPersonalGiftDetail } from '@/api/finance/personalGift/personalGiftTs';
+import type { Info } from '@/views/common/pop/selectPop.vue';
+import { getDictList } from '@/api/finance/dict/dictManager';
 
-let route = useRoute();
-let router = useRouter();
+const route = useRoute();
+const router = useRouter();
 const info = ref<any>({
 	title: route?.meta?.title || '个人随礼信息表',
 	leftPath: '/selfFinance/personalGift',
 });
 
-let formInfo = ref<any>({});
+const formInfo = ref<any>({});
 
-let popInfo = ref<Info>({ showFlag: false });
+const popInfo = ref<Info>({ showFlag: false });
 
-let actionName = ref<string>('');
+const actionName = ref<string>('');
 
-let actionInfo = ref<Info>({
+const actionInfo = ref<Info>({
 	label: 'action',
 	labelName: label.action,
 	rule: rulesRef.action,
@@ -137,12 +143,7 @@ const cancelInfo = () => {
 	popInfo.value.showFlag = false;
 };
 
-const getListName = (
-	list: any[],
-	value: any,
-	code: string,
-	name: string,
-): string => {
+const getListName = (list: any[], value: any, code: string, name: string): string => {
 	if (!list?.length) {
 		return '';
 	}
@@ -157,22 +158,15 @@ const getListName = (
 
 const getDictInfoList = (res: any): void => {
 	if (res?.code == '200') {
-		actionInfo.value.list = res.data.filter(
-			(item: { belongTo: string }) => item.belongTo == 'gift_action',
-		);
-		actionName.value = getListName(
-			actionInfo.value.list || [],
-			formInfo.value.action,
-			'typeCode',
-			'typeName',
-		);
+		actionInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'gift_action');
+		actionName.value = getListName(actionInfo.value.list || [], formInfo.value.action, 'typeCode', 'typeName');
 	} else {
 		showFailToast(res?.message || '查询失败，请联系管理员!');
 	}
 };
 
-let eventTimeName = ref<string>('');
-let eventTimeInfo = ref<any>({
+const eventTimeName = ref<string>('');
+const eventTimeInfo = ref<any>({
 	label: 'eventTime',
 	labelName: '随礼时间',
 	rule: rulesRef.eventTime,
@@ -192,7 +186,7 @@ let eventTimeInfo = ref<any>({
 	},
 });
 
-let chooseDateInfo = ref<Info>({ showFlag: false });
+const chooseDateInfo = ref<Info>({ showFlag: false });
 
 const chooseDate = (type: string): void => {
 	chooseDateInfo.value.showFlag = true;
@@ -244,7 +238,7 @@ const onSubmit = (): void => {
 };
 
 const init = (): void => {
-	let id: any = route?.query?.id;
+	const id: any = route?.query?.id;
 	if (id) {
 		Promise.all([getPersonalGiftDetail(id || '-1'), getDictList('gift_action')])
 			.then((res: any) => {

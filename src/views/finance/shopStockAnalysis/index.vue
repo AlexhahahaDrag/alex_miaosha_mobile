@@ -1,27 +1,41 @@
 <template>
 	<NavBar :info="info"></NavBar>
-	<van-tabs v-model:active="activeTab" sticky swipeable @change="changeTab">
-		<van-tab title="店总览" name="1">
+	<van-tabs
+		v-model:active="activeTab"
+		sticky
+		swipeable
+		@change="changeTab"
+	>
+		<van-tab
+			title="店总览"
+			name="1"
+		>
 			<ShopStockOverview v-bind="props"></ShopStockOverview>
 		</van-tab>
-		<van-tab title="店收支分析" name="2">
+		<van-tab
+			title="店收支分析"
+			name="2"
+		>
 			<ShopStockInfoAnalysis v-bind="props"></ShopStockInfoAnalysis>
 		</van-tab>
-		<van-tab title="店收支明细" name="3">
+		<van-tab
+			title="店收支明细"
+			name="3"
+		>
 			<ShopStockAnalysisDetail v-bind="props"></ShopStockAnalysisDetail>
 		</van-tab>
 	</van-tabs>
 	<monthPop
 		:info="chooseDateInfo"
-		@selectInfo="selectDateInfo"
-		@cancelInfo="cancelDateInfo"
+		@select-info="selectDateInfo"
+		@cancel-info="cancelDateInfo"
 	></monthPop>
 </template>
 
 <script lang="ts" setup>
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs, { type Dayjs } from 'dayjs';
 
-let route = useRoute();
+const route = useRoute();
 
 const info = ref<any>({
 	title: route?.meta?.title || '店财务分析',
@@ -31,25 +45,16 @@ const info = ref<any>({
 const dateFormatter = 'YYYY年MM月';
 const YYYYMM = 'YYYY-MM';
 
-let activeTab = ref<number>(2);
+const activeTab = ref<number>(2);
 
-let props = reactive<any>({
+const props = reactive<any>({
 	activeTab: activeTab.value,
 	dateStr: dayjs().format(YYYYMM),
 });
 
-const changeTab = (name: number) => {
-	props.activeTab = name;
-	activeTab.value = name;
-};
+const infoDateName = ref<string>(dayjs().format(dateFormatter));
 
-let infoDateName = ref<string>(dayjs().format(dateFormatter));
-
-const chooseDate = () => {
-	chooseDateInfo.value.showFlag = true;
-};
-
-let chooseDateInfo = ref<any>({
+const chooseDateInfo = ref<any>({
 	label: 'infoDate',
 	labelName: '月份选择',
 	selectValue: dayjs(),
@@ -65,6 +70,11 @@ let chooseDateInfo = ref<any>({
 		return option;
 	},
 });
+
+const changeTab = (name: number) => {
+	props.activeTab = name;
+	activeTab.value = name;
+};
 
 const selectDateInfo = (dateInfo: Dayjs, dateName: string) => {
 	chooseDateInfo.value.showFlag = false;

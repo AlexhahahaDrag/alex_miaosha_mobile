@@ -1,23 +1,52 @@
 {
-	"experimentalTernaries": true,
-	"printWidth": 80,
-	"tabWidth": 2,
 	"useTabs": true,
+	"tabWidth": 1,
 	"semi": true,
 	"singleQuote": true,
 	"quoteProps": "as-needed",
-	"jsxSingleQuote": false,
 	"trailingComma": "all",
 	"bracketSpacing": true,
 	"bracketSameLine": false,
 	"arrowParens": "always",
-	"rangeStart": 0,
-	"proseWrap": "preserve",
-	"htmlWhitespaceSensitivity": "css",
-	"vueIndentScriptAndStyle": false,
+	"printWidth": 100,
 	"endOfLine": "lf",
-	"insertFinalNewline": true,
-	"embeddedLanguageFormatting": "auto",
-	"singleAttributePerLine": false,
-	"plugins": []
+	"vueIndentScriptAndStyle": false,
+	"htmlWhitespaceSensitivity": "strict",
+	"overrides": [
+		{
+			"files": "*.vue",
+			"options": {
+				"parser": "vue",
+				"htmlWhitespaceSensitivity": "strict",
+				"vueIndentScriptAndStyle": false,
+				"useTabs": true,
+				"tabWidth": 1,
+				"printWidth": 120,
+				"singleAttributePerLine": true,
+				"bracketSameLine": false
+			}
+		},
+		{
+			"files": ["*.ts", "*.tsx"],
+			"options": {
+				"parser": "typescript",
+				"useTabs": true,
+				"tabWidth": 1,
+				"semi": true,
+				"singleQuote": true,
+				"trailingComma": "all"
+			}
+		},
+		{
+			"files": ["*.js", "*.mjs"],
+			"options": {
+				"parser": "babel",
+				"useTabs": true,
+				"tabWidth": 1,
+				"semi": true,
+				"singleQuote": true,
+				"trailingComma": "all"
+			}
+		}
+	]
 }

@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { barItem } from '@/views/model/chart/bar';
+import type { barItem } from '@/views/model/chart/bar';
 
 const props = defineProps({
 	config: {
@@ -54,32 +54,31 @@ const judgeTitle = (yAxis: any[], title: string) => {
 };
 
 const setOption = (data: any[]) => {
-	const { xAxis, nameInfo, yTitle, tooltip, xTile, dataType, stackInfo } =
-		props.config;
+	const { xAxis, nameInfo, yTitle, tooltip, xTile, dataType, stackInfo } = props.config;
 	if (data?.length) {
-		let yAxis = [] as any[];
-		let series = [] as any[];
+		const yAxis = [] as any[];
+		const series = [] as any[];
 		let yAxisIndex = 0;
-		let map = {} as any;
+		const map = {} as any;
 		for (let i = 0; i < data.length; i++) {
-			let max = getMax(Math.max(...data[i]));
-			let min = getMin(Math.min(...data[i]));
-			let title = yTitle ? yTitle[i] : '';
-			let exists = judgeTitle(yAxis, title);
+			const max = getMax(Math.max(...data[i]));
+			const min = getMin(Math.min(...data[i]));
+			const title = yTitle ? yTitle[i] : '';
+			const exists = judgeTitle(yAxis, title);
 			if (!exists) {
 				map[title] = yAxisIndex++;
 				yAxis.push({
 					type: 'value',
 					name: title,
-					min: min,
-					max: max,
+					min,
+					max,
 					nameLocation: 'center',
 					nameGap: 25,
 					interval: (max - min) / 5,
 					axisLabel: {
-						formatter: function (value: number) {
+						formatter (value: number) {
 							if (value >= 10000) {
-								return (value / 1000).toFixed(1) + 'k';
+								return `${(value / 1000).toFixed(1)}k`;
 							} else {
 								return value;
 							}

@@ -1,5 +1,8 @@
 <template>
-	<NavBar :info="info" @clickRight="addOrgInfo"></NavBar>
+	<NavBar
+		:info="info"
+		@click-right="addOrgInfo"
+	></NavBar>
 	<van-pull-refresh
 		pulling-text="加载中。。。"
 		:style="{ height: 'calc(100% - 44px)' }"
@@ -24,7 +27,10 @@
 				borderColor: 'grey',
 			}"
 		></van-divider>
-		<van-empty v-if="dataSource.length == 0" description="暂无数据"></van-empty>
+		<van-empty
+			v-if="dataSource.length == 0"
+			description="暂无数据"
+		></van-empty>
 		<van-list
 			v-else
 			v-model:loading="loading"
@@ -85,24 +91,26 @@
 	<van-back-top></van-back-top>
 </template>
 <script lang="ts" setup>
+import { showSuccessToast, showFailToast } from 'vant';
+import type { SearchInfo } from './orgInfoTs';
+import { pagination } from './orgInfoTs';
 import { getOrgInfoPage, deleteOrgInfo } from '@/api/user/orgInfo/orgInfoTs';
 import { getUserManagerList } from '@/api/user/userManager';
-import { SearchInfo, pagination, pageInfo } from './orgInfoTs';
-import { showSuccessToast, showFailToast } from 'vant';
+import type { PageInfo } from '@/views/common/config/index';
 
-let router = useRouter();
-let route = useRoute();
+const router = useRouter();
+const route = useRoute();
 const info = ref<any>({
 	title: route?.meta?.title || '财务管理11',
 	rightButton: '新增',
 	leftPath: '/',
 });
-let loading = ref<boolean>(false);
-let dataSource = ref<any[]>([]);
-let searchInfo = ref<SearchInfo>({});
+const loading = ref<boolean>(false);
+const dataSource = ref<any[]>([]);
+const searchInfo = ref<SearchInfo>({});
 
-let finished = ref<boolean>(false); //加载是否已经没有更多数据
-let isRefresh = ref<boolean>(false); //是否下拉刷新
+const finished = ref<boolean>(false); //加载是否已经没有更多数据
+const isRefresh = ref<boolean>(false); //是否下拉刷新
 
 const onSearch = () => {
 	pagination.value.current = 1;
@@ -116,7 +124,7 @@ const onCancel = () => {
 	query(searchInfo.value, pagination.value);
 };
 
-function query(param: SearchInfo, cur: pageInfo) {
+async function query(param: SearchInfo, cur: PageInfo) {
 	loading.value = true;
 	getOrgInfoPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
 		.then((res: any) => {
@@ -128,9 +136,7 @@ function query(param: SearchInfo, cur: pageInfo) {
 				if (
 					!pagination.value?.total ||
 					(pagination.value.total &&
-						pagination.value.total <
-							(pagination.value.current || 1) *
-								(pagination.value.pageSize || 10))
+						pagination.value.total < (pagination.value.current || 1) * (pagination.value.pageSize || 10))
 				) {
 					finished.value = true;
 				}
@@ -148,7 +154,7 @@ const addOrgInfo = () => {
 	router.push({ path: '/user/orgInfo/orgInfoDetail' });
 };
 
-let userMap = {};
+const userMap = {};
 function getUserInfoList() {
 	getUserManagerList({}).then((res) => {
 		if (res.code == '200') {
@@ -178,7 +184,7 @@ const beforeClose = (e: any) => {
 };
 
 const delOrgInfo = (id: number) => {
-	deleteOrgInfo(id + '').then((res: any) => {
+	deleteOrgInfo(`${id}`).then((res: any) => {
 		if (res?.code == '200') {
 			refresh();
 			showSuccessToast((res && res.message) || '删除成功！');

@@ -52,11 +52,7 @@ const divide = (x: number | string, y: number | string) => {
 	return xx.div(yy).toNumber();
 };
 
-const formatAmount = (
-	amount: number | Decimal,
-	digit: number,
-	unit: string,
-) => {
+const formatAmount = (amount: number | Decimal, digit: number, unit: string) => {
 	if (amount == null || amount == undefined) {
 		return '--';
 	}
@@ -81,10 +77,10 @@ const getListName = (list: any[], value: any, code: string, name: string) => {
 };
 
 export default {
-	formatAmount: formatAmount,
-	plus: plus,
-	minus: minus,
-	multiply: multiply,
-	divide: divide,
-	getListName: getListName,
+	formatAmount,
+	plus,
+	minus,
+	multiply,
+	divide,
+	getListName,
 };

@@ -28,9 +28,7 @@
 				<div class="stat-card-row">
 					<div class="stat-left">
 						<div class="stat-label">总余额</div>
-						<div class="stat-value">
-							¥{{ formatNumber(statistics.totalBalance) }}
-						</div>
+						<div class="stat-value"> ¥{{ formatNumber(statistics.totalBalance) }} </div>
 					</div>
 					<div class="stat-right stat-icon green">
 						<van-icon name="gold-coin-o" />
@@ -46,9 +44,7 @@
 				<div class="stat-card-row">
 					<div class="stat-left">
 						<div class="stat-label">本月消费</div>
-						<div class="stat-value">
-							¥{{ formatNumber(statistics.monthlySpend) }}
-						</div>
+						<div class="stat-value"> ¥{{ formatNumber(statistics.monthlySpend) }} </div>
 					</div>
 					<div class="stat-right stat-icon red">
 						<van-icon name="cart-o" />
@@ -64,9 +60,7 @@
 				<div class="stat-card-row">
 					<div class="stat-left">
 						<div class="stat-label">本月充值</div>
-						<div class="stat-value">
-							¥{{ formatNumber(statistics.monthlyRecharge) }}
-						</div>
+						<div class="stat-value"> ¥{{ formatNumber(statistics.monthlyRecharge) }} </div>
 					</div>
 					<div class="stat-right stat-icon orange-light">
 						<van-icon name="add-o" />
@@ -74,9 +68,7 @@
 				</div>
 				<div class="stat-delta positive">
 					<van-icon name="arrow-up" />
-					<span
-						>较上月 +¥{{ formatNumber(statisticsDelta.monthlyRecharge) }}</span
-					>
+					<span>较上月 +¥{{ formatNumber(statisticsDelta.monthlyRecharge) }}</span>
 				</div>
 			</div>
 		</div>
@@ -91,26 +83,23 @@
 						:type="selectedPeriod === 'week' ? 'primary' : 'default'"
 						round
 						@click="handleSwitchPeriod('week')"
-						>周</van-button
-					>
+					>周</van-button>
 					<van-button
 						size="mini"
 						:type="selectedPeriod === 'month' ? 'primary' : 'default'"
 						round
 						@click="handleSwitchPeriod('month')"
-						>月</van-button
-					>
+					>月</van-button>
 					<van-button
 						size="mini"
 						:type="selectedPeriod === 'year' ? 'primary' : 'default'"
 						round
 						@click="handleSwitchPeriod('year')"
-						>年</van-button
-					>
+					>年</van-button>
 				</div>
 			</div>
 			<div class="trend-body">
-				<Chart :options="chartOptions" width="100%" height="256px" />
+				<chart :options="chartOptions" width="100%" height="256px" />
 			</div>
 		</div>
 
@@ -125,35 +114,24 @@
 			</div>
 			<div class="cards-list">
 				<div class="card-row" v-for="card in cardList" :key="card.id">
-					<div
-						class="card-row-left"
-						:style="{ background: getTypeBg(card.cardName) }"
-					>
-						<SvgIcon :name="getTypeIconName(card.cardName)" color="#FF7A00" />
+					<div class="card-row-left" :style="{ background: getTypeBg(card.cardName) }">
+						<svg-icon :name="getTypeIconName(card.cardName)" color="#FF7A00" />
 					</div>
 					<div class="card-row-center">
 						<div class="card-row-title">{{ card.name }}</div>
-						<div class="card-row-sub">
-							余额: ¥{{
-								formatNumber(Number(card.currentBalance ?? card.balance))
-							}}
-						</div>
+						<div class="card-row-sub"> 余额: ¥{{ formatNumber(Number(card.currentBalance ?? card.balance)) }} </div>
 					</div>
 					<div class="card-row-right">
-						<van-button
-							size="small"
+						<van-button size="small"
 							round
 							type="success"
 							@click="handleRecharge(card)"
-							>充值</van-button
-						>
-						<van-button
-							size="small"
+						>充值</van-button>
+						<van-button size="small"
 							round
 							type="danger"
 							@click="handleConsume(card)"
-							>消费</van-button
-						>
+						>消费</van-button>
 					</div>
 				</div>
 			</div>
@@ -161,28 +139,22 @@
 
 		<!-- 底部 Tabbar -->
 		<van-tabbar route fixed>
-			<van-tabbar-item icon="bar-chart-o" @click="handleGoDashboard"
-				>总览</van-tabbar-item
-			>
-			<van-tabbar-item icon="credit-pay" @click="navigateToAll"
-				>消费卡</van-tabbar-item
-			>
-			<van-tabbar-item icon="clock-o" @click="handleGoRecords"
-				>记录</van-tabbar-item
-			>
-			<van-tabbar-item icon="user-o" @click="handleGoUser"
-				>我的</van-tabbar-item
-			>
+			<van-tabbar-item icon="bar-chart-o" @click="handleGoDashboard">总览</van-tabbar-item>
+			<van-tabbar-item icon="credit-pay" @click="navigateToAll">消费卡</van-tabbar-item>
+			<van-tabbar-item icon="clock-o" @click="handleGoRecords">记录</van-tabbar-item>
+			<van-tabbar-item icon="user-o" @click="handleGoUser">我的</van-tabbar-item>
 		</van-tabbar>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { showToast } from 'vant';
+
+import { typeIconMap, type CardItem, getCardColor } from '../config/index';
+
 import Chart from '@/views/model/chart/index.vue';
 import SvgIcon from '@/views/common/icons/svgIcon.vue';
 import { useNavBar } from '@/composables/useNavBar';
-import { typeIconMap, type CardItem, getCardColor } from '../config/index';
 
 // 使用局部组件（通过标签 <SvgIcon /> 引用）
 
@@ -221,30 +193,16 @@ const handleSwitchPeriod = (period: Period) => {
 const chartOptions = ref<Record<string, any>>({});
 const makeSeriesData = (period: Period) => {
 	if (period === 'week') return [120, 132, 101, 134, 90, 230, 210];
-	if (period === 'year')
-		return [320, 282, 301, 334, 390, 330, 320, 220, 180, 260, 300, 420];
+	if (period === 'year') return [320, 282, 301, 334, 390, 330, 320, 220, 180, 260, 300, 420];
 	return [220, 182, 191, 234, 290, 330, 310];
 };
 const rebuildChartOptions = () => {
 	const xAxisLabels =
-		selectedPeriod.value === 'year' ?
-			[
-				'1月',
-				'2月',
-				'3月',
-				'4月',
-				'5月',
-				'6月',
-				'7月',
-				'8月',
-				'9月',
-				'10月',
-				'11月',
-				'12月',
-			]
-		: selectedPeriod.value === 'week' ?
-			['周一', '周二', '周三', '周四', '周五', '周六', '周日']
-		:	['第1周', '第2周', '第3周', '第4周', '第5周', '第6周', '第7周'];
+		selectedPeriod.value === 'year'
+			? ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
+			: selectedPeriod.value === 'week'
+				? ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+				: ['第1周', '第2周', '第3周', '第4周', '第5周', '第6周', '第7周'];
 	chartOptions.value = {
 		tooltip: { trigger: 'axis' },
 		grid: { left: 8, right: 8, top: 16, bottom: 8, containLabel: true },
@@ -302,9 +260,7 @@ const getTypeIconName = (typeName?: string): string => {
 	// vite-plugin-svg-icons 已将路径注册到 symbolId：icon-[dir]-[name]
 	// 这里仅返回文件名（不含后缀），由 SvgIcon 统一拼接
 	// 已在 config 中将业务名称映射到具体 svg 引用
-	const entry = Object.entries(typeIconMap).find(
-		([key]) => key === (typeName || ''),
-	);
+	const entry = Object.entries(typeIconMap).find(([key]) => key === (typeName || ''));
 	if (!entry) return 'shop-card';
 	const filePath = entry[1] as string; // e.g. /src/assets/icons/shop/xxx.svg
 	const parts = filePath.split('/');

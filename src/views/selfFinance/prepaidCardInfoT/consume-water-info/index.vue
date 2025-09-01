@@ -6,25 +6,13 @@
 			<div class="filter-section">
 				<div class="filter-container">
 					<div class="filter-buttons">
-						<button
-							class="filter-btn"
-							:class="{ active: activeFilter === 'all' }"
-							@click="handleFilterClick('all')"
-						>
+						<button class="filter-btn" :class="{ active: activeFilter === 'all' }" @click="handleFilterClick('all')">
 							全部
 						</button>
-						<button
-							class="filter-btn"
-							:class="{ active: activeFilter === 'income' }"
-							@click="handleFilterClick('income')"
-						>
+						<button class="filter-btn" :class="{ active: activeFilter === 'income' }" @click="handleFilterClick('income')">
 							收入
 						</button>
-						<button
-							class="filter-btn"
-							:class="{ active: activeFilter === 'expense' }"
-							@click="handleFilterClick('expense')"
-						>
+						<button class="filter-btn" :class="{ active: activeFilter === 'expense' }" @click="handleFilterClick('expense')">
 							支出
 						</button>
 					</div>
@@ -49,33 +37,18 @@
 						<div class="loading-text">加载中...</div>
 					</div>
 
-					<div
-						v-else-if="transactionList?.length === 0"
-						class="empty-container"
-					>
+					<div v-else-if="transactionList?.length === 0" class="empty-container">
 						<div class="empty-text">暂无交易记录</div>
 					</div>
 
 					<div v-else class="transaction-list">
-						<div
-							v-for="(transactions, dateGroup) in groupedTransactions"
-							:key="dateGroup"
-							class="date-section"
-						>
+						<div v-for="(transactions, dateGroup) in groupedTransactions" :key="dateGroup" class="date-section">
 							<h3 class="date-title">{{ dateGroup }}</h3>
 
-							<div
-								v-for="transaction in transactions"
-								:key="transaction.id"
-								class="transaction-item"
-							>
+							<div v-for="transaction in transactions" :key="transaction.id" class="transaction-item">
 								<div class="transaction-content">
 									<div class="icon-container">
-										<van-image
-											:src="getCategoryIcon(transaction.cardName)"
-											:alt="transaction.cardName"
-											class="category-icon"
-										/>
+										<van-image :src="getCategoryIcon(transaction.cardName)" :alt="transaction.cardName" class="category-icon" />
 									</div>
 									<div class="transaction-info">
 										<h4 class="merchant-name">
@@ -88,10 +61,7 @@
 									</div>
 								</div>
 								<div class="transaction-amount">
-									<div
-										class="amount"
-										:class="getTransactionTypeClass(transaction.amount)"
-									>
+									<div class="amount" :class="getTransactionTypeClass(transaction.amount)">
 										{{ formatAmount(transaction.amount) }}
 									</div>
 									<div class="time">
@@ -108,14 +78,12 @@
 			<van-popup v-model:show="filterVisible" position="bottom" round>
 				<div class="filter-popup">
 					<van-cell-group inset>
-						<van-cell
-							title="选择卡片"
+						<van-cell title="选择卡片"
 							:value="selectedCardName || '全部卡片'"
 							is-link
 							@click="openCardPicker"
 						/>
-						<van-cell
-							title="日期范围"
+						<van-cell title="日期范围"
 							:value="displayDateRange"
 							is-link
 							@click="calendarVisible = true"
@@ -123,46 +91,40 @@
 					</van-cell-group>
 
 					<div class="filter-actions">
-						<van-button type="default" block class="mr8" @click="resetFilters"
-							>重置</van-button
-						>
-						<van-button type="primary" block @click="applyFilters"
-							>确定</van-button
-						>
+						<van-button type="default"
+							block
+							class="mr8"
+							@click="resetFilters"
+						>重置</van-button>
+						<van-button type="primary" block @click="applyFilters">确定</van-button>
 					</div>
 				</div>
 			</van-popup>
 
 			<!-- 卡片选择器 -->
 			<van-popup v-model:show="cardPickerVisible" position="bottom" round>
-				<van-picker
-					:columns="cardColumns"
-					@confirm="onCardConfirm"
-					@cancel="cardPickerVisible = false"
-				/>
+				<van-picker :columns="cardColumns" @confirm="onCardConfirm" @cancel="cardPickerVisible = false" />
 			</van-popup>
 
 			<!-- 日历（日期范围） -->
-			<van-calendar
-				v-model:show="calendarVisible"
-				type="range"
-				@confirm="onCalendarConfirm"
-			/>
+			<van-calendar v-model:show="calendarVisible" type="range" @confirm="onCalendarConfirm" />
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { useNavBar } from '@/composables/useNavBar';
-import { Pagination } from '@/views/common/config';
+import { showFailToast } from 'vant';
+
 import { typeIconMap } from '../config/index';
+import { getPrepaidCardInfoList } from '../api/index';
+
+import { useNavBar } from '@/composables/useNavBar';
+import type { Pagination } from '@/views/common/config';
 import {
 	getConsumeCardRecordPage,
 	type TransactionRecord,
 	type TransactionQueryParams,
 } from '@/api/finance/consumeCardRecord/index';
-import { showFailToast } from 'vant';
-import { getPrepaidCardInfoList } from '../api/index';
 import filterIcon from '@/assets/icons/shop/filter.svg';
 
 const route = useRoute();
@@ -217,12 +179,12 @@ function formatDateGroup(dateStr: string): string {
 		return '昨日';
 	} else {
 		return (
-			transactionDate
+			`${transactionDate
 				.toLocaleDateString('zh-CN', {
 					month: '2-digit',
 					day: '2-digit',
 				})
-				.replace('/', '月') + '日'
+				.replace('/', '月')}日`
 		);
 	}
 }
@@ -258,9 +220,7 @@ const filterVisible = ref(false);
 const cardPickerVisible = ref(false);
 const calendarVisible = ref(false);
 
-const cardColumns = ref<Array<{ text: string; value: string | number }>>([
-	{ text: '全部卡片', value: '' },
-]);
+const cardColumns = ref<Array<{ text: string; value: string | number }>>([{ text: '全部卡片', value: '' }]);
 const selectedCardId = ref<string | number | ''>('');
 const selectedCardName = ref<string>('');
 
@@ -372,8 +332,7 @@ async function fetchTransactionData(isLoadMore = false) {
 				transactionList.value = data.records;
 			}
 			pagination.value.total = data.total || 0;
-			hasMore.value =
-				transactionList.value.length < (pagination.value.total || 0);
+			hasMore.value = transactionList.value.length < (pagination.value.total || 0);
 			finished.value = !hasMore.value; // 同步finished，防止List误判一直加载
 		} else {
 			pagination.value.total = 0;

@@ -29,8 +29,10 @@
 </template>
 
 <script lang="ts" setup>
-import type { barItem } from './common';
 import { showNotify } from 'vant';
+
+import type { barItem } from './common';
+
 import { getDayExpense, getMonthExpense } from '@/api/finance/financeAnalysis';
 
 interface Props {
@@ -38,9 +40,9 @@ interface Props {
 	dateStr: string;
 	belongTo?: number | string | null;
 }
-let props = defineProps<Props>();
+const props = defineProps<Props>();
 
-let dayConfig = ref<barItem>({
+const dayConfig = ref<barItem>({
 	xAxis: [],
 	series: [[]],
 	xTile: '天数',
@@ -51,9 +53,9 @@ let dayConfig = ref<barItem>({
 	color: '#aa55ff',
 });
 
-let monthData = ref<any>([]);
+const monthData = ref<any>([]);
 
-let monthConfig = ref<barItem>({
+const monthConfig = ref<barItem>({
 	xAxis: [],
 	series: [[]],
 	xTile: '月份',
@@ -64,118 +66,100 @@ let monthConfig = ref<barItem>({
 	color: '#5555ff',
 });
 
-let dayData = ref<any>([]);
+const dayData = ref<any>([]);
 
 function getDayExpenseInfo(userId: number | null, dateStr: string) {
-	getDayExpense(userId, dateStr).then(
-		(res: { code: string; data: any[]; message: any }) => {
-			if (res.code == '200') {
-				if (res.data) {
-					let series = [] as any;
-					let xAxis = [] as any;
-					res.data.forEach((item) => {
-						series.push(item.amount);
-						xAxis.push(item.infoDate);
-					});
-					let seriesAll = [] as any[];
-					seriesAll[0] = series;
-					dayConfig.value = {
-						xAxis: xAxis,
-						series: seriesAll,
-						xTile: '天数',
-						yTitle: ['金钱(元)'],
-						yNameGap: 50,
-						tooltip: {
-							trigger: 'axis',
-							axisPointer: {
-								type: 'shadow',
-							},
-							formatter(param: any) {
-								let tip = '';
-								let unit = '元';
-								let name = '花费';
-								tip += `<p style="margin: 0;text-align: left">${param[0].axisValue}日</p>`;
-								param.forEach(
-									(element: {
-										axisValue: any;
-										marker: any;
-										value: any;
-										seriesName: any;
-									}) => {
-										tip += `<p style="margin: 0;text-align: left">${element.marker}${name}: ${element.value ? element.value : 0.0}${unit}</p>`;
-									},
-								);
-								return tip;
-							},
-						},
-						color: '#aa55ff',
-					};
-					dayData.value = seriesAll;
-				}
-			} else {
-				showNotify({
-					type: 'danger',
-					message: (res && res.message) || '查询列表失败！',
+	getDayExpense(userId, dateStr).then((res: { code: string; data: any[]; message: any }) => {
+		if (res.code == '200') {
+			if (res.data) {
+				const series = [] as any;
+				const xAxis = [] as any;
+				res.data.forEach((item) => {
+					series.push(item.amount);
+					xAxis.push(item.infoDate);
 				});
+				const seriesAll = [] as any[];
+				seriesAll[0] = series;
+				dayConfig.value = {
+					xAxis,
+					series: seriesAll,
+					xTile: '天数',
+					yTitle: ['金钱(元)'],
+					yNameGap: 50,
+					tooltip: {
+						trigger: 'axis',
+						axisPointer: {
+							type: 'shadow',
+						},
+						formatter(param: any) {
+							let tip = '';
+							const unit = '元';
+							const name = '花费';
+							tip += `<p style="margin: 0;text-align: left">${param[0].axisValue}日</p>`;
+							param.forEach((element: { axisValue: any; marker: any; value: any; seriesName: any }) => {
+								tip += `<p style="margin: 0;text-align: left">${element.marker}${name}: ${element.value ? element.value : 0.0}${unit}</p>`;
+							});
+							return tip;
+						},
+					},
+					color: '#aa55ff',
+				};
+				dayData.value = seriesAll;
 			}
-		},
-	);
+		} else {
+			showNotify({
+				type: 'danger',
+				message: (res && res.message) || '查询列表失败！',
+			});
+		}
+	});
 }
 
 function getMonthExpenseInfo(userId: number | null, dateStr: string) {
-	getMonthExpense(userId, dateStr).then(
-		(res: { code: string; data: any[]; message: any }) => {
-			if (res.code == '200') {
-				if (res.data) {
-					let series = [] as any;
-					let xAxis = [] as any;
-					res.data.forEach((item) => {
-						series.push(item.amount);
-						xAxis.push(item.infoDate);
-					});
-					let seriesAll = [] as any[];
-					seriesAll[0] = series;
-					monthConfig.value = {
-						xAxis: xAxis,
-						series: seriesAll,
-						yTitle: ['金钱(元)'],
-						xTile: '月份',
-						yNameGap: 50,
-						tooltip: {
-							trigger: 'axis',
-							axisPointer: {
-								type: 'shadow',
-							},
-							formatter(param: any) {
-								let tip = '';
-								let unit = '元';
-								let name = '花费';
-								tip += `<p style="margin: 0;text-align: left">${param[0].axisValue}月</p>`;
-								param.forEach(
-									(element: {
-										axisValue: any;
-										marker: any;
-										value: any;
-										seriesName: any;
-									}) => {
-										tip += `<p style="margin: 0;text-align: left">${element.marker}${name}: ${element.value ? element.value : 0.0}${unit}</p>`;
-									},
-								);
-								return tip;
-							},
-						},
-						color: '#5555ff',
-					};
-					monthData.value = seriesAll;
-				}
-			} else {
-				showNotify({
-					type: 'danger',
-					message: (res && res.message) || '查询列表失败！',
+	getMonthExpense(userId, dateStr).then((res: { code: string; data: any[]; message: any }) => {
+		if (res.code == '200') {
+			if (res.data) {
+				const series = [] as any;
+				const xAxis = [] as any;
+				res.data.forEach((item) => {
+					series.push(item.amount);
+					xAxis.push(item.infoDate);
 				});
+				const seriesAll = [] as any[];
+				seriesAll[0] = series;
+				monthConfig.value = {
+					xAxis,
+					series: seriesAll,
+					yTitle: ['金钱(元)'],
+					xTile: '月份',
+					yNameGap: 50,
+					tooltip: {
+						trigger: 'axis',
+						axisPointer: {
+							type: 'shadow',
+						},
+						formatter(param: any) {
+							let tip = '';
+							const unit = '元';
+							const name = '花费';
+							tip += `<p style="margin: 0;text-align: left">${param[0].axisValue}月</p>`;
+							param.forEach((element: { axisValue: any; marker: any; value: any; seriesName: any }) => {
+								tip += `<p style="margin: 0;text-align: left">${element.marker}${name}: ${element.value ? element.value : 0.0}${unit}</p>`;
+							});
+							return tip;
+						},
+					},
+					color: '#5555ff',
+				};
+				monthData.value = seriesAll;
 			}
-		},
-	);
+		} else {
+			showNotify({
+				type: 'danger',
+				message: (res && res.message) || '查询列表失败！',
+			});
+		}
+	});
 }
 
 const init = (dateStr: string, belongTo: number | null) => {

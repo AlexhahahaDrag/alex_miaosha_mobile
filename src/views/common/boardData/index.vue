@@ -1,8 +1,14 @@
 <template>
-	<div class="all-content" :style="{ background: info?.color || '#1c54aa' }">
+	<div
+		class="all-content"
+		:style="{ background: info?.color || '#1c54aa' }"
+	>
 		<div class="info">
 			<div class="content-title">
-				<SvgIcon :name="info?.icon || ''" class="content-svg"></SvgIcon>
+				<SvgIcon
+					:name="info?.icon || ''"
+					class="content-svg"
+				></SvgIcon>
 				<div class="content-title-desc">
 					<span>{{ info?.title || '' }}</span>
 				</div>
@@ -49,7 +55,7 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { Info } from '@/views/common/boardData/config';
+import type { Info } from '@/views/common/boardData/config';
 
 interface Props {
 	info: Info;

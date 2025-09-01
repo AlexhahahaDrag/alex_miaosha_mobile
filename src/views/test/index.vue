@@ -27,18 +27,10 @@
 			>
 				<div class="button-text">本周</div>
 			</div>
-			<div
-				class="filter-button"
-				:class="{ active: activeTimeFilter === 'month' }"
-				@click="activeTimeFilter = 'month'"
-			>
+			<div class="filter-button" :class="{ active: activeTimeFilter === 'month' }" @click="activeTimeFilter = 'month'">
 				<div class="button-text">本月</div>
 			</div>
-			<div
-				class="filter-button"
-				:class="{ active: activeTimeFilter === 'all' }"
-				@click="activeTimeFilter = 'all'"
-			>
+			<div class="filter-button" :class="{ active: activeTimeFilter === 'all' }" @click="activeTimeFilter = 'all'">
 				<div class="button-text">全部</div>
 			</div>
 		</div>
@@ -52,9 +44,7 @@
 			<div class="record-item">
 				<div class="record-left">
 					<div class="merchant-name">公司食堂 · 午餐</div>
-					<div class="transaction-details">
-						12:30 · 订单号: 2024121012301001
-					</div>
+					<div class="transaction-details"> 12:30 · 订单号: 2024121012301001 </div>
 				</div>
 				<div class="record-right">
 					<div class="transaction-amount expense">-￥18.50</div>
@@ -66,9 +56,7 @@
 			<div class="record-item">
 				<div class="record-left">
 					<div class="merchant-name">充值 · 银行卡转入</div>
-					<div class="transaction-details">
-						09:15 · 订单号: 2024121009151002
-					</div>
+					<div class="transaction-details"> 09:15 · 订单号: 2024121009151002 </div>
 				</div>
 				<div class="record-right">
 					<div class="transaction-amount income">+￥200.00</div>
@@ -83,9 +71,7 @@
 			<div class="record-item">
 				<div class="record-left">
 					<div class="merchant-name">星巴克 · 咖啡</div>
-					<div class="transaction-details">
-						14:20 · 订单号: 2024120914201003
-					</div>
+					<div class="transaction-details"> 14:20 · 订单号: 2024120914201003 </div>
 				</div>
 				<div class="record-right">
 					<div class="transaction-amount expense">-￥35.00</div>
@@ -95,16 +81,8 @@
 		</div>
 
 		<!-- 消费卡选择弹框 -->
-		<van-popup
-			v-model:show="showCardPicker"
-			position="bottom"
-			:style="{ height: '30%' }"
-		>
-			<van-picker
-				:columns="cardOptions"
-				@confirm="onCardConfirm"
-				@cancel="showCardPicker = false"
-			/>
+		<van-popup v-model:show="showCardPicker" position="bottom" :style="{ height: '30%' }">
+			<van-picker :columns="cardOptions" @confirm="onCardConfirm" @cancel="showCardPicker = false" />
 		</van-popup>
 	</div>
 </template>

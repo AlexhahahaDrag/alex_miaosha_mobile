@@ -13,8 +13,8 @@ interface Info {
 	title?: string;
 	leftButton?: string;
 	rightButton?: string;
-	noShowLeft?: Boolean;
-	showRight?: Boolean;
+	noShowLeft?: boolean;
+	showRight?: boolean;
 	leftPath?: string;
 }
 
@@ -30,8 +30,8 @@ const emit = defineEmits(['clickRight']);
 const router = useRouter();
 const onClickLeft = () => {
 	if (props.info?.leftPath) {
-		let leftArr = props.info.leftPath.split('?');
-		let query: Record<string, any> = {};
+		const leftArr = props.info.leftPath.split('?');
+		const query: Record<string, any> = {};
 		if (leftArr?.length > 1) {
 			const params = new URLSearchParams(leftArr[1]);
 			params.forEach((value, key) => {

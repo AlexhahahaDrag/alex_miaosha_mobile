@@ -15,10 +15,12 @@
 </template>
 
 <script lang="ts" setup>
-import { getBalance } from '@/api/finance/financeAnalysis';
-import { FinanceDetail } from './common';
 import { showNotify } from 'vant';
 import * as math from 'mathjs';
+
+import type { FinanceDetail } from './common';
+
+import { getBalance } from '@/api/finance/financeAnalysis';
 
 interface Props {
 	activeTab: number | string;
@@ -26,27 +28,18 @@ interface Props {
 	belongTo?: number | string | null;
 }
 
-let props = defineProps<Props>();
+const props = defineProps<Props>();
 
-let balanceList = ref<FinanceDetail | any>([]);
-let sum = ref<any>(0);
+const balanceList = ref<FinanceDetail | any>([]);
+const sum = ref<any>(0);
 
-const getBalanceInfo = async (
-	userId: number | string | null,
-	dateStr: string,
-) => {
+const getBalanceInfo = async (userId: number | string | null, dateStr: string) => {
 	const { code, data, message } = await getBalance(userId, dateStr);
 	if (code == '200') {
 		sum.value = 0;
 		balanceList.value = data || [];
 		if (data?.length) {
-			data.forEach(
-				(item: any) =>
-					(sum.value = math.add(
-						sum.value,
-						math.bignumber(item.amount ? item.amount : 0),
-					)),
-			);
+			data.forEach((item: any) => (sum.value = math.add(sum.value, math.bignumber(item.amount ? item.amount : 0))));
 		}
 	} else {
 		showNotify({

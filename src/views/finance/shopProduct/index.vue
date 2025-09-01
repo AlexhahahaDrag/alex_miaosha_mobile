@@ -25,8 +25,7 @@
 			}"
 		></van-divider>
 		<van-empty v-if="dataSource.length == 0" description="暂无数据"></van-empty>
-		<van-list
-			v-else
+		<van-list v-else
 			v-model:loading="loading"
 			:finished="finished"
 			finished-text="没有更多了"
@@ -38,12 +37,8 @@
 						<van-space size="4px">
 							<span class="custom-title">{{ item.shopName }}</span>
 							<van-tag type="primary">{{ item.oldShopCode }}</van-tag>
-							<van-tag color="#7232dd" v-if="item.style">{{
-								item.style
-							}}</van-tag>
-							<van-tag type="success" v-if="item.color">{{
-								item.color
-							}}</van-tag>
+							<van-tag color="#7232dd" v-if="item.style">{{ item.style }}</van-tag>
+							<van-tag type="success" v-if="item.color">{{ item.color }}</van-tag>
 							<van-tag type="warning" v-if="item.size">{{ item.size }}</van-tag>
 						</van-space>
 					</div>
@@ -51,22 +46,12 @@
 				<template #right-icon>
 					<div class="text-right">
 						<div style="display: flex">
-							<div class="van-ellipsis">
-								￥{{ commonUtils.formatAmount(item?.saleAmount, 2, '') }}
-							</div>
+							<div class="van-ellipsis"> ￥{{ commonUtils.formatAmount(item?.saleAmount, 2, '') }} </div>
 						</div>
 						<div class="rightRedDiv">
 							<div>
-								<SvgIcon
-									name="shoppingCart"
-									class="svg"
-									@click="shoppingCart(item)"
-								></SvgIcon>
-								<SvgIcon
-									name="shoppingBuy"
-									class="svg"
-									@click="shoppingBuy(item)"
-								></SvgIcon>
+								<SvgIcon name="shoppingCart" class="svg" @click="shoppingCart(item)"></SvgIcon>
+								<SvgIcon name="shoppingBuy" class="svg" @click="shoppingBuy(item)"></SvgIcon>
 							</div>
 						</div>
 					</div>
@@ -82,16 +67,14 @@
 	<Tabbar :data="useTabBar"></Tabbar>
 </template>
 <script lang="ts" setup>
+import { showFailToast } from 'vant';
+
+import type { SearchInfo, pageInfo, ShopStockInfo } from './shopProductTs';
+import { pagination } from './shopProductTs';
+
 import { getShopStockPage } from '@/api/finance/shopStock/shopStockTs';
 import { getUserManagerList } from '@/api/user/userManager';
 import { addOrEditShopCart } from '@/api/finance/shopCart/shopCartTs';
-import {
-	SearchInfo,
-	pagination,
-	pageInfo,
-	ShopStockInfo,
-} from './shopProductTs';
-import { showFailToast } from 'vant';
 import commonUtils from '@/utils/common/index';
 import { useUserStore } from '@/store/modules/user/user';
 
@@ -108,20 +91,20 @@ const useTabBar = reactive([
 	},
 ]);
 
-let router = useRouter();
-let route = useRoute();
-let userInfo = useUserStore()?.getUserInfo;
+const router = useRouter();
+const route = useRoute();
+const userInfo = useUserStore()?.getUserInfo;
 const info = ref<any>({
 	title: route?.meta?.title || '商品详情',
 	rightButton: '详情',
 	leftPath: '/',
 });
-let loading = ref<boolean>(false);
-let dataSource = ref<any[]>([]);
-let searchInfo = ref<SearchInfo>({ isShopping: true });
+const loading = ref<boolean>(false);
+const dataSource = ref<any[]>([]);
+const searchInfo = ref<SearchInfo>({ isShopping: true });
 
-let finished = ref<boolean>(false); //加载是否已经没有更多数据
-let isRefresh = ref<boolean>(false); //是否下拉刷新
+const finished = ref<boolean>(false); //加载是否已经没有更多数据
+const isRefresh = ref<boolean>(false); //是否下拉刷新
 
 const onSearch = () => {
 	pagination.value.current = 1;
@@ -144,10 +127,7 @@ function query(param: SearchInfo, cur: pageInfo) {
 				pagination.value.current = res.data.current + 1;
 				pagination.value.pageSize = res.data.size;
 				pagination.value.total = res.data.total;
-				if (
-					(pagination.value.total || 0) <
-					(pagination.value.current || 1) * (pagination.value.pageSize || 10)
-				) {
+				if ((pagination.value.total || 0) < (pagination.value.current || 1) * (pagination.value.pageSize || 10)) {
 					finished.value = true;
 				}
 			} else {
@@ -160,7 +140,7 @@ function query(param: SearchInfo, cur: pageInfo) {
 		});
 }
 
-let userMap = {};
+const userMap = {};
 function getUserInfoList() {
 	getUserManagerList({}).then((res: any) => {
 		if (res?.code == '200') {
@@ -193,7 +173,7 @@ const shoppingBuy = (item: ShopStockInfo): void => {
 };
 
 const shoppingCart = (item: ShopStockInfo) => {
-	let info = {
+	const info = {
 		shopId: item.id,
 		userId: userInfo.id,
 		customerId: null,

@@ -9,9 +9,7 @@
 			action-text="清空"
 		/>
 	</form>
-	<van-divider
-		:style="{ color: '#1989fa', borderColor: 'grey', margin: '0 0 10px 0' }"
-	/>
+	<van-divider :style="{ color: '#1989fa', borderColor: 'grey', margin: '0 0 10px 0' }" />
 	<van-pull-refresh
 		pulling-text="加载中。。。"
 		:style="{}"
@@ -22,35 +20,18 @@
 		immediate-check="false"
 	>
 		<div style="height: 100%; overflow-y: auto">
-			<van-empty
-				v-if="dataSource.length == 0"
-				description="暂无数据"
-			></van-empty>
-			<van-list
-				v-else
+			<van-empty v-if="dataSource.length == 0" description="暂无数据"></van-empty>
+			<van-list v-else
 				v-model:loading="loading"
 				:finished="finished"
 				finished-text="没有更多了"
 				@load="onRefresh"
 			>
 				<van-cell-group>
-					<van-swipe-cell
-						v-for="(item, index) in dataSource"
-						:before-close="beforeClose"
-						:key="index"
-					>
+					<van-swipe-cell v-for="(item, index) in dataSource" :before-close="beforeClose" :key="index">
 						<van-cell
-							:title-class="
-								item.isValid == '1' ? 'validClass' : 'notValidClass'
-							"
-							:title="
-								userMap[item.belongTo] +
-								'的' +
-								item.name +
-								'(' +
-								item.typeCode +
-								')'
-							"
+							:title-class="item.isValid == '1' ? 'validClass' : 'notValidClass'"
+							:title="userMap[item.belongTo] + '的' + item.name + '(' + item.typeCode + ')'"
 							:key="index"
 							is-link
 							:to="{
@@ -60,16 +41,9 @@
 						>
 							<template #label>
 								<div class="svgInfo">
-									<div
-										class="svgDiv"
-										v-for="(fromSource, index) in fromSourceTransferList"
-										:key="index"
-									>
+									<div class="svgDiv" v-for="(fromSource, index) in fromSourceTransferList" :key="index">
 										<SvgIcon
-											v-if="
-												item.fromSource.indexOf(fromSource.value) >= 0 &&
-												fromSource.value != ''
-											"
+											v-if="item.fromSource.indexOf(fromSource.value) >= 0 && fromSource.value != ''"
 											:name="fromSource.label"
 											class="svg"
 										></SvgIcon>
@@ -80,34 +54,17 @@
 								<div class="text-right">
 									<div style="display: flex">
 										<div class="van-ellipsis">
-											{{
-												item?.infoDate ?
-													String(item.infoDate).substring(0, 10)
-												:	'--'
-											}}
+											{{ item?.infoDate ? String(item.infoDate).substring(0, 10) : '--' }}
 										</div>
 									</div>
-									<div
-										:class="
-											item.incomeAndExpenses === 'income' ?
-												'rightGreenDiv'
-											:	'rightRedDiv'
-										"
-									>
-										{{
-											item.amount ?
-												(item.incomeAndExpenses === 'income' ?
-													item.amount
-												:	-item.amount) + '元'
-											:	'--'
-										}}
+									<div :class="item.incomeAndExpenses === 'income' ? 'rightGreenDiv' : 'rightRedDiv'">
+										{{ item.amount ? (item.incomeAndExpenses === 'income' ? item.amount : -item.amount) + '元' : '--' }}
 									</div>
 								</div>
 							</template>
 						</van-cell>
 						<template #right>
-							<van-button
-								class="right_info"
+							<van-button class="right_info"
 								@click="delFinance(item.id)"
 								square
 								type="danger"
@@ -122,8 +79,7 @@
 								'margin-top': '0px',
 								'margin-bottom': '0px',
 							}"
-						>
-						</van-divider>
+						></van-divider>
 					</van-swipe-cell>
 				</van-cell-group>
 			</van-list>
@@ -132,22 +88,17 @@
 	<van-back-top></van-back-top>
 </template>
 <script lang="ts" setup>
-import {
-	getFinanceMangerPage,
-	deleteFinanceManager,
-} from '@/api/finance/financeManager';
-import { getUserManagerList } from '@/api/user/userManager';
-import {
-	SearchInfo,
-	pagination,
-	pageInfo,
-	fromSourceTransferList,
-} from './financeManager';
 import { showSuccessToast, showFailToast } from 'vant';
+
+import type { SearchInfo, PageInfo } from './financeManager';
+import { pagination, fromSourceTransferList } from './financeManager';
+
+import { getFinanceMangerPage, deleteFinanceManager } from '@/api/finance/financeManager';
+import { getUserManagerList } from '@/api/user/userManager';
 import { useNavBar } from '@/composables/useNavBar';
 
-let router = useRouter();
-let route = useRoute();
+const router = useRouter();
+const route = useRoute();
 
 // 定义addFinance函数
 const addFinance = () => {
@@ -163,12 +114,12 @@ useNavBar({
 	onRightClick: addFinance,
 });
 
-let loading = ref<boolean>(false);
-let dataSource = ref<any[]>([]);
-let searchInfo = ref<SearchInfo>({});
+const loading = ref<boolean>(false);
+const dataSource = ref<any[]>([]);
+const searchInfo = ref<SearchInfo>({});
 
-let finished = ref<boolean>(false); //加载是否已经没有更多数据
-let isRefresh = ref<boolean>(false); //是否下拉刷新
+const finished = ref<boolean>(false); //加载是否已经没有更多数据
+const isRefresh = ref<boolean>(false); //是否下拉刷新
 
 const onSearch = () => {
 	pagination.value.current = 1;
@@ -182,23 +133,16 @@ const onCancel = () => {
 	getFinancePage(searchInfo.value, pagination.value);
 };
 
-function getFinancePage(param: SearchInfo, cur: pageInfo) {
+function getFinancePage(param: SearchInfo, cur: PageInfo) {
 	loading.value = true;
-	getFinanceMangerPage(
-		param,
-		cur?.current ? cur.current : 1,
-		cur?.pageSize || 10,
-	)
+	getFinanceMangerPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
 		.then((res) => {
 			if (res?.code == '200') {
 				dataSource.value = [...dataSource.value, ...res.data.records];
 				pagination.value.current = res.data.current + 1;
 				pagination.value.pageSize = res.data.size;
 				pagination.value.total = res.data.total;
-				if (
-					(pagination.value.total || 0) <
-					(pagination.value.current || 1) * (pagination.value.pageSize || 10)
-				) {
+				if ((pagination.value.total || 0) < (pagination.value.current || 1) * (pagination.value.pageSize || 10)) {
 					finished.value = true;
 				}
 			} else {
@@ -211,7 +155,7 @@ function getFinancePage(param: SearchInfo, cur: pageInfo) {
 		});
 }
 
-let userMap = {};
+const userMap = {};
 function getUserInfoList() {
 	getUserManagerList({}).then((res) => {
 		if (res.code == '200') {
@@ -241,7 +185,7 @@ const beforeClose = (e: any) => {
 };
 
 const delFinance = (id: number) => {
-	deleteFinanceManager(id + '').then((res: any) => {
+	deleteFinanceManager(id).then((res: any) => {
 		if (res?.code == '200') {
 			refresh();
 			showSuccessToast((res && res.message) || '删除成功！');

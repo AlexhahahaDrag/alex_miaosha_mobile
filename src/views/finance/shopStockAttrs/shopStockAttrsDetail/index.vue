@@ -51,44 +51,41 @@
 				:rules="rulesRef.description"
 				:maxlength="65535"
 			/>
-			<selectPop
-				:info="popInfo"
-				@selectInfo="selectInfo"
-				@cancelInfo="cancelInfo"
-			></selectPop>
+			<selectPop :info="popInfo" @selectInfo="selectInfo" @cancelInfo="cancelInfo"></selectPop>
 		</van-cell-group>
 		<div class="subButton">
-			<van-button round block type="primary" native-type="submit">
-				提交
-			</van-button>
+			<van-button round
+				block
+				type="primary"
+				native-type="submit"
+			> 提交 </van-button>
 		</div>
 	</van-form>
 </template>
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-import {
-	addOrEditShopStockAttrs,
-	getShopStockAttrsDetail,
-} from '@/api/finance/shopStockAttrs/shopStockAttrsTs';
-import { Info } from '@/views/common/pop/selectPop.vue';
-import { getDictList } from '@/api/finance/dict/dictManager';
+
 import { label, rulesRef } from './shopStockAttrsDetailTs';
 
-let route = useRoute();
-let router = useRouter();
+import { addOrEditShopStockAttrs, getShopStockAttrsDetail } from '@/api/finance/shopStockAttrs/shopStockAttrsTs';
+import type { Info } from '@/views/common/pop/selectPop.vue';
+import { getDictList } from '@/api/finance/dict/dictManager';
+
+const route = useRoute();
+const router = useRouter();
 const info = ref<any>({
 	title: route?.meta?.title || '商店库存属性表',
 	leftPath: '/finance/shopStockAttrs',
 });
 
-let formInfo = ref<any>({});
+const formInfo = ref<any>({});
 
-let popInfo = ref<Info>({ showFlag: false });
+const popInfo = ref<Info>({ showFlag: false });
 
-let isValidName = ref<string>('');
+const isValidName = ref<string>('');
 
-let isValidInfo = ref<Info>({
+const isValidInfo = ref<Info>({
 	label: 'isValid',
 	labelName: label.isValid,
 	rule: rulesRef.isValid,
@@ -101,9 +98,9 @@ let isValidInfo = ref<Info>({
 
 const choose = (type: string): void => {
 	switch (type) {
-		case 'isValid':
-			popInfo.value = isValidInfo.value;
-			break;
+	case 'isValid':
+		popInfo.value = isValidInfo.value;
+		break;
 	}
 	popInfo.value.showFlag = true;
 };
@@ -111,10 +108,10 @@ const choose = (type: string): void => {
 const selectInfo = (type: string, value: any, name: string): void => {
 	popInfo.value.showFlag = false;
 	switch (type) {
-		case 'isValid':
-			formInfo.value.isValid = value;
-			isValidName.value = name;
-			break;
+	case 'isValid':
+		formInfo.value.isValid = value;
+		isValidName.value = name;
+		break;
 	}
 };
 
@@ -122,12 +119,7 @@ const cancelInfo = () => {
 	popInfo.value.showFlag = false;
 };
 
-const getListName = (
-	list: any[],
-	value: any,
-	code: string,
-	name: string,
-): void => {
+const getListName = (list: any[], value: any, code: string, name: string): void => {
 	if (!list?.length) {
 		return '';
 	}
@@ -142,15 +134,8 @@ const getListName = (
 
 const getDictInfoList = (res: any): void => {
 	if (res?.code == '200') {
-		isValidInfo.value.list = res.data.filter(
-			(item: { belongTo: string }) => item.belongTo == 'is_valid',
-		);
-		isValidName.value = getListName(
-			isValidInfo.value.list || [],
-			formInfo.value.isValid,
-			'typeCode',
-			'typeName',
-		);
+		isValidInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'is_valid');
+		isValidName.value = getListName(isValidInfo.value.list || [], formInfo.value.isValid, 'typeCode', 'typeName');
 	} else {
 		showFailToast(res?.message || '查询失败，请联系管理员!');
 	}
@@ -172,7 +157,7 @@ const onSubmit = (): void => {
 };
 
 const init = (): void => {
-	let id: any = route?.query?.id;
+	const id: any = route?.query?.id;
 	if (id) {
 		Promise.all([getShopStockAttrsDetail(id || '-1'), getDictList('is_valid')])
 			.then((res: any) => {

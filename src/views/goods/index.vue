@@ -22,8 +22,7 @@
 		</van-cell-group>
 
 		<van-cell-group class="goods-cell-group">
-			<van-cell
-				value="进入店铺"
+			<van-cell value="进入店铺"
 				icon="shop-o"
 				is-link
 				@click="sorry('进入店铺~')"
@@ -33,13 +32,16 @@
 					<van-tag class="goods-tag" type="danger">官方</van-tag>
 				</template>
 			</van-cell>
-			<van-cell
-				title="线下门店"
+			<van-cell title="线下门店"
 				icon="location-o"
 				is-link
 				@click="sorry('线下门店~')"
 			/>
-			<van-cell title="会员中心" icon="user-o" is-link @click="onClickMember" />
+			<van-cell title="会员中心"
+				icon="user-o"
+				is-link
+				@click="onClickMember"
+			/>
 		</van-cell-group>
 
 		<van-cell-group class="goods-cell-group">
@@ -47,18 +49,10 @@
 		</van-cell-group>
 
 		<van-action-bar>
-			<van-action-bar-icon icon="chat-o" @click="sorry('客服~')">
-				客服
-			</van-action-bar-icon>
-			<van-action-bar-icon icon="cart-o" @click="onClickCart">
-				购物车
-			</van-action-bar-icon>
-			<van-action-bar-button type="warning" @click="sorry('加入购物车~')">
-				加入购物车
-			</van-action-bar-button>
-			<van-action-bar-button type="danger" @click="sorry('立即购买~')">
-				立即购买
-			</van-action-bar-button>
+			<van-action-bar-icon icon="chat-o" @click="sorry('客服~')"> 客服 </van-action-bar-icon>
+			<van-action-bar-icon icon="cart-o" @click="onClickCart"> 购物车 </van-action-bar-icon>
+			<van-action-bar-button type="warning" @click="sorry('加入购物车~')"> 加入购物车 </van-action-bar-button>
+			<van-action-bar-button type="danger" @click="sorry('立即购买~')"> 立即购买 </van-action-bar-button>
 		</van-action-bar>
 	</div>
 </template>
@@ -66,7 +60,7 @@
 <script lang="ts" setup>
 import { showToast } from 'vant';
 
-let router = useRouter();
+const router = useRouter();
 interface IGoods {
 	title: string;
 	price: number;
@@ -87,7 +81,7 @@ const goods = reactive<IGoods>({
 });
 
 const formatPrice = () => {
-	return '¥' + (goods.price / 100).toFixed(2);
+	return `¥${(goods.price / 100).toFixed(2)}`;
 };
 
 const onClickMember = () => {

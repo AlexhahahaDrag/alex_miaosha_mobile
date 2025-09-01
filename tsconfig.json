@@ -41,11 +41,9 @@
 		"build/**/*.d.ts",
 		"mock/**/*.ts",
 		"vite.config.ts",
+		"eslint.config.mjs",
 		"env.d.ts",
-		"src/main.ts",
-		"components.d.ts",
-		"src/auto-imports.d.ts",
-		"postcss.config.js"
+		"src/main.ts"
 	],
 	"references": [
 		{

@@ -1,6 +1,10 @@
 <template>
 	<navBar :info="info"></navBar>
-	<van-form @submit="onSubmit" :rules="rulesRef" required="auto">
+	<van-form
+		@submit="onSubmit"
+		:rules="rulesRef"
+		required="auto"
+	>
 		<van-cell-group>
 			<van-field
 				v-model="formInfo.name"
@@ -36,17 +40,22 @@
 			/>
 			<selectPop
 				:info="popInfo"
-				@selectInfo="selectInfo"
-				@cancelInfo="cancelInfo"
+				@select-info="handleSelectInfo"
+				@cancel-info="handleCancelInfo"
 			></selectPop>
 			<datePop
 				:info="chooseDateInfo"
-				@selectInfo="selectDateInfo"
-				@cancelInfo="cancelDateInfo"
+				@select-date-info="handleSelectDateInfo"
+				@cancel-date-info="handleCancelDateInfo"
 			></datePop>
 		</van-cell-group>
 		<div class="subButton">
-			<van-button round block type="primary" native-type="submit">
+			<van-button
+				round
+				block
+				type="primary"
+				native-type="submit"
+			>
 				提交
 			</van-button>
 		</div>
@@ -54,7 +63,7 @@
 </template>
 
 <script setup lang="ts">
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
 import {
 	addOrEditAccountRecordInfo,
@@ -62,14 +71,14 @@ import {
 } from '@/api/finance/accountRecordInfo/accountRecordInfoTs';
 import { getDictList } from '@/api/finance/dict/dictManager';
 
-let route = useRoute();
-let router = useRouter();
+const route = useRoute();
+const router = useRouter();
 const info = ref<any>({
 	title: route?.meta?.title || '',
 	leftPath: '/selfFinance/accountRecordInfo',
 });
 
-let formInfo = ref<any>({});
+const formInfo = ref<any>({});
 
 const label = reactive({
 	name: '名称',
@@ -106,9 +115,9 @@ const rulesRef = reactive({
 	],
 });
 
-let accountName = ref<string>('');
+const accountName = ref<string>('');
 
-let accountInfo = ref<Info>({
+const accountInfo = ref<Info>({
 	label: 'account',
 	labelName: '账号',
 	rule: rulesRef.account,
@@ -119,7 +128,7 @@ let accountInfo = ref<Info>({
 	selectValue: formInfo.value.account,
 });
 
-let popInfo = ref<Info>({ showFlag: false });
+const popInfo = ref<Info>({ showFlag: false });
 
 const choose = (type: string) => {
 	switch (type) {
@@ -144,8 +153,8 @@ const cancelInfo = () => {
 	popInfo.value.showFlag = false;
 };
 
-let avliDateName = ref<string>('');
-let avliDateInfo = ref<any>({
+const avliDateName = ref<string>('');
+const avliDateInfo = ref<any>({
 	label: 'avliDate',
 	labelName: 'field.comment',
 	rule: rulesRef.avliDate,
@@ -165,7 +174,7 @@ let avliDateInfo = ref<any>({
 	},
 });
 
-let chooseDateInfo = ref<Info>({ showFlag: false });
+const chooseDateInfo = ref<Info>({ showFlag: false });
 
 const chooseDate = (type: string) => {
 	chooseDateInfo.value.showFlag = true;
@@ -231,37 +240,22 @@ const getListName = (list: any[], value: any, code: string, name: string) => {
 
 function getDictInfoList(res: any) {
 	if (res.code == '200') {
-		accountInfo.value.list = res.data.filter(
-			(item: { belongTo: string }) => item.belongTo == 'account_type',
-		);
-		accountName.value = getListName(
-			accountInfo.value.list || [],
-			formInfo.value.account,
-			'typeCode',
-			'typeName',
-		);
+		accountInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'account_type');
+		accountName.value = getListName(accountInfo.value.list || [], formInfo.value.account, 'typeCode', 'typeName');
 	} else {
 		showFailToast(res?.message || '查询失败，请联系管理员!');
 	}
 }
 
 function init() {
-	let id: any = route?.query?.id;
+	const id: any = route?.query?.id;
 	if (id) {
-		Promise.all([
-			getAccountRecordInfoDetail(id || '-1'),
-			getDictList('account_type'),
-		])
+		Promise.all([getAccountRecordInfoDetail(id || '-1'), getDictList('account_type')])
 			.then((res: any) => {
 				if (res[0].code == '200') {
 					formInfo.value = res[0].data;
 					initInfoDate(formInfo.value.avliDate, 'avliDate');
-					accountName.value = getListName(
-						accountInfo.value.list || [],
-						formInfo.value.account,
-						'typeCode',
-						'typeName',
-					);
+					accountName.value = getListName(accountInfo.value.list || [], formInfo.value.account, 'typeCode', 'typeName');
 				} else {
 					showFailToast(res?.message || '查询详情失败，请联系管理员!');
 				}

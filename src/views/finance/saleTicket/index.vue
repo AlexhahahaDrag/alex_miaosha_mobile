@@ -5,35 +5,34 @@
 	</div>
 	<div class="container">
 		<div class="content">
-			<van-cell
-				v-if="saleOrderInfo.shopOrderDetailVoList?.length"
-				v-for="item in saleOrderInfo.shopOrderDetailVoList"
-				:key="item?.id"
-				center
-			>
-				<template #title>
-					<div class="text-left">
-						<span class="custom-title">{{ item.shopName }}</span>
-						<van-tag type="primary">{{ item.oldShopCode }}</van-tag>
-					</div>
-				</template>
-				<template #right-icon>
-					<div class="text-right">
-						<van-stepper
-							v-model="item.saleNum"
-							@change="getSumAmount"
-							min="1"
-							theme="round"
-							button-size="20px"
-						></van-stepper>
-					</div>
-				</template>
-				<template #label>
-					<div class="amount-cell-info">
-						￥{{ commonUtils.formatAmount(item?.saleAmount || 0, 2, '') }}
-					</div>
-				</template>
-			</van-cell>
+			<template v-if="saleOrderInfo.shopOrderDetailVoList?.length">
+				<van-cell
+					v-for="item in saleOrderInfo.shopOrderDetailVoList"
+					:key="item?.id"
+					center
+				>
+					<template #title>
+						<div class="text-left">
+							<span class="custom-title">{{ item.shopName }}</span>
+							<van-tag type="primary">{{ item.oldShopCode }}</van-tag>
+						</div>
+					</template>
+					<template #right-icon>
+						<div class="text-right">
+							<van-stepper
+								v-model="item.saleNum"
+								@change="getSumAmount"
+								min="1"
+								theme="round"
+								button-size="20px"
+							></van-stepper>
+						</div>
+					</template>
+					<template #label>
+						<div class="amount-cell-info"> ￥{{ commonUtils.formatAmount(item?.saleAmount || 0, 2, '') }} </div>
+					</template>
+				</van-cell>
+			</template>
 		</div>
 		<div class="footer-container">
 			<div class="footer">
@@ -45,7 +44,10 @@
 						label="￥"
 						placeholder="请输入金额"
 					></van-field>
-					<div class="old-info" v-if="showOldAmount">
+					<div
+						class="old-info"
+						v-if="showOldAmount"
+					>
 						￥{{ commonUtils.formatAmount(sumAmount || 0, 2, '') }}
 					</div>
 				</div>
@@ -74,42 +76,41 @@
 	</div>
 	<SelectPop
 		:info="popInfo"
-		@selectInfo="selectInfo"
-		@cancelInfo="cancelInfo"
+		@select-info="selectInfo"
+		@cancel-info="cancelInfo"
 	></SelectPop>
 </template>
 
 <script setup lang="ts">
 import { showFailToast } from 'vant';
+import dayjs from 'dayjs';
 import commonUtils from '@/utils/common/index';
 import { getShopList } from '@/api/finance/shopStock/shopStockTs';
 import { submitOrder } from '@/api/finance/shopOrder/shopOrderTs';
-import { ShopStockInfo } from '@/views/finance/shopStock/shopStockTs';
-import { SaleOrderInfo } from '@/views/finance/saleTicket/saleTicketTs';
+import type { ShopStockInfo } from '@/views/finance/shopStock/shopStockTs';
+import type { SaleOrderInfo } from '@/views/finance/saleTicket/saleTicketTs';
 import { getShopCartList } from '@/api/finance/shopCart/shopCartTs';
-import dayjs from 'dayjs';
-import { ShopCartInfo } from '@/views/finance/shoppingCart/shoppingCartTs';
-import { Info } from '@/views/common/pop/selectPop.vue';
+import type { ShopCartInfo } from '@/views/finance/shoppingCart/shoppingCartTs';
+import type { Info } from '@/views/common/pop/selectPop.vue';
 import { getDictList } from '@/api/finance/dict/dictManager';
-import CommonUtils from '@/utils/common/index';
 
-let route = useRoute();
-let router = useRouter();
+const route = useRoute();
+const router = useRouter();
 
 const info = ref<any>({
 	title: route?.meta?.title || '订单提交',
 });
 
-let sumAmount = ref<number>(0);
-let submitLoading = ref<boolean>(false);
-let showOldAmount = ref<boolean>(false);
-let saleOrderInfo = ref<SaleOrderInfo>({
+const sumAmount = ref<number>(0);
+const submitLoading = ref<boolean>(false);
+const showOldAmount = ref<boolean>(false);
+const saleOrderInfo = ref<SaleOrderInfo>({
 	saleAmount: 0,
 	payWay: 'wx',
 });
-let payWayName = ref<string>('');
-let popInfo = ref<Info>({ showFlag: false });
-let payWayInfo = ref<Info>({
+const payWayName = ref<string>('');
+const popInfo = ref<Info>({ showFlag: false });
+const payWayInfo = ref<Info>({
 	label: 'payWay',
 	labelName: '支付方式',
 	customFieldName: {
@@ -173,10 +174,7 @@ const getSumAmount = (): void => {
 	}
 	sumAmount.value = 0;
 	saleOrderInfo.value.shopOrderDetailVoList.forEach((item: any) => {
-		sumAmount.value = commonUtils.plus(
-			sumAmount.value,
-			commonUtils.multiply(item.saleAmount, item.saleNum),
-		);
+		sumAmount.value = commonUtils.plus(sumAmount.value, commonUtils.multiply(item.saleAmount, item.saleNum));
 	});
 	saleOrderInfo.value.saleAmount = sumAmount.value;
 	showOldAmount.value = false;
@@ -190,17 +188,15 @@ const getShopListInfo = async (ids: string) => {
 	await getShopList(ids).then((res: any) => {
 		if (res?.code == '200') {
 			if (res?.data?.length) {
-				saleOrderInfo.value.shopOrderDetailVoList = res.data.map(
-					(item: ShopStockInfo) => ({
-						shopName: item.shopName,
-						shopCode: item.shopCode,
-						oldShopCode: item.oldShopCode,
-						saleAmount: item.saleAmount,
-						saleDate: dayjs(),
-						saleNum: 1,
-						shopStockId: item.id,
-					}),
-				);
+				saleOrderInfo.value.shopOrderDetailVoList = res.data.map((item: ShopStockInfo) => ({
+					shopName: item.shopName,
+					shopCode: item.shopCode,
+					oldShopCode: item.oldShopCode,
+					saleAmount: item.saleAmount,
+					saleDate: dayjs(),
+					saleNum: 1,
+					shopStockId: item.id,
+				}));
 			} else {
 				showFailToast('获取订单失败，请联系管理员！');
 			}
@@ -212,18 +208,16 @@ const getShopCartListInfo = async (ids: string) => {
 	await getShopCartList(ids).then((res: any) => {
 		if (res?.code == '200') {
 			if (res?.data?.length) {
-				saleOrderInfo.value.shopOrderDetailVoList = res.data.map(
-					(item: ShopCartInfo) => ({
-						shopName: item.shopName,
-						shopCode: item.shopCode,
-						oldShopCode: item.oldShopCode,
-						saleAmount: item.saleAmount,
-						saleDate: dayjs(),
-						saleNum: item.saleNum,
-						shopStockId: item.shopId,
-						shopCartId: item.id,
-					}),
-				);
+				saleOrderInfo.value.shopOrderDetailVoList = res.data.map((item: ShopCartInfo) => ({
+					shopName: item.shopName,
+					shopCode: item.shopCode,
+					oldShopCode: item.oldShopCode,
+					saleAmount: item.saleAmount,
+					saleDate: dayjs(),
+					saleNum: item.saleNum,
+					shopStockId: item.shopId,
+					shopCartId: item.id,
+				}));
 			} else {
 				showFailToast('获取订单失败，请联系管理员！');
 			}
@@ -233,9 +227,7 @@ const getShopCartListInfo = async (ids: string) => {
 
 const getDictInfoList = (res: any) => {
 	if (res?.code == '200') {
-		payWayInfo.value.list = res.data.filter(
-			(item: { belongTo: string }) => item.belongTo == 'shop_pay_way',
-		);
+		payWayInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'shop_pay_way');
 		payWayName.value = CommonUtils.getListName(
 			payWayInfo.value.list || [],
 			saleOrderInfo.value.payWay,
@@ -248,7 +240,7 @@ const getDictInfoList = (res: any) => {
 };
 
 onMounted(async () => {
-	let params: any = route.query;
+	const params: any = route.query;
 	getDictList('shop_pay_way').then((res: any) => {
 		if (res?.code == '200') {
 			getDictInfoList(res);

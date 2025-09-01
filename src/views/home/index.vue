@@ -2,8 +2,7 @@
 	<div style="height: calc(100vh - 50px)">
 		<div style="overflow-y: auto; height: calc(100% - 46px)">
 			<van-grid :column-num="3" :square="true">
-				<van-grid-item
-					v-for="item in homeList"
+				<van-grid-item v-for="item in homeList"
 					:key="item.id"
 					:text="item?.meta?.title"
 					:to="item.path"
@@ -20,9 +19,9 @@
 <script setup lang="ts">
 import { useNavBar } from '@/composables/useNavBar';
 
-let route = useRoute();
-let router = useRouter();
-let homeList = ref<any>([]);
+const route = useRoute();
+const router = useRouter();
+const homeList = ref<any>([]);
 
 // 使用新的NavBar系统
 useNavBar({

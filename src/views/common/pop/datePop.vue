@@ -35,14 +35,13 @@ const emit = defineEmits(['selectInfo', 'cancelInfo']);
 
 const props = defineProps<Props>();
 
-let showFlag = ref<boolean>(false);
+const showFlag = ref<boolean>(false);
 
-let curSelectValue = ref<string[]>([]);
+const curSelectValue = ref<string[]>([]);
 
 const confirm = ({ selectedValues }) => {
 	showFlag.value = false;
-	let dateName =
-		selectedValues[0] + '-' + selectedValues[1] + '-' + selectedValues[2];
+	const dateName = `${selectedValues[0]}-${selectedValues[1]}-${selectedValues[2]}`;
 	emit('selectInfo', formatDayjs(dateName), dateName, props.info.label);
 };
 
@@ -55,7 +54,7 @@ const onClickOverlay = () => {
 	cancel();
 };
 
-let cur = ref<Info>({});
+const cur = ref<Info>({});
 
 watch(
 	() => props.info.showFlag,
@@ -64,11 +63,11 @@ watch(
 			cur.value = props.info;
 			showFlag.value = props.info.showFlag;
 			if (props.info.selectValue) {
-				let month = props.info.selectValue.month() + 1;
+				const month = props.info.selectValue.month() + 1;
 				curSelectValue.value = [
-					props.info.selectValue.year() + '',
-					month < 10 ? '0' + month : month + '',
-					props.info.selectValue.date() + '',
+					`${props.info.selectValue.year()}`,
+					month < 10 ? `0${month}` : `${month}`,
+					`${props.info.selectValue.date()}`,
 				];
 			}
 		}

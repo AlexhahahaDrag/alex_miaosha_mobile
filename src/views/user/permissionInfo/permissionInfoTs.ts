@@ -1,3 +1,5 @@
+import { type PageInfo, type ModelInfo } from '@/views/common/config/index';
+
 export interface SearchInfo {
 	permissionCode?: string;
 	permissionName?: string;
@@ -6,20 +8,7 @@ export interface SearchInfo {
 	options?: string;
 }
 
-export interface pageInfo {
-	current?: number;
-	pageSize?: number;
-	total?: number;
-	showTotal: Function;
-	showSizeChanger: boolean;
-	pageSizeOptions: string[];
-	showSizeChange: Function;
-	size: string;
-	showQuickJumper: boolean;
-	defaultPageSize: number;
-}
-
-export let pagination = ref<pageInfo>({
+export const pagination = ref<PageInfo>({
 	// 数据总数
 	total: 0,
 	// 当前页数
@@ -85,13 +74,6 @@ export interface DataItem {
 	summary: string;
 	status: string;
 	options: string;
-}
-
-export interface ModelInfo {
-	title?: string;
-	width?: string;
-	id?: number | undefined;
-	confirmLoading?: boolean;
 }
 
 export interface dictInfo {

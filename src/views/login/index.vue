@@ -4,9 +4,7 @@
 		<Particles id="tsparticles" :options="options"></Particles>
 		<div style="height: 100vh">
 			<div style="height: 35vh; line-height: 35vh; text-align: center">
-				<span style="font-size: 3.5rem; margin-bottom: 15vh; color: #fff"
-					><b>alex系统管理平台</b></span
-				>
+				<span style="font-size: 3.5rem; margin-bottom: 15vh; color: #fff"><b>alex系统管理平台</b></span>
 			</div>
 			<van-form @submit="onSubmit">
 				<van-cell-group inset>
@@ -28,17 +26,20 @@
 					/>
 				</van-cell-group>
 				<div style="margin: 16px">
-					<van-button round block type="primary" native-type="submit">
-						提交
-					</van-button>
+					<van-button round
+						block
+						type="primary"
+						native-type="submit"
+					> 提交 </van-button>
 				</div>
 			</van-form>
 		</div>
 	</div>
 </template>
 <script setup lang="ts">
-import { LoginForm } from './login';
-import { LoginParams } from '@/api/user/login';
+import type { LoginForm } from './login';
+
+import type { LoginParams } from '@/api/user/login';
 import { useUserStore } from '@/store/modules/user/user';
 import { useNavBar } from '@/composables/useNavBar';
 
@@ -55,7 +56,7 @@ const loginForm = ref<LoginForm>({
 });
 
 const onSubmit = async () => {
-	let param: LoginParams = {
+	const param: LoginParams = {
 		type: 'account',
 		username: loginForm.value.username,
 		password: loginForm.value.password,

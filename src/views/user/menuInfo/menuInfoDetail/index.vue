@@ -92,44 +92,41 @@
 				:rules="rulesRef.orderBy"
 				:maxlength="orderBy"
 			/>
-			<selectPop
-				:info="popInfo"
-				@selectInfo="selectInfo"
-				@cancelInfo="cancelInfo"
-			></selectPop>
+			<selectPop :info="popInfo" @selectInfo="selectInfo" @cancelInfo="cancelInfo"></selectPop>
 		</van-cell-group>
 		<div class="subButton">
-			<van-button round block type="primary" native-type="submit">
-				提交
-			</van-button>
+			<van-button round
+				block
+				type="primary"
+				native-type="submit"
+			> 提交 </van-button>
 		</div>
 	</van-form>
 </template>
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-import {
-	addOrEditMenuInfo,
-	getMenuInfoDetail,
-} from '@/api/user/menuInfo/menuInfoTs';
-import { Info } from '@/views/common/pop/selectPop.vue';
-import { getDictList } from '@/api/finance/dict/dictManager';
+
 import { label, rulesRef } from './menuInfoDetailTs';
 
-let route = useRoute();
-let router = useRouter();
+import { addOrEditMenuInfo, getMenuInfoDetail } from '@/api/user/menuInfo/menuInfoTs';
+import type { Info } from '@/views/common/pop/selectPop.vue';
+import { getDictList } from '@/api/finance/dict/dictManager';
+
+const route = useRoute();
+const router = useRouter();
 const info = ref<any>({
 	title: route?.meta?.title || '菜单管理表',
 	leftPath: '/user/menuInfo',
 });
 
-let formInfo = ref<any>({});
+const formInfo = ref<any>({});
 
-let popInfo = ref<Info>({ showFlag: false });
+const popInfo = ref<Info>({ showFlag: false });
 
-let hideInMenuName = ref<string>('');
+const hideInMenuName = ref<string>('');
 
-let hideInMenuInfo = ref<Info>({
+const hideInMenuInfo = ref<Info>({
 	label: 'hideInMenu',
 	labelName: label.hideInMenu,
 	rule: rulesRef.hideInMenu,
@@ -139,9 +136,9 @@ let hideInMenuInfo = ref<Info>({
 	},
 	selectValue: formInfo.value.hideInMenu,
 });
-let statusName = ref<string>('');
+const statusName = ref<string>('');
 
-let statusInfo = ref<Info>({
+const statusInfo = ref<Info>({
 	label: 'status',
 	labelName: label.status,
 	rule: rulesRef.status,
@@ -154,12 +151,12 @@ let statusInfo = ref<Info>({
 
 const choose = (type: string) => {
 	switch (type) {
-		case 'hideInMenu':
-			popInfo.value = hideInMenuInfo.value;
-			break;
-		case 'status':
-			popInfo.value = statusInfo.value;
-			break;
+	case 'hideInMenu':
+		popInfo.value = hideInMenuInfo.value;
+		break;
+	case 'status':
+		popInfo.value = statusInfo.value;
+		break;
 	}
 	popInfo.value.showFlag = true;
 };
@@ -167,14 +164,14 @@ const choose = (type: string) => {
 const selectInfo = (type: string, value: any, name: string) => {
 	popInfo.value.showFlag = false;
 	switch (type) {
-		case 'hideInMenu':
-			formInfo.value.hideInMenu = value;
-			hideInMenuName.value = name;
-			break;
-		case 'status':
-			formInfo.value.status = value;
-			statusName.value = name;
-			break;
+	case 'hideInMenu':
+		formInfo.value.hideInMenu = value;
+		hideInMenuName.value = name;
+		break;
+	case 'status':
+		formInfo.value.status = value;
+		statusName.value = name;
+		break;
 	}
 };
 
@@ -197,24 +194,15 @@ const getListName = (list: any[], value: any, code: string, name: string) => {
 
 function getDictInfoList(res: any) {
 	if (res.code == '200') {
-		hideInMenuInfo.value.list = res.data.filter(
-			(item: { belongTo: string }) => item.belongTo == 'true_or_false',
-		);
+		hideInMenuInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'true_or_false');
 		hideInMenuName.value = getListName(
 			hideInMenuInfo.value.list || [],
 			formInfo.value.hideInMenu,
 			'typeCode',
 			'typeName',
 		);
-		statusInfo.value.list = res.data.filter(
-			(item: { belongTo: string }) => item.belongTo == 'is_valid',
-		);
-		statusName.value = getListName(
-			statusInfo.value.list || [],
-			formInfo.value.status,
-			'typeCode',
-			'typeName',
-		);
+		statusInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'is_valid');
+		statusName.value = getListName(statusInfo.value.list || [], formInfo.value.status, 'typeCode', 'typeName');
 	} else {
 		showFailToast(res?.message || '查询失败，请联系管理员!');
 	}
@@ -236,12 +224,9 @@ const onSubmit = () => {
 };
 
 function init() {
-	let id: any = route?.query?.id;
+	const id: any = route?.query?.id;
 	if (id) {
-		Promise.all([
-			getMenuInfoDetail(id || '-1'),
-			getDictList('true_or_false,is_valid'),
-		])
+		Promise.all([getMenuInfoDetail(id || '-1'), getDictList('true_or_false,is_valid')])
 			.then((res: any) => {
 				if (res[0].code == '200') {
 					formInfo.value = res[0].data;

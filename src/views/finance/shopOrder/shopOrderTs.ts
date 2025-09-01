@@ -1,4 +1,6 @@
-import { Dayjs } from 'dayjs';
+import type { Dayjs } from 'dayjs';
+import { type PageInfo } from '@/views/common/config/index';
+
 export interface SearchInfo {
 	saleOrderCode?: string | null;
 	saleOrderName?: string;
@@ -10,20 +12,7 @@ export interface SearchInfo {
 	saleCount?: number;
 }
 
-export interface pageInfo {
-	current?: number;
-	pageSize?: number;
-	total?: number;
-	showTotal: Function;
-	showSizeChanger: boolean;
-	pageSizeOptions: string[];
-	showSizeChange: Function;
-	size: string;
-	showQuickJumper: boolean;
-	defaultPageSize: number;
-}
-
-export let pagination = ref<pageInfo>({
+export const pagination = ref<PageInfo>({
 	// 数据总数
 	total: 0,
 	// 当前页数
@@ -107,13 +96,6 @@ export interface DataItem {
 	description: string;
 	payWay: string;
 	saleCount: number;
-}
-
-export interface ModelInfo {
-	title?: string;
-	width?: string;
-	id?: number | undefined;
-	confirmLoading?: boolean;
 }
 
 export interface dictInfo {

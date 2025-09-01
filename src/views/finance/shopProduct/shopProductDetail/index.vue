@@ -60,10 +60,20 @@
 			/>
 		</van-cell-group>
 		<div class="subButton">
-			<van-button round block type="primary" native-type="submit">
+			<van-button
+				round
+				block
+				type="primary"
+				native-type="submit"
+			>
 				加入购物车
 			</van-button>
-			<van-button round block type="primary" native-type="submit">
+			<van-button
+				round
+				block
+				type="primary"
+				native-type="submit"
+			>
 				直接购买
 			</van-button>
 		</div>
@@ -71,25 +81,25 @@
 </template>
 
 <script setup lang="ts">
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast } from 'vant';
+import { label } from './shopProductDetailTs';
 import { getShopStockDetail } from '@/api/finance/shopStock/shopStockTs';
 import { getDictList } from '@/api/finance/dict/dictManager';
-import { label } from './shopProductDetailTs';
 
-let route = useRoute();
+const route = useRoute();
 const info = ref<any>({
 	title: route?.meta?.title || '商店库存表',
 	leftPath: '/finance/shopStock',
 });
 
-let formInfo = ref<any>({});
+const formInfo = ref<any>({});
 
-let isValidName = ref<string>('');
+const isValidName = ref<string>('');
 
-let categoryName = ref<string>('');
+const categoryName = ref<string>('');
 
-let purchasePlaceName = ref<string>('');
+const purchasePlaceName = ref<string>('');
 
 const getListName = (list: any[], value: any, code: string, name: string) => {
 	if (!list?.length) {
@@ -107,25 +117,19 @@ const getListName = (list: any[], value: any, code: string, name: string) => {
 function getDictInfoList(res: any) {
 	if (res?.code == '200') {
 		isValidName.value = getListName(
-			res.data.filter(
-				(item: { belongTo: string }) => item.belongTo == 'is_valid',
-			) || [],
+			res.data.filter((item: { belongTo: string }) => item.belongTo == 'is_valid') || [],
 			formInfo.value.isValid,
 			'typeCode',
 			'typeName',
 		);
 		categoryName.value = getListName(
-			res.data.filter(
-				(item: { belongTo: string }) => item.belongTo == 'shop_category',
-			) || [],
+			res.data.filter((item: { belongTo: string }) => item.belongTo == 'shop_category') || [],
 			formInfo.value.category,
 			'typeCode',
 			'typeName',
 		);
 		purchasePlaceName.value = getListName(
-			res.data.filter(
-				(item: { belongTo: string }) => item.belongTo == 'stock_place',
-			) || [],
+			res.data.filter((item: { belongTo: string }) => item.belongTo == 'stock_place') || [],
 			formInfo.value.purchasePlace,
 			'typeCode',
 			'typeName',
@@ -135,7 +139,7 @@ function getDictInfoList(res: any) {
 	}
 }
 
-let saleDateName = ref<string>('');
+const saleDateName = ref<string>('');
 
 const initInfoDate = (infoDate: Dayjs, type: string) => {
 	if (infoDate) {
@@ -148,12 +152,9 @@ const initInfoDate = (infoDate: Dayjs, type: string) => {
 };
 
 function init() {
-	let id: any = route?.query?.id;
+	const id: any = route?.query?.id;
 	if (id) {
-		Promise.all([
-			getShopStockDetail(id || '-1'),
-			getDictList('is_valid,shop_category,stock_place'),
-		])
+		Promise.all([getShopStockDetail(id || '-1'), getDictList('is_valid,shop_category,stock_place')])
 			.then((res: any) => {
 				if (res[0].code == '200') {
 					formInfo.value = res[0].data;

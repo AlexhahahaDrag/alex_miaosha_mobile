@@ -43,44 +43,41 @@
 				:rules="rulesRef.options"
 				:maxlength="65535"
 			/>
-			<selectPop
-				:info="popInfo"
-				@selectInfo="selectInfo"
-				@cancelInfo="cancelInfo"
-			></selectPop>
+			<selectPop :info="popInfo" @selectInfo="selectInfo" @cancelInfo="cancelInfo"></selectPop>
 		</van-cell-group>
 		<div class="subButton">
-			<van-button round block type="primary" native-type="submit">
-				提交
-			</van-button>
+			<van-button round
+				block
+				type="primary"
+				native-type="submit"
+			> 提交 </van-button>
 		</div>
 	</van-form>
 </template>
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-import {
-	addOrEditPermissionInfo,
-	getPermissionInfoDetail,
-} from '@/api/user/permissionInfo/permissionInfoTs';
-import { Info } from '@/views/common/pop/selectPop.vue';
-import { getDictList } from '@/api/finance/dict/dictManager';
+
 import { label, rulesRef } from './permissionInfoDetailTs';
 
-let route = useRoute();
-let router = useRouter();
+import { addOrEditPermissionInfo, getPermissionInfoDetail } from '@/api/user/permissionInfo/permissionInfoTs';
+import type { Info } from '@/views/common/pop/selectPop.vue';
+import { getDictList } from '@/api/finance/dict/dictManager';
+
+const route = useRoute();
+const router = useRouter();
 const info = ref<any>({
 	title: route?.meta?.title || '权限信息表',
 	leftPath: '/user/permissionInfo',
 });
 
-let formInfo = ref<any>({});
+const formInfo = ref<any>({});
 
-let popInfo = ref<Info>({ showFlag: false });
+const popInfo = ref<Info>({ showFlag: false });
 
-let statusName = ref<string>('');
+const statusName = ref<string>('');
 
-let statusInfo = ref<Info>({
+const statusInfo = ref<Info>({
 	label: 'status',
 	labelName: label.status,
 	rule: rulesRef.status,
@@ -93,9 +90,9 @@ let statusInfo = ref<Info>({
 
 const choose = (type: string) => {
 	switch (type) {
-		case 'status':
-			popInfo.value = statusInfo.value;
-			break;
+	case 'status':
+		popInfo.value = statusInfo.value;
+		break;
 	}
 	popInfo.value.showFlag = true;
 };
@@ -103,10 +100,10 @@ const choose = (type: string) => {
 const selectInfo = (type: string, value: any, name: string) => {
 	popInfo.value.showFlag = false;
 	switch (type) {
-		case 'status':
-			formInfo.value.status = value;
-			statusName.value = name;
-			break;
+	case 'status':
+		formInfo.value.status = value;
+		statusName.value = name;
+		break;
 	}
 };
 
@@ -129,15 +126,8 @@ const getListName = (list: any[], value: any, code: string, name: string) => {
 
 function getDictInfoList(res: any) {
 	if (res?.code == '200') {
-		statusInfo.value.list = res.data.filter(
-			(item: { belongTo: string }) => item.belongTo == 'is_valid',
-		);
-		statusName.value = getListName(
-			statusInfo.value.list || [],
-			formInfo.value.status,
-			'typeCode',
-			'typeName',
-		);
+		statusInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'is_valid');
+		statusName.value = getListName(statusInfo.value.list || [], formInfo.value.status, 'typeCode', 'typeName');
 	} else {
 		showFailToast(res?.message || '查询失败，请联系管理员!');
 	}
@@ -159,7 +149,7 @@ const onSubmit = () => {
 };
 
 function init() {
-	let id: any = route?.query?.id;
+	const id: any = route?.query?.id;
 	if (id) {
 		Promise.all([getPermissionInfoDetail(id || '-1'), getDictList('is_valid')])
 			.then((res: any) => {

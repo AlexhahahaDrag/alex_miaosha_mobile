@@ -13,8 +13,7 @@
 				>
 					总览
 				</van-button>
-				<van-button
-					type="default"
+				<van-button type="default"
 					size="small"
 					class="add-btn"
 					icon="plus"
@@ -36,21 +35,12 @@
 						<div class="card-content">
 							<div class="card-left">
 								<div class="card-name">
-									{{ card.name
-									}}<span class="status-badge">{{ getStatusLabel(card) }}</span>
+									{{ card.name }}<span class="status-badge">{{ getStatusLabel(card) }}</span>
 								</div>
 								<div class="card-label">可用余额</div>
 								<div class="balance-box">
-									<span class="balance-integer"
-										>¥{{
-											getBalanceParts(card.currentBalance || card.balance)
-												.integer
-										}}</span
-									>
-									<span class="balance-fraction">{{
-										getBalanceParts(card.currentBalance || card.balance)
-											.fraction
-									}}</span>
+									<span class="balance-integer">¥{{ getBalanceParts(card.currentBalance || card.balance).integer }}</span>
+									<span class="balance-fraction">{{ getBalanceParts(card.currentBalance || card.balance).fraction }}</span>
 								</div>
 							</div>
 							<div class="card-right">
@@ -76,8 +66,7 @@
 		</div>
 		<!-- 快捷操作按钮 -->
 		<div class="quick-actions">
-			<van-button
-				class="action-btn consume-btn"
+			<van-button class="action-btn consume-btn"
 				@click="handleAmount('consume')"
 				color="#ff6666"
 				block
@@ -87,8 +76,7 @@
 					消费
 				</div>
 			</van-button>
-			<van-button
-				class="action-btn recharge-btn"
+			<van-button class="action-btn recharge-btn"
 				@click="handleAmount('recharge')"
 				color="#4db280"
 				block
@@ -115,10 +103,7 @@
 				v-if="!transactionsLoading && transactionList.length > 0"
 			>
 				<div class="transaction-left">
-					<div
-						class="card-indicator-dot"
-						:style="{ backgroundColor: transaction.cardColor }"
-					></div>
+					<div class="card-indicator-dot" :style="{ backgroundColor: transaction.cardColor }"></div>
 					<div class="transaction-info">
 						<div class="transaction-name">{{ transaction.name }}</div>
 						<div class="transaction-time">{{ transaction.time }}</div>
@@ -140,10 +125,7 @@
 				<span>加载交易记录中...</span>
 			</div>
 			<!-- 无交易记录状态 -->
-			<div
-				class="transaction-empty"
-				v-if="!transactionsLoading && transactionList.length === 0"
-			>
+			<div class="transaction-empty" v-if="!transactionsLoading && transactionList.length === 0">
 				<div class="empty-icon">📋</div>
 				<div class="empty-text">暂无交易记录</div>
 			</div>
@@ -153,16 +135,10 @@
 
 <script setup lang="ts">
 import { showToast, showLoadingToast, showFailToast, closeToast } from 'vant';
-import {
-	getPrepaidCardInfoList,
-	getPrepaidConsumeRecordPage,
-} from './api/index';
-import {
-	type CardItem,
-	type TransactionItem,
-	getCardColor,
-	typeIconMap,
-} from './config/index';
+
+import { getPrepaidCardInfoList, getPrepaidConsumeRecordPage } from './api/index';
+import { type CardItem, type TransactionItem, getCardColor, typeIconMap } from './config/index';
+
 import { formatTime, formatAmount } from '@/views/common/config';
 import { useNavBar } from '@/composables/useNavBar';
 import shopCardSvg from '@/assets/icons/shop/shop-card.svg';
@@ -234,11 +210,7 @@ const getCardList = async () => {
 };
 
 const getCardDetail = async () => {
-	const { code, data, message } = await getPrepaidConsumeRecordPage(
-		{ cardId: currentCard.value?.id },
-		1,
-		10,
-	);
+	const { code, data, message } = await getPrepaidConsumeRecordPage({ cardId: currentCard.value?.id }, 1, 10);
 	if (code === '200') {
 		const records = data.records || [];
 		// 转换数据格式以匹配组件期望的结构
@@ -281,10 +253,7 @@ const fetchData = async () => {
 
 // 金额格式拆分（整数与小数）
 const getBalanceParts = (value: string | number) => {
-	const numeric =
-		typeof value === 'number' ? value : (
-			Number(String(value).replace(/[^\d.-]/g, ''))
-		);
+	const numeric = typeof value === 'number' ? value : Number(String(value).replace(/[^\d.-]/g, ''));
 	if (Number.isNaN(numeric)) {
 		return { integer: '0', fraction: '.00' };
 	}
@@ -297,8 +266,7 @@ const getBalanceParts = (value: string | number) => {
 const getStatusLabel = (card: CardItem) => {
 	const status = (card?.status || '1').toString();
 	if (status === '1' || status === '正常' || status === 'normal') return '正常';
-	if (status === '0' || status === '禁用' || status === 'disabled')
-		return '禁用';
+	if (status === '0' || status === '禁用' || status === 'disabled') return '禁用';
 	return '未知';
 };
 

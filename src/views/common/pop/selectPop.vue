@@ -40,7 +40,7 @@ const emit = defineEmits(['selectInfo', 'cancelInfo']);
 
 const props = defineProps<Props>();
 
-let showFlag = ref<boolean>(false);
+const showFlag = ref<boolean>(false);
 
 const confirm = ({ selectedOptions }) => {
 	showFlag.value = false;
@@ -66,7 +66,7 @@ let customFieldName = ref<any>({
 	value: 'typeCode',
 });
 
-let cur = ref<Info>({});
+const cur = ref<Info>({});
 
 watch(
 	() => props.info.showFlag,

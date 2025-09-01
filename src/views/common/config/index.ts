@@ -6,11 +6,7 @@ export const formatTime = (timeStr: string) => {
 	const now = new Date();
 	const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 	const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
-	const recordDate = new Date(
-		date.getFullYear(),
-		date.getMonth(),
-		date.getDate(),
-	);
+	const recordDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
 	const timeFormat = date.toLocaleTimeString('zh-CN', {
 		hour: '2-digit',
@@ -47,4 +43,26 @@ export interface Pagination {
 	pageNum?: number;
 	pageSize?: number;
 	total?: number;
+}
+
+// 分页信息
+export interface PageInfo {
+	current?: number;
+	pageSize?: number;
+	total?: number;
+	showTotal: (total: number) => string;
+	showSizeChanger: boolean;
+	pageSizeOptions: string[];
+	showSizeChange: (current: number, pageSize: number) => void;
+	size: string;
+	showQuickJumper: boolean;
+	defaultPageSize: number;
+}
+
+// 模态框信息
+export interface ModelInfo {
+	title?: string;
+	width?: string;
+	id?: number | undefined;
+	confirmLoading?: boolean;
 }

@@ -1,6 +1,6 @@
-import { CartState } from './typing';
+import type { CartState } from './typing';
 import { piniaPersistConfig } from '@/config/piniaPersist';
-import { ShopStockInfo } from '@/views/finance/shopStock/shopStockTs';
+import type { ShopStockInfo } from '@/views/finance/shopStock/shopStockTs';
 
 export const useCartStore = defineStore({
 	id: 'app-cart',
@@ -10,13 +10,8 @@ export const useCartStore = defineStore({
 
 	getters: {
 		getShoppingCart(): ShopStockInfo[] {
-			let localStorage = window.localStorage;
-			console.log(`get shoppingCart`, this.shoppingCart);
-			return (
-				this.shoppingCart ||
-				JSON.parse(localStorage.getItem('shoppingCart') || '') ||
-				[]
-			);
+			const localStorage = window.localStorage;
+			return this.shoppingCart || JSON.parse(localStorage.getItem('shoppingCart') || '') || [];
 		},
 	},
 	actions: {

@@ -68,29 +68,30 @@
 			/>
 		</van-cell-group>
 		<div class="subButton">
-			<van-button round block type="primary" native-type="submit">
-				提交
-			</van-button>
+			<van-button round
+				block
+				type="primary"
+				native-type="submit"
+			> 提交 </van-button>
 		</div>
 	</van-form>
 </template>
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-import {
-	addOrEditPmsAttr,
-	getPmsAttrDetail,
-} from '@/api/product/pmsAttr/pmsAttrTs';
+
 import { label, rulesRef } from './pmsAttrDetailTs';
 
-let route = useRoute();
-let router = useRouter();
+import { addOrEditPmsAttr, getPmsAttrDetail } from '@/api/product/pmsAttr/pmsAttrTs';
+
+const route = useRoute();
+const router = useRouter();
 const info = ref<any>({
 	title: route?.meta?.title || '商品属性',
 	leftPath: '/product/pmsAttr',
 });
 
-let formInfo = ref<any>({});
+const formInfo = ref<any>({});
 
 const onSubmit = () => {
 	let method = 'post';
@@ -108,7 +109,7 @@ const onSubmit = () => {
 };
 
 function init() {
-	let id: any = route?.query?.id;
+	const id: any = route?.query?.id;
 	if (id) {
 		Promise.all([getPmsAttrDetail(id || '-1')])
 			.then((res: any) => {

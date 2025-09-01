@@ -3,19 +3,13 @@
 	<div class="container">
 		<div class="content">
 			<van-cell-group>
-				<van-swipe-cell
-					:key="index"
-					v-if="shopCartList?.length"
-					v-for="(item, index) in shopCartList"
-				>
+				<van-swipe-cell :key="index" v-if="shopCartList?.length" v-for="(item, index) in shopCartList">
 					<div class="cell-info">
-						<van-tag
-							style="width: 10px"
+						<van-tag style="width: 10px"
 							v-if="(item?.stockNum || 0) === 0"
 							color="grey"
 							text-color="#ffffff"
-							>无货</van-tag
-						>
+						>无货</van-tag>
 						<van-checkbox
 							v-if="item?.stockNum || 0 > 0"
 							v-model="item.checked"
@@ -25,9 +19,7 @@
 						<van-cell center :key="item?.id" @click="selectProduct(item)">
 							<template #title>
 								<div class="text-left">
-									<span :class="item?.stockNum || 0 > 0 ? '' : 'font-grey'">{{
-										item.shopName
-									}}</span>
+									<span :class="item?.stockNum || 0 > 0 ? '' : 'font-grey'">{{ item.shopName }}</span>
 									<van-tag type="primary">{{ item.oldShopCode }}</van-tag>
 								</div>
 							</template>
@@ -46,15 +38,12 @@
 								</div>
 							</template>
 							<template #label>
-								<div class="amountInfo">
-									￥{{ commonUtils.formatAmount(item.saleAmount || 0, 2, '') }}
-								</div>
+								<div class="amountInfo"> ￥{{ commonUtils.formatAmount(item.saleAmount || 0, 2, '') }} </div>
 							</template>
 						</van-cell>
 					</div>
 					<template #right>
-						<van-button
-							class="right_info"
+						<van-button class="right_info"
 							@click="delShopCartInfo(item.id)"
 							square
 							type="danger"
@@ -76,9 +65,7 @@
 		</div>
 		<div class="footer-container">
 			<div class="footer">
-				<div class="amount-info">
-					￥{{ commonUtils.formatAmount(sumAmount || 0, 2, '') }}
-				</div>
+				<div class="amount-info"> ￥{{ commonUtils.formatAmount(sumAmount || 0, 2, '') }} </div>
 				<div class="checkout-button">
 					<van-button
 						@click="settlementAmount"
@@ -87,8 +74,7 @@
 						round
 						type="danger"
 						loading-text="结算中..."
-						>结 算</van-button
-					>
+					>结 算</van-button>
 				</div>
 			</div>
 		</div>
@@ -97,29 +83,24 @@
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-import commonUtils from '@/utils/common/index';
-import { ShopCartInfo } from '@/views/finance/shoppingCart/shoppingCartTs';
-import {
-	getShopCartList,
-	addOrEditShopCart,
-	deleteShopCart,
-} from '@/api/finance/shopCart/shopCartTs';
 
-let route = useRoute();
-let router = useRouter();
+import commonUtils from '@/utils/common/index';
+import type { ShopCartInfo } from '@/views/finance/shoppingCart/shoppingCartTs';
+import { getShopCartList, addOrEditShopCart, deleteShopCart } from '@/api/finance/shopCart/shopCartTs';
+
+const route = useRoute();
+const router = useRouter();
 
 const info = ref<any>({
 	title: route?.meta?.title || '购物车',
 });
 
-let sumAmount = ref<number>(0);
-let submitLoading = ref<boolean>(false);
-let shopCartList = ref<ShopCartInfo[]>([]);
+const sumAmount = ref<number>(0);
+const submitLoading = ref<boolean>(false);
+const shopCartList = ref<ShopCartInfo[]>([]);
 const settlementAmount = () => {
-	let ids = shopCartList.value
-		.filter((item: ShopCartInfo) => item.checked)
-		.map((item: ShopCartInfo) => item.id);
-	router.push({ name: 'saleTicket', query: { type: 'shopCart', ids: ids } });
+	const ids = shopCartList.value.filter((item: ShopCartInfo) => item.checked).map((item: ShopCartInfo) => item.id);
+	router.push({ name: 'saleTicket', query: { type: 'shopCart', ids } });
 };
 
 const getSumAmount = (): void => {
@@ -130,10 +111,7 @@ const getSumAmount = (): void => {
 	sumAmount.value = 0;
 	shopCartList.value.forEach((item: any) => {
 		if (item?.checked) {
-			sumAmount.value = commonUtils.plus(
-				sumAmount.value,
-				commonUtils.multiply(item.saleAmount, item.saleNum),
-			);
+			sumAmount.value = commonUtils.plus(sumAmount.value, commonUtils.multiply(item.saleAmount, item.saleNum));
 		}
 	});
 };
@@ -178,7 +156,7 @@ const changeCheck = (): void => {
 };
 
 const delShopCartInfo = (id: number): void => {
-	deleteShopCart(id + '')
+	deleteShopCart(`${id}`)
 		.then((res: any) => {
 			if (res?.code == '200') {
 				showSuccessToast('删除成功！');
