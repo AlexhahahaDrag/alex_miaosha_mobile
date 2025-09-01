@@ -1,4 +1,4 @@
-import { Dayjs } from 'dayjs';
+import type { Dayjs } from 'dayjs';
 
 export interface ItemInfo {
 	name: string;
@@ -12,7 +12,7 @@ export interface barItem {
 	xTile?: string;
 	yNameGap?: number;
 	dataType?: string[];
-	tooltip?: {};
+	tooltip?: object;
 	legend?: [];
 	color?: string;
 	stackInfo?: string[];

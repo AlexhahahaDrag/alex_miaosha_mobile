@@ -1,6 +1,10 @@
 <template>
 	<navBar :info="info"></navBar>
-	<van-form @submit="onSubmit" :rules="rulesRef" required="auto">
+	<van-form
+		@submit="onSubmit"
+		:rules="rulesRef"
+		required="auto"
+	>
 		<van-cell-group>
 			<van-field
 				v-model="formInfo.batchCode"
@@ -35,23 +39,28 @@
 				:rules="rulesRef.description"
 				:maxlength="65535"
 			/>
-			<selectPop :info="popInfo" @selectInfo="selectInfo" @cancelInfo="cancelInfo"></selectPop>
+			<selectPop
+				:info="popInfo"
+				@select-info="selectInfo"
+				@cancel-info="cancelInfo"
+			></selectPop>
 		</van-cell-group>
 		<div class="subButton">
-			<van-button round
+			<van-button
+				round
 				block
 				type="primary"
 				native-type="submit"
-			> 提交 </van-button>
+			>
+				提交
+			</van-button>
 		</div>
 	</van-form>
 </template>
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-
 import { label, rulesRef } from './shopStockBatchDetailTs';
-
 import { addOrEditShopStockBatch, getShopStockBatchDetail } from '@/api/finance/shopStockBatch/shopStockBatchTs';
 import type { Info } from '@/views/common/pop/selectPop.vue';
 import { getDictList } from '@/api/finance/dict/dictManager';
@@ -82,9 +91,9 @@ const isValidInfo = ref<Info>({
 
 const choose = (type: string): void => {
 	switch (type) {
-	case 'isValid':
-		popInfo.value = isValidInfo.value;
-		break;
+		case 'isValid':
+			popInfo.value = isValidInfo.value;
+			break;
 	}
 	popInfo.value.showFlag = true;
 };
@@ -92,10 +101,10 @@ const choose = (type: string): void => {
 const selectInfo = (type: string, value: any, name: string): void => {
 	popInfo.value.showFlag = false;
 	switch (type) {
-	case 'isValid':
-		formInfo.value.isValid = value;
-		isValidName.value = name;
-		break;
+		case 'isValid':
+			formInfo.value.isValid = value;
+			isValidName.value = name;
+			break;
 	}
 };
 

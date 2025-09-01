@@ -1,4 +1,4 @@
-import { type PageInfo, type ModelInfo } from '@/views/common/config/index';
+import { type PageInfo } from '@/views/common/config/index';
 
 export interface SearchInfo {
 	roleId?: string;
@@ -21,7 +21,7 @@ export const pagination = ref<PageInfo>({
 	// 设置每页可以展示多少条的选项
 	pageSizeOptions: ['10', '20', '50', '100'],
 	// 改变pageSize后触发
-	showSizeChange: (current: number, pageSize: any) => (
+	showSizeChange: (current: number, pageSize: number) => (
 		(pagination.value.current = current),
 		(pagination.value.pageSize = pageSize)
 	),
@@ -32,35 +32,6 @@ export const pagination = ref<PageInfo>({
 	//默认条数
 	defaultPageSize: 10,
 });
-
-export const columns = [
-	{
-		title: '角色id',
-		dataIndex: 'roleId',
-		key: 'roleId',
-	},
-	{
-		title: '权限id',
-		dataIndex: 'permissionId',
-		key: 'permissionId',
-	},
-	{
-		title: '描述',
-		dataIndex: 'summary',
-		key: 'summary',
-	},
-	{
-		title: '状态',
-		dataIndex: 'status',
-		key: 'status',
-	},
-	{
-		title: '操作',
-		key: 'operation',
-		fixed: 'right',
-		width: '8',
-	},
-];
 
 export interface DataItem {
 	roleId: string;

@@ -1,4 +1,4 @@
-import { type PageInfo, type ModelInfo } from '@/views/common/config/index';
+import { type PageInfo } from '@/views/common/config/index';
 
 export interface SearchInfo {
 	batchCode?: string;
@@ -22,7 +22,7 @@ export const pagination = ref<PageInfo>({
 	// 设置每页可以展示多少条的选项
 	pageSizeOptions: ['10', '20', '50', '100'],
 	// 改变pageSize后触发
-	showSizeChange: (current: number, pageSize: any) => (
+	showSizeChange: (current: number, pageSize: number) => (
 		(pagination.value.current = current),
 		(pagination.value.pageSize = pageSize)
 	),
@@ -33,35 +33,6 @@ export const pagination = ref<PageInfo>({
 	//默认条数
 	defaultPageSize: 10,
 });
-
-export const columns = [
-	{
-		title: '订单编码',
-		dataIndex: 'batchCode',
-		key: 'batchCode',
-	},
-	{
-		title: '订单名称',
-		dataIndex: 'batchName',
-		key: 'batchName',
-	},
-	{
-		title: '状态',
-		dataIndex: 'isValid',
-		key: 'isValid',
-	},
-	{
-		title: '描述',
-		dataIndex: 'description',
-		key: 'description',
-	},
-	{
-		title: '操作',
-		key: 'operation',
-		fixed: 'right',
-		width: '8',
-	},
-];
 
 export interface DataItem {
 	batchCode: string;

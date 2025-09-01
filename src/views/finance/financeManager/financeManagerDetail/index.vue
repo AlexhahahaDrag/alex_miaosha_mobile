@@ -89,8 +89,9 @@
 				block
 				type="primary"
 				native-type="submit"
-				>提交</van-button
 			>
+				提交
+			</van-button>
 		</div>
 	</van-form>
 </template>

@@ -6,25 +6,47 @@
 			<div class="filter-section">
 				<div class="filter-container">
 					<div class="filter-buttons">
-						<button class="filter-btn" :class="{ active: activeFilter === 'all' }" @click="handleFilterClick('all')">
+						<button
+							class="filter-btn"
+							:class="{ active: activeFilter === 'all' }"
+							@click="handleFilterClick('all')"
+						>
 							全部
 						</button>
-						<button class="filter-btn" :class="{ active: activeFilter === 'income' }" @click="handleFilterClick('income')">
+						<button
+							class="filter-btn"
+							:class="{ active: activeFilter === 'income' }"
+							@click="handleFilterClick('income')"
+						>
 							收入
 						</button>
-						<button class="filter-btn" :class="{ active: activeFilter === 'expense' }" @click="handleFilterClick('expense')">
+						<button
+							class="filter-btn"
+							:class="{ active: activeFilter === 'expense' }"
+							@click="handleFilterClick('expense')"
+						>
 							支出
 						</button>
 					</div>
-					<div class="filter-icon-btn" @click="openFilterPopup">
-						<van-image :src="filterIcon" width="18" height="18" />
+					<div
+						class="filter-icon-btn"
+						@click="openFilterPopup"
+					>
+						<van-image
+							:src="filterIcon"
+							width="18"
+							height="18"
+						/>
 						<span>筛选</span>
 					</div>
 				</div>
 			</div>
 
 			<!-- Vant下拉刷新 + 触底加载 -->
-			<van-pull-refresh v-model="refreshing" @refresh="onRefresh">
+			<van-pull-refresh
+				v-model="refreshing"
+				@refresh="onRefresh"
+			>
 				<van-list
 					v-model:loading="loadingMore"
 					:finished="finished"
@@ -33,22 +55,43 @@
 					:immediate-check="false"
 				>
 					<!-- Loading State -->
-					<div v-if="loading" class="loading-container">
+					<div
+						v-if="loading"
+						class="loading-container"
+					>
 						<div class="loading-text">加载中...</div>
 					</div>
 
-					<div v-else-if="transactionList?.length === 0" class="empty-container">
+					<div
+						v-else-if="transactionList?.length === 0"
+						class="empty-container"
+					>
 						<div class="empty-text">暂无交易记录</div>
 					</div>
 
-					<div v-else class="transaction-list">
-						<div v-for="(transactions, dateGroup) in groupedTransactions" :key="dateGroup" class="date-section">
+					<div
+						v-else
+						class="transaction-list"
+					>
+						<div
+							v-for="(transactions, dateGroup) in groupedTransactions"
+							:key="dateGroup"
+							class="date-section"
+						>
 							<h3 class="date-title">{{ dateGroup }}</h3>
 
-							<div v-for="transaction in transactions" :key="transaction.id" class="transaction-item">
+							<div
+								v-for="transaction in transactions"
+								:key="transaction.id"
+								class="transaction-item"
+							>
 								<div class="transaction-content">
 									<div class="icon-container">
-										<van-image :src="getCategoryIcon(transaction.cardName)" :alt="transaction.cardName" class="category-icon" />
+										<van-image
+											:src="getCategoryIcon(transaction.cardName)"
+											:alt="transaction.cardName"
+											class="category-icon"
+										/>
 									</div>
 									<div class="transaction-info">
 										<h4 class="merchant-name">
@@ -61,7 +104,10 @@
 									</div>
 								</div>
 								<div class="transaction-amount">
-									<div class="amount" :class="getTransactionTypeClass(transaction.amount)">
+									<div
+										class="amount"
+										:class="getTransactionTypeClass(transaction.amount)"
+									>
 										{{ formatAmount(transaction.amount) }}
 									</div>
 									<div class="time">
@@ -75,15 +121,21 @@
 			</van-pull-refresh>
 
 			<!-- 筛选弹窗：卡片与日期范围 -->
-			<van-popup v-model:show="filterVisible" position="bottom" round>
+			<van-popup
+				v-model:show="filterVisible"
+				position="bottom"
+				round
+			>
 				<div class="filter-popup">
 					<van-cell-group inset>
-						<van-cell title="选择卡片"
+						<van-cell
+							title="选择卡片"
 							:value="selectedCardName || '全部卡片'"
 							is-link
 							@click="openCardPicker"
 						/>
-						<van-cell title="日期范围"
+						<van-cell
+							title="日期范围"
 							:value="displayDateRange"
 							is-link
 							@click="calendarVisible = true"
@@ -91,33 +143,52 @@
 					</van-cell-group>
 
 					<div class="filter-actions">
-						<van-button type="default"
+						<van-button
+							type="default"
 							block
 							class="mr8"
 							@click="resetFilters"
-						>重置</van-button>
-						<van-button type="primary" block @click="applyFilters">确定</van-button>
+						>
+							重置
+						</van-button>
+						<van-button
+							type="primary"
+							block
+							@click="applyFilters"
+						>
+							确定
+						</van-button>
 					</div>
 				</div>
 			</van-popup>
 
 			<!-- 卡片选择器 -->
-			<van-popup v-model:show="cardPickerVisible" position="bottom" round>
-				<van-picker :columns="cardColumns" @confirm="onCardConfirm" @cancel="cardPickerVisible = false" />
+			<van-popup
+				v-model:show="cardPickerVisible"
+				position="bottom"
+				round
+			>
+				<van-picker
+					:columns="cardColumns"
+					@confirm="onCardConfirm"
+					@cancel="cardPickerVisible = false"
+				/>
 			</van-popup>
 
 			<!-- 日历（日期范围） -->
-			<van-calendar v-model:show="calendarVisible" type="range" @confirm="onCalendarConfirm" />
+			<van-calendar
+				v-model:show="calendarVisible"
+				type="range"
+				@confirm="onCalendarConfirm"
+			/>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { showFailToast } from 'vant';
-
 import { typeIconMap } from '../config/index';
 import { getPrepaidCardInfoList } from '../api/index';
-
 import { useNavBar } from '@/composables/useNavBar';
 import type { Pagination } from '@/views/common/config';
 import {
@@ -178,14 +249,12 @@ function formatDateGroup(dateStr: string): string {
 	} else if (transactionDate.toDateString() === yesterday.toDateString()) {
 		return '昨日';
 	} else {
-		return (
-			`${transactionDate
-				.toLocaleDateString('zh-CN', {
-					month: '2-digit',
-					day: '2-digit',
-				})
-				.replace('/', '月')}日`
-		);
+		return `${transactionDate
+			.toLocaleDateString('zh-CN', {
+				month: '2-digit',
+				day: '2-digit',
+			})
+			.replace('/', '月')}日`;
 	}
 }
 

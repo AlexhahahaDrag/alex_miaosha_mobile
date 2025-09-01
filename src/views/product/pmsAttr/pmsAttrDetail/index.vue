@@ -1,6 +1,10 @@
 <template>
 	<NavBar :info="info"></NavBar>
-	<van-form @submit="onSubmit" :rules="rulesRef" required="auto">
+	<van-form
+		@submit="onSubmit"
+		:rules="rulesRef"
+		required="auto"
+	>
 		<van-cell-group>
 			<van-field
 				v-model="formInfo.attrName"
@@ -68,20 +72,21 @@
 			/>
 		</van-cell-group>
 		<div class="subButton">
-			<van-button round
+			<van-button
+				round
 				block
 				type="primary"
 				native-type="submit"
-			> 提交 </van-button>
+			>
+				提交
+			</van-button>
 		</div>
 	</van-form>
 </template>
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-
 import { label, rulesRef } from './pmsAttrDetailTs';
-
 import { addOrEditPmsAttr, getPmsAttrDetail } from '@/api/product/pmsAttr/pmsAttrTs';
 
 const route = useRoute();

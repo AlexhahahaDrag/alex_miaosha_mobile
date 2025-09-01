@@ -83,23 +83,33 @@
 						:type="selectedPeriod === 'week' ? 'primary' : 'default'"
 						round
 						@click="handleSwitchPeriod('week')"
-					>周</van-button>
+					>
+						周
+					</van-button>
 					<van-button
 						size="mini"
 						:type="selectedPeriod === 'month' ? 'primary' : 'default'"
 						round
 						@click="handleSwitchPeriod('month')"
-					>月</van-button>
+					>
+						月
+					</van-button>
 					<van-button
 						size="mini"
 						:type="selectedPeriod === 'year' ? 'primary' : 'default'"
 						round
 						@click="handleSwitchPeriod('year')"
-					>年</van-button>
+					>
+						年
+					</van-button>
 				</div>
 			</div>
 			<div class="trend-body">
-				<chart :options="chartOptions" width="100%" height="256px" />
+				<chart
+					:options="chartOptions"
+					width="100%"
+					height="256px"
+				/>
 			</div>
 		</div>
 
@@ -107,51 +117,91 @@
 		<div class="my-cards-section">
 			<div class="section-header">
 				<div class="section-title">我的消费卡</div>
-				<div class="view-all" @click="navigateToAll">
+				<div
+					class="view-all"
+					@click="navigateToAll"
+				>
 					<van-icon name="arrow" />
 					<span>查看全部</span>
 				</div>
 			</div>
 			<div class="cards-list">
-				<div class="card-row" v-for="card in cardList" :key="card.id">
-					<div class="card-row-left" :style="{ background: getTypeBg(card.cardName) }">
-						<svg-icon :name="getTypeIconName(card.cardName)" color="#FF7A00" />
+				<div
+					class="card-row"
+					v-for="card in cardList"
+					:key="card.id"
+				>
+					<div
+						class="card-row-left"
+						:style="{ background: getTypeBg(card.cardName) }"
+					>
+						<svg-icon
+							:name="getTypeIconName(card.cardName)"
+							color="#FF7A00"
+						/>
 					</div>
 					<div class="card-row-center">
 						<div class="card-row-title">{{ card.name }}</div>
 						<div class="card-row-sub"> 余额: ¥{{ formatNumber(Number(card.currentBalance ?? card.balance)) }} </div>
 					</div>
 					<div class="card-row-right">
-						<van-button size="small"
+						<van-button
+							size="small"
 							round
 							type="success"
 							@click="handleRecharge(card)"
-						>充值</van-button>
-						<van-button size="small"
+						>
+							充值
+						</van-button>
+						<van-button
+							size="small"
 							round
 							type="danger"
 							@click="handleConsume(card)"
-						>消费</van-button>
+						>
+							消费
+						</van-button>
 					</div>
 				</div>
 			</div>
 		</div>
 
 		<!-- 底部 Tabbar -->
-		<van-tabbar route fixed>
-			<van-tabbar-item icon="bar-chart-o" @click="handleGoDashboard">总览</van-tabbar-item>
-			<van-tabbar-item icon="credit-pay" @click="navigateToAll">消费卡</van-tabbar-item>
-			<van-tabbar-item icon="clock-o" @click="handleGoRecords">记录</van-tabbar-item>
-			<van-tabbar-item icon="user-o" @click="handleGoUser">我的</van-tabbar-item>
+		<van-tabbar
+			route
+			fixed
+		>
+			<van-tabbar-item
+				icon="bar-chart-o"
+				@click="handleGoDashboard"
+			>
+				总览
+			</van-tabbar-item>
+			<van-tabbar-item
+				icon="credit-pay"
+				@click="navigateToAll"
+			>
+				消费卡
+			</van-tabbar-item>
+			<van-tabbar-item
+				icon="clock-o"
+				@click="handleGoRecords"
+			>
+				记录
+			</van-tabbar-item>
+			<van-tabbar-item
+				icon="user-o"
+				@click="handleGoUser"
+			>
+				我的
+			</van-tabbar-item>
 		</van-tabbar>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { showToast } from 'vant';
-
 import { typeIconMap, type CardItem, getCardColor } from '../config/index';
-
 import Chart from '@/views/model/chart/index.vue';
 import SvgIcon from '@/views/common/icons/svgIcon.vue';
 import { useNavBar } from '@/composables/useNavBar';

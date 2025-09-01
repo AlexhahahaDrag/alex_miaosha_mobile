@@ -1,11 +1,19 @@
 <template>
-	<van-pull-refresh v-model="refreshing" @refresh="onRefresh">
-		<van-list v-model:loading="loading"
+	<van-pull-refresh
+		v-model="refreshing"
+		@refresh="onRefresh"
+	>
+		<van-list
+			v-model:loading="loading"
 			:finished="finished"
 			finished-text="没有更多了"
 			@load="onLoad"
 		>
-			<van-cell v-for="item in list" :key="item" :title="item" />
+			<van-cell
+				v-for="item in list"
+				:key="item"
+				:title="item"
+			/>
 		</van-list>
 	</van-pull-refresh>
 </template>

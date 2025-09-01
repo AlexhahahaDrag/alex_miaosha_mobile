@@ -1,12 +1,20 @@
 <template>
 	<van-grid :column-num="2">
 		<div class="box-content-show">
-			<div :class="index % 2 === 0 ? 'show-left' : 'show-right'" v-for="(item, index) in stockList" :key="index">
+			<div
+				:class="index % 2 === 0 ? 'show-left' : 'show-right'"
+				v-for="(item, index) in stockList"
+				:key="index"
+			>
 				<BoardData :info="item"></BoardData>
 			</div>
 		</div>
 		<div class="box-content-show">
-			<div :class="index % 2 === 0 ? 'show-left' : 'show-right'" v-for="(item, index) in crashList" :key="index">
+			<div
+				:class="index % 2 === 0 ? 'show-left' : 'show-right'"
+				v-for="(item, index) in crashList"
+				:key="index"
+			>
 				<BoardData :info="item"></BoardData>
 			</div>
 		</div>
@@ -15,9 +23,7 @@
 
 <script lang="ts" setup>
 import { showNotify } from 'vant';
-
 import type { ShopFinanceChainYear } from './common';
-
 import { getAllStock, getCashAmount } from '@/api/finance/shopStockAnalysis';
 import commonUtils from '@/utils/common/index';
 import type { Info } from '@/views/common/boardData/config';

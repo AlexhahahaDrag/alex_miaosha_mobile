@@ -9,25 +9,25 @@ export const rulesRef = reactive({
 	batchCode: [
 		{
 			required: true,
-			message: label.batchCode + '不能为空！',
+			message: `${label.batchCode}不能为空！`,
 		},
 	],
 	batchName: [
 		{
 			required: true,
-			message: label.batchName + '不能为空！',
+			message: `${label.batchName}不能为空！`,
 		},
 	],
 	isValid: [
 		{
 			required: true,
-			message: label.isValid + '不能为空！',
+			message: `${label.isValid}不能为空！`,
 		},
 	],
 	description: [
 		{
 			required: true,
-			message: label.description + '不能为空！',
+			message: `${label.description}不能为空！`,
 		},
 	],
 });

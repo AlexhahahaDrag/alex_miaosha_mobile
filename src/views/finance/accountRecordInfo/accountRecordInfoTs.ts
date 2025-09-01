@@ -1,5 +1,4 @@
 import type { Dayjs } from 'dayjs';
-
 import { type PageInfo } from '@/views/common/config/index';
 
 export interface SearchInfo {
@@ -24,7 +23,7 @@ export const pagination = ref<PageInfo>({
 	// 设置每页可以展示多少条的选项
 	pageSizeOptions: ['10', '20', '50', '100'],
 	// 改变pageSize后触发
-	showSizeChange: (current: number, pageSize: any) => (
+	showSizeChange: (current: number, pageSize: number) => (
 		(pagination.value.current = current),
 		(pagination.value.pageSize = pageSize)
 	),
@@ -35,40 +34,6 @@ export const pagination = ref<PageInfo>({
 	//默认条数
 	defaultPageSize: 10,
 });
-
-export const columns = [
-	{
-		title: '名称',
-		dataIndex: 'name',
-		key: 'name',
-	},
-	{
-		title: '有效期',
-		dataIndex: 'avliDate',
-		key: 'avliDate',
-	},
-	{
-		title: '金额',
-		dataIndex: 'amount',
-		key: 'amount',
-	},
-	{
-		title: '账号',
-		dataIndex: 'account',
-		key: 'account',
-	},
-	{
-		title: '是否发送提醒',
-		dataIndex: 'isSend',
-		key: 'isSend',
-	},
-	{
-		title: '操作',
-		key: 'operation',
-		fixed: 'right',
-		width: '8',
-	},
-];
 
 export interface DataItem {
 	name: string;

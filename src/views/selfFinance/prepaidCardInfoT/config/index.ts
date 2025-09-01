@@ -46,13 +46,6 @@ export const typeIconMap = {
 
 // 根据索引获取卡片颜色
 export const getCardColor = (index: number) => {
-	const colors = [
-		'#268CF2',
-		'#CC66E5',
-		'#4DB280',
-		'#FF6B6B',
-		'#FFA726',
-		'#66BB6A',
-	];
+	const colors = ['#268CF2', '#CC66E5', '#4DB280', '#FF6B6B', '#FFA726', '#66BB6A'];
 	return colors[index % colors.length];
 };

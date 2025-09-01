@@ -1,5 +1,9 @@
 <template>
-	<chart :options="options" :width="props.width" :height="props.height" />
+	<chart
+		:options="options"
+		:width="props.width"
+		:height="props.height"
+	/>
 </template>
 
 <script setup lang="ts">
@@ -16,11 +20,11 @@ const props = defineProps({
 	},
 	tooltip: {
 		type: Object,
-		default: {},
+		default: () => {},
 	},
 	data: {
 		type: Array,
-		default: [[]],
+		default: () => [[]],
 	},
 	width: {
 		type: String,
@@ -32,11 +36,11 @@ const props = defineProps({
 	},
 	stackInfo: {
 		type: Array,
-		default: [],
+		default: () => [],
 	},
 	nameInfo: {
 		type: Array,
-		default: [],
+		default: () => [],
 	},
 });
 
@@ -76,7 +80,7 @@ const setOption = (data: any[]) => {
 					nameGap: 25,
 					interval: (max - min) / 5,
 					axisLabel: {
-						formatter (value: number) {
+						formatter(value: number) {
 							if (value >= 10000) {
 								return `${(value / 1000).toFixed(1)}k`;
 							} else {
@@ -176,7 +180,7 @@ const chartOption = {
 		left: 'center',
 	},
 	color: [] as string[],
-	tooltip: {} as Object,
+	tooltip: {} as object,
 	xAxis: {
 		type: 'category',
 		boundaryGap: false,

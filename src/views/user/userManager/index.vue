@@ -1,6 +1,9 @@
 <template>
 	<van-divider>基本信息</van-divider>
-	<van-field v-model="value" label="头像">
+	<van-field
+		v-model="value"
+		label="头像"
+	>
 		<template #input>
 			<uploadImage></uploadImage>
 		</template>

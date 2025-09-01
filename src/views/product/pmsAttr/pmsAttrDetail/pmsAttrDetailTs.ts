@@ -13,49 +13,49 @@ export const rulesRef = reactive({
 	attrName: [
 		{
 			required: true,
-			message: label.attrName + '不能为空！',
+			message: `${label.attrName}不能为空！`,
 		},
 	],
 	searchType: [
 		{
 			required: true,
-			message: label.searchType + '不能为空！',
+			message: `${label.searchType}不能为空！`,
 		},
 	],
 	icon: [
 		{
 			required: true,
-			message: label.icon + '不能为空！',
+			message: `${label.icon}不能为空！`,
 		},
 	],
 	valueSelect: [
 		{
 			required: true,
-			message: label.valueSelect + '不能为空！',
+			message: `${label.valueSelect}不能为空！`,
 		},
 	],
 	attrType: [
 		{
 			required: true,
-			message: label.attrType + '不能为空！',
+			message: `${label.attrType}不能为空！`,
 		},
 	],
 	enable: [
 		{
 			required: true,
-			message: label.enable + '不能为空！',
+			message: `${label.enable}不能为空！`,
 		},
 	],
 	catelogId: [
 		{
 			required: true,
-			message: label.catelogId + '不能为空！',
+			message: `${label.catelogId}不能为空！`,
 		},
 	],
 	showDesc: [
 		{
 			required: true,
-			message: label.showDesc + '不能为空！',
+			message: `${label.showDesc}不能为空！`,
 		},
 	],
 });

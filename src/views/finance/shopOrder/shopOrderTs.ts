@@ -26,7 +26,7 @@ export const pagination = ref<PageInfo>({
 	// 设置每页可以展示多少条的选项
 	pageSizeOptions: ['10', '20', '50', '100'],
 	// 改变pageSize后触发
-	showSizeChange: (current: number, pageSize: any) => (
+	showSizeChange: (current: number, pageSize: number) => (
 		(pagination.value.current = current),
 		(pagination.value.pageSize = pageSize)
 	),
@@ -37,55 +37,6 @@ export const pagination = ref<PageInfo>({
 	//默认条数
 	defaultPageSize: 10,
 });
-
-export const columns = [
-	{
-		title: '订单编码',
-		dataIndex: 'saleOrderCode',
-		key: 'saleOrderCode',
-	},
-	{
-		title: '订单名称',
-		dataIndex: 'saleOrderName',
-		key: 'saleOrderName',
-	},
-	{
-		title: '总销售金额',
-		dataIndex: 'saleAmount',
-		key: 'saleAmount',
-	},
-	{
-		title: '状态',
-		dataIndex: 'isValid',
-		key: 'isValid',
-	},
-	{
-		title: '销售日期',
-		dataIndex: 'saleDate',
-		key: 'saleDate',
-	},
-	{
-		title: '描述',
-		dataIndex: 'description',
-		key: 'description',
-	},
-	{
-		title: '支付方式',
-		dataIndex: 'payWay',
-		key: 'payWay',
-	},
-	{
-		title: '销售数量',
-		dataIndex: 'saleCount',
-		key: 'saleCount',
-	},
-	{
-		title: '操作',
-		key: 'operation',
-		fixed: 'right',
-		width: '8',
-	},
-];
 
 export interface DataItem {
 	saleOrderCode: string;

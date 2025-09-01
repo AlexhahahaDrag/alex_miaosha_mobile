@@ -2,7 +2,8 @@
 	<van-row gutter="20">
 		<div class="mainGrid">
 			<div class="div2">
-				<pie-chart title="店铺资金分布"
+				<pie-chart
+					title="店铺资金分布"
 					height="100%"
 					width="100%"
 					:data="pieShopData"
@@ -13,7 +14,8 @@
 		<van-divider />
 		<div class="mainGrid">
 			<div class="div2">
-				<pie-chart title="当月收入支付方式"
+				<pie-chart
+					title="当月收入支付方式"
 					height="100%"
 					width="100%"
 					:data="piePayWayData"
@@ -26,9 +28,7 @@
 
 <script lang="ts" setup>
 import { showNotify } from 'vant';
-
 import type { ItemInfo } from './common';
-
 import { getAllAmount } from '@/api/finance/shopStockAnalysis';
 
 interface Props {

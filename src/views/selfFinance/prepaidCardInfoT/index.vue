@@ -13,7 +13,8 @@
 				>
 					总览
 				</van-button>
-				<van-button type="default"
+				<van-button
+					type="default"
 					size="small"
 					class="add-btn"
 					icon="plus"
@@ -30,8 +31,14 @@
 				@change="handleCardChange"
 				v-if="!cardsLoading && cardList.length > 0"
 			>
-				<van-swipe-item v-for="(card, index) in cardList" :key="index">
-					<div class="card-item" :style="{ backgroundColor: card.bgColor }">
+				<van-swipe-item
+					v-for="(card, index) in cardList"
+					:key="index"
+				>
+					<div
+						class="card-item"
+						:style="{ backgroundColor: card.bgColor }"
+					>
 						<div class="card-content">
 							<div class="card-left">
 								<div class="card-name">
@@ -53,36 +60,61 @@
 				</van-swipe-item>
 			</van-swipe>
 			<!-- 卡片加载中 -->
-			<div class="card-loading" v-if="cardsLoading">
-				<van-loading type="spinner" color="#3399ff" size="24px" />
+			<div
+				class="card-loading"
+				v-if="cardsLoading"
+			>
+				<van-loading
+					type="spinner"
+					color="#3399ff"
+					size="24px"
+				/>
 				<span>加载中...</span>
 			</div>
 			<!-- 无卡片状态 -->
-			<div class="card-empty" v-if="!cardsLoading && cardList.length === 0">
+			<div
+				class="card-empty"
+				v-if="!cardsLoading && cardList.length === 0"
+			>
 				<div class="empty-icon">📇</div>
 				<div class="empty-text">暂无消费卡</div>
-				<div class="add-card-btn" @click="handleAddCard">添加卡片</div>
+				<div
+					class="add-card-btn"
+					@click="handleAddCard"
+				>
+					添加卡片
+				</div>
 			</div>
 		</div>
 		<!-- 快捷操作按钮 -->
 		<div class="quick-actions">
-			<van-button class="action-btn consume-btn"
+			<van-button
+				class="action-btn consume-btn"
 				@click="handleAmount('consume')"
 				color="#ff6666"
 				block
 			>
 				<div class="action-btn-content">
-					<van-image :src="shopCarSvg" width="20" height="20" />
+					<van-image
+						:src="shopCarSvg"
+						width="20"
+						height="20"
+					/>
 					消费
 				</div>
 			</van-button>
-			<van-button class="action-btn recharge-btn"
+			<van-button
+				class="action-btn recharge-btn"
 				@click="handleAmount('recharge')"
 				color="#4db280"
 				block
 			>
 				<div class="action-btn-content">
-					<van-image :src="shopCardSvg" width="20" height="20" />
+					<van-image
+						:src="shopCardSvg"
+						width="20"
+						height="20"
+					/>
 					充值
 				</div>
 			</van-button>
@@ -90,55 +122,72 @@
 		<!-- 流水标题栏 -->
 		<div class="transaction-header">
 			<span class="transaction-title">流水</span>
-			<div class="more-btn" @click="handleViewMore">更多</div>
+			<div
+				class="more-btn"
+				@click="handleViewMore"
+			>
+				更多
+			</div>
 		</div>
 		<!-- 交易记录列表 -->
 		<div class="transaction-list">
 			<!-- 有交易记录时显示列表 -->
-			<div
-				class="transaction-item"
-				v-for="(transaction, index) in transactionList"
-				:key="index"
-				@click="handleTransactionDetail(transaction)"
-				v-if="!transactionsLoading && transactionList.length > 0"
-			>
-				<div class="transaction-left">
-					<div class="card-indicator-dot" :style="{ backgroundColor: transaction.cardColor }"></div>
-					<div class="transaction-info">
-						<div class="transaction-name">{{ transaction.name }}</div>
-						<div class="transaction-time">{{ transaction.time }}</div>
+			<template v-if="!transactionsLoading && transactionList.length > 0">
+				<div
+					class="transaction-item"
+					v-for="(transaction, index) in transactionList"
+					:key="index"
+					@click="handleTransactionDetail(transaction)"
+				>
+					<div class="transaction-left">
+						<div
+							class="card-indicator-dot"
+							:style="{ backgroundColor: transaction.cardColor }"
+						></div>
+						<div class="transaction-info">
+							<div class="transaction-name">{{ transaction.name }}</div>
+							<div class="transaction-time">{{ transaction.time }}</div>
+						</div>
+					</div>
+					<div
+						class="transaction-amount"
+						:class="{
+							'amount-positive': transaction.formattedAmount.startsWith('+'),
+							'amount-negative': transaction.formattedAmount.startsWith('-'),
+						}"
+					>
+						{{ transaction.formattedAmount }}
 					</div>
 				</div>
+				<!-- 交易记录加载中 -->
 				<div
-					class="transaction-amount"
-					:class="{
-						'amount-positive': transaction.formattedAmount.startsWith('+'),
-						'amount-negative': transaction.formattedAmount.startsWith('-'),
-					}"
+					class="transaction-loading"
+					v-if="transactionsLoading"
 				>
-					{{ transaction.formattedAmount }}
+					<van-loading
+						type="spinner"
+						color="#3399ff"
+						size="20px"
+					/>
+					<span>加载交易记录中...</span>
 				</div>
-			</div>
-			<!-- 交易记录加载中 -->
-			<div class="transaction-loading" v-if="transactionsLoading">
-				<van-loading type="spinner" color="#3399ff" size="20px" />
-				<span>加载交易记录中...</span>
-			</div>
-			<!-- 无交易记录状态 -->
-			<div class="transaction-empty" v-if="!transactionsLoading && transactionList.length === 0">
-				<div class="empty-icon">📋</div>
-				<div class="empty-text">暂无交易记录</div>
-			</div>
+				<!-- 无交易记录状态 -->
+				<div
+					class="transaction-empty"
+					v-if="!transactionsLoading && transactionList.length === 0"
+				>
+					<div class="empty-icon">📋</div>
+					<div class="empty-text">暂无交易记录</div>
+				</div>
+			</template>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { showToast, showLoadingToast, showFailToast, closeToast } from 'vant';
-
 import { getPrepaidCardInfoList, getPrepaidConsumeRecordPage } from './api/index';
 import { type CardItem, type TransactionItem, getCardColor, typeIconMap } from './config/index';
-
 import { formatTime, formatAmount } from '@/views/common/config';
 import { useNavBar } from '@/composables/useNavBar';
 import shopCardSvg from '@/assets/icons/shop/shop-card.svg';

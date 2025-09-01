@@ -20,15 +20,23 @@
 		immediate-check="false"
 	>
 		<div style="height: 100%; overflow-y: auto">
-			<van-empty v-if="dataSource.length == 0" description="暂无数据"></van-empty>
-			<van-list v-else
+			<van-empty
+				v-if="dataSource.length == 0"
+				description="暂无数据"
+			></van-empty>
+			<van-list
+				v-else
 				v-model:loading="loading"
 				:finished="finished"
 				finished-text="没有更多了"
 				@load="onRefresh"
 			>
 				<van-cell-group>
-					<van-swipe-cell v-for="(item, index) in dataSource" :before-close="beforeClose" :key="index">
+					<van-swipe-cell
+						v-for="(item, index) in dataSource"
+						:before-close="beforeClose"
+						:key="index"
+					>
 						<van-cell
 							:title-class="item.isValid == '1' ? 'validClass' : 'notValidClass'"
 							:title="userMap[item.belongTo] + '的' + item.name + '(' + item.typeCode + ')'"
@@ -41,7 +49,11 @@
 						>
 							<template #label>
 								<div class="svgInfo">
-									<div class="svgDiv" v-for="(fromSource, index) in fromSourceTransferList" :key="index">
+									<div
+										class="svgDiv"
+										v-for="(fromSource, index) in fromSourceTransferList"
+										:key="index"
+									>
 										<SvgIcon
 											v-if="item.fromSource.indexOf(fromSource.value) >= 0 && fromSource.value != ''"
 											:name="fromSource.label"
@@ -64,7 +76,8 @@
 							</template>
 						</van-cell>
 						<template #right>
-							<van-button class="right_info"
+							<van-button
+								class="right_info"
 								@click="delFinance(item.id)"
 								square
 								type="danger"
@@ -89,10 +102,8 @@
 </template>
 <script lang="ts" setup>
 import { showSuccessToast, showFailToast } from 'vant';
-
 import type { SearchInfo, PageInfo } from './financeManager';
 import { pagination, fromSourceTransferList } from './financeManager';
-
 import { getFinanceMangerPage, deleteFinanceManager } from '@/api/finance/financeManager';
 import { getUserManagerList } from '@/api/user/userManager';
 import { useNavBar } from '@/composables/useNavBar';

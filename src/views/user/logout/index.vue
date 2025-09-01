@@ -12,9 +12,8 @@
 </template>
 
 <script setup lang="ts">
-import type { ToastOptions} from 'vant';
+import type { ToastOptions } from 'vant';
 import { showToast } from 'vant';
-
 import { logoutApi } from '@/api/user/login';
 
 interface Props {

@@ -1,7 +1,10 @@
 <template>
 	<div class="login-container">
 		<!--引入粒子特效-->
-		<Particles id="tsparticles" :options="options"></Particles>
+		<Particles
+			id="tsparticles"
+			:options="options"
+		></Particles>
 		<div style="height: 100vh">
 			<div style="height: 35vh; line-height: 35vh; text-align: center">
 				<span style="font-size: 3.5rem; margin-bottom: 15vh; color: #fff"><b>alex系统管理平台</b></span>
@@ -26,11 +29,14 @@
 					/>
 				</van-cell-group>
 				<div style="margin: 16px">
-					<van-button round
+					<van-button
+						round
 						block
 						type="primary"
 						native-type="submit"
-					> 提交 </van-button>
+					>
+						提交
+					</van-button>
 				</div>
 			</van-form>
 		</div>
@@ -38,7 +44,6 @@
 </template>
 <script setup lang="ts">
 import type { LoginForm } from './login';
-
 import type { LoginParams } from '@/api/user/login';
 import { useUserStore } from '@/store/modules/user/user';
 import { useNavBar } from '@/composables/useNavBar';

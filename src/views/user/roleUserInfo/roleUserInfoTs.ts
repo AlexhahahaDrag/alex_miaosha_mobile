@@ -33,35 +33,6 @@ export const pagination = ref<PageInfo>({
 	defaultPageSize: 10,
 });
 
-export const columns = [
-	{
-		title: '角色id',
-		dataIndex: 'roleId',
-		key: 'roleId',
-	},
-	{
-		title: '用户id',
-		dataIndex: 'userId',
-		key: 'userId',
-	},
-	{
-		title: '描述',
-		dataIndex: 'summary',
-		key: 'summary',
-	},
-	{
-		title: '状态',
-		dataIndex: 'status',
-		key: 'status',
-	},
-	{
-		title: '操作',
-		key: 'operation',
-		fixed: 'right',
-		width: '8',
-	},
-];
-
 export interface DataItem {
 	roleId: string;
 	userId: string;

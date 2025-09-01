@@ -1,13 +1,15 @@
 <template>
 	<div class="user-page">
 		<div class="user-header">
-			<van-skeleton :loading="loading"
+			<van-skeleton
+				:loading="loading"
 				avatar
 				:row="1"
 				avatar-size="64"
 			>
 				<div class="user-profile">
-					<van-image round
+					<van-image
+						round
 						width="64"
 						height="64"
 						fit="cover"
@@ -15,7 +17,10 @@
 					/>
 					<div class="user-meta">
 						<div class="user-name">{{ displayName }}</div>
-						<div class="user-desc" v-if="orgName || roleName">
+						<div
+							class="user-desc"
+							v-if="orgName || roleName"
+						>
 							{{ roleName }}<span v-if="roleName && orgName"> · </span>{{ orgName }}
 						</div>
 					</div>
@@ -23,48 +28,73 @@
 			</van-skeleton>
 		</div>
 
-		<van-cell-group inset title="账户">
-			<van-cell icon="points"
+		<van-cell-group
+			inset
+			title="账户"
+		>
+			<van-cell
+				icon="points"
 				title="个人信息"
 				is-link
 				to="/myself/info"
 			/>
-			<van-cell icon="gold-coin-o"
+			<van-cell
+				icon="gold-coin-o"
 				title="账号与安全"
 				is-link
 				@click="goSecurity"
 			/>
 		</van-cell-group>
 
-		<van-cell-group inset title="个性化" class="mt16">
-			<van-cell icon="gift-o"
+		<van-cell-group
+			inset
+			title="个性化"
+			class="mt16"
+		>
+			<van-cell
+				icon="gift-o"
 				title="主题设置"
 				is-link
 				@click="openTheme"
 			/>
 		</van-cell-group>
 
-		<van-cell-group inset title="信息" class="mt16">
-			<van-cell title="组织" :value="orgName || '-'" />
-			<van-cell title="角色" :value="roleName || '-'" />
+		<van-cell-group
+			inset
+			title="信息"
+			class="mt16"
+		>
+			<van-cell
+				title="组织"
+				:value="orgName || '-'"
+			/>
+			<van-cell
+				title="角色"
+				:value="roleName || '-'"
+			/>
 		</van-cell-group>
 
-		<van-cell-group inset class="mt16">
-			<van-cell icon="warning-o"
+		<van-cell-group
+			inset
+			class="mt16"
+		>
+			<van-cell
+				icon="warning-o"
 				title="退出登录"
 				is-link
 				@click="showLogout"
 			/>
 		</van-cell-group>
 	</div>
-	<logout :visible="showLogoutFlag" @select="logout" />
+	<logout
+		:visible="showLogoutFlag"
+		@select="logout"
+	/>
 </template>
 
 <script lang="ts" setup>
 import { showToast } from 'vant';
-
-import Logout from './logout/index.vue';
-
+import logout from './logout/index.vue';
 import { useUserStore } from '@/store/modules/user/user';
 import { useNavBar } from '@/composables/useNavBar';
 

@@ -1,5 +1,9 @@
 <template>
-	<chart :options="options" :width="props.width" :height="props.height" />
+	<chart
+		:options="options"
+		:width="props.width"
+		:height="props.height"
+	/>
 </template>
 
 <script setup lang="ts">
@@ -10,11 +14,11 @@ const props = defineProps({
 	},
 	tooltip: {
 		type: Object,
-		default: {},
+		default: () => {},
 	},
 	data: {
 		type: Array,
-		default: [],
+		default: () => [],
 	},
 	width: {
 		type: String,

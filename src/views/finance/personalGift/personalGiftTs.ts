@@ -1,6 +1,5 @@
-import { Dayjs } from 'dayjs';
-
-import { type PageInfo, type ModelInfo } from '@/views/common/config/index';
+import type { Dayjs } from 'dayjs';
+import { type PageInfo } from '@/views/common/config/index';
 
 export interface SearchInfo {
 	eventName?: string;
@@ -27,7 +26,7 @@ export const pagination = ref<PageInfo>({
 	// 设置每页可以展示多少条的选项
 	pageSizeOptions: ['10', '20', '50', '100'],
 	// 改变pageSize后触发
-	showSizeChange: (current: number, pageSize: any) => (
+	showSizeChange: (current: number, pageSize: number) => (
 		(pagination.value.current = current),
 		(pagination.value.pageSize = pageSize)
 	),
@@ -38,50 +37,6 @@ export const pagination = ref<PageInfo>({
 	//默认条数
 	defaultPageSize: 10,
 });
-
-export const columns = [
-	{
-		title: '事件名称',
-		dataIndex: 'eventName',
-		key: 'eventName',
-	},
-	{
-		title: '金额',
-		dataIndex: 'amount',
-		key: 'amount',
-	},
-	{
-		title: '其他人',
-		dataIndex: 'otherPerson',
-		key: 'otherPerson',
-	},
-	{
-		title: '随礼时间',
-		dataIndex: 'eventTime',
-		key: 'eventTime',
-	},
-	{
-		title: '备注',
-		dataIndex: 'remarks',
-		key: 'remarks',
-	},
-	{
-		title: '动作',
-		dataIndex: 'action',
-		key: 'action',
-	},
-	{
-		title: '通知次数',
-		dataIndex: 'noticeNum',
-		key: 'noticeNum',
-	},
-	{
-		title: '操作',
-		key: 'operation',
-		fixed: 'right',
-		width: '8',
-	},
-];
 
 export interface DataItem {
 	eventName: string;

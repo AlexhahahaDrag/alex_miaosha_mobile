@@ -1,6 +1,10 @@
 <template>
 	<NavBar :info="info"></NavBar>
-	<van-form @submit="onSubmit" :rules="rulesRef" required="auto">
+	<van-form
+		@submit="onSubmit"
+		:rules="rulesRef"
+		required="auto"
+	>
 		<van-cell-group>
 			<van-field
 				v-model="formInfo.name"
@@ -92,23 +96,28 @@
 				:rules="rulesRef.orderBy"
 				:maxlength="orderBy"
 			/>
-			<selectPop :info="popInfo" @selectInfo="selectInfo" @cancelInfo="cancelInfo"></selectPop>
+			<selectPop
+				:info="popInfo"
+				@select-info="selectInfo"
+				@cancel-info="cancelInfo"
+			></selectPop>
 		</van-cell-group>
 		<div class="subButton">
-			<van-button round
+			<van-button
+				round
 				block
 				type="primary"
 				native-type="submit"
-			> 提交 </van-button>
+			>
+				提交
+			</van-button>
 		</div>
 	</van-form>
 </template>
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-
 import { label, rulesRef } from './menuInfoDetailTs';
-
 import { addOrEditMenuInfo, getMenuInfoDetail } from '@/api/user/menuInfo/menuInfoTs';
 import type { Info } from '@/views/common/pop/selectPop.vue';
 import { getDictList } from '@/api/finance/dict/dictManager';
@@ -151,12 +160,12 @@ const statusInfo = ref<Info>({
 
 const choose = (type: string) => {
 	switch (type) {
-	case 'hideInMenu':
-		popInfo.value = hideInMenuInfo.value;
-		break;
-	case 'status':
-		popInfo.value = statusInfo.value;
-		break;
+		case 'hideInMenu':
+			popInfo.value = hideInMenuInfo.value;
+			break;
+		case 'status':
+			popInfo.value = statusInfo.value;
+			break;
 	}
 	popInfo.value.showFlag = true;
 };
@@ -164,14 +173,14 @@ const choose = (type: string) => {
 const selectInfo = (type: string, value: any, name: string) => {
 	popInfo.value.showFlag = false;
 	switch (type) {
-	case 'hideInMenu':
-		formInfo.value.hideInMenu = value;
-		hideInMenuName.value = name;
-		break;
-	case 'status':
-		formInfo.value.status = value;
-		statusName.value = name;
-		break;
+		case 'hideInMenu':
+			formInfo.value.hideInMenu = value;
+			hideInMenuName.value = name;
+			break;
+		case 'status':
+			formInfo.value.status = value;
+			statusName.value = name;
+			break;
 	}
 };
 

@@ -1,6 +1,5 @@
-import { Dayjs } from 'dayjs';
-
-import { type PageInfo, type ModelInfo } from '@/views/common/config/index';
+import type { Dayjs } from 'dayjs';
+import { type PageInfo } from '@/views/common/config/index';
 
 export interface SearchInfo {
 	shopName?: string;
@@ -29,7 +28,7 @@ export const pagination = ref<PageInfo>({
 	// 设置每页可以展示多少条的选项
 	pageSizeOptions: ['10', '20', '50', '100'],
 	// 改变pageSize后触发
-	showSizeChange: (current: number, pageSize: any) => (
+	showSizeChange: (current: number, pageSize: number) => (
 		(pagination.value.current = current),
 		(pagination.value.pageSize = pageSize)
 	),
@@ -40,60 +39,6 @@ export const pagination = ref<PageInfo>({
 	//默认条数
 	defaultPageSize: 10,
 });
-
-export const columns = [
-	{
-		title: '商品名称',
-		dataIndex: 'shopName',
-		key: 'shopName',
-	},
-	{
-		title: '商品编码',
-		dataIndex: 'shopCode',
-		key: 'shopCode',
-	},
-	{
-		title: '成本价',
-		dataIndex: 'costAmount',
-		key: 'costAmount',
-	},
-	{
-		title: '零售价',
-		dataIndex: 'saleAmount',
-		key: 'saleAmount',
-	},
-	{
-		title: '状态',
-		dataIndex: 'isValid',
-		key: 'isValid',
-	},
-	{
-		title: '进货日期',
-		dataIndex: 'saleDate',
-		key: 'saleDate',
-	},
-	{
-		title: '类别',
-		dataIndex: 'category',
-		key: 'category',
-	},
-	{
-		title: '进货地点',
-		dataIndex: 'purchasePlace',
-		key: 'purchasePlace',
-	},
-	{
-		title: '数量',
-		dataIndex: 'saleNum',
-		key: 'saleNum',
-	},
-	{
-		title: '操作',
-		key: 'operation',
-		fixed: 'right',
-		width: '8',
-	},
-];
 
 export interface ShopStockInfo {
 	id?: number | null;

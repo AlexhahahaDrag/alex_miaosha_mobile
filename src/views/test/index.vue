@@ -2,14 +2,22 @@
 	<div class="consume-water-page">
 		<!-- 标题栏 -->
 		<div class="header-section">
-			<div class="back-button" @click="handleBack">←</div>
+			<div
+				class="back-button"
+				@click="handleBack"
+			>
+				←
+			</div>
 			<div class="page-title">流水详情</div>
 		</div>
 
 		<!-- 消费卡选择区域 -->
 		<div class="card-selection-section">
 			<div class="selection-label">选择消费卡</div>
-			<div class="card-dropdown" @click="showCardPicker = true">
+			<div
+				class="card-dropdown"
+				@click="showCardPicker = true"
+			>
 				<div class="selected-card">
 					<div class="card-indicator"></div>
 					<div class="card-name">工作餐卡</div>
@@ -27,10 +35,18 @@
 			>
 				<div class="button-text">本周</div>
 			</div>
-			<div class="filter-button" :class="{ active: activeTimeFilter === 'month' }" @click="activeTimeFilter = 'month'">
+			<div
+				class="filter-button"
+				:class="{ active: activeTimeFilter === 'month' }"
+				@click="activeTimeFilter = 'month'"
+			>
 				<div class="button-text">本月</div>
 			</div>
-			<div class="filter-button" :class="{ active: activeTimeFilter === 'all' }" @click="activeTimeFilter = 'all'">
+			<div
+				class="filter-button"
+				:class="{ active: activeTimeFilter === 'all' }"
+				@click="activeTimeFilter = 'all'"
+			>
 				<div class="button-text">全部</div>
 			</div>
 		</div>
@@ -81,8 +97,16 @@
 		</div>
 
 		<!-- 消费卡选择弹框 -->
-		<van-popup v-model:show="showCardPicker" position="bottom" :style="{ height: '30%' }">
-			<van-picker :columns="cardOptions" @confirm="onCardConfirm" @cancel="showCardPicker = false" />
+		<van-popup
+			v-model:show="showCardPicker"
+			position="bottom"
+			:style="{ height: '30%' }"
+		>
+			<van-picker
+				:columns="cardOptions"
+				@confirm="onCardConfirm"
+				@cancel="showCardPicker = false"
+			/>
 		</van-popup>
 	</div>
 </template>
