@@ -9,7 +9,7 @@ import { visualizer } from 'rollup-plugin-visualizer';
 import viteCompression from 'vite-plugin-compression';
 import { qrcode } from 'vite-plugin-qrcode';
 
-const pathResolve = (dir: string): any => {
+const pathResolve = (dir: string): string => {
 	return resolve(__dirname, './', dir);
 };
 

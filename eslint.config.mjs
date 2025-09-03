@@ -25,15 +25,51 @@ const config = [
 			'**/postcss.config.js',
 			'**/components.d.ts',
 			'**/auto-imports.d.ts',
+			'**/.husky/**',
+			'**/*.html',
+			'**/*.json',
+			'**/*.lock',
+			'**/*.yml',
+			'**/*.yaml',
+			'**/.editorconfig',
+			'**/.gitignore',
+			'**/.eslintignore',
+			'**/.prettierignore',
+			'**/stats.html',
 		],
 	},
+	// 为 vite.config.ts 单独配置
 	{
+		files: ['vite.config.ts'],
+		languageOptions: {
+			globals: globals.node,
+			parserOptions: {
+				ecmaVersion: 'latest',
+				sourceType: 'module',
+				project: './tsconfig.node.json',
+				tsconfigRootDir: __dirname,
+			},
+		},
+		rules: {
+			// 基本的 TypeScript 规则
+			'@typescript-eslint/no-unused-vars': [
+				'error',
+				{
+					argsIgnorePattern: '^_',
+					varsIgnorePattern: '^_',
+				},
+			],
+			'@typescript-eslint/no-explicit-any': 'warn',
+		},
+	},
+	{
+		files: ['**/*.ts', '**/*.tsx', '!vite.config.ts'],
 		languageOptions: {
 			globals: globals.browser,
 			parserOptions: {
 				ecmaVersion: 'latest',
 				sourceType: 'module',
-				project: ['./tsconfig.json', './tsconfig.node.json'],
+				project: './tsconfig.json',
 				tsconfigRootDir: __dirname,
 				extraFileExtensions: ['.vue'],
 			},
@@ -142,7 +178,7 @@ const config = [
 		languageOptions: {
 			parserOptions: {
 				parser: '@typescript-eslint/parser',
-				project: ['./tsconfig.json', './tsconfig.node.json'],
+				project: './tsconfig.json',
 				tsconfigRootDir: __dirname,
 				extraFileExtensions: ['.vue'],
 			},
