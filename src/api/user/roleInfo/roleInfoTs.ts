@@ -1,10 +1,4 @@
-import {
-	getData,
-	postData,
-	putData,
-	deleteData,
-	baseService,
-} from '@/api/common/index';
+import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
 
 const baseRoleInfo = '/api/v1//role-info';
 
@@ -18,27 +12,18 @@ export function getRoleInfoPage(
 	pageNo: number | null | undefined,
 	pageSize: number | null | undefined,
 ): Promise<any> {
-	let url =
-		baseService.user +
-		baseRoleInfo +
-		RoleInfoUrl.page +
-		'?pageNum=' +
-		(pageNo ? pageNo : 1) +
-		'&pageSize=' +
-		(pageSize ? pageSize : 10);
+	const url = `${baseService.user + baseRoleInfo + RoleInfoUrl.page}?pageNum=${
+		pageNo ? pageNo : 1
+	}&pageSize=${pageSize ? pageSize : 10}`;
 	return postData(url, params);
 }
 
 export function getRoleInfoDetail(id: number): Promise<any> {
-	return getData(
-		baseService.user + baseRoleInfo + RoleInfoUrl.url + '?id=' + id,
-	);
+	return getData(`${baseService.user + baseRoleInfo + RoleInfoUrl.url}?id=${id}`);
 }
 
 export function deleteRoleInfo(ids: string): Promise<any> {
-	return deleteData(
-		baseService.user + baseRoleInfo + RoleInfoUrl.url + '?ids=' + ids,
-	);
+	return deleteData(`${baseService.user + baseRoleInfo + RoleInfoUrl.url}?ids=${ids}`);
 }
 
 export function addOrEditRoleInfo(method: string, params: any): Promise<any> {

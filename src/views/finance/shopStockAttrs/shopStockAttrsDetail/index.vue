@@ -79,6 +79,7 @@ import { showFailToast, showSuccessToast } from 'vant';
 import { label, rulesRef } from './shopStockAttrsDetailTs';
 import { addOrEditShopStockAttrs, getShopStockAttrsDetail } from '@/api/finance/shopStockAttrs/shopStockAttrsTs';
 import type { Info } from '@/views/common/pop/selectPop.vue';
+import { getListName } from '@/views/common/config';
 import { getDictList } from '@/api/finance/dict/dictManager';
 
 const route = useRoute();
@@ -126,19 +127,6 @@ const selectInfo = (type: string, value: any, name: string): void => {
 
 const cancelInfo = () => {
 	popInfo.value.showFlag = false;
-};
-
-const getListName = (list: any[], value: any, code: string, name: string): void => {
-	if (!list?.length) {
-		return '';
-	}
-	let listName = '';
-	list.forEach((item) => {
-		if (item[code] == value) {
-			listName = item[name];
-		}
-	});
-	return listName;
 };
 
 const getDictInfoList = (res: any): void => {
@@ -190,7 +178,7 @@ const init = (): void => {
 
 init();
 </script>
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .subButton {
 	margin: 16px;
 }

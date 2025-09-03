@@ -53,8 +53,3 @@ export interface DataItem {
 	status: string;
 	orderBy: number;
 }
-
-export interface dictInfo {
-	typeCode?: string | number | undefined;
-	typeName?: string | undefined;
-}

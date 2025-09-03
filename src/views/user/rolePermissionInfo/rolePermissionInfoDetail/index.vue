@@ -61,6 +61,7 @@
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
 import { label, rulesRef } from './rolePermissionInfoDetailTs';
+import { getListName } from '@/views/common/config';
 import {
 	addOrEditRolePermissionInfo,
 	getRolePermissionInfoDetail,
@@ -115,19 +116,6 @@ const cancelInfo = () => {
 	popInfo.value.showFlag = false;
 };
 
-const getListName = (list: any[], value: any, code: string, name: string) => {
-	if (!list?.length) {
-		return '';
-	}
-	let listName = '';
-	list.forEach((item) => {
-		if (item[code] == value) {
-			listName = item[name];
-		}
-	});
-	return listName;
-};
-
 function getDictInfoList(res: any) {
 	if (res?.code == '200') {
 		statusInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'is_valid');
@@ -177,7 +165,7 @@ function init() {
 
 init();
 </script>
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .subButton {
 	margin: 16px;
 }

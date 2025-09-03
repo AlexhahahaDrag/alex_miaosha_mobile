@@ -218,7 +218,7 @@ const init = (): void => {
 init();
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .right_info {
 	height: 100%;
 }

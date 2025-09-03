@@ -79,7 +79,7 @@ const useTabBar = reactive([
 ]);
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .homeSvgClass {
 	height: 80%;
 	width: 80%;

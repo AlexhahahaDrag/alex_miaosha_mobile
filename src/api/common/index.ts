@@ -1,4 +1,4 @@
-import { Params } from '@/types/global';
+import type { Params } from '@/types/global';
 import request, { requestFile } from '@/utils/request/request';
 
 export function postData(url: string, params: any): Promise<any> {

@@ -30,6 +30,7 @@
 
 <script lang="ts" setup>
 import { showNotify } from 'vant';
+import { number } from 'mathjs';
 import type { ItemInfo } from './common';
 import { getIncomeAndExpense } from '@/api/finance/financeAnalysis';
 
@@ -86,14 +87,14 @@ watch(
 	() => [props.activeTab, props.dateStr, props.belongTo],
 	() => {
 		if (props.activeTab === '2' && props.dateStr) {
-			init(props.dateStr, props.belongTo || null);
+			init(props.dateStr, props.belongTo ? number(props.belongTo) : null);
 		}
 	},
 	{ immediate: true },
 );
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .mainGrid {
 	width: 100%;
 	height: 400px;

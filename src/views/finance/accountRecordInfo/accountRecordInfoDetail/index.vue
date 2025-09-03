@@ -40,13 +40,13 @@
 			/>
 			<selectPop
 				:info="popInfo"
-				@select-info="handleSelectInfo"
-				@cancel-info="handleCancelInfo"
+				@select-info="selectInfo"
+				@cancel-info="cancelInfo"
 			></selectPop>
 			<datePop
 				:info="chooseDateInfo"
-				@select-date-info="handleSelectDateInfo"
-				@cancel-date-info="handleCancelDateInfo"
+				@select-date-info="selectDateInfo"
+				@cancel-date-info="cancelDateInfo"
 			></datePop>
 		</van-cell-group>
 		<div class="subButton">
@@ -65,6 +65,8 @@
 <script setup lang="ts">
 import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
+import type { Info } from '@/views/common/pop/selectPop.vue';
+import { getListName } from '@/views/common/config';
 import {
 	addOrEditAccountRecordInfo,
 	getAccountRecordInfoDetail,
@@ -210,32 +212,18 @@ const initInfoDate = (infoDate: Dayjs, type: string) => {
 	}
 };
 
-const onSubmit = () => {
+const onSubmit = async () => {
 	let method = 'post';
 	if (formInfo.value.id) {
 		method = 'put';
 	}
-	addOrEditAccountRecordInfo(method, formInfo.value).then((res: any) => {
-		if (res?.code == '200') {
-			showSuccessToast(res?.message || '保存成功!');
-			router.push({ path: '/selfFinance/accountRecordInfo' });
-		} else {
-			showFailToast(res?.message || '保存失败，请联系管理员!');
-		}
-	});
-};
-
-const getListName = (list: any[], value: any, code: string, name: string) => {
-	if (!list?.length) {
-		return '';
+	const { code, message } = await addOrEditAccountRecordInfo(method, formInfo.value);
+	if (code == '200') {
+		showSuccessToast(message || '保存成功!');
+		router.push({ path: '/selfFinance/accountRecordInfo' });
+	} else {
+		showFailToast(message || '保存失败，请联系管理员!');
 	}
-	let listName = '';
-	list.forEach((item) => {
-		if (item[code] == value) {
-			listName = item[name];
-		}
-	});
-	return listName;
 };
 
 function getDictInfoList(res: any) {
@@ -277,7 +265,7 @@ function init() {
 
 init();
 </script>
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .subButton {
 	margin: 16px;
 }

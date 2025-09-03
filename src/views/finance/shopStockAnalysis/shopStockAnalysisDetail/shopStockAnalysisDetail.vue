@@ -2,7 +2,8 @@
 	<van-row gutter="20">
 		<div class="mainGrid">
 			<div class="div1">
-				<bar-chart height="100%"
+				<bar-chart
+					height="100%"
 					width="100%"
 					title="日销售"
 					:data="dayData"
@@ -13,7 +14,8 @@
 		<van-divider />
 		<div class="mainGrid">
 			<div class="div2">
-				<bar-chart height="100%"
+				<bar-chart
+					height="100%"
 					width="100%"
 					title="月销售"
 					:data="monthData"
@@ -26,9 +28,7 @@
 
 <script lang="ts" setup>
 import { showNotify } from 'vant';
-
 import type { barItem } from './common';
-
 import { getDayShopFinanceInfo, getMonthShopFinanceInfo } from '@/api/finance/shopFinanceAnalysis';
 
 interface Props {
@@ -178,7 +178,7 @@ watch(
 );
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .mainGrid {
 	width: 100%;
 	height: 400px;

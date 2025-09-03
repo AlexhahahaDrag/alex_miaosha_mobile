@@ -41,8 +41,3 @@ export interface DataItem {
 	status: string;
 	options: string;
 }
-
-export interface dictInfo {
-	typeCode?: string | number | undefined;
-	typeName?: string | undefined;
-}

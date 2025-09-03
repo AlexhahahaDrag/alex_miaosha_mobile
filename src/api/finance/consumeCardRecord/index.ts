@@ -1,10 +1,4 @@
-import {
-	getData,
-	postData,
-	putData,
-	deleteData,
-	baseService,
-} from '@/api/common/index';
+import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
 
 const baseConsumeCardRecord = '/api/v1/prepaid-consume-record-t';
 
@@ -56,14 +50,9 @@ export function getConsumeCardRecordPage(
 	pageNo: number | null | undefined,
 	pageSize: number | null | undefined,
 ): Promise<any> {
-	let url =
-		baseService.finance +
-		baseConsumeCardRecord +
-		ConsumeCardRecordUrl.page +
-		'?pageNum=' +
-		(pageNo ? pageNo : 1) +
-		'&pageSize=' +
-		(pageSize ? pageSize : 10);
+	const url = `${baseService.finance + baseConsumeCardRecord + ConsumeCardRecordUrl.page}?pageNum=${
+		pageNo ? pageNo : 1
+	}&pageSize=${pageSize ? pageSize : 10}`;
 	return postData(url, params);
 }
 
@@ -71,15 +60,9 @@ export function getConsumeCardRecordPage(
  * 获取交易记录详情
  * @param id 记录ID
  */
-export function getConsumeCardRecordDetail(
-	id: number,
-): Promise<TransactionRecord> {
+export function getConsumeCardRecordDetail(id: number): Promise<TransactionRecord> {
 	return getData(
-		baseService.finance +
-			baseConsumeCardRecord +
-			ConsumeCardRecordUrl.url +
-			'?id=' +
-			id,
+		`${baseService.finance + baseConsumeCardRecord + ConsumeCardRecordUrl.url}?id=${id}`,
 	);
 }
 
@@ -89,11 +72,7 @@ export function getConsumeCardRecordDetail(
  */
 export function deleteConsumeCardRecord(ids: string): Promise<any> {
 	return deleteData(
-		baseService.finance +
-			baseConsumeCardRecord +
-			ConsumeCardRecordUrl.url +
-			'?ids=' +
-			ids,
+		`${baseService.finance + baseConsumeCardRecord + ConsumeCardRecordUrl.url}?ids=${ids}`,
 	);
 }
 
@@ -107,14 +86,8 @@ export function addOrEditConsumeCardRecord(
 	params: TransactionRecord,
 ): Promise<any> {
 	if ('put' == method) {
-		return putData(
-			baseService.finance + baseConsumeCardRecord + ConsumeCardRecordUrl.url,
-			params,
-		);
+		return putData(baseService.finance + baseConsumeCardRecord + ConsumeCardRecordUrl.url, params);
 	} else {
-		return postData(
-			baseService.finance + baseConsumeCardRecord + ConsumeCardRecordUrl.url,
-			params,
-		);
+		return postData(baseService.finance + baseConsumeCardRecord + ConsumeCardRecordUrl.url, params);
 	}
 }

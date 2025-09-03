@@ -84,6 +84,7 @@
 import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast } from 'vant';
 import { label } from './shopProductDetailTs';
+import { getListName } from '@/views/common/config';
 import { getShopStockDetail } from '@/api/finance/shopStock/shopStockTs';
 import { getDictList } from '@/api/finance/dict/dictManager';
 
@@ -100,19 +101,6 @@ const isValidName = ref<string>('');
 const categoryName = ref<string>('');
 
 const purchasePlaceName = ref<string>('');
-
-const getListName = (list: any[], value: any, code: string, name: string) => {
-	if (!list?.length) {
-		return '';
-	}
-	let listName = '';
-	list.forEach((item) => {
-		if (item[code] == value) {
-			listName = item[name];
-		}
-	});
-	return listName;
-};
 
 function getDictInfoList(res: any) {
 	if (res?.code == '200') {
@@ -183,7 +171,7 @@ function init() {
 
 init();
 </script>
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .subButton {
 	margin: 16px;
 }

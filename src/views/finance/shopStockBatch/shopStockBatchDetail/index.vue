@@ -61,6 +61,7 @@
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
 import { label, rulesRef } from './shopStockBatchDetailTs';
+import { getListName } from '@/views/common/config';
 import { addOrEditShopStockBatch, getShopStockBatchDetail } from '@/api/finance/shopStockBatch/shopStockBatchTs';
 import type { Info } from '@/views/common/pop/selectPop.vue';
 import { getDictList } from '@/api/finance/dict/dictManager';
@@ -112,19 +113,6 @@ const cancelInfo = () => {
 	popInfo.value.showFlag = false;
 };
 
-const getListName = (list: any[], value: any, code: string, name: string): void => {
-	if (!list?.length) {
-		return '';
-	}
-	let listName = '';
-	list.forEach((item) => {
-		if (item[code] == value) {
-			listName = item[name];
-		}
-	});
-	return listName;
-};
-
 const getDictInfoList = (res: any): void => {
 	if (res?.code == '200') {
 		isValidInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'is_valid');
@@ -174,7 +162,7 @@ const init = (): void => {
 
 init();
 </script>
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .subButton {
 	margin: 16px;
 }

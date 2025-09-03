@@ -124,8 +124,9 @@
 </template>
 <script lang="ts" setup>
 import { showSuccessToast, showFailToast } from 'vant';
-import type { SearchInfo, pageInfo, ShopStockInfo } from './shopStockTs';
+import type { SearchInfo, ShopStockInfo } from './shopStockTs';
 import { pagination } from './shopStockTs';
+import type { PageInfo } from '@/views/common/config/index';
 import { getShopStockPage, deleteShopStock } from '@/api/finance/shopStock/shopStockTs';
 import { getUserManagerList } from '@/api/user/userManager';
 import commonUtils from '@/utils/common/index';
@@ -156,7 +157,7 @@ const onCancel = () => {
 	query(searchInfo.value, pagination.value);
 };
 
-function query(param: SearchInfo, cur: pageInfo) {
+function query(param: SearchInfo, cur: PageInfo) {
 	loading.value = true;
 	getShopStockPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
 		.then((res: any) => {
@@ -236,7 +237,7 @@ function init() {
 init();
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .right_info {
 	height: 100%;
 }

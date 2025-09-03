@@ -30,9 +30,7 @@
 
 <script lang="ts" setup>
 import { showNotify } from 'vant';
-
 import type { barItem } from './common';
-
 import { getDayExpense, getMonthExpense } from '@/api/finance/financeAnalysis';
 
 interface Props {
@@ -68,7 +66,7 @@ const monthConfig = ref<barItem>({
 
 const dayData = ref<any>([]);
 
-function getDayExpenseInfo(userId: number | null, dateStr: string) {
+function getDayExpenseInfo(userId: number | string | null, dateStr: string) {
 	getDayExpense(userId, dateStr).then((res: { code: string; data: any[]; message: any }) => {
 		if (res.code == '200') {
 			if (res.data) {
@@ -115,7 +113,7 @@ function getDayExpenseInfo(userId: number | null, dateStr: string) {
 	});
 }
 
-function getMonthExpenseInfo(userId: number | null, dateStr: string) {
+function getMonthExpenseInfo(userId: number | string | null, dateStr: string) {
 	getMonthExpense(userId, dateStr).then((res: { code: string; data: any[]; message: any }) => {
 		if (res.code == '200') {
 			if (res.data) {
@@ -162,7 +160,7 @@ function getMonthExpenseInfo(userId: number | null, dateStr: string) {
 	});
 }
 
-const init = (dateStr: string, belongTo: number | null) => {
+const init = (dateStr: string, belongTo: number | string | null) => {
 	getDayExpenseInfo(belongTo, dateStr);
 	getMonthExpenseInfo(belongTo, dateStr);
 };
@@ -178,7 +176,7 @@ watch(
 );
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .mainGrid {
 	width: 100%;
 	height: 400px;

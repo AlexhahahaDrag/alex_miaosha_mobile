@@ -53,8 +53,3 @@ export interface ShopStockInfo {
 	purchasePlace: string;
 	saleNum: number;
 }
-
-export interface dictInfo {
-	typeCode?: string | number | undefined;
-	typeName?: string | undefined;
-}

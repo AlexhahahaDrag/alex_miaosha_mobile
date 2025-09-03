@@ -47,8 +47,3 @@ export interface DataItem {
 	action: number;
 	noticeNum: number;
 }
-
-export interface dictInfo {
-	typeCode?: string | number | undefined;
-	typeName?: string | undefined;
-}

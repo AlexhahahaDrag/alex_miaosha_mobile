@@ -59,6 +59,7 @@
 import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast } from 'vant';
 import type { Info } from '@/views/common/pop/selectPop.vue';
+import { getListName } from '@/views/common/config';
 import { useUserStore } from '@/store/modules/user/user';
 import { getUserManagerList } from '@/api/user/userManager';
 import { useNavBar } from '@/composables/useNavBar';
@@ -168,26 +169,13 @@ const getUserInfoListInfo = () => {
 	});
 };
 
-const getListName = (list: any[], value: any, code: string, name: string) => {
-	if (!list?.length) {
-		return '';
-	}
-	let listName = '';
-	list.forEach((item) => {
-		if (item[code] == value) {
-			listName = item[name];
-		}
-	});
-	return listName;
-};
-
 const init = () => {
 	getUserInfoListInfo();
 };
 
 init();
 </script>
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .topRow {
 	padding-top: 10px;
 }

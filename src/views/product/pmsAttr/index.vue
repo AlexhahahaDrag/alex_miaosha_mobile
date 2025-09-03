@@ -208,7 +208,7 @@ function init() {
 init();
 </script>
 
-<style lang="scss">
+<style lang="less">
 .right_info {
 	height: 100%;
 }

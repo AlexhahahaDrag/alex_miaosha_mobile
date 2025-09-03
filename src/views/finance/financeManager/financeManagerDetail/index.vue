@@ -99,6 +99,8 @@
 <script setup lang="ts">
 import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
+import { getListName } from '@/views/common/config';
+import { rulesRef } from '@/views/finance/financeManager/financeManager';
 import { getDictList } from '@/api/finance/dict/dictManager';
 import { getUserManagerList } from '@/api/user/userManager';
 import { useUserStore } from '@/store/modules/user/user';
@@ -128,57 +130,6 @@ const label = reactive({
 	isValid: '状态',
 	infoDate: '业务时间',
 	belongTo: '属于',
-});
-
-const rulesRef = reactive({
-	name: [
-		{
-			required: true,
-			message: '名称不能为空！',
-		},
-	],
-	amount: [
-		{
-			required: true,
-			message: '金额不能为空！',
-		},
-	],
-	typeCode: [
-		{
-			required: true,
-			message: '类别不能为空！',
-		},
-	],
-	fromSource: [
-		{
-			required: true,
-			message: '支付方式不能为空！',
-		},
-	],
-	incomeAndExpenses: [
-		{
-			required: true,
-			message: '收支类型不能为空！',
-		},
-	],
-	isValid: [
-		{
-			required: true,
-			message: '状态不能为空！',
-		},
-	],
-	infoDate: [
-		{
-			required: true,
-			message: '业务时间不能为空！',
-		},
-	],
-	belongTo: [
-		{
-			required: true,
-			message: '属于不能为空！',
-		},
-	],
 });
 
 const popInfo = ref<Info>({ showFlag: false });
@@ -226,6 +177,8 @@ const belongToInfo = ref<Info>({
 	},
 	selectValue: formInfo.value.belongTo,
 });
+
+const infoDateName = ref<string>('');
 
 const choose = (type: string) => {
 	switch (type) {
@@ -291,8 +244,6 @@ const chooseDateInfo = ref<any>({
 	},
 });
 
-const infoDateName = ref<string>('');
-
 const chooseDate = () => {
 	chooseDateInfo.value.showFlag = true;
 };
@@ -352,19 +303,6 @@ function getDictInfoList(res: any) {
 		showFailToast(res?.message || '查询失败，请联系管理员!');
 	}
 }
-
-const getListName = (list: any[], value: any, code: string, name: string) => {
-	if (!list?.length) {
-		return '';
-	}
-	let listName = '';
-	list.forEach((item) => {
-		if (item[code] == value) {
-			listName = item[name];
-		}
-	});
-	return listName;
-};
 
 function getUserInfoList(res: any) {
 	if (res.code == '200') {
@@ -426,6 +364,4 @@ function init() {
 
 init();
 </script>
-<style lang="scss" scoped>
-//@import url(); 引入公共css类
-</style>
+<style lang="less" scoped></style>

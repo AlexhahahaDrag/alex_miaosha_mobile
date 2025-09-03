@@ -24,22 +24,44 @@
 				borderColor: '#515151',
 			}"
 		></van-divider>
-		<van-empty v-if="dataSource.length == 0" description="暂无数据"></van-empty>
-		<van-list v-else
+		<van-empty
+			v-if="dataSource.length == 0"
+			description="暂无数据"
+		></van-empty>
+		<van-list
+			v-else
 			v-model:loading="loading"
 			:finished="finished"
 			finished-text="没有更多了"
 			@load="onRefresh"
 		>
-			<van-cell v-for="item in dataSource" :key="item">
+			<van-cell
+				v-for="item in dataSource"
+				:key="item"
+			>
 				<template #title>
 					<div class="text-left">
 						<van-space size="4px">
 							<span class="custom-title">{{ item.shopName }}</span>
 							<van-tag type="primary">{{ item.oldShopCode }}</van-tag>
-							<van-tag color="#7232dd" v-if="item.style">{{ item.style }}</van-tag>
-							<van-tag type="success" v-if="item.color">{{ item.color }}</van-tag>
-							<van-tag type="warning" v-if="item.size">{{ item.size }}</van-tag>
+							<van-tag
+								color="#7232dd"
+								v-if="item.style"
+							>
+								{{ item.style }}
+							</van-tag>
+							<van-tag
+								type="success"
+								v-if="item.color"
+							>
+								{{ item.color }}
+							</van-tag>
+							<van-tag
+								type="warning"
+								v-if="item.size"
+							>
+								{{ item.size }}
+							</van-tag>
 						</van-space>
 					</div>
 				</template>
@@ -50,8 +72,16 @@
 						</div>
 						<div class="rightRedDiv">
 							<div>
-								<SvgIcon name="shoppingCart" class="svg" @click="shoppingCart(item)"></SvgIcon>
-								<SvgIcon name="shoppingBuy" class="svg" @click="shoppingBuy(item)"></SvgIcon>
+								<SvgIcon
+									name="shoppingCart"
+									class="svg"
+									@click="shoppingCart(item)"
+								></SvgIcon>
+								<SvgIcon
+									name="shoppingBuy"
+									class="svg"
+									@click="shoppingBuy(item)"
+								></SvgIcon>
 							</div>
 						</div>
 					</div>
@@ -68,10 +98,9 @@
 </template>
 <script lang="ts" setup>
 import { showFailToast } from 'vant';
-
-import type { SearchInfo, pageInfo, ShopStockInfo } from './shopProductTs';
+import type { SearchInfo, ShopStockInfo } from './shopProductTs';
 import { pagination } from './shopProductTs';
-
+import type { PageInfo } from '@/views/common/config/index';
 import { getShopStockPage } from '@/api/finance/shopStock/shopStockTs';
 import { getUserManagerList } from '@/api/user/userManager';
 import { addOrEditShopCart } from '@/api/finance/shopCart/shopCartTs';
@@ -118,7 +147,7 @@ const onCancel = () => {
 	query(searchInfo.value, pagination.value);
 };
 
-function query(param: SearchInfo, cur: pageInfo) {
+function query(param: SearchInfo, cur: PageInfo) {
 	loading.value = true;
 	getShopStockPage(param, cur?.current || 1, cur?.pageSize || 10)
 		.then((res: any) => {
@@ -203,7 +232,7 @@ function init(): void {
 init();
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .text-left {
 	font-size: 17px;
 	width: 100%;

@@ -101,6 +101,7 @@
 import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
 import { label, rulesRef } from './shopFinanceDetailTs';
+import { getListName } from '@/views/common/config';
 import { addOrEditShopFinance, getShopFinanceDetail } from '@/api/finance/shopFinance/shopFinanceTs';
 import type { Info } from '@/views/common/pop/selectPop.vue';
 import { getDictList } from '@/api/finance/dict/dictManager';
@@ -282,19 +283,6 @@ function getDictInfoList(res: any) {
 	}
 }
 
-const getListName = (list: any[], value: any, code: string, name: string) => {
-	if (!list?.length) {
-		return '';
-	}
-	let listName = '';
-	list.forEach((item) => {
-		if (item[code] == value) {
-			listName = item[name];
-		}
-	});
-	return listName;
-};
-
 function init() {
 	const id: any = route?.query?.id;
 	if (id) {
@@ -330,7 +318,7 @@ function init() {
 
 init();
 </script>
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .subButton {
 	margin: 16px;
 }

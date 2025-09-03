@@ -5,5 +5,5 @@ export function getSeckillList(params: any): Promise<any> {
 }
 
 export function deleteBlogById(id: number) {
-	return deleteData('/api/blog/delete?id=' + id);
+	return deleteData(`/api/blog/delete?id=${id}`);
 }

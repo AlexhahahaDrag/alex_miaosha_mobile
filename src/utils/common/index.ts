@@ -63,24 +63,10 @@ const formatAmount = (amount: number | Decimal, digit: number, unit: string) => 
 	);
 };
 
-const getListName = (list: any[], value: any, code: string, name: string) => {
-	if (!list?.length) {
-		return '';
-	}
-	let listName = '';
-	list.forEach((item) => {
-		if (item[code] == value) {
-			listName = item[name];
-		}
-	});
-	return listName;
-};
-
 export default {
 	formatAmount,
 	plus,
 	minus,
 	multiply,
 	divide,
-	getListName,
 };

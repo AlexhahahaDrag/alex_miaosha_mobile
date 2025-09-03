@@ -43,11 +43,6 @@ export interface DataItem {
 	saleDate?: Dayjs | string;
 }
 
-export interface dictInfo {
-	typeCode?: string | number | undefined;
-	typeName?: string | undefined;
-}
-
 export const fromSourceTransferList = [
 	{ value: 'xj', label: 'cash' },
 	{ value: 'yhk', label: 'card' },

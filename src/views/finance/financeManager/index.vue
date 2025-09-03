@@ -218,7 +218,7 @@ function init() {
 init();
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .refresh-info {
 	height: calc(100% - 64px);
 }

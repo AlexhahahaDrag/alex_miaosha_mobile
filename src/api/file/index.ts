@@ -19,40 +19,24 @@ export function getFilePage(
 	pageNo: number | null | undefined,
 	pageSize: number | null | undefined,
 ): Promise<any> {
-	let url =
-		baseService.file +
-		baseFileManager +
-		fileUrl.page +
-		'?pageNum=' +
-		(pageNo ? pageNo : 1) +
-		'&pageSize=' +
-		(pageSize ? pageSize : 10);
+	const url = `${baseService.file + baseFileManager + fileUrl.page}?pageNum=${
+		pageNo ? pageNo : 1
+	}&pageSize=${pageSize ? pageSize : 10}`;
 	return postData(url, params);
 }
 
 export function getFileDetail(id: number | string): Promise<any> {
-	return getData(
-		baseService.file + baseFileManager + fileUrl.url + '?id=' + id,
-	);
+	return getData(`${baseService.file + baseFileManager + fileUrl.url}?id=${id}`);
 }
 
-export function addOrEditFileManager(
-	method: string,
-	type: string,
-	params: any,
-): Promise<any> {
+export function addOrEditFileManager(method: string, type: string, params: any): Promise<any> {
 	if ('put' == method) {
 		return putData(baseService.file + baseFileManager + fileUrl.url, params);
 	} else {
-		return postFileData(
-			baseService.file + baseFileManager + fileUrl.url + '?type=' + type,
-			params,
-		);
+		return postFileData(`${baseService.file + baseFileManager + fileUrl.url}?type=${type}`, params);
 	}
 }
 
 export function deleteDictManager(ids: string): Promise<any> {
-	return deleteData(
-		baseService.file + baseFileManager + fileUrl.url + '?ids=' + ids,
-	);
+	return deleteData(`${baseService.file + baseFileManager + fileUrl.url}?ids=${ids}`);
 }

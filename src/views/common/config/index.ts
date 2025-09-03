@@ -66,3 +66,22 @@ export interface ModelInfo {
 	id?: number | undefined;
 	confirmLoading?: boolean;
 }
+
+// 字典信息
+export interface DictInfo {
+	typeCode?: string | number | undefined;
+	typeName?: string | undefined;
+}
+
+export const getListName = (list: any[], value: any, code: string, name: string) => {
+	if (!list?.length) {
+		return '';
+	}
+	let listName = '';
+	list.forEach((item) => {
+		if (item[code] == value) {
+			listName = item[name];
+		}
+	});
+	return listName;
+};

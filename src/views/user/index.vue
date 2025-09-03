@@ -88,8 +88,8 @@
 	</div>
 	<logout
 		:visible="showLogoutFlag"
-		@select="logout"
-	/>
+		@select="logoutInfo"
+	></logout>
 </template>
 
 <script lang="ts" setup>
@@ -119,7 +119,7 @@ const showLogoutFlag = ref<boolean>(false);
 const showLogout = () => {
 	showLogoutFlag.value = true;
 };
-const logout = (v: boolean) => {
+const logoutInfo = (v: boolean) => {
 	showLogoutFlag.value = v;
 };
 
@@ -127,7 +127,7 @@ const goSecurity = () => showToast('功能即将上线');
 const openTheme = () => showToast('功能即将上线');
 </script>
 
-<style lang="scss">
+<style lang="less">
 .user-page {
 	padding: 12px 12px 24px;
 }

@@ -58,8 +58,3 @@ export interface ShopStockInfo {
 	style?: string;
 	stockBatch?: string;
 }
-
-export interface dictInfo {
-	typeCode?: string | number | undefined;
-	typeName?: string | undefined;
-}

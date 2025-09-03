@@ -47,8 +47,3 @@ export interface DataItem {
 	catelogId: number;
 	showDesc: number;
 }
-
-export interface dictInfo {
-	typeCode?: string | number | undefined;
-	typeName?: string | undefined;
-}

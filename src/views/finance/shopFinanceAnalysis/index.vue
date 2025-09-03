@@ -102,7 +102,7 @@ const cancelDateInfo = () => {
 	chooseDateInfo.value.showFlag = false;
 };
 </script>
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .topRow {
 	padding-top: 10px;
 }

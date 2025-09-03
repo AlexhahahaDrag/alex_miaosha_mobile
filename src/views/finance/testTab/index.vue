@@ -1,19 +1,32 @@
 <template>
-	<van-tabs v-model:active="activeTab"
+	<van-tabs
+		v-model:active="activeTab"
 		sticky
 		swipeable
 		@change="changeTab"
 	>
-		<van-tab title="test1" name="1">
+		<van-tab
+			title="test1"
+			name="1"
+		>
 			<test1 v-bind="props"></test1>
 		</van-tab>
-		<van-tab title="test2" name="2">
+		<van-tab
+			title="test2"
+			name="2"
+		>
 			<test2 v-bind="props"></test2>
 		</van-tab>
-		<van-tab title="test3" name="3">
+		<van-tab
+			title="test3"
+			name="3"
+		>
 			<test3 v-bind="props"></test3>
 		</van-tab>
-		<van-tab title="test4" name="4">
+		<van-tab
+			title="test4"
+			name="4"
+		>
 			<test4 v-bind="props"></test4>
 		</van-tab>
 	</van-tabs>

@@ -44,7 +44,6 @@
 				name="remarks"
 				:label="label.remarks + '：'"
 				:placeholder="'请输入' + label.remarks"
-				:rules="rulesRef.remarks"
 				:maxlength="65535"
 			/>
 			<van-field
@@ -61,7 +60,6 @@
 				name="noticeNum"
 				:label="label.noticeNum + '：'"
 				:placeholder="'请输入' + label.noticeNum"
-				:rules="rulesRef.noticeNum"
 				:maxlength="3"
 			/>
 			<selectPop
@@ -92,6 +90,7 @@
 import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
 import { label, rulesRef } from './personalGiftDetailTs';
+import { getListName } from '@/views/common/config';
 import { addOrEditPersonalGift, getPersonalGiftDetail } from '@/api/finance/personalGift/personalGiftTs';
 import type { Info } from '@/views/common/pop/selectPop.vue';
 import { getDictList } from '@/api/finance/dict/dictManager';
@@ -141,19 +140,6 @@ const selectInfo = (type: string, value: any, name: string): void => {
 
 const cancelInfo = () => {
 	popInfo.value.showFlag = false;
-};
-
-const getListName = (list: any[], value: any, code: string, name: string): string => {
-	if (!list?.length) {
-		return '';
-	}
-	let listName = '';
-	list.forEach((item) => {
-		if (item[code] == value) {
-			listName = item[name];
-		}
-	});
-	return listName;
 };
 
 const getDictInfoList = (res: any): void => {
@@ -267,7 +253,7 @@ const init = (): void => {
 
 init();
 </script>
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .subButton {
 	margin: 16px;
 }

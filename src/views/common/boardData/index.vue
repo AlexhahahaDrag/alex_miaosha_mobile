@@ -72,7 +72,7 @@ watch(
 	},
 );
 </script>
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .all-content {
 	width: 100%;
 	border-radius: 5%;

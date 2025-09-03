@@ -1,10 +1,4 @@
-import {
-	getData,
-	postData,
-	putData,
-	deleteData,
-	baseService,
-} from '@/api/common/index';
+import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
 
 const basePmsSkuInfo = '/api/v1/pms-sku-info';
 
@@ -18,39 +12,24 @@ export function getPmsSkuInfoPage(
 	pageNo: number | null | undefined,
 	pageSize: number | null | undefined,
 ): Promise<any> {
-	let url =
-		baseService.product +
-		basePmsSkuInfo +
-		PmsSkuInfoUrl.page +
-		'?pageNum=' +
-		(pageNo ? pageNo : 1) +
-		'&pageSize=' +
-		(pageSize ? pageSize : 10);
+	const url = `${baseService.product + basePmsSkuInfo + PmsSkuInfoUrl.page}?pageNum=${
+		pageNo ? pageNo : 1
+	}&pageSize=${pageSize ? pageSize : 10}`;
 	return postData(url, params);
 }
 
 export function getPmsSkuInfoDetail(id: number): Promise<any> {
-	return getData(
-		baseService.product + basePmsSkuInfo + PmsSkuInfoUrl.url + '?id=' + id,
-	);
+	return getData(`${baseService.product + basePmsSkuInfo + PmsSkuInfoUrl.url}?id=${id}`);
 }
 
 export function deletePmsSkuInfo(ids: string): Promise<any> {
-	return deleteData(
-		baseService.product + basePmsSkuInfo + PmsSkuInfoUrl.url + '?ids=' + ids,
-	);
+	return deleteData(`${baseService.product + basePmsSkuInfo + PmsSkuInfoUrl.url}?ids=${ids}`);
 }
 
 export function addOrEditPmsSkuInfo(method: string, params: any): Promise<any> {
 	if ('put' == method) {
-		return putData(
-			baseService.product + basePmsSkuInfo + PmsSkuInfoUrl.url,
-			params,
-		);
+		return putData(baseService.product + basePmsSkuInfo + PmsSkuInfoUrl.url, params);
 	} else {
-		return postData(
-			baseService.product + basePmsSkuInfo + PmsSkuInfoUrl.url,
-			params,
-		);
+		return postData(baseService.product + basePmsSkuInfo + PmsSkuInfoUrl.url, params);
 	}
 }

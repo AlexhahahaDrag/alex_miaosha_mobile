@@ -70,6 +70,7 @@ import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import { showFailToast } from 'vant';
 import { label } from './shopOrderDetailTs';
+import { getListName } from '@/views/common/config';
 import { getShopOrderDetail } from '@/api/finance/shopOrder/shopOrderTs';
 import type { Info } from '@/views/common/pop/selectPop.vue';
 import { getDictList } from '@/api/finance/dict/dictManager';
@@ -103,19 +104,6 @@ const choose = (type: string): void => {
 			break;
 	}
 	popInfo.value.showFlag = true;
-};
-
-const getListName = (list: any[], value: any, code: string, name: string): string => {
-	if (!list?.length) {
-		return '';
-	}
-	let listName = '';
-	list.forEach((item) => {
-		if (item[code] == value) {
-			listName = item[name];
-		}
-	});
-	return listName;
 };
 
 const getDictInfoList = (res: any): void => {
@@ -199,7 +187,7 @@ const init = (): void => {
 
 init();
 </script>
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .subButton {
 	margin: 16px;
 }

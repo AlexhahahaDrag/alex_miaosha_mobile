@@ -43,8 +43,3 @@ export interface DataItem {
 	isValid: string;
 	description: string;
 }
-
-export interface dictInfo {
-	typeCode?: string | number | undefined;
-	typeName?: string | undefined;
-}

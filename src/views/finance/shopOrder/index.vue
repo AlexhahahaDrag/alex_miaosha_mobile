@@ -186,7 +186,7 @@ const init = (): void => {
 init();
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .text-left {
 	font-size: 17px;
 	width: 100%;

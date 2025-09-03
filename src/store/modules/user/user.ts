@@ -82,7 +82,7 @@ export const useUserStore = defineStore({
 			},
 		) {
 			try {
-				const { goHome = true, ...loginParams } = params;
+				const { ...loginParams } = params;
 				const data = await loginApi(loginParams);
 				if (data?.code == '200') {
 					const { token, admin } = data.data;

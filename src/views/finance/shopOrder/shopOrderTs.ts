@@ -48,8 +48,3 @@ export interface DataItem {
 	payWay: string;
 	saleCount: number;
 }
-
-export interface dictInfo {
-	typeCode?: string | number | undefined;
-	typeName?: string | undefined;
-}

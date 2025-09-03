@@ -131,6 +131,7 @@ import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
 import type { ShopStockInfo } from '../shopStockTs';
 import { label, rulesRef } from './shopStockDetailTs';
+import { getListName } from '@/views/common/config';
 import { addOrEditShopStock, getShopStockDetail } from '@/api/finance/shopStock/shopStockTs';
 import type { Info } from '@/views/common/pop/selectPop.vue';
 import { getDictList } from '@/api/finance/dict/dictManager';
@@ -238,19 +239,6 @@ const selectInfo = (type: string, value: any, name: string) => {
 
 const cancelInfo = () => {
 	popInfo.value.showFlag = false;
-};
-
-const getListName = (list: any[], value: any, code: string, name: string) => {
-	if (!list?.length) {
-		return '';
-	}
-	let listName = '';
-	list.forEach((item) => {
-		if (item[code] == value) {
-			listName = item[name];
-		}
-	});
-	return listName;
 };
 
 function getDictInfoList(res: any) {
@@ -371,7 +359,7 @@ function init() {
 
 init();
 </script>
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .subButton {
 	margin: 16px;
 }

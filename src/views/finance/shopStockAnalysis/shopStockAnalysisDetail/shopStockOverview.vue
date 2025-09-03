@@ -114,7 +114,7 @@ watch(
 );
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .box-content-show {
 	display: flex;
 	justify-content: space-around;

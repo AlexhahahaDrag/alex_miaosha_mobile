@@ -12,57 +12,39 @@ const financeAnalysisUrl = {
 };
 
 export function getDayShopFinanceInfo(searchDate?: string): Promise<any> {
-	let url =
-		baseService.finance +
-		baseFinanceAnalysis +
-		financeAnalysisUrl.getDayShopFinanceInfo +
-		'?searchDate=' +
-		searchDate;
+	const url = `${
+		baseService.finance + baseFinanceAnalysis + financeAnalysisUrl.getDayShopFinanceInfo
+	}?searchDate=${searchDate}`;
 	return getData(url);
 }
 
 export function getMonthShopFinanceInfo(searchDate?: string): Promise<any> {
-	let url =
-		baseService.finance +
-		baseFinanceAnalysis +
-		financeAnalysisUrl.getMonthShopFinanceInfo +
-		'?searchDate=' +
-		searchDate;
+	const url = `${
+		baseService.finance + baseFinanceAnalysis + financeAnalysisUrl.getMonthShopFinanceInfo
+	}?searchDate=${searchDate}`;
 	return getData(url);
 }
 
 export function getShopNameInfo(searchDate?: string): Promise<any> {
-	let url =
-		baseService.finance +
-		baseFinanceAnalysis +
-		financeAnalysisUrl.getShopNameInfo +
-		'?searchDate=' +
-		searchDate;
+	const url = `${
+		baseService.finance + baseFinanceAnalysis + financeAnalysisUrl.getShopNameInfo
+	}?searchDate=${searchDate}`;
 	return getData(url);
 }
 
 export function getPayWayInfo(searchDate?: string): Promise<any> {
-	let url =
-		baseService.finance +
-		baseFinanceAnalysis +
-		financeAnalysisUrl.getPayWayInfo +
-		'?searchDate=' +
-		searchDate;
+	const url = `${
+		baseService.finance + baseFinanceAnalysis + financeAnalysisUrl.getPayWayInfo
+	}?searchDate=${searchDate}`;
 	return getData(url);
 }
 
 export function getChainAndYear(params?: any): Promise<any> {
-	let url =
-		baseService.finance +
-		baseFinanceAnalysis +
-		financeAnalysisUrl.getChainAndYear;
-	return getData(url, { params: params });
+	const url = baseService.finance + baseFinanceAnalysis + financeAnalysisUrl.getChainAndYear;
+	return getData(url, { params });
 }
 
 export function getBenefit(params?: any): Promise<any> {
-	let url =
-		baseService.finance +
-		baseFinanceAnalysis +
-		financeAnalysisUrl.getBenefitInfo;
+	const url = baseService.finance + baseFinanceAnalysis + financeAnalysisUrl.getBenefitInfo;
 	return getData(url, params);
 }

@@ -42,8 +42,3 @@ export interface DataItem {
 	account: string;
 	isSend: number;
 }
-
-export interface dictInfo {
-	typeCode?: string | number | undefined;
-	typeName?: string | undefined;
-}

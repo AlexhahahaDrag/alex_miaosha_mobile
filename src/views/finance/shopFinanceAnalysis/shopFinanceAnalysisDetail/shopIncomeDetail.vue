@@ -178,7 +178,7 @@ watch(
 );
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .mainGrid {
 	width: 100%;
 	height: 400px;
