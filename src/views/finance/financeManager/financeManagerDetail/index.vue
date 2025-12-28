@@ -311,7 +311,11 @@ const onSubmit = () => {
 	if (formInfo.value.id) {
 		method = 'put';
 	}
-	addOrEditFinanceManger(method, formInfo.value).then((res: any) => {
+	let params = {
+		...formInfo.value,
+		infoDate: dayjs(infoDateName.value).format('YYYY-MM-DD HH:mm:ss'),
+	};
+	addOrEditFinanceManger(method, params).then((res: any) => {
 		if (res?.code == '200') {
 			showSuccessToast(res?.message || '保存成功!');
 			// todo 是否修改成返回列表对应的位置
