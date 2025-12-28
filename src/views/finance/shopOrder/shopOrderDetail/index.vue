@@ -66,26 +66,28 @@
 </template>
 
 <script setup lang="ts">
-import dayjs, { Dayjs } from 'dayjs';
+import type { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import { showFailToast } from 'vant';
-import { getShopOrderDetail } from '@/api/finance/shopOrder/shopOrderTs';
-import { Info } from '@/views/common/pop/selectPop.vue';
-import { getDictList } from '@/api/finance/dict/dictManager';
 import { label } from './shopOrderDetailTs';
+import { getListName } from '@/views/common/config';
+import { getShopOrderDetail } from '@/api/finance/shopOrder/shopOrderTs';
+import type { Info } from '@/views/common/pop/selectPop.vue';
+import { getDictList } from '@/api/finance/dict/dictManager';
 
-let route = useRoute();
+const route = useRoute();
 const info = ref<any>({
 	title: route?.meta?.title || '商店订单表',
 	leftPath: '/finance/shopOrder',
 });
 
-let formInfo = ref<any>({});
+const formInfo = ref<any>({});
 
-let popInfo = ref<Info>({ showFlag: false });
+const popInfo = ref<Info>({ showFlag: false });
 
-let isValidName = ref<string>('');
+const isValidName = ref<string>('');
 
-let isValidInfo = ref<Info>({
+const isValidInfo = ref<Info>({
 	label: 'isValid',
 	labelName: label.isValid,
 	customFieldName: {
@@ -104,42 +106,17 @@ const choose = (type: string): void => {
 	popInfo.value.showFlag = true;
 };
 
-const getListName = (
-	list: any[],
-	value: any,
-	code: string,
-	name: string,
-): string => {
-	if (!list?.length) {
-		return '';
-	}
-	let listName = '';
-	list.forEach((item) => {
-		if (item[code] == value) {
-			listName = item[name];
-		}
-	});
-	return listName;
-};
-
 const getDictInfoList = (res: any): void => {
 	if (res?.code == '200') {
-		isValidInfo.value.list = res.data.filter(
-			(item: { belongTo: string }) => item.belongTo == 'is_valid',
-		);
-		isValidName.value = getListName(
-			isValidInfo.value.list || [],
-			formInfo.value.isValid,
-			'typeCode',
-			'typeName',
-		);
+		isValidInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'is_valid');
+		isValidName.value = getListName(isValidInfo.value.list || [], formInfo.value.isValid, 'typeCode', 'typeName');
 	} else {
 		showFailToast(res?.message || '查询失败，请联系管理员!');
 	}
 };
 
-let saleDateName = ref<string>('');
-let saleDateInfo = ref<any>({
+const saleDateName = ref<string>('');
+const saleDateInfo = ref<any>({
 	label: 'saleDate',
 	labelName: '销售日期',
 	selectValue: dayjs(),
@@ -158,7 +135,7 @@ let saleDateInfo = ref<any>({
 	},
 });
 
-let chooseDateInfo = ref<Info>({ showFlag: false });
+const chooseDateInfo = ref<Info>({ showFlag: false });
 
 const chooseDate = (type: string): void => {
 	chooseDateInfo.value.showFlag = true;
@@ -181,7 +158,7 @@ const initInfoDate = (infoDate: Dayjs, type: string): void => {
 };
 
 const init = (): void => {
-	let id: any = route?.query?.id;
+	const id: any = route?.query?.id;
 	if (id) {
 		Promise.all([getShopOrderDetail(id || '-1'), getDictList('is_valid')])
 			.then((res: any) => {
@@ -210,7 +187,7 @@ const init = (): void => {
 
 init();
 </script>
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .subButton {
 	margin: 16px;
 }

@@ -29,12 +29,9 @@
 </template>
 
 <script lang="ts" setup>
-import {
-	getShopNameInfo,
-	getPayWayInfo,
-} from '@/api/finance/shopFinanceAnalysis';
 import { showNotify } from 'vant';
-import { ItemInfo } from './common';
+import type { ItemInfo } from './common';
+import { getShopNameInfo, getPayWayInfo } from '@/api/finance/shopFinanceAnalysis';
 
 interface Props {
 	activeTab: number | string;
@@ -42,52 +39,48 @@ interface Props {
 	belongTo?: number | null;
 }
 
-let props = defineProps<Props>();
+const props = defineProps<Props>();
 
-let pieShopData = ref<object[]>([]);
+const pieShopData = ref<object[]>([]);
 
 const getShopNameInfoInfo = (dateStr: string) => {
-	getShopNameInfo(dateStr).then(
-		(res: { code: string; data: any[]; message: any }) => {
-			if (res.code == '200') {
-				if (res.data) {
-					let shop: ItemInfo[] = [];
-					res.data.forEach((item: { shopName: any; saleAmount: any }) => {
-						shop.push({ name: item.shopName, value: item.saleAmount });
-					});
-					pieShopData.value = shop;
-				}
-			} else {
-				showNotify({
-					type: 'danger',
-					message: (res && res.message) || '查询列表失败！',
+	getShopNameInfo(dateStr).then((res: { code: string; data: any[]; message: any }) => {
+		if (res.code == '200') {
+			if (res.data) {
+				const shop: ItemInfo[] = [];
+				res.data.forEach((item: { shopName: any; saleAmount: any }) => {
+					shop.push({ name: item.shopName, value: item.saleAmount });
 				});
+				pieShopData.value = shop;
 			}
-		},
-	);
+		} else {
+			showNotify({
+				type: 'danger',
+				message: (res && res.message) || '查询列表失败！',
+			});
+		}
+	});
 };
 
-let piePayWayData = ref<object[]>([]);
+const piePayWayData = ref<object[]>([]);
 
 const getPayWayInfoInfo = (dateStr: string) => {
-	getPayWayInfo(dateStr).then(
-		(res: { code: string; data: any[]; message: any }) => {
-			if (res.code == '200') {
-				if (res.data) {
-					let shop: ItemInfo[] = [];
-					res.data.forEach((item: { payWayName: any; saleAmount: any }) => {
-						shop.push({ name: item.payWayName, value: item.saleAmount });
-					});
-					piePayWayData.value = shop;
-				}
-			} else {
-				showNotify({
-					type: 'danger',
-					message: (res && res.message) || '查询列表失败！',
+	getPayWayInfo(dateStr).then((res: { code: string; data: any[]; message: any }) => {
+		if (res.code == '200') {
+			if (res.data) {
+				const shop: ItemInfo[] = [];
+				res.data.forEach((item: { payWayName: any; saleAmount: any }) => {
+					shop.push({ name: item.payWayName, value: item.saleAmount });
 				});
+				piePayWayData.value = shop;
 			}
-		},
-	);
+		} else {
+			showNotify({
+				type: 'danger',
+				message: (res && res.message) || '查询列表失败！',
+			});
+		}
+	});
 };
 
 const tooltip = ref({
@@ -111,7 +104,7 @@ watch(
 );
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .mainGrid {
 	width: 100%;
 	height: 400px;

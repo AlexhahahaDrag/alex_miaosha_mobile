@@ -1,10 +1,7 @@
+import type { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import axios from 'axios';
 import { useUserStore } from '@/store/modules/user/user';
-import axios, {
-	AxiosError,
-	AxiosResponse,
-	InternalAxiosRequestConfig,
-} from 'axios';
-import { ResponseBody } from '@/api/typing';
+import type { ResponseBody } from '@/api/typing';
 import router from '@/router';
 import { decrypt } from '@/utils/crypto';
 
@@ -42,7 +39,6 @@ const requestHandler = (
 	if (token) {
 		config.headers['Authorization'] = token;
 	} else {
-		console.log('token不存在');
 		router.push({ name: 'login' });
 	}
 	return config;
@@ -58,7 +54,6 @@ const requestHandlerFile = (
 		config.headers['Authorization'] = token;
 		config.headers['Content-Type'] = 'multipart/form-data';
 	} else {
-		console.log('请求拦截器, token不存在');
 		router.push({ name: 'login' });
 	}
 	return config;
@@ -72,9 +67,8 @@ const responseHandler = (
 	response: AxiosResponse<any>,
 ): ResponseBody<any> | AxiosResponse<any> | Promise<any> | any => {
 	const { data } = response;
-	let resData = decrypt(data);
+	const resData = decrypt(data);
 	if (resData.code == 403) {
-		console.log('响应拦截器 token过期');
 		router.push({ name: 'login' });
 		return;
 	}

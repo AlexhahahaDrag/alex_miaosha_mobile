@@ -1,10 +1,4 @@
-import {
-	getData,
-	postData,
-	putData,
-	deleteData,
-	baseService,
-} from '@/api/common/index';
+import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
 
 const baseOrgUserInfo = '/api/v1//org-user-info';
 
@@ -18,42 +12,24 @@ export function getOrgUserInfoPage(
 	pageNo: number | null | undefined,
 	pageSize: number | null | undefined,
 ): Promise<any> {
-	let url =
-		baseService.user +
-		baseOrgUserInfo +
-		OrgUserInfoUrl.page +
-		'?pageNum=' +
-		(pageNo ? pageNo : 1) +
-		'&pageSize=' +
-		(pageSize ? pageSize : 10);
+	const url = `${baseService.user + baseOrgUserInfo + OrgUserInfoUrl.page}?pageNum=${
+		pageNo ? pageNo : 1
+	}&pageSize=${pageSize ? pageSize : 10}`;
 	return postData(url, params);
 }
 
 export function getOrgUserInfoDetail(id: number): Promise<any> {
-	return getData(
-		baseService.user + baseOrgUserInfo + OrgUserInfoUrl.url + '?id=' + id,
-	);
+	return getData(`${baseService.user + baseOrgUserInfo + OrgUserInfoUrl.url}?id=${id}`);
 }
 
 export function deleteOrgUserInfo(ids: string): Promise<any> {
-	return deleteData(
-		baseService.user + baseOrgUserInfo + OrgUserInfoUrl.url + '?ids=' + ids,
-	);
+	return deleteData(`${baseService.user + baseOrgUserInfo + OrgUserInfoUrl.url}?ids=${ids}`);
 }
 
-export function addOrEditOrgUserInfo(
-	method: string,
-	params: any,
-): Promise<any> {
+export function addOrEditOrgUserInfo(method: string, params: any): Promise<any> {
 	if ('put' == method) {
-		return putData(
-			baseService.user + baseOrgUserInfo + OrgUserInfoUrl.url,
-			params,
-		);
+		return putData(baseService.user + baseOrgUserInfo + OrgUserInfoUrl.url, params);
 	} else {
-		return postData(
-			baseService.user + baseOrgUserInfo + OrgUserInfoUrl.url,
-			params,
-		);
+		return postData(baseService.user + baseOrgUserInfo + OrgUserInfoUrl.url, params);
 	}
 }

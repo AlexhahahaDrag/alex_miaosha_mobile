@@ -1,5 +1,8 @@
 <template>
-	<navBar :info="info" @clickRight="addShopOrder"></navBar>
+	<navBar
+		:info="info"
+		@click-right="addShopOrder"
+	></navBar>
 	<van-pull-refresh
 		pulling-text="加载中。。。"
 		:style="{ height: 'calc(100% - 44px)' }"
@@ -24,7 +27,10 @@
 				borderColor: 'grey',
 			}"
 		></van-divider>
-		<van-empty v-if="dataSource.length == 0" description="暂无数据"></van-empty>
+		<van-empty
+			v-if="dataSource.length == 0"
+			description="暂无数据"
+		></van-empty>
 		<van-list
 			v-else
 			v-model:loading="loading"
@@ -57,9 +63,7 @@
 						<template #right-icon>
 							<div class="text-right">
 								<div style="display: flex">
-									<div class="van-ellipsis">
-										￥{{ commonUtils.formatAmount(item?.saleAmount, 2, '') }}
-									</div>
+									<div class="van-ellipsis"> ￥{{ commonUtils.formatAmount(item?.saleAmount, 2, '') }} </div>
 								</div>
 								<div class="rightRedDiv">
 									<div>
@@ -70,9 +74,7 @@
 						</template>
 						<template #value></template>
 						<template #label>
-							{{
-								item.saleDate ? dayjs(item.saleDate).format('YYYY-MM-DD') : ''
-							}}
+							{{ item.saleDate ? dayjs(item.saleDate).format('YYYY-MM-DD') : '' }}
 						</template>
 					</van-cell>
 					<van-divider class="dividerClass"></van-divider>
@@ -83,26 +85,28 @@
 	<van-back-top></van-back-top>
 </template>
 <script lang="ts" setup>
+import { showFailToast } from 'vant';
+import dayjs from 'dayjs';
+import type { SearchInfo } from './shopOrderTs';
+import { pagination } from './shopOrderTs';
 import { getShopOrderPage } from '@/api/finance/shopOrder/shopOrderTs';
 import { getUserManagerList } from '@/api/user/userManager';
-import { SearchInfo, pagination, pageInfo } from './shopOrderTs';
-import { showFailToast } from 'vant';
+import type { PageInfo } from '@/views/common/config/index';
 import commonUtils from '@/utils/common/index';
-import dayjs from 'dayjs';
 
-let router = useRouter();
-let route = useRoute();
+const router = useRouter();
+const route = useRoute();
 const info = ref<any>({
 	title: route?.meta?.title || '商品订单',
 	rightButton: '新增',
 	leftPath: '/',
 });
-let loading = ref<boolean>(false);
-let dataSource = ref<any[]>([]);
-let searchInfo = ref<SearchInfo>({});
+const loading = ref<boolean>(false);
+const dataSource = ref<any[]>([]);
+const searchInfo = ref<SearchInfo>({});
 
-let finished = ref<boolean>(false); //加载是否已经没有更多数据
-let isRefresh = ref<boolean>(false); //是否下拉刷新
+const finished = ref<boolean>(false); //加载是否已经没有更多数据
+const isRefresh = ref<boolean>(false); //是否下拉刷新
 
 const onSearch = () => {
 	pagination.value.current = 1;
@@ -116,7 +120,7 @@ const onCancel = () => {
 	query(searchInfo.value, pagination.value);
 };
 
-const query = (param: SearchInfo, cur: pageInfo): void => {
+const query = (param: SearchInfo, cur: PageInfo): void => {
 	loading.value = true;
 	getShopOrderPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
 		.then((res: any) => {
@@ -125,10 +129,7 @@ const query = (param: SearchInfo, cur: pageInfo): void => {
 				pagination.value.current = res.data.current + 1;
 				pagination.value.pageSize = res.data.size;
 				pagination.value.total = res.data.total;
-				if (
-					(pagination.value.total || 0) <
-					(pagination.value.current || 1) * (pagination.value.pageSize || 10)
-				) {
+				if ((pagination.value.total || 0) < (pagination.value.current || 1) * (pagination.value.pageSize || 10)) {
 					finished.value = true;
 				}
 			} else {
@@ -145,7 +146,7 @@ const addShopOrder = (): void => {
 	router.push({ path: '/finance/shopOrder/shopOrderDetail' });
 };
 
-let userMap = {};
+const userMap = {};
 const getUserInfoList = (): void => {
 	getUserManagerList({}).then((res: any) => {
 		if (res?.code == '200') {
@@ -185,7 +186,7 @@ const init = (): void => {
 init();
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .text-left {
 	font-size: 17px;
 	width: 100%;

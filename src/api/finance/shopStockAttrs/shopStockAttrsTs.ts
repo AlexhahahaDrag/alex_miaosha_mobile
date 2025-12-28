@@ -1,10 +1,4 @@
-import {
-	getData,
-	postData,
-	putData,
-	deleteData,
-	baseService,
-} from '@/api/common/index';
+import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
 
 const baseShopStockAttrs = '/api/v1//shop-stock-attrs';
 
@@ -18,50 +12,26 @@ export function getShopStockAttrsPage(
 	pageNo: number | null | undefined,
 	pageSize: number | null | undefined,
 ): Promise<any> {
-	let url =
-		baseService.finance +
-		baseShopStockAttrs +
-		ShopStockAttrsUrl.page +
-		'?pageNum=' +
-		(pageNo ? pageNo : 1) +
-		'&pageSize=' +
-		(pageSize ? pageSize : 10);
+	const url = `${baseService.finance + baseShopStockAttrs + ShopStockAttrsUrl.page}?pageNum=${
+		pageNo ? pageNo : 1
+	}&pageSize=${pageSize ? pageSize : 10}`;
 	return postData(url, params);
 }
 
 export function getShopStockAttrsDetail(id: number): Promise<any> {
-	return getData(
-		baseService.finance +
-			baseShopStockAttrs +
-			ShopStockAttrsUrl.url +
-			'?id=' +
-			id,
-	);
+	return getData(`${baseService.finance + baseShopStockAttrs + ShopStockAttrsUrl.url}?id=${id}`);
 }
 
 export function deleteShopStockAttrs(ids: string): Promise<any> {
 	return deleteData(
-		baseService.finance +
-			baseShopStockAttrs +
-			ShopStockAttrsUrl.url +
-			'?ids=' +
-			ids,
+		`${baseService.finance + baseShopStockAttrs + ShopStockAttrsUrl.url}?ids=${ids}`,
 	);
 }
 
-export function addOrEditShopStockAttrs(
-	method: string,
-	params: any,
-): Promise<any> {
+export function addOrEditShopStockAttrs(method: string, params: any): Promise<any> {
 	if ('put' == method) {
-		return putData(
-			baseService.finance + baseShopStockAttrs + ShopStockAttrsUrl.url,
-			params,
-		);
+		return putData(baseService.finance + baseShopStockAttrs + ShopStockAttrsUrl.url, params);
 	} else {
-		return postData(
-			baseService.finance + baseShopStockAttrs + ShopStockAttrsUrl.url,
-			params,
-		);
+		return postData(baseService.finance + baseShopStockAttrs + ShopStockAttrsUrl.url, params);
 	}
 }

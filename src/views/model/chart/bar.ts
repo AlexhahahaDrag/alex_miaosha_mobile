@@ -5,7 +5,7 @@ export interface barItem {
 	dataType?: string[];
 	xTile?: string;
 	yNameGap?: number;
-	tooltip?: {};
+	tooltip?: object;
 	legend?: [];
 	color?: string;
 	stackInfo?: string[];

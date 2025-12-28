@@ -22,11 +22,11 @@
 </template>
 
 <script lang="ts" setup>
-import { getAllStock, getCashAmount } from '@/api/finance/shopStockAnalysis';
 import { showNotify } from 'vant';
-import { ShopFinanceChainYear } from './common';
+import type { ShopFinanceChainYear } from './common';
+import { getAllStock, getCashAmount } from '@/api/finance/shopStockAnalysis';
 import commonUtils from '@/utils/common/index';
-import { Info } from '@/views/common/boardData/config';
+import type { Info } from '@/views/common/boardData/config';
 
 interface Props {
 	activeTab: number | string;
@@ -34,64 +34,53 @@ interface Props {
 	belongTo?: number | null;
 }
 
-let props = defineProps<Props>();
+const props = defineProps<Props>();
 
-let stockList = ref<Info[]>([]);
+const stockList = ref<Info[]>([]);
 
 const getAllStockInfo = () => {
-	getAllStock().then(
-		(res: { code: string; data: ShopFinanceChainYear; message: any }) => {
-			if (res.code == '200') {
-				console.log(`res:`, res);
-				let arr: Info[] = [];
-				arr.push({
-					title: '库存金额',
-					value:
-						res.data?.costAmount !== null ?
-							commonUtils.formatAmount(res.data.costAmount || 0, 2, '')
-						:	'--',
-					icon: 'stockAmount',
-					unit: '元',
-					showChain: false,
-					showYear: false,
-					color: '#55aaff',
-				});
-				arr.push({
-					title: '库存数量',
-					value:
-						res.data?.saleNum !== null ?
-							commonUtils.formatAmount(res.data.saleNum || 0, 0, '')
-						:	'--',
-					icon: 'stockNum',
-					unit: '件',
-					showChain: false,
-					showYear: false,
-					color: '#55aaff',
-				});
-				stockList.value = arr;
-			} else {
-				showNotify({
-					type: 'danger',
-					message: (res && res.message) || '查询列表失败！',
-				});
-			}
-		},
-	);
+	getAllStock().then((res: { code: string; data: ShopFinanceChainYear; message: any }) => {
+		if (res.code == '200') {
+			console.log('res:', res);
+			const arr: Info[] = [];
+			arr.push({
+				title: '库存金额',
+				value: res.data?.costAmount !== null ? commonUtils.formatAmount(res.data.costAmount || 0, 2, '') : '--',
+				icon: 'stockAmount',
+				unit: '元',
+				showChain: false,
+				showYear: false,
+				color: '#55aaff',
+			});
+			arr.push({
+				title: '库存数量',
+				value: res.data?.saleNum !== null ? commonUtils.formatAmount(res.data.saleNum || 0, 0, '') : '--',
+				icon: 'stockNum',
+				unit: '件',
+				showChain: false,
+				showYear: false,
+				color: '#55aaff',
+			});
+			stockList.value = arr;
+		} else {
+			showNotify({
+				type: 'danger',
+				message: (res && res.message) || '查询列表失败！',
+			});
+		}
+	});
 };
 
-let crashList = ref<Info[]>([]);
+const crashList = ref<Info[]>([]);
 
 const getCashAmountInfo = () => {
 	getCashAmount().then((res: any) => {
 		if (res.code == '200') {
-			console.log(`res:`, res);
-			let arr: Info[] = [];
+			console.log('res:', res);
+			const arr: Info[] = [];
 			arr.push({
 				title: '流动资金',
-				value:
-					res.data?.amount !== null ?
-						commonUtils.formatAmount(res.data.amount || 0, 2, '')
-					:	'--',
+				value: res.data?.amount !== null ? commonUtils.formatAmount(res.data.amount || 0, 2, '') : '--',
 				icon: 'stockAmount',
 				unit: '元',
 				showChain: false,
@@ -125,7 +114,7 @@ watch(
 );
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .box-content-show {
 	display: flex;
 	justify-content: space-around;

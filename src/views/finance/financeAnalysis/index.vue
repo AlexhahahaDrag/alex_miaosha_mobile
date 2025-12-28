@@ -1,54 +1,70 @@
 <template>
 	<div
 		class="check-title-info"
-		style="
-			display: flex;
-			align-items: center;
-			justify-content: flex-end;
-			margin-right: 10px;
-		"
+		style="display: flex; align-items: center; justify-content: flex-end; margin-right: 10px"
 	>
-		<span name="belongTo" @click="choose()">
+		<span
+			name="belongTo"
+			@click="choose"
+		>
 			<a>{{ belongToName }}</a>
 		</span>
 		的
-		<span name="infoDate" @click="chooseDate()">
+		<span
+			name="infoDate"
+			@click="chooseDate"
+		>
 			<a> {{ infoDateName }}</a>
 		</span>
 		账单
 	</div>
-	<van-tabs v-model:active="activeTab" sticky swipeable @change="changeTab">
-		<van-tab title="总览" name="1">
+	<van-tabs
+		v-model:active="activeTab"
+		sticky
+		swipeable
+		@change="changeTab"
+	>
+		<van-tab
+			title="总览"
+			name="1"
+		>
 			<overview v-bind="props"></overview>
 		</van-tab>
-		<van-tab title="收支分析" name="2">
+		<van-tab
+			title="收支分析"
+			name="2"
+		>
 			<incomeAnalysis v-bind="props"></incomeAnalysis>
 		</van-tab>
-		<van-tab title="收支明细" name="3">
+		<van-tab
+			title="收支明细"
+			name="3"
+		>
 			<incomeDetail v-bind="props"></incomeDetail>
 		</van-tab>
 	</van-tabs>
 	<monthPop
 		:info="chooseDateInfo"
-		@selectInfo="selectDateInfo"
-		@cancelInfo="cancelDateInfo"
+		@select-info="selectDateInfo"
+		@cancel-info="cancelDateInfo"
 	></monthPop>
 	<selectPop
 		:info="popInfo"
-		@selectInfo="selectInfo"
-		@cancelInfo="cancelInfo"
+		@select-info="selectInfo"
+		@cancel-info="cancelInfo"
 	></selectPop>
 </template>
 
 <script lang="ts" setup>
-import dayjs, { Dayjs } from 'dayjs';
-import { Info } from '@/views/common/pop/selectPop.vue';
+import dayjs, { type Dayjs } from 'dayjs';
+import { showFailToast } from 'vant';
+import type { Info } from '@/views/common/pop/selectPop.vue';
+import { getListName } from '@/views/common/config';
 import { useUserStore } from '@/store/modules/user/user';
 import { getUserManagerList } from '@/api/user/userManager';
-import { showFailToast } from 'vant';
 import { useNavBar } from '@/composables/useNavBar';
 
-let route = useRoute();
+const route = useRoute();
 
 // 使用新的NavBar系统
 useNavBar({
@@ -57,15 +73,15 @@ useNavBar({
 	visible: true,
 });
 
-let userInfo = useUserStore()?.getUserInfo;
+const userInfo = useUserStore()?.getUserInfo;
 const dateFormatter = 'YYYY年MM月';
 const YYYYMM = 'YYYY-MM';
 
-let belongTo = ref<number | null>(userInfo?.id ? Number(userInfo.id) : null);
+const belongTo = ref<number | null>(userInfo?.id ? Number(userInfo.id) : null);
 
-let activeTab = ref<number>(2);
+const activeTab = ref<number>(2);
 
-let props = reactive<any>({
+const props = reactive<any>({
 	activeTab: activeTab.value,
 	dateStr: dayjs().format(YYYYMM),
 	belongTo: belongTo.value,
@@ -76,13 +92,13 @@ const changeTab = (name: number) => {
 	activeTab.value = name;
 };
 
-let infoDateName = ref<string>(dayjs().format(dateFormatter));
+const infoDateName = ref<string>(dayjs().format(dateFormatter));
 
 const chooseDate = () => {
 	chooseDateInfo.value.showFlag = true;
 };
 
-let chooseDateInfo = ref<any>({
+const chooseDateInfo = ref<any>({
 	label: 'infoDate',
 	labelName: '月份选择',
 	selectValue: dayjs(),
@@ -110,8 +126,8 @@ const cancelDateInfo = () => {
 	chooseDateInfo.value.showFlag = false;
 };
 
-let belongToName = ref<string>();
-let popInfo = ref<Info>({
+const belongToName = ref<string>();
+const popInfo = ref<Info>({
 	showFlag: false,
 	label: 'belongTo',
 	labelName: '属于',
@@ -145,33 +161,12 @@ const choose = () => {
 const getUserInfoListInfo = () => {
 	getUserManagerList({}).then((res: any) => {
 		if (res.code == '200') {
-			popInfo.value.list = [
-				...(popInfo.value?.list || []),
-				...(res?.data || []),
-			];
-			belongToName.value = getListName(
-				res.data,
-				belongTo.value,
-				'id',
-				'nickName',
-			);
+			popInfo.value.list = [...(popInfo.value?.list || []), ...(res?.data || [])];
+			belongToName.value = getListName(res.data, belongTo.value, 'id', 'nickName');
 		} else {
 			showFailToast(res[2]?.message || '查询失败，请联系管理员!');
 		}
 	});
-};
-
-const getListName = (list: any[], value: any, code: string, name: string) => {
-	if (!list?.length) {
-		return '';
-	}
-	let listName = '';
-	list.forEach((item) => {
-		if (item[code] == value) {
-			listName = item[name];
-		}
-	});
-	return listName;
 };
 
 const init = () => {
@@ -180,7 +175,7 @@ const init = () => {
 
 init();
 </script>
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .topRow {
 	padding-top: 10px;
 }

@@ -1,6 +1,6 @@
-import { Nullable } from '@/types/global';
-import { RoleEnum } from '@/types/role_enum';
-import { UserInfo } from '@/types/store';
+import type { Nullable } from '@/types/global';
+import type { RoleEnum } from '@/types/role_enum';
+import type { UserInfo } from '@/types/store';
 
 export interface UserState {
 	userInfo: Nullable<UserInfo>;
@@ -51,7 +51,7 @@ export interface MenuInfo {
 }
 
 export function getAuthInfo(type: string) {
-	let infoStr = localStorage.getItem(type);
+	const infoStr = localStorage.getItem(type);
 	if (infoStr) {
 		return JSON.parse(infoStr);
 	}

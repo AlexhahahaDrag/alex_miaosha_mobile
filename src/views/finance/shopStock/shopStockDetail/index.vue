@@ -1,6 +1,10 @@
 <template>
 	<NavBar :info="info"></NavBar>
-	<van-form @submit="onSubmit" :rules="rulesRef" required="auto">
+	<van-form
+		@submit="onSubmit"
+		:rules="rulesRef"
+		required="auto"
+	>
 		<van-cell-group>
 			<van-field
 				v-model="formInfo.shopName"
@@ -100,49 +104,52 @@
 			/>
 			<selectPop
 				:info="popInfo"
-				@selectInfo="selectInfo"
-				@cancelInfo="cancelInfo"
+				@select-info="selectInfo"
+				@cancel-info="cancelInfo"
 			></selectPop>
 			<datePop
 				:info="chooseDateInfo"
-				@selectInfo="selectDateInfo"
-				@cancelInfo="cancelDateInfo"
+				@select-info="selectDateInfo"
+				@cancel-info="cancelDateInfo"
 			></datePop>
 		</van-cell-group>
 		<div class="subButton">
-			<van-button round block type="primary" native-type="submit"
-				>提交</van-button
+			<van-button
+				round
+				block
+				type="primary"
+				native-type="submit"
 			>
+				提交
+			</van-button>
 		</div>
 	</van-form>
 </template>
 
 <script setup lang="ts">
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
-import {
-	addOrEditShopStock,
-	getShopStockDetail,
-} from '@/api/finance/shopStock/shopStockTs';
-import { Info } from '@/views/common/pop/selectPop.vue';
-import { getDictList } from '@/api/finance/dict/dictManager';
+import type { ShopStockInfo } from '../shopStockTs';
 import { label, rulesRef } from './shopStockDetailTs';
-import { ShopStockInfo } from '../shopStockTs';
+import { getListName } from '@/views/common/config';
+import { addOrEditShopStock, getShopStockDetail } from '@/api/finance/shopStock/shopStockTs';
+import type { Info } from '@/views/common/pop/selectPop.vue';
+import { getDictList } from '@/api/finance/dict/dictManager';
 
-let route = useRoute();
-let router = useRouter();
+const route = useRoute();
+const router = useRouter();
 const info = ref<any>({
 	title: route?.meta?.title || '商店库存表',
 	leftPath: '/finance/shopStock',
 });
 
-let formInfo = ref<ShopStockInfo>({});
+const formInfo = ref<ShopStockInfo>({});
 
-let popInfo = ref<Info>({ showFlag: false });
+const popInfo = ref<Info>({ showFlag: false });
 
-let isValidName = ref<string>('');
+const isValidName = ref<string>('');
 
-let isValidInfo = ref<Info>({
+const isValidInfo = ref<Info>({
 	label: 'isValid',
 	labelName: label.isValid,
 	rule: rulesRef.isValid,
@@ -152,9 +159,9 @@ let isValidInfo = ref<Info>({
 	},
 	selectValue: formInfo.value.isValid,
 });
-let categoryName = ref<string>('');
+const categoryName = ref<string>('');
 
-let categoryInfo = ref<Info>({
+const categoryInfo = ref<Info>({
 	label: 'category',
 	labelName: label.category,
 	rule: rulesRef.category,
@@ -164,9 +171,9 @@ let categoryInfo = ref<Info>({
 	},
 	selectValue: formInfo.value.category,
 });
-let purchasePlaceName = ref<string>('');
+const purchasePlaceName = ref<string>('');
 
-let purchasePlaceInfo = ref<Info>({
+const purchasePlaceInfo = ref<Info>({
 	label: 'purchasePlace',
 	labelName: label.purchasePlace,
 	rule: rulesRef.purchasePlace,
@@ -177,9 +184,9 @@ let purchasePlaceInfo = ref<Info>({
 	selectValue: formInfo.value.purchasePlace,
 });
 
-let stockBatchName = ref<string>('');
+const stockBatchName = ref<string>('');
 
-let stockBatchInfo = ref<Info>({
+const stockBatchInfo = ref<Info>({
 	label: 'stockBatch',
 	labelName: label.stockBatch,
 	rule: rulesRef.stockBatch,
@@ -234,42 +241,13 @@ const cancelInfo = () => {
 	popInfo.value.showFlag = false;
 };
 
-const getListName = (list: any[], value: any, code: string, name: string) => {
-	if (!list?.length) {
-		return '';
-	}
-	let listName = '';
-	list.forEach((item) => {
-		if (item[code] == value) {
-			listName = item[name];
-		}
-	});
-	return listName;
-};
-
 function getDictInfoList(res: any) {
 	if (res?.code == '200') {
-		isValidInfo.value.list = res.data.filter(
-			(item: { belongTo: string }) => item.belongTo == 'is_valid',
-		);
-		isValidName.value = getListName(
-			isValidInfo.value.list || [],
-			formInfo.value.isValid,
-			'typeCode',
-			'typeName',
-		);
-		categoryInfo.value.list = res.data.filter(
-			(item: { belongTo: string }) => item.belongTo == 'shop_category',
-		);
-		categoryName.value = getListName(
-			categoryInfo.value.list || [],
-			formInfo.value.category,
-			'typeCode',
-			'typeName',
-		);
-		purchasePlaceInfo.value.list = res.data.filter(
-			(item: { belongTo: string }) => item.belongTo == 'stock_place',
-		);
+		isValidInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'is_valid');
+		isValidName.value = getListName(isValidInfo.value.list || [], formInfo.value.isValid, 'typeCode', 'typeName');
+		categoryInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'shop_category');
+		categoryName.value = getListName(categoryInfo.value.list || [], formInfo.value.category, 'typeCode', 'typeName');
+		purchasePlaceInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'stock_place');
 		purchasePlaceName.value = getListName(
 			purchasePlaceInfo.value.list || [],
 			formInfo.value.purchasePlace,
@@ -281,8 +259,8 @@ function getDictInfoList(res: any) {
 	}
 }
 
-let saleDateName = ref<string>('');
-let saleDateInfo = ref<any>({
+const saleDateName = ref<string>('');
+const saleDateInfo = ref<any>({
 	label: 'saleDate',
 	labelName: '进货日期',
 	rule: rulesRef.saleDate,
@@ -302,16 +280,7 @@ let saleDateInfo = ref<any>({
 	},
 });
 
-let chooseDateInfo = ref<Info>({ showFlag: false });
-
-const chooseDate = (type: string) => {
-	chooseDateInfo.value.showFlag = true;
-	switch (type) {
-		case 'saleDate':
-			chooseDateInfo.value = saleDateInfo.value;
-			break;
-	}
-};
+const chooseDateInfo = ref<Info>({ showFlag: false });
 
 const selectDateInfo = (date: Dayjs, dateName: string, type: string) => {
 	switch (type) {
@@ -354,13 +323,10 @@ const onSubmit = () => {
 };
 
 function init() {
-	let id: any = route?.query?.id;
-	let type: any = route?.query?.type;
+	const id: any = route?.query?.id;
+	const type: any = route?.query?.type;
 	if (id) {
-		Promise.all([
-			getShopStockDetail(id || '-1'),
-			getDictList('is_valid,shop_category,stock_place'),
-		])
+		Promise.all([getShopStockDetail(id || '-1'), getDictList('is_valid,shop_category,stock_place')])
 			.then((res: any) => {
 				if (res[0].code == '200') {
 					formInfo.value = res[0].data;
@@ -393,7 +359,7 @@ function init() {
 
 init();
 </script>
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .subButton {
 	margin: 16px;
 }

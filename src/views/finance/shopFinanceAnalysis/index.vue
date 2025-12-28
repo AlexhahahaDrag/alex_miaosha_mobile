@@ -1,35 +1,52 @@
 <template>
 	<NavBar :info="info"></NavBar>
 	<van-row class="topRow">
-		<van-col offset="14" span="10">
-			<span @click="chooseDate()">
+		<van-col
+			offset="14"
+			span="10"
+		>
+			<span @click="chooseDate">
 				<a> {{ infoDateName }}</a>
 			</span>
 			账单
 		</van-col>
 	</van-row>
-	<van-tabs v-model:active="activeTab" sticky swipeable @change="changeTab">
-		<van-tab title="店总览" name="1">
+	<van-tabs
+		v-model:active="activeTab"
+		sticky
+		swipeable
+		@change="changeTab"
+	>
+		<van-tab
+			title="店总览"
+			name="1"
+		>
 			<ShopOverview v-bind="props"></ShopOverview>
 		</van-tab>
-		<van-tab title="店收支分析" name="2">
+		<van-tab
+			title="店收支分析"
+			name="2"
+		>
 			<ShopIncomeAnalysis v-bind="props"></ShopIncomeAnalysis>
 		</van-tab>
-		<van-tab title="店收支明细" name="3">
+		<van-tab
+			title="店收支明细"
+			name="3"
+		>
 			<ShopIncomeDetail v-bind="props"></ShopIncomeDetail>
 		</van-tab>
 	</van-tabs>
 	<monthPop
 		:info="chooseDateInfo"
-		@selectInfo="selectDateInfo"
-		@cancelInfo="cancelDateInfo"
+		@select-info="selectDateInfo"
+		@cancel-info="cancelDateInfo"
 	></monthPop>
 </template>
 
 <script lang="ts" setup>
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs, { type Dayjs } from 'dayjs';
 
-let route = useRoute();
+const route = useRoute();
 
 const info = ref<any>({
 	title: route?.meta?.title || '店财务分析',
@@ -39,9 +56,9 @@ const info = ref<any>({
 const dateFormatter = 'YYYY年MM月';
 const YYYYMM = 'YYYY-MM';
 
-let activeTab = ref<number>(2);
+const activeTab = ref<number>(2);
 
-let props = reactive<any>({
+const props = reactive<any>({
 	activeTab: activeTab.value,
 	dateStr: dayjs().format(YYYYMM),
 });
@@ -51,13 +68,13 @@ const changeTab = (name: number) => {
 	activeTab.value = name;
 };
 
-let infoDateName = ref<string>(dayjs().format(dateFormatter));
+const infoDateName = ref<string>(dayjs().format(dateFormatter));
 
 const chooseDate = () => {
 	chooseDateInfo.value.showFlag = true;
 };
 
-let chooseDateInfo = ref<any>({
+const chooseDateInfo = ref<any>({
 	label: 'infoDate',
 	labelName: '月份选择',
 	selectValue: dayjs(),
@@ -82,16 +99,10 @@ const selectDateInfo = (dateInfo: Dayjs, dateName: string) => {
 };
 
 const cancelDateInfo = () => {
-	// todo
-	// TODO
-	// TODO:
-	// fixme
-	// FIXME
-	// FIXME:
 	chooseDateInfo.value.showFlag = false;
 };
 </script>
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .topRow {
 	padding-top: 10px;
 }

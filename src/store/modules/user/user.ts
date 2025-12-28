@@ -1,10 +1,10 @@
-import { loginApi } from '@/api/user/login';
 import { defineStore } from 'pinia';
-import { UserState, getAuthInfo } from './typing';
-import { LoginParams } from '@/api/user/login';
-import { piniaPersistConfig } from '@/config/piniaPersist';
 import { showFailToast } from 'vant';
-import type { MenuInfo } from './typing';
+import { getAuthInfo } from './typing';
+import type { MenuInfo, UserState } from './typing';
+import { loginApi } from '@/api/user/login';
+import type { LoginParams } from '@/api/user/login';
+import { piniaPersistConfig } from '@/config/piniaPersist';
 import { refreshRouter } from '@/router';
 
 export const useUserStore = defineStore({
@@ -27,7 +27,7 @@ export const useUserStore = defineStore({
 			// return this.userInfo || getAuthCache<UserInfo>(USER_INFO_KEY) || {};
 		},
 		getToken(): string {
-			let localStorage = window.localStorage;
+			const localStorage = window.localStorage;
 			return this.token || localStorage.getItem('token') || '';
 		},
 		getMenuInfo(): MenuInfo[] | null {
@@ -39,7 +39,7 @@ export const useUserStore = defineStore({
 		getLastUpdateTime(): number {
 			return this.lastUpdateTime;
 		},
-		getRouteStatus(): Boolean {
+		getRouteStatus(): boolean {
 			return this.hasMenu || localStorage.getItem('hasRoute') === 'true';
 		},
 		getRoleInfo(): any {
@@ -82,7 +82,7 @@ export const useUserStore = defineStore({
 			},
 		) {
 			try {
-				const { goHome = true, ...loginParams } = params;
+				const { ...loginParams } = params;
 				const data = await loginApi(loginParams);
 				if (data?.code == '200') {
 					const { token, admin } = data.data;

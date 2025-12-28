@@ -1,5 +1,9 @@
 <template>
-	<van-form @submit="onSubmit" :rules="rulesRef" required="auto">
+	<van-form
+		@submit="onSubmit"
+		:rules="rulesRef"
+		required="auto"
+	>
 		<van-cell-group inset>
 			<van-field
 				v-model="formInfo.name"
@@ -70,17 +74,22 @@
 			/>
 			<selectPop
 				:info="popInfo"
-				@selectInfo="selectInfo"
-				@cancelInfo="cancelInfo"
+				@select-info="selectInfo"
+				@cancel-info="cancelInfo"
 			></selectPop>
 			<datePop
 				:info="chooseDateInfo"
-				@selectInfo="selectDateInfo"
-				@cancelInfo="cancelDateInfo"
+				@select-date-info="selectDateInfo"
+				@cancel-date-info="cancelDateInfo"
 			></datePop>
 		</van-cell-group>
 		<div style="margin: 16px">
-			<van-button round block type="primary" native-type="submit">
+			<van-button
+				round
+				block
+				type="primary"
+				native-type="submit"
+			>
 				提交
 			</van-button>
 		</div>
@@ -88,21 +97,20 @@
 </template>
 
 <script setup lang="ts">
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs, { type Dayjs } from 'dayjs';
+import { showFailToast, showSuccessToast } from 'vant';
+import { getListName } from '@/views/common/config';
+import { rulesRef } from '@/views/finance/financeManager/financeManager';
 import { getDictList } from '@/api/finance/dict/dictManager';
 import { getUserManagerList } from '@/api/user/userManager';
 import { useUserStore } from '@/store/modules/user/user';
-import { Info } from '@/views/common/pop/selectPop.vue';
-import { showFailToast, showSuccessToast } from 'vant';
-import {
-	addOrEditFinanceManger,
-	getFinanceMangerDetail,
-} from '@/api/finance/financeManager';
+import type { Info } from '@/views/common/pop/selectPop.vue';
+import { addOrEditFinanceManger, getFinanceMangerDetail } from '@/api/finance/financeManager';
 import { useNavBar } from '@/composables/useNavBar';
 
-let route = useRoute();
-let router = useRouter();
-let userInfo = useUserStore()?.getUserInfo;
+const route = useRoute();
+const router = useRouter();
+const userInfo = useUserStore()?.getUserInfo;
 
 // 使用新的NavBar系统
 useNavBar({
@@ -111,7 +119,7 @@ useNavBar({
 	visible: true,
 });
 
-let formInfo = ref<any>({});
+const formInfo = ref<any>({});
 
 const label = reactive({
 	name: '名称',
@@ -124,60 +132,9 @@ const label = reactive({
 	belongTo: '属于',
 });
 
-const rulesRef = reactive({
-	name: [
-		{
-			required: true,
-			message: '名称不能为空！',
-		},
-	],
-	amount: [
-		{
-			required: true,
-			message: '金额不能为空！',
-		},
-	],
-	typeCode: [
-		{
-			required: true,
-			message: '类别不能为空！',
-		},
-	],
-	fromSource: [
-		{
-			required: true,
-			message: '支付方式不能为空！',
-		},
-	],
-	incomeAndExpenses: [
-		{
-			required: true,
-			message: '收支类型不能为空！',
-		},
-	],
-	isValid: [
-		{
-			required: true,
-			message: '状态不能为空！',
-		},
-	],
-	infoDate: [
-		{
-			required: true,
-			message: '业务时间不能为空！',
-		},
-	],
-	belongTo: [
-		{
-			required: true,
-			message: '属于不能为空！',
-		},
-	],
-});
+const popInfo = ref<Info>({ showFlag: false });
 
-let popInfo = ref<Info>({ showFlag: false });
-
-let fromSourceInfo = ref<Info>({
+const fromSourceInfo = ref<Info>({
 	label: 'fromSource',
 	labelName: '支付方式',
 	rule: rulesRef.fromSource,
@@ -188,7 +145,7 @@ let fromSourceInfo = ref<Info>({
 	selectValue: formInfo.value.fromSource,
 });
 
-let incomeAndExpensesInfo = ref<Info>({
+const incomeAndExpensesInfo = ref<Info>({
 	label: 'incomeAndExpenses',
 	labelName: '收支类型',
 	rule: rulesRef.incomeAndExpenses,
@@ -199,7 +156,7 @@ let incomeAndExpensesInfo = ref<Info>({
 	selectValue: formInfo.value.incomeAndExpenses,
 });
 
-let isValidInfo = ref<Info>({
+const isValidInfo = ref<Info>({
 	label: 'isValid',
 	labelName: '状态',
 	rule: rulesRef.isValid,
@@ -210,7 +167,7 @@ let isValidInfo = ref<Info>({
 	selectValue: formInfo.value.isValid,
 });
 
-let belongToInfo = ref<Info>({
+const belongToInfo = ref<Info>({
 	label: 'belongTo',
 	labelName: '属于',
 	rule: rulesRef.belongTo,
@@ -220,6 +177,8 @@ let belongToInfo = ref<Info>({
 	},
 	selectValue: formInfo.value.belongTo,
 });
+
+const infoDateName = ref<string>('');
 
 const choose = (type: string) => {
 	switch (type) {
@@ -265,7 +224,7 @@ const cancelInfo = () => {
 	popInfo.value.showFlag = false;
 };
 
-let chooseDateInfo = ref<any>({
+const chooseDateInfo = ref<any>({
 	label: 'infoDate',
 	labelName: '业务日期',
 	rule: rulesRef.infoDate,
@@ -285,8 +244,6 @@ let chooseDateInfo = ref<any>({
 	},
 });
 
-let infoDateName = ref<string>('');
-
 const chooseDate = () => {
 	chooseDateInfo.value.showFlag = true;
 };
@@ -301,10 +258,10 @@ const cancelDateInfo = () => {
 	chooseDateInfo.value.showFlag = false;
 };
 
-let fromSourceName = ref<string>('');
-let incomeAndExpensesName = ref<string>('');
-let isValidName = ref<string>('');
-let belongToName = ref<string>('');
+const fromSourceName = ref<string>('');
+const incomeAndExpensesName = ref<string>('');
+const isValidName = ref<string>('');
+const belongToName = ref<string>('');
 
 const onSubmit = () => {
 	let method = 'post';
@@ -328,15 +285,11 @@ const onSubmit = () => {
 
 function getDictInfoList(res: any) {
 	if (res?.code == '200') {
-		fromSourceInfo.value.list = res.data.filter(
-			(item: { belongTo: string }) => item.belongTo == 'pay_way',
-		);
+		fromSourceInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'pay_way');
 		incomeAndExpensesInfo.value.list = res.data.filter(
 			(item: { belongTo: string }) => item.belongTo == 'income_expense_type',
 		);
-		isValidInfo.value.list = res.data.filter(
-			(item: { belongTo: string }) => item.belongTo == 'is_valid',
-		);
+		isValidInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'is_valid');
 		fromSourceName.value = getListName(
 			fromSourceInfo.value.list || [],
 			formInfo.value.fromSource,
@@ -349,39 +302,16 @@ function getDictInfoList(res: any) {
 			'typeCode',
 			'typeName',
 		);
-		isValidName.value = getListName(
-			isValidInfo.value.list || [],
-			formInfo.value.isValid,
-			'typeCode',
-			'typeName',
-		);
+		isValidName.value = getListName(isValidInfo.value.list || [], formInfo.value.isValid, 'typeCode', 'typeName');
 	} else {
 		showFailToast(res?.message || '查询失败，请联系管理员!');
 	}
 }
 
-const getListName = (list: any[], value: any, code: string, name: string) => {
-	if (!list?.length) {
-		return '';
-	}
-	let listName = '';
-	list.forEach((item) => {
-		if (item[code] == value) {
-			listName = item[name];
-		}
-	});
-	return listName;
-};
-
 function getUserInfoList(res: any) {
 	if (res.code == '200') {
 		belongToInfo.value.list = res.data;
-		belongToName.value = getListName(
-			res.data,
-			formInfo.value.belongTo,
-			'id',
-			'nickName',
-		);
+		belongToName.value = getListName(res.data, formInfo.value.belongTo, 'id', 'nickName');
 	} else {
 		showFailToast(res[2]?.message || '查询失败，请联系管理员!');
 	}
@@ -395,7 +325,7 @@ const initInfoDate = (infoDate: Dayjs) => {
 };
 
 function init() {
-	let id: any = route?.query?.id;
+	const id: any = route?.query?.id;
 	if (id) {
 		Promise.all([
 			getFinanceMangerDetail(id || '-1'),
@@ -421,7 +351,7 @@ function init() {
 			isValid: '1',
 			incomeAndExpenses: 'expense',
 			infoDate: dayjs(),
-			belongTo: userInfo ? userInfo.id + '' : '2',
+			belongTo: userInfo ? `${userInfo.id}` : '2',
 			fromSource: 'wx',
 		};
 		//获取用户信息
@@ -438,6 +368,4 @@ function init() {
 
 init();
 </script>
-<style lang="scss" scoped>
-//@import url(); 引入公共css类
-</style>
+<style lang="less" scoped></style>

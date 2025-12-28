@@ -1,10 +1,4 @@
-import {
-	getData,
-	postData,
-	putData,
-	deleteData,
-	baseService,
-} from '@/api/common/index';
+import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
 
 const basePmsShopProduct = '/api/v1//pms-shop-product';
 
@@ -20,14 +14,9 @@ export function getPmsShopProductPage(
 	pageNo: number | null | undefined,
 	pageSize: number | null | undefined,
 ): Promise<any> {
-	let url =
-		baseService.product +
-		basePmsShopProduct +
-		PmsShopProductUrl.page +
-		'?pageNum=' +
-		(pageNo ? pageNo : 1) +
-		'&pageSize=' +
-		(pageSize ? pageSize : 10);
+	const url = `${baseService.product + basePmsShopProduct + PmsShopProductUrl.page}?pageNum=${
+		pageNo ? pageNo : 1
+	}&pageSize=${pageSize ? pageSize : 10}`;
 	return postData(url, params);
 }
 
@@ -36,64 +25,34 @@ export function getNewestPmsShopProductPage(
 	pageNo: number | null | undefined,
 	pageSize: number | null | undefined,
 ): Promise<any> {
-	let url =
-		baseService.product +
-		basePmsShopProduct +
-		PmsShopProductUrl.newestPage +
-		'?pageNum=' +
-		(pageNo ? pageNo : 1) +
-		'&pageSize=' +
-		(pageSize ? pageSize : 10);
+	const url = `${baseService.product + basePmsShopProduct + PmsShopProductUrl.newestPage}?pageNum=${
+		pageNo ? pageNo : 1
+	}&pageSize=${pageSize ? pageSize : 10}`;
 	return postData(url, params);
 }
 
 export function getPmsShopProductDetail(id: number): Promise<any> {
-	return getData(
-		baseService.product +
-			basePmsShopProduct +
-			PmsShopProductUrl.url +
-			'?id=' +
-			id,
-	);
+	return getData(`${baseService.product + basePmsShopProduct + PmsShopProductUrl.url}?id=${id}`);
 }
 
 export function deletePmsShopProduct(ids: string): Promise<any> {
 	return deleteData(
-		baseService.product +
-			basePmsShopProduct +
-			PmsShopProductUrl.url +
-			'?ids=' +
-			ids,
+		`${baseService.product + basePmsShopProduct + PmsShopProductUrl.url}?ids=${ids}`,
 	);
 }
 
-export function getProductHisInfo(
-	skuId: string,
-	startTime: string | null,
-): Promise<any> {
+export function getProductHisInfo(skuId: string, startTime: string | null): Promise<any> {
 	return getData(
-		baseService.product +
-			basePmsShopProduct +
-			PmsShopProductUrl.hisInfo +
-			'?skuId=' +
-			skuId +
-			(startTime ? '&startTime=' + startTime : ''),
+		`${baseService.product + basePmsShopProduct + PmsShopProductUrl.hisInfo}?skuId=${
+			skuId
+		}${startTime ? `&startTime=${startTime}` : ''}`,
 	);
 }
 
-export function addOrEditPmsShopProduct(
-	method: string,
-	params: any,
-): Promise<any> {
+export function addOrEditPmsShopProduct(method: string, params: any): Promise<any> {
 	if ('put' == method) {
-		return putData(
-			baseService.product + basePmsShopProduct + PmsShopProductUrl.url,
-			params,
-		);
+		return putData(baseService.product + basePmsShopProduct + PmsShopProductUrl.url, params);
 	} else {
-		return postData(
-			baseService.product + basePmsShopProduct + PmsShopProductUrl.url,
-			params,
-		);
+		return postData(baseService.product + basePmsShopProduct + PmsShopProductUrl.url, params);
 	}
 }

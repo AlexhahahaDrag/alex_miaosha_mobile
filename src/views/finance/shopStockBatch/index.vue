@@ -1,5 +1,8 @@
 <template>
-	<navBar :info="info" @clickRight="addShopStockBatch"></navBar>
+	<navBar
+		:info="info"
+		@click-right="addShopStockBatch"
+	></navBar>
 	<van-pull-refresh
 		pulling-text="加载中。。。"
 		:style="{ height: 'calc(100% - 44px)' }"
@@ -25,7 +28,10 @@
 				borderColor: 'grey',
 			}"
 		></van-divider>
-		<van-empty v-if="dataSource.length == 0" description="暂无数据" />
+		<van-empty
+			v-if="dataSource.length == 0"
+			description="暂无数据"
+		/>
 		<van-list
 			v-else
 			v-model:loading="loading"
@@ -78,27 +84,26 @@
 	<van-back-top />
 </template>
 <script lang="ts" setup>
-import {
-	getShopStockBatchPage,
-	deleteShopStockBatch,
-} from '@/api/finance/shopStockBatch/shopStockBatchTs';
-import { getUserManagerList } from '@/api/user/userManager';
-import { SearchInfo, pagination, pageInfo } from './shopStockBatchTs';
 import { showSuccessToast, showFailToast } from 'vant';
+import type { SearchInfo } from './shopStockBatchTs';
+import { pagination } from './shopStockBatchTs';
+import { getShopStockBatchPage, deleteShopStockBatch } from '@/api/finance/shopStockBatch/shopStockBatchTs';
+import { getUserManagerList } from '@/api/user/userManager';
+import type { PageInfo } from '@/views/common/config/index';
 
-let router = useRouter();
-let route = useRoute();
+const router = useRouter();
+const route = useRoute();
 const info = ref<any>({
 	title: route?.meta?.title || '财务管理11',
 	rightButton: '新增',
 	leftPath: '/',
 });
-let loading = ref<boolean>(false);
-let dataSource = ref<any[]>([]);
-let searchInfo = ref<SearchInfo>({});
+const loading = ref<boolean>(false);
+const dataSource = ref<any[]>([]);
+const searchInfo = ref<SearchInfo>({});
 
-let finished = ref<boolean>(false); //加载是否已经没有更多数据
-let isRefresh = ref<boolean>(false); //是否下拉刷新
+const finished = ref<boolean>(false); //加载是否已经没有更多数据
+const isRefresh = ref<boolean>(false); //是否下拉刷新
 
 const onSearch = () => {
 	pagination.value.current = 1;
@@ -112,23 +117,16 @@ const onCancel = () => {
 	query(searchInfo.value, pagination.value);
 };
 
-const query = (param: SearchInfo, cur: pageInfo): void => {
+const query = (param: SearchInfo, cur: PageInfo): void => {
 	loading.value = true;
-	getShopStockBatchPage(
-		param,
-		cur?.current ? cur.current : 1,
-		cur?.pageSize || 10,
-	)
+	getShopStockBatchPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
 		.then((res: any) => {
 			if (res?.code == '200') {
 				dataSource.value = [...dataSource.value, ...res.data.records];
 				pagination.value.current = res.data.current + 1;
 				pagination.value.pageSize = res.data.size;
 				pagination.value.total = res.data.total;
-				if (
-					(pagination.value.total || 0) <
-					(pagination.value.current || 1) * (pagination.value.pageSize || 10)
-				) {
+				if ((pagination.value.total || 0) < (pagination.value.current || 1) * (pagination.value.pageSize || 10)) {
 					finished.value = true;
 				}
 			} else {
@@ -145,7 +143,7 @@ const addShopStockBatch = (): void => {
 	router.push({ path: '/finance/shopStockBatch/shopStockBatchDetail' });
 };
 
-let userMap = {};
+const userMap = {};
 const getUserInfoList = (): void => {
 	getUserManagerList({}).then((res: any) => {
 		if (res?.code == '200') {
@@ -175,7 +173,7 @@ const beforeClose = (e: any): void => {
 };
 
 const delShopStockBatch = (id: number): void => {
-	deleteShopStockBatch(id + '').then((res: any) => {
+	deleteShopStockBatch(`${id}`).then((res: any) => {
 		if (res?.code == '200') {
 			refresh();
 			showSuccessToast(res?.message || '删除成功！');
@@ -196,7 +194,7 @@ const init = (): void => {
 init();
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .right_info {
 	height: 100%;
 }

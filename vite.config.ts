@@ -1,14 +1,15 @@
+import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
-import { resolve } from 'path';
 import Components from 'unplugin-vue-components/vite';
 import { VantResolver } from 'unplugin-vue-components/resolvers';
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
 import AutoImport from 'unplugin-auto-import/vite';
 import { visualizer } from 'rollup-plugin-visualizer';
 import viteCompression from 'vite-plugin-compression';
+import { qrcode } from 'vite-plugin-qrcode';
 
-const pathResolve = (dir: string): any => {
+const pathResolve = (dir: string): string => {
 	return resolve(__dirname, './', dir);
 };
 
@@ -50,6 +51,19 @@ export default defineConfig({
 		}),
 		visualizer(),
 		viteCompression(),
+		qrcode({
+			filter: (url: string) => {
+				// 过滤掉本地地址，只显示外网可访问的地址
+				return (
+					!url.includes('localhost') &&
+					!url.includes('127.0.0.1') &&
+					!url.includes('0.0.0.0') &&
+					!url.includes('2.0.0.1') &&
+					!url.match(/192\.168\./) &&
+					!url.match(/172\.(1[6-9]|2[0-9]|3[0-1])\./)
+				);
+			},
+		}),
 	],
 	css: {
 		preprocessorOptions: {
@@ -65,11 +79,11 @@ export default defineConfig({
 		host: '0.0.0.0',
 		// port: VITE_PORT,
 		port: 2000,
-		open: true,
+		// open: true,
 		proxy: {
 			'/api': {
-				target: 'http://120.48.156.47:30001',
-				// target: 'http://localhost:30001',
+				// target: 'http://120.48.156.47:30001',
+				target: 'http://localhost:30001',
 				changeOrigin: true,
 				rewrite: (path) => path.replace(/^\/api/, ''),
 			},
@@ -106,18 +120,37 @@ export default defineConfig({
 						if (id.includes('axios')) {
 							return 'axios-vendor';
 						}
-						if (
-							id.includes('dayjs') ||
-							id.includes('crypto-js') ||
-							id.includes('mathjs')
-						) {
+						if (id.includes('dayjs') || id.includes('crypto-js') || id.includes('mathjs')) {
 							return 'utils-vendor';
 						}
-						return id
-							.toString()
-							.split('node_modules/')[1]
-							.split('/')[0]
-							.toString();
+						// 将小型工具库打包到一起，避免生成空chunks
+						if (
+							id.includes('javascript-natural-sort') ||
+							id.includes('tiny-emitter') ||
+							id.includes('lodash') ||
+							id.includes('classnames') ||
+							id.includes('normalize-wheel') ||
+							id.includes('resize-observer-polyfill')
+						) {
+							return 'common-utils';
+						}
+						// 对于较大的第三方库，才创建单独的chunk
+						const packageName = id.toString().split('node_modules/')[1].split('/')[0].toString();
+						// 只为较大的包创建单独的chunk，小包归类到misc-vendor
+						const largePackages = [
+							'pinia',
+							'vue-router',
+							'typescript',
+							'@types',
+							'rollup',
+							'unplugin',
+							'particles.vue3',
+						];
+						if (largePackages.some((pkg) => packageName.includes(pkg))) {
+							return packageName;
+						}
+						// 其他小型库统一打包
+						return 'misc-vendor';
 					}
 				},
 			},

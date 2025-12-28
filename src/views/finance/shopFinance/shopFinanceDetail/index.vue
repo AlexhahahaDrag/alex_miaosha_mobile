@@ -1,6 +1,10 @@
 <template>
 	<NavBar :info="info"></NavBar>
-	<van-form @submit="onSubmit" :rules="rulesRef" required="auto">
+	<van-form
+		@submit="onSubmit"
+		:rules="rulesRef"
+		required="auto"
+	>
 		<van-cell-group>
 			<van-field
 				v-model="formInfo.shopName"
@@ -71,17 +75,22 @@
 			/>
 			<datePop
 				:info="chooseDateInfo"
-				@selectInfo="selectDateInfo"
-				@cancelInfo="cancelDateInfo"
+				@select-info="selectDateInfo"
+				@cancel-info="cancelDateInfo"
 			></datePop>
 			<selectPop
 				:info="popInfo"
-				@selectInfo="selectInfo"
-				@cancelInfo="cancelInfo"
+				@select-info="selectInfo"
+				@cancel-info="cancelInfo"
 			></selectPop>
 		</van-cell-group>
 		<div class="subButton">
-			<van-button round block type="primary" native-type="submit">
+			<van-button
+				round
+				block
+				type="primary"
+				native-type="submit"
+			>
 				提交
 			</van-button>
 		</div>
@@ -89,27 +98,25 @@
 </template>
 
 <script setup lang="ts">
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
-import {
-	addOrEditShopFinance,
-	getShopFinanceDetail,
-} from '@/api/finance/shopFinance/shopFinanceTs';
 import { label, rulesRef } from './shopFinanceDetailTs';
-import { Info } from '@/views/common/pop/selectPop.vue';
+import { getListName } from '@/views/common/config';
+import { addOrEditShopFinance, getShopFinanceDetail } from '@/api/finance/shopFinance/shopFinanceTs';
+import type { Info } from '@/views/common/pop/selectPop.vue';
 import { getDictList } from '@/api/finance/dict/dictManager';
 
-let route = useRoute();
-let router = useRouter();
+const route = useRoute();
+const router = useRouter();
 const info = ref<any>({
 	title: route?.meta?.title || '商店财务表',
 	leftPath: '/finance/shopFinance',
 });
 
-let formInfo = ref<any>({});
+const formInfo = ref<any>({});
 
-let saleDateName = ref<string>('');
-let saleDateInfo = ref<any>({
+const saleDateName = ref<string>('');
+const saleDateInfo = ref<any>({
 	label: 'saleDate',
 	labelName: '销售日期',
 	rule: rulesRef.saleDate,
@@ -129,7 +136,7 @@ let saleDateInfo = ref<any>({
 	},
 });
 
-let chooseDateInfo = ref<Info>({ showFlag: false });
+const chooseDateInfo = ref<Info>({ showFlag: false });
 
 const chooseDate = (type: string) => {
 	chooseDateInfo.value.showFlag = true;
@@ -165,9 +172,9 @@ const initSaleDate = (saleDate: Dayjs, type: string) => {
 	}
 };
 
-let popInfo = ref<Info>({ showFlag: false });
+const popInfo = ref<Info>({ showFlag: false });
 
-let payWayInfo = ref<Info>({
+const payWayInfo = ref<Info>({
 	label: 'payWay',
 	labelName: '支付方式',
 	rule: rulesRef.payWay,
@@ -178,7 +185,7 @@ let payWayInfo = ref<Info>({
 	selectValue: formInfo.value.payWay,
 });
 
-let incomeAndExpensesInfo = ref<Info>({
+const incomeAndExpensesInfo = ref<Info>({
 	label: 'incomeAndExpenses',
 	labelName: '收支类型',
 	rule: rulesRef.incomeAndExpenses,
@@ -189,7 +196,7 @@ let incomeAndExpensesInfo = ref<Info>({
 	selectValue: formInfo.value.incomeAndExpenses,
 });
 
-let isValidInfo = ref<Info>({
+const isValidInfo = ref<Info>({
 	label: 'isValid',
 	labelName: '状态',
 	rule: rulesRef.isValid,
@@ -200,9 +207,9 @@ let isValidInfo = ref<Info>({
 	selectValue: formInfo.value.isValid,
 });
 
-let payWayName = ref<string>('');
-let incomeAndExpensesName = ref<string>('');
-let isValidName = ref<string>('');
+const payWayName = ref<string>('');
+const incomeAndExpensesName = ref<string>('');
+const isValidName = ref<string>('');
 
 const choose = (type: string) => {
 	switch (type) {
@@ -258,58 +265,28 @@ const onSubmit = () => {
 
 function getDictInfoList(res: any) {
 	if (res?.code == '200') {
-		payWayInfo.value.list = res.data.filter(
-			(item: { belongTo: string }) => item.belongTo == 'shop_pay_way',
-		);
+		payWayInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'shop_pay_way');
 		incomeAndExpensesInfo.value.list = res.data.filter(
 			(item: { belongTo: string }) => item.belongTo == 'income_expense_type',
 		);
-		isValidInfo.value.list = res.data.filter(
-			(item: { belongTo: string }) => item.belongTo == 'is_valid',
-		);
-		payWayName.value = getListName(
-			payWayInfo.value.list || [],
-			formInfo.value.payWay,
-			'typeCode',
-			'typeName',
-		);
+		isValidInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'is_valid');
+		payWayName.value = getListName(payWayInfo.value.list || [], formInfo.value.payWay, 'typeCode', 'typeName');
 		incomeAndExpensesName.value = getListName(
 			incomeAndExpensesInfo.value.list || [],
 			formInfo.value.incomeAndExpenses,
 			'typeCode',
 			'typeName',
 		);
-		isValidName.value = getListName(
-			isValidInfo.value.list || [],
-			formInfo.value.isValid,
-			'typeCode',
-			'typeName',
-		);
+		isValidName.value = getListName(isValidInfo.value.list || [], formInfo.value.isValid, 'typeCode', 'typeName');
 	} else {
 		showFailToast(res?.message || '查询失败，请联系管理员!');
 	}
 }
 
-const getListName = (list: any[], value: any, code: string, name: string) => {
-	if (!list?.length) {
-		return '';
-	}
-	let listName = '';
-	list.forEach((item) => {
-		if (item[code] == value) {
-			listName = item[name];
-		}
-	});
-	return listName;
-};
-
 function init() {
-	let id: any = route?.query?.id;
+	const id: any = route?.query?.id;
 	if (id) {
-		Promise.all([
-			getShopFinanceDetail(id || '-1'),
-			getDictList('shop_pay_way,income_expense_type,is_valid'),
-		])
+		Promise.all([getShopFinanceDetail(id || '-1'), getDictList('shop_pay_way,income_expense_type,is_valid')])
 			.then((res: any) => {
 				if (res[0].code == '200') {
 					formInfo.value = res[0].data;
@@ -321,15 +298,13 @@ function init() {
 				getDictInfoList(res[1]);
 			})
 			.catch((_error: any) => {
-				console.log(`error:`, _error);
+				console.log('error:', _error);
 				showFailToast('系统问题，请联系管理员！');
 			});
 	} else {
-		getDictList('shop_pay_way,income_expense_type,is_valid').then(
-			(res: any) => {
-				getDictInfoList(res);
-			},
-		);
+		getDictList('shop_pay_way,income_expense_type,is_valid').then((res: any) => {
+			getDictInfoList(res);
+		});
 		formInfo.value = {
 			saleDate: dayjs(),
 			isValid: '1',
@@ -343,7 +318,7 @@ function init() {
 
 init();
 </script>
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .subButton {
 	margin: 16px;
 }

@@ -10,18 +10,12 @@ const financeAnalysisUrl = {
 };
 
 // 获取财务分析总览
-export function getBalance(
-	belongTo?: number | string | null,
-	searchDate?: string,
-): Promise<any> {
-	let url =
-		baseService.finance +
-		baseFinanceAnalysis +
-		financeAnalysisUrl.getBalance +
-		'?searchDate=' +
-		searchDate;
+export function getBalance(belongTo?: number | string | null, searchDate?: string): Promise<any> {
+	let url = `${
+		baseService.finance + baseFinanceAnalysis + financeAnalysisUrl.getBalance
+	}?searchDate=${searchDate}`;
 	if (belongTo) {
-		url += '&belongTo=' + belongTo;
+		url += `&belongTo=${belongTo}`;
 	}
 	return getData(url);
 }
@@ -32,19 +26,17 @@ export function getIncomeAndExpense(
 	searchDate?: string,
 	type?: string,
 ): Promise<any> {
-	let url =
-		baseService.finance +
-		baseFinanceAnalysis +
-		financeAnalysisUrl.getIncomeAndExpense +
-		'?1=1';
+	let url = `${
+		baseService.finance + baseFinanceAnalysis + financeAnalysisUrl.getIncomeAndExpense
+	}?1=1`;
 	if (belongTo) {
-		url += '&belongTo=' + belongTo;
+		url += `&belongTo=${belongTo}`;
 	}
 	if (searchDate) {
-		url += '&searchDate=' + searchDate;
+		url += `&searchDate=${searchDate}`;
 	}
 	if (type) {
-		url += '&type=' + type;
+		url += `&type=${type}`;
 	}
 	return getData(url);
 }
@@ -54,14 +46,11 @@ export function getDayExpense(
 	belongTo?: number | string | null,
 	searchDate?: string,
 ): Promise<any> {
-	let url =
-		baseService.finance +
-		baseFinanceAnalysis +
-		financeAnalysisUrl.getDayExpense +
-		'?searchDate=' +
-		searchDate;
+	let url = `${
+		baseService.finance + baseFinanceAnalysis + financeAnalysisUrl.getDayExpense
+	}?searchDate=${searchDate}`;
 	if (belongTo) {
-		url += '&belongTo=' + belongTo;
+		url += `&belongTo=${belongTo}`;
 	}
 	return getData(url);
 }
@@ -71,14 +60,11 @@ export function getMonthExpense(
 	belongTo?: number | string | null,
 	searchDate?: string,
 ): Promise<any> {
-	let url =
-		baseService.finance +
-		baseFinanceAnalysis +
-		financeAnalysisUrl.getMonthExpense +
-		'?searchDate=' +
-		searchDate;
+	let url = `${
+		baseService.finance + baseFinanceAnalysis + financeAnalysisUrl.getMonthExpense
+	}?searchDate=${searchDate}`;
 	if (belongTo) {
-		url += '&belongTo=' + belongTo;
+		url += `&belongTo=${belongTo}`;
 	}
 	return getData(url);
 }

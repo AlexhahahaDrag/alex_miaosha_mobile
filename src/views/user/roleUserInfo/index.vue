@@ -1,5 +1,8 @@
 <template>
-	<NavBar :info="info" @clickRight="addRoleUserInfo"></NavBar>
+	<NavBar
+		:info="info"
+		@click-right="addRoleUserInfo"
+	></NavBar>
 	<van-pull-refresh
 		pulling-text="加载中。。。"
 		:style="{ height: 'calc(100% - 44px)' }"
@@ -17,14 +20,18 @@
         @search='onSearch'
         @cancel='onCancel'
         action-text="清空"/>
-    --></form>
+    -->
+		</form>
 		<van-divider
 			:style="{
 				color: '#1989fa',
 				borderColor: 'grey',
 			}"
 		></van-divider>
-		<van-empty v-if="dataSource.length == 0" description="暂无数据"></van-empty>
+		<van-empty
+			v-if="dataSource.length == 0"
+			description="暂无数据"
+		></van-empty>
 		<van-list
 			v-else
 			v-model:loading="loading"
@@ -49,7 +56,10 @@
 					>
 						<template #label>
 							<div class="iconClass">
-								<div class="icon" style="background-color: #ffcc00">
+								<div
+									class="icon"
+									style="background-color: #ffcc00"
+								>
 									{{ item.roleId }}
 								</div>
 							</div>
@@ -61,9 +71,7 @@
 										{{ item.userId }}
 									</div>
 								</div>
-								<div :class="true ? 'rightDiv' : 'rightRedDiv'">
-									item.status+;
-								</div>
+								<div :class="true ? 'rightDiv' : 'rightRedDiv'"> item.status+; </div>
 							</div>
 						</template>
 					</van-cell>
@@ -84,27 +92,26 @@
 	<van-back-top></van-back-top>
 </template>
 <script lang="ts" setup>
-import {
-	getRoleUserInfoPage,
-	deleteRoleUserInfo,
-} from '@/api/user/roleUserInfo/roleUserInfoTs';
-import { getUserManagerList } from '@/api/user/userManager';
-import { SearchInfo, pagination, pageInfo } from './roleUserInfoTs';
 import { showSuccessToast, showFailToast } from 'vant';
+import type { SearchInfo } from './roleUserInfoTs';
+import { pagination } from './roleUserInfoTs';
+import { getRoleUserInfoPage, deleteRoleUserInfo } from '@/api/user/roleUserInfo/roleUserInfoTs';
+import { getUserManagerList } from '@/api/user/userManager';
+import type { PageInfo } from '@/views/common/config/index';
 
-let router = useRouter();
-let route = useRoute();
+const router = useRouter();
+const route = useRoute();
 const info = ref<any>({
 	title: route?.meta?.title || '财务管理11',
 	rightButton: '新增',
 	leftPath: '/',
 });
-let loading = ref<boolean>(false);
-let dataSource = ref<any[]>([]);
-let searchInfo = ref<SearchInfo>({});
+const loading = ref<boolean>(false);
+const dataSource = ref<any[]>([]);
+const searchInfo = ref<SearchInfo>({});
 
-let finished = ref<boolean>(false); //加载是否已经没有更多数据
-let isRefresh = ref<boolean>(false); //是否下拉刷新
+const finished = ref<boolean>(false); //加载是否已经没有更多数据
+const isRefresh = ref<boolean>(false); //是否下拉刷新
 
 // const onSearch = () => {
 //  pagination.value.current = 1;
@@ -118,23 +125,16 @@ let isRefresh = ref<boolean>(false); //是否下拉刷新
 //   getFinancePage(searchInfo.value, pagination.value);
 // };
 
-function query(param: SearchInfo, cur: pageInfo) {
+async function query(param: SearchInfo, cur: PageInfo) {
 	loading.value = true;
-	getRoleUserInfoPage(
-		param,
-		cur?.current ? cur.current : 1,
-		cur?.pageSize || 10,
-	)
+	getRoleUserInfoPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
 		.then((res: any) => {
 			if (res?.code == '200') {
 				dataSource.value = [...dataSource.value, ...res.data.records];
 				pagination.value.current = res.data.current + 1;
 				pagination.value.pageSize = res.data.size;
 				pagination.value.total = res.data.total;
-				if (
-					(pagination.value.total || 0) <
-					(pagination.value.current || 1) * (pagination.value.pageSize || 10)
-				) {
+				if ((pagination.value.total || 0) < (pagination.value.current || 1) * (pagination.value.pageSize || 10)) {
 					finished.value = true;
 				}
 			} else {
@@ -151,7 +151,7 @@ const addRoleUserInfo = () => {
 	router.push({ path: '/user/roleUserInfo/roleUserInfoDetail' });
 };
 
-let userMap = {};
+const userMap = {};
 function getUserInfoList() {
 	getUserManagerList({}).then((res: any) => {
 		if (res?.code == '200') {
@@ -181,7 +181,7 @@ const beforeClose = (e: any) => {
 };
 
 const delRoleUserInfo = (id: number) => {
-	deleteRoleUserInfo(id + '').then((res: any) => {
+	deleteRoleUserInfo(`${id}`).then((res: any) => {
 		if (res?.code == '200') {
 			refresh();
 			showSuccessToast(res?.message || '删除成功！');
@@ -202,7 +202,7 @@ function init() {
 init();
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .right_info {
 	height: 100%;
 }

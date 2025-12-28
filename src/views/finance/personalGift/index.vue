@@ -18,7 +18,10 @@
 				action-text="清空"
 			/>
 		</form>
-		<van-empty v-if="dataSource.length == 0" description="暂无数据" />
+		<van-empty
+			v-if="dataSource.length == 0"
+			description="暂无数据"
+		/>
 		<van-list
 			v-else
 			v-model:loading="loading"
@@ -43,22 +46,29 @@
 						<template #title>
 							<div class="text-left">
 								<van-space size="4px">
-									<span class="custom-title">{{
-										item.otherPerson + item.eventName
-									}}</span>
+									<span class="custom-title">{{ item.otherPerson + item.eventName }}</span>
 									<van-tag type="primary">{{ item.noticeNum }}</van-tag>
-									<van-tag type="success" v-if="item.action === 'recieve'"
-										>收礼</van-tag
+									<van-tag
+										type="success"
+										v-if="item.action === 'recieve'"
 									>
-									<van-tag type="warning" v-if="item.action === 'give'"
-										>随礼</van-tag
+										收礼
+									</van-tag>
+									<van-tag
+										type="warning"
+										v-if="item.action === 'give'"
 									>
+										随礼
+									</van-tag>
 								</van-space>
 							</div>
 						</template>
 						<template #label>
 							<div class="iconClass">
-								<div class="icon" style="background-color: #ffcc00">
+								<div
+									class="icon"
+									style="background-color: #ffcc00"
+								>
 									{{ item.remarks }}
 								</div>
 							</div>
@@ -93,18 +103,17 @@
 	<van-back-top />
 </template>
 <script lang="ts" setup>
-import {
-	getPersonalGiftPage,
-	deletePersonalGift,
-} from '@/api/finance/personalGift/personalGiftTs';
-import { getUserManagerList } from '@/api/user/userManager';
-import { SearchInfo, pagination, pageInfo } from './personalGiftTs';
 import { showSuccessToast, showFailToast } from 'vant';
 import dayjs from 'dayjs';
+import type { SearchInfo } from './personalGiftTs';
+import { pagination } from './personalGiftTs';
+import { getPersonalGiftPage, deletePersonalGift } from '@/api/finance/personalGift/personalGiftTs';
+import { getUserManagerList } from '@/api/user/userManager';
+import type { PageInfo } from '@/views/common/config/index';
 import { useNavBar } from '@/composables/useNavBar';
 
-let router = useRouter();
-let route = useRoute();
+const router = useRouter();
+const route = useRoute();
 
 const addPersonalGift = (): void => {
 	router.push({ path: '/selfFinance/personalGift/personalGiftDetail' });
@@ -117,12 +126,12 @@ useNavBar({
 	visible: true,
 	onRightClick: addPersonalGift,
 });
-let loading = ref<boolean>(false);
-let dataSource = ref<any[]>([]);
-let searchInfo = ref<SearchInfo>({});
+const loading = ref<boolean>(false);
+const dataSource = ref<any[]>([]);
+const searchInfo = ref<SearchInfo>({});
 
-let finished = ref<boolean>(false); //加载是否已经没有更多数据
-let isRefresh = ref<boolean>(false); //是否下拉刷新
+const finished = ref<boolean>(false); //加载是否已经没有更多数据
+const isRefresh = ref<boolean>(false); //是否下拉刷新
 
 const onSearch = () => {
 	pagination.value.current = 0;
@@ -136,23 +145,16 @@ const onCancel = () => {
 	query(searchInfo.value, pagination.value);
 };
 
-const query = (param: SearchInfo, cur: pageInfo): void => {
+const query = (param: SearchInfo, cur: PageInfo): void => {
 	loading.value = true;
-	getPersonalGiftPage(
-		param,
-		cur?.current ? cur.current : 1,
-		cur?.pageSize || 10,
-	)
+	getPersonalGiftPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
 		.then((res: any) => {
 			if (res?.code == '200') {
 				dataSource.value = [...dataSource.value, ...res.data.records];
 				pagination.value.current = res.data.current + 1;
 				pagination.value.pageSize = res.data.size;
 				pagination.value.total = res.data.total;
-				if (
-					(pagination.value.total || 0) <
-					(pagination.value.current || 1) * (pagination.value.pageSize || 10)
-				) {
+				if ((pagination.value.total || 0) < (pagination.value.current || 1) * (pagination.value.pageSize || 10)) {
 					finished.value = true;
 				}
 			} else {
@@ -165,7 +167,7 @@ const query = (param: SearchInfo, cur: pageInfo): void => {
 		});
 };
 
-let userMap = {};
+const userMap = {};
 const getUserInfoList = (): void => {
 	getUserManagerList({}).then((res: any) => {
 		if (res?.code == '200') {
@@ -195,7 +197,7 @@ const beforeClose = (e: any): void => {
 };
 
 const delPersonalGift = (id: number): void => {
-	deletePersonalGift(id + '').then((res: any) => {
+	deletePersonalGift(`${id}`).then((res: any) => {
 		if (res?.code == '200') {
 			refresh();
 			showSuccessToast(res?.message || '删除成功！');
@@ -216,7 +218,7 @@ const init = (): void => {
 init();
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .right_info {
 	height: 100%;
 }

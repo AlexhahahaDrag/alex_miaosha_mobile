@@ -4,7 +4,12 @@
 		<div class="amount-section">
 			<div class="amount-card">
 				<div class="amount-display">
-					<span class="currency" :class="formData.type">¥</span>
+					<span
+						class="currency"
+						:class="formData.type"
+					>
+						¥
+					</span>
 					<van-field
 						v-model="formData.amount"
 						placeholder="0.00"
@@ -17,9 +22,7 @@
 					/>
 				</div>
 				<div class="balance-after">
-					<div class="balance-after-label">
-						{{ formData.type === 'recharge' ? '充值' : '消费' }}后余额
-					</div>
+					<div class="balance-after-label"> {{ formData.type === 'recharge' ? '充值' : '消费' }}后余额 </div>
 					<div
 						class="balance-after-amount"
 						:class="{ insufficient: balanceAfter < 0 }"
@@ -44,7 +47,10 @@
 				</div>
 				<div class="info-item">
 					<span class="label">消费时间</span>
-					<div class="time-display" @click="updateCurrentTime">
+					<div
+						class="time-display"
+						@click="updateCurrentTime"
+					>
 						{{ consumeTimeDisplay }}
 					</div>
 				</div>
@@ -79,27 +85,22 @@
 	</div>
 	<datePop
 		:info="chooseDateInfo"
-		@selectInfo="selectDateInfo"
-		@cancelInfo="cancelDateInfo"
+		@select-info="selectDateInfo"
+		@cancel-info="cancelDateInfo"
 	></datePop>
 </template>
 
 <script setup lang="ts">
 import { showToast, showSuccessToast, showFailToast } from 'vant';
-import {
-	getPrepaidCardInfoDetail,
-	prepaidCardConsumeAndRecharge,
-} from '../api/index';
-import { type Dayjs } from 'dayjs';
-import dayjs from 'dayjs';
-import { useRoute } from 'vue-router';
+import dayjs, { type Dayjs } from 'dayjs';
+import { getPrepaidCardInfoDetail, prepaidCardConsumeAndRecharge } from '../api/index';
 import { useNavBar } from '@/composables/useNavBar';
 import { useUserStore } from '@/store/modules/user/user';
 
 const route = useRoute();
 const router = useRouter();
 
-let userInfo = useUserStore()?.getUserInfo;
+const userInfo = useUserStore()?.getUserInfo;
 
 const formData = reactive<any>({});
 
@@ -112,7 +113,7 @@ useNavBar({
 
 // 表单数据对象
 
-let chooseDateInfo = ref<any>({
+const chooseDateInfo = ref<any>({
 	label: 'infoDate',
 	labelName: '消费时间',
 	selectValue: dayjs(),
@@ -134,9 +135,7 @@ let chooseDateInfo = ref<any>({
 // 计算属性：消费后余额
 const balanceAfter = computed(() => {
 	const amountValue = parseFloat(formData.amount) || 0;
-	return formData.type === 'recharge' ?
-			formData.balance + amountValue
-		:	formData.balance - amountValue;
+	return formData.type === 'recharge' ? formData.balance + amountValue : formData.balance - amountValue;
 });
 
 // 显示的消费时间文本
@@ -158,11 +157,11 @@ function formatDateTime(date: Dayjs) {
 	const targetDate = date.startOf('day').local();
 	// 今天
 	if (targetDate.isSame(today, 'day')) {
-		return `今天`;
+		return '今天';
 	}
 	// 昨天
 	else if (targetDate.isSame(yesterday, 'day')) {
-		return `昨天`;
+		return '昨天';
 	}
 	// 昨天之前
 	else {
@@ -237,7 +236,7 @@ const confirmConsume = async () => {
 		// 例如：充值金额上限等
 	}
 	try {
-		let params = {
+		const params = {
 			id: formData.id,
 			cardName: formData.cardName,
 			userId: userInfo.id,
@@ -248,9 +247,7 @@ const confirmConsume = async () => {
 		};
 		const { code, message } = await prepaidCardConsumeAndRecharge(params);
 		if (code === '200') {
-			showSuccessToast(
-				(formData.type === 'recharge' ? '充值' : '消费') + '成功!',
-			);
+			showSuccessToast(`${formData.type === 'recharge' ? '充值' : '消费'}成功!`);
 			router.push({ name: 'prepaidCardInfoT', query: { cardId: formData.id } });
 		} else {
 			showFailToast(message || '失败，请联系管理员!');
@@ -263,11 +260,7 @@ const confirmConsume = async () => {
 // 获取预付卡信息
 const getPrepaidCardInfoDetailInfo = async () => {
 	try {
-		const {
-			code,
-			data,
-			message: messageInfo,
-		} = await getPrepaidCardInfoDetail(formData.id);
+		const { code, data, message: messageInfo } = await getPrepaidCardInfoDetail(formData.id);
 		if (code === '200') {
 			// 取第一张卡片的信息
 			const cardInfo = data;
@@ -297,7 +290,7 @@ const init = () => {
 init();
 </script>
 
-<style scoped lang="scss">
+<style scoped lang="less">
 .consume-page {
 	background-color: #f5f5f5;
 	min-height: 100vh;

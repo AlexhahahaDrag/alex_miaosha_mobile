@@ -6,8 +6,9 @@
 			:to="item.to"
 			:name="item.name"
 			:key="index"
-			>{{ item.title }}</van-tabbar-item
 		>
+			{{ item.title }}
+		</van-tabbar-item>
 	</van-tabbar>
 </template>
 
@@ -16,7 +17,7 @@ interface Props {
 	data: any;
 }
 
-let active = ref<number>(0);
+const active = ref<number>(0);
 
 const props = defineProps<Props>();
 </script>

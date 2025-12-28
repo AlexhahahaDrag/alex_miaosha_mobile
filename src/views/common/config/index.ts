@@ -6,11 +6,7 @@ export const formatTime = (timeStr: string) => {
 	const now = new Date();
 	const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 	const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
-	const recordDate = new Date(
-		date.getFullYear(),
-		date.getMonth(),
-		date.getDate(),
-	);
+	const recordDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
 	const timeFormat = date.toLocaleTimeString('zh-CN', {
 		hour: '2-digit',
@@ -41,4 +37,51 @@ export const formatAmount = (amount: number, type: string): string => {
 		// 默认根据金额正负判断
 		return amount >= 0 ? `+￥${formattedAmount}` : `-￥${formattedAmount}`;
 	}
+};
+
+export interface Pagination {
+	pageNum?: number;
+	pageSize?: number;
+	total?: number;
+}
+
+// 分页信息
+export interface PageInfo {
+	current?: number;
+	pageSize?: number;
+	total?: number;
+	showTotal: (total: number) => string;
+	showSizeChanger: boolean;
+	pageSizeOptions: string[];
+	showSizeChange: (current: number, pageSize: number) => void;
+	size: string;
+	showQuickJumper: boolean;
+	defaultPageSize: number;
+}
+
+// 模态框信息
+export interface ModelInfo {
+	title?: string;
+	width?: string;
+	id?: number | undefined;
+	confirmLoading?: boolean;
+}
+
+// 字典信息
+export interface DictInfo {
+	typeCode?: string | number | undefined;
+	typeName?: string | undefined;
+}
+
+export const getListName = (list: any[], value: any, code: string, name: string) => {
+	if (!list?.length) {
+		return '';
+	}
+	let listName = '';
+	list.forEach((item) => {
+		if (item[code] == value) {
+			listName = item[name];
+		}
+	});
+	return listName;
 };

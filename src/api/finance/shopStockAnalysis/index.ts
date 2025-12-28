@@ -9,25 +9,16 @@ const financeAnalysisUrl = {
 };
 
 export function getAllStock(params?: any): Promise<any> {
-	let url =
-		baseService.finance +
-		baseFinanceAnalysis +
-		financeAnalysisUrl.getAllStockInfo;
+	const url = baseService.finance + baseFinanceAnalysis + financeAnalysisUrl.getAllStockInfo;
 	return getData(url, params);
 }
 
 export function getAllAmount(params?: any): Promise<any> {
-	let url =
-		baseService.finance +
-		baseFinanceAnalysis +
-		financeAnalysisUrl.getAllAmountInfo;
+	const url = baseService.finance + baseFinanceAnalysis + financeAnalysisUrl.getAllAmountInfo;
 	return getData(url, params);
 }
 
 export function getCashAmount(params?: any): Promise<any> {
-	let url =
-		baseService.finance +
-		baseFinanceAnalysis +
-		financeAnalysisUrl.getCashAmountInfo;
+	const url = baseService.finance + baseFinanceAnalysis + financeAnalysisUrl.getCashAmountInfo;
 	return getData(url, params);
 }

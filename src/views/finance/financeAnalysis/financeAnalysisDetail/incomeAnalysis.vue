@@ -29,11 +29,12 @@
 </template>
 
 <script lang="ts" setup>
-import { getIncomeAndExpense } from '@/api/finance/financeAnalysis';
 import { showNotify } from 'vant';
-import { ItemInfo } from './common';
+import { number } from 'mathjs';
+import type { ItemInfo } from './common';
+import { getIncomeAndExpense } from '@/api/finance/financeAnalysis';
 
-let pieExpenseData = ref<object[]>([]);
+const pieExpenseData = ref<object[]>([]);
 
 interface Props {
 	activeTab: number | string;
@@ -41,38 +42,36 @@ interface Props {
 	belongTo?: number | string | null;
 }
 
-let pieIncomeData = ref<object[]>([]);
+const pieIncomeData = ref<object[]>([]);
 
-let props = defineProps<Props>();
+const props = defineProps<Props>();
 
 const getIncomeAndExpenseInfo = (userId: number | null, dateStr: string) => {
-	getIncomeAndExpense(userId, dateStr).then(
-		(res: { code: string; data: any[]; message: any }) => {
-			if (res.code == '200') {
-				if (res.data) {
-					let dd: ItemInfo[] = [];
-					res.data
-						.filter((item) => item.incomeAndExpenses == 'income')
-						.forEach((item: { typeCode: any; amount: any }) => {
-							dd.push({ name: item.typeCode, value: item.amount });
-						});
-					pieIncomeData.value = dd;
-					let expense: ItemInfo[] = [];
-					res.data
-						.filter((item) => item.incomeAndExpenses == 'expense')
-						.forEach((item: { typeCode: any; amount: any }) => {
-							expense.push({ name: item.typeCode, value: item.amount });
-						});
-					pieExpenseData.value = expense;
-				}
-			} else {
-				showNotify({
-					type: 'danger',
-					message: (res && res.message) || '查询列表失败！',
-				});
+	getIncomeAndExpense(userId, dateStr).then((res: { code: string; data: any[]; message: any }) => {
+		if (res.code == '200') {
+			if (res.data) {
+				const dd: ItemInfo[] = [];
+				res.data
+					.filter((item) => item.incomeAndExpenses == 'income')
+					.forEach((item: { typeCode: string; amount: any }) => {
+						dd.push({ name: item.typeCode, value: item.amount });
+					});
+				pieIncomeData.value = dd;
+				const expense: ItemInfo[] = [];
+				res.data
+					.filter((item) => item.incomeAndExpenses == 'expense')
+					.forEach((item: { typeCode: string; amount: any }) => {
+						expense.push({ name: item.typeCode, value: item.amount });
+					});
+				pieExpenseData.value = expense;
 			}
-		},
-	);
+		} else {
+			showNotify({
+				type: 'danger',
+				message: (res && res.message) || '查询列表失败！',
+			});
+		}
+	});
 };
 
 const tooltip = ref({
@@ -88,14 +87,14 @@ watch(
 	() => [props.activeTab, props.dateStr, props.belongTo],
 	() => {
 		if (props.activeTab === '2' && props.dateStr) {
-			init(props.dateStr, props.belongTo || null);
+			init(props.dateStr, props.belongTo ? number(props.belongTo) : null);
 		}
 	},
 	{ immediate: true },
 );
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .mainGrid {
 	width: 100%;
 	height: 400px;

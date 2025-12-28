@@ -1,4 +1,4 @@
-import { UserInfo } from '@/types/store';
+import type { UserInfo } from '@/types/store';
 
 export interface LoginResultModel {
 	admin: UserInfo;

@@ -12,14 +12,15 @@
 </template>
 
 <script setup lang="ts">
-import { ToastOptions, showToast } from 'vant';
+import type { ToastOptions } from 'vant';
+import { showToast } from 'vant';
 import { logoutApi } from '@/api/user/login';
 
 interface Props {
 	visible: boolean;
 }
 
-let router = useRouter();
+const router = useRouter();
 const logout = async () => {
 	await logoutApi();
 	router.push('/login');

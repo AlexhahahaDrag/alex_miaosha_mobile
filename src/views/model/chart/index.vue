@@ -1,18 +1,15 @@
 <template>
-	<div :id="id" :style="style" />
+	<div
+		:id="id"
+		:style="style"
+	></div>
 </template>
 
 <script setup lang="ts">
 // 按需导入ECharts组件，减少包体积
 import * as echarts from 'echarts/core';
 import { BarChart, LineChart, PieChart } from 'echarts/charts';
-import {
-	TitleComponent,
-	TooltipComponent,
-	GridComponent,
-	LegendComponent,
-	ToolboxComponent,
-} from 'echarts/components';
+import { TitleComponent, TooltipComponent, GridComponent, LegendComponent, ToolboxComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import { nanoid } from 'nanoid';
 

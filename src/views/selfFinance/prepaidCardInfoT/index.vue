@@ -5,9 +5,10 @@
 			<span class="title">我的消费卡</span>
 			<div class="header-actions">
 				<van-button
-					ype="primary"
+					type="primary"
 					size="small"
 					class="overview-btn"
+					:style="{ color: currentCard.bgColor }"
 					@click="handleOverview"
 				>
 					总览
@@ -30,24 +31,59 @@
 				@change="handleCardChange"
 				v-if="!cardsLoading && cardList.length > 0"
 			>
-				<van-swipe-item v-for="(card, index) in cardList" :key="index">
-					<div class="card-item" :style="{ backgroundColor: card.bgColor }">
-						<div class="card-name">{{ card.name }}</div>
-						<div class="card-balance">{{ card.balance }}</div>
-						<div class="card-label">可用余额</div>
+				<van-swipe-item
+					v-for="(card, index) in cardList"
+					:key="index"
+				>
+					<div
+						class="card-item"
+						:style="{ backgroundColor: card.bgColor }"
+					>
+						<div class="card-content">
+							<div class="card-left">
+								<div class="card-name">
+									{{ card.name }}<span class="status-badge">{{ getStatusLabel(card) }}</span>
+								</div>
+								<div class="card-label">可用余额</div>
+								<div class="balance-box">
+									<span class="balance-integer">¥{{ getBalanceParts(card.currentBalance || card.balance).integer }}</span>
+									<span class="balance-fraction">{{ getBalanceParts(card.currentBalance || card.balance).fraction }}</span>
+								</div>
+							</div>
+							<div class="card-right">
+								<div class="image-placeholder">
+									<van-image :src="getCategoryIcon(card.cardName || '')" />
+								</div>
+							</div>
+						</div>
 					</div>
 				</van-swipe-item>
 			</van-swipe>
 			<!-- 卡片加载中 -->
-			<div class="card-loading" v-if="cardsLoading">
-				<van-loading type="spinner" color="#3399ff" size="24px" />
+			<div
+				class="card-loading"
+				v-if="cardsLoading"
+			>
+				<van-loading
+					type="spinner"
+					color="#3399ff"
+					size="24px"
+				/>
 				<span>加载中...</span>
 			</div>
 			<!-- 无卡片状态 -->
-			<div class="card-empty" v-if="!cardsLoading && cardList.length === 0">
+			<div
+				class="card-empty"
+				v-if="!cardsLoading && cardList.length === 0"
+			>
 				<div class="empty-icon">📇</div>
 				<div class="empty-text">暂无消费卡</div>
-				<div class="add-card-btn" @click="handleAddCard">添加卡片</div>
+				<div
+					class="add-card-btn"
+					@click="handleAddCard"
+				>
+					添加卡片
+				</div>
 			</div>
 		</div>
 		<!-- 快捷操作按钮 -->
@@ -57,81 +93,105 @@
 				@click="handleAmount('consume')"
 				color="#ff6666"
 				block
-				round
 			>
-				消费
+				<div class="action-btn-content">
+					<van-image
+						:src="shopCarSvg"
+						width="20"
+						height="20"
+					/>
+					消费
+				</div>
 			</van-button>
 			<van-button
 				class="action-btn recharge-btn"
 				@click="handleAmount('recharge')"
 				color="#4db280"
 				block
-				round
 			>
-				充值
+				<div class="action-btn-content">
+					<van-image
+						:src="shopCardSvg"
+						width="20"
+						height="20"
+					/>
+					充值
+				</div>
 			</van-button>
 		</div>
 		<!-- 流水标题栏 -->
 		<div class="transaction-header">
 			<span class="transaction-title">流水</span>
-			<div class="more-btn" @click="handleViewMore">更多</div>
+			<div
+				class="more-btn"
+				@click="handleViewMore"
+			>
+				更多
+			</div>
 		</div>
 		<!-- 交易记录列表 -->
 		<div class="transaction-list">
 			<!-- 有交易记录时显示列表 -->
-			<div
-				class="transaction-item"
-				v-for="(transaction, index) in transactionList"
-				:key="index"
-				@click="handleTransactionDetail(transaction)"
-				v-if="!transactionsLoading && transactionList.length > 0"
-			>
-				<div class="transaction-left">
+			<template v-if="!transactionsLoading && transactionList.length > 0">
+				<div
+					class="transaction-item"
+					v-for="(transaction, index) in transactionList"
+					:key="index"
+					@click="handleTransactionDetail(transaction)"
+				>
+					<div class="transaction-left">
+						<div
+							class="card-indicator-dot"
+							:style="{ backgroundColor: transaction.cardColor }"
+						></div>
+						<div class="transaction-info">
+							<div class="transaction-name">{{ transaction.name }}</div>
+							<div class="transaction-time">{{ transaction.time }}</div>
+						</div>
+					</div>
 					<div
-						class="card-indicator-dot"
-						:style="{ backgroundColor: transaction.cardColor }"
-					></div>
-					<div class="transaction-info">
-						<div class="transaction-name">{{ transaction.name }}</div>
-						<div class="transaction-time">{{ transaction.time }}</div>
+						class="transaction-amount"
+						:class="{
+							'amount-positive': transaction.formattedAmount.startsWith('+'),
+							'amount-negative': transaction.formattedAmount.startsWith('-'),
+						}"
+					>
+						{{ transaction.formattedAmount }}
 					</div>
 				</div>
+				<!-- 交易记录加载中 -->
 				<div
-					class="transaction-amount"
-					:class="{
-						'amount-positive': transaction.formattedAmount.startsWith('+'),
-						'amount-negative': transaction.formattedAmount.startsWith('-'),
-					}"
+					class="transaction-loading"
+					v-if="transactionsLoading"
 				>
-					{{ transaction.formattedAmount }}
+					<van-loading
+						type="spinner"
+						color="#3399ff"
+						size="20px"
+					/>
+					<span>加载交易记录中...</span>
 				</div>
-			</div>
-			<!-- 交易记录加载中 -->
-			<div class="transaction-loading" v-if="transactionsLoading">
-				<van-loading type="spinner" color="#3399ff" size="20px" />
-				<span>加载交易记录中...</span>
-			</div>
-			<!-- 无交易记录状态 -->
-			<div
-				class="transaction-empty"
-				v-if="!transactionsLoading && transactionList.length === 0"
-			>
-				<div class="empty-icon">📋</div>
-				<div class="empty-text">暂无交易记录</div>
-			</div>
+				<!-- 无交易记录状态 -->
+				<div
+					class="transaction-empty"
+					v-if="!transactionsLoading && transactionList.length === 0"
+				>
+					<div class="empty-icon">📋</div>
+					<div class="empty-text">暂无交易记录</div>
+				</div>
+			</template>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { showToast, showLoadingToast, showFailToast, closeToast } from 'vant';
-import {
-	getPrepaidCardInfoList,
-	getPrepaidConsumeRecordPage,
-} from './api/index';
-import { type CardItem, type TransactionItem } from './config/index';
+import { getPrepaidCardInfoList, getPrepaidConsumeRecordPage } from './api/index';
+import { type CardItem, type TransactionItem, getCardColor, typeIconMap } from './config/index';
 import { formatTime, formatAmount } from '@/views/common/config';
 import { useNavBar } from '@/composables/useNavBar';
+import shopCardSvg from '@/assets/icons/shop/shop-card.svg';
+import shopCarSvg from '@/assets/icons/shop/shop-car.svg';
 
 // 路由实例
 const router = useRouter();
@@ -169,7 +229,6 @@ const setCurrentCardIndexByRouteCardId = () => {
 	const { cardId } = route.query;
 	if (cardId && cardList.value.length > 0) {
 		const index = cardList.value.findIndex((card) => card.id === cardId);
-		console.log('1111111111111111111111111111', index, cardList.value);
 		if (index !== -1) {
 			currentCardIndex.value = index;
 		}
@@ -200,12 +259,7 @@ const getCardList = async () => {
 };
 
 const getCardDetail = async () => {
-	const { code, data, message } = await getPrepaidConsumeRecordPage(
-		{ cardId: currentCard.value?.id },
-		1,
-		10,
-	);
-
+	const { code, data, message } = await getPrepaidConsumeRecordPage({ cardId: currentCard.value?.id }, 1, 10);
 	if (code === '200') {
 		const records = data.records || [];
 		// 转换数据格式以匹配组件期望的结构
@@ -231,7 +285,6 @@ const fetchData = async () => {
 		message: '加载中...',
 		forbidClick: true,
 	});
-
 	try {
 		await getCardList();
 		// 获取交易记录分页数据
@@ -247,24 +300,29 @@ const fetchData = async () => {
 	}
 };
 
-// 根据索引获取卡片颜色
-const getCardColor = (index: number) => {
-	const colors = [
-		'#268CF2',
-		'#CC66E5',
-		'#4DB280',
-		'#FF6B6B',
-		'#FFA726',
-		'#66BB6A',
-	];
-	return colors[index % colors.length];
+// 金额格式拆分（整数与小数）
+const getBalanceParts = (value: string | number) => {
+	const numeric = typeof value === 'number' ? value : Number(String(value).replace(/[^\d.-]/g, ''));
+	if (Number.isNaN(numeric)) {
+		return { integer: '0', fraction: '.00' };
+	}
+	const fixed = numeric.toFixed(2);
+	const [intPart, fracPart] = fixed.split('.');
+	return { integer: intPart, fraction: `.${fracPart}` };
 };
 
-// 刷新数据
-const refreshData = async () => {
-	console.log('刷新数据中...');
-	await fetchData();
+// 状态映射（颜色与标签）
+const getStatusLabel = (card: CardItem) => {
+	const status = (card?.status || '1').toString();
+	if (status === '1' || status === '正常' || status === 'normal') return '正常';
+	if (status === '0' || status === '禁用' || status === 'disabled') return '禁用';
+	return '未知';
 };
+
+// 获取分类图标
+function getCategoryIcon(type: string): string {
+	return typeIconMap[type] || '';
+}
 
 // 卡片切换处理函数
 const handleCardChange = async (index: number) => {
@@ -287,9 +345,10 @@ const handleAmount = (type: 'consume' | 'recharge') => {
 
 // 查看更多流水记录
 const handleViewMore = () => {
-	// 除了触发父组件事件，也提供刷新数据的功能
-	refreshData();
-	emit('viewMore');
+	router.push({
+		name: 'consumeWaterInfo',
+		query: { cardId: currentCard.value.id },
+	});
 };
 
 // 查看交易详情
@@ -303,16 +362,9 @@ const handleOverview = () => {
 		showToast('暂无消费卡数据');
 		return;
 	}
-
-	// 计算总余额
-	const totalBalance = cardList.value.reduce((sum, card) => {
-		const balance = parseFloat(card.balance.replace(/[￥,]/g, '')) || 0;
-		return sum + balance;
-	}, 0);
-
-	showToast({
-		message: `共 ${cardList.value.length} 张卡片\n总余额: ￥${totalBalance.toFixed(2)}`,
-		duration: 3000,
+	router.push({
+		name: 'consumeOverviewInfo',
+		query: { cardId: currentCard.value.id },
 	});
 };
 
@@ -339,8 +391,8 @@ onMounted(() => {
 // 主题颜色现在使用全局CSS变量（在 @/assets/styles/variables.css 中定义）
 .prepaid-card-container {
 	width: 100%;
-	min-height: 100vh;
-	background-color: var(--bg-color);
+	height: 100%;
+	background-color: #f2f3f5;
 	box-sizing: border-box;
 	display: flex;
 	flex-direction: column;
@@ -366,11 +418,11 @@ onMounted(() => {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: 15px 20px;
+	padding: 0 20px;
 	box-sizing: border-box;
-	background-color: #ffffff;
 	border-radius: 12px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+	margin-top: 10px;
+	margin-bottom: 0;
 
 	.title {
 		font-size: 20px;
@@ -389,7 +441,10 @@ onMounted(() => {
 			font-size: 14px;
 			font-weight: 600;
 			border-radius: 15px;
+			padding: 0 18px;
 			transition: opacity 0.2s ease;
+			background: #faede2;
+			border: none;
 
 			:deep(.van-button__content) {
 				display: flex;
@@ -408,6 +463,7 @@ onMounted(() => {
 			padding: 0;
 			border-radius: 50%;
 			transition: transform 0.2s ease;
+			background-color: #f3f4f6;
 
 			:deep(.van-button__content) {
 				display: flex;
@@ -416,7 +472,8 @@ onMounted(() => {
 			}
 
 			:deep(.van-icon) {
-				font-size: 18px;
+				font-size: 14px;
+				font-weight: 700;
 			}
 
 			&:active {
@@ -429,8 +486,6 @@ onMounted(() => {
 // 卡片滚动区域样式
 .card-scroll-area {
 	width: 100%;
-	height: 150px;
-	overflow: hidden;
 	margin-bottom: 5px;
 	position: relative;
 
@@ -502,7 +557,6 @@ onMounted(() => {
 
 	.card-item {
 		width: 100%;
-		height: 100%;
 		border-radius: 16px;
 		padding: 25px;
 		box-sizing: border-box;
@@ -518,7 +572,6 @@ onMounted(() => {
 			transform: translateY(-2px);
 			box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 		}
-
 		@media screen and (max-width: 375px) {
 			height: 150px;
 			padding: 20px;
@@ -530,23 +583,111 @@ onMounted(() => {
 			padding: 30px;
 		}
 
+		.card-content {
+			height: calc(100% - 0px);
+			display: flex;
+			align-items: stretch;
+			justify-content: space-between;
+			gap: 12px;
+			flex: 1;
+		}
+
+		.card-left {
+			display: flex;
+			flex-direction: column;
+			gap: 6px;
+			flex: 1 1 auto;
+			min-height: 0;
+			overflow: visible;
+		}
+
+		.card-right {
+			width: 40%;
+			display: flex;
+			align-items: flex-start;
+			justify-content: flex-end;
+			flex: 0 0 auto;
+		}
+
+		.image-placeholder {
+			width: 90%;
+			height: 90%;
+			border-radius: 12px;
+			backdrop-filter: blur(2px);
+			flex-shrink: 0;
+			padding: 2px;
+			background-color: #ffffff;
+		}
+
 		.card-name {
-			font-size: 16px;
+			font-size: 18px;
 			font-weight: 500;
 			color: rgba(255, 255, 255, 0.8);
 		}
 
-		.card-balance {
-			font-size: 28px;
+		.balance-box {
+			display: inline-flex;
+			align-items: baseline;
+			border-radius: 6px;
+			margin-top: -2px;
+		}
+
+		.currency {
+			font-size: 18px;
 			font-weight: 700;
 			color: #ffffff;
-			margin-top: 5px;
+			opacity: 0.95;
+		}
+
+		.balance-integer {
+			font-size: 34px;
+			font-weight: 800;
+			color: #ffffff;
+			letter-spacing: 1px;
+		}
+
+		.balance-fraction {
+			font-size: 18px;
+			font-weight: 700;
+			color: rgba(255, 255, 255, 0.9);
 		}
 
 		.card-label {
+			margin-top: 10px;
 			font-size: 14px;
 			font-weight: 400;
 			color: rgba(255, 255, 255, 0.7);
+		}
+
+		.status-box {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			border-radius: 12px;
+			backdrop-filter: blur(2px);
+			margin-top: 6px;
+		}
+
+		.status-dot {
+			width: 10px;
+			height: 10px;
+			border-radius: 50%;
+			background: #00b42a;
+		}
+
+		.status-text {
+			font-size: 14px;
+			color: rgba(255, 255, 255, 0.9);
+		}
+
+		.status-badge {
+			margin-left: 4px;
+			font-size: 12px;
+			padding: 4px 14px;
+			border-radius: 9999px;
+			color: #ffffff;
+			background: rgba(255, 255, 255, 0.2);
+			font-weight: 400;
 		}
 	}
 }
@@ -559,16 +700,18 @@ onMounted(() => {
 	justify-content: center;
 	align-items: center;
 	gap: 15px;
-	padding: 20px 15px;
 	box-sizing: border-box;
+	margin: 10px 0 0;
+	padding: 10px 10px 0;
 
 	.action-btn {
 		flex: 1;
-		max-width: 120px;
-		height: 40px;
-		font-size: 14px;
+		width: 40%;
+		height: 48px;
+		font-size: 15px;
 		font-weight: 600;
 		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+		border-radius: 12px;
 
 		:deep(.van-button__content) {
 			display: flex;
@@ -647,7 +790,6 @@ onMounted(() => {
 	flex-direction: column;
 	align-items: center;
 	gap: 12px;
-	min-height: 200px;
 
 	@media screen and (max-width: 375px) {
 		padding: 10px;
@@ -767,5 +909,13 @@ onMounted(() => {
 			}
 		}
 	}
+}
+
+.action-btn-content {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	gap: 5px;
 }
 </style>

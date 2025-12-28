@@ -4,15 +4,15 @@
 
 <script setup lang="ts">
 interface Props {
-	activeTab: Number;
+	activeTab: number;
 }
 
-let props = defineProps<Props>();
+const props = defineProps<Props>();
 
 watch(
 	() => [props.activeTab],
 	() => {
-		console.log(`test2`);
+		console.log('test2');
 	},
 	{ immediate: true },
 );

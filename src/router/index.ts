@@ -1,8 +1,9 @@
-import { MenuDataItem } from './typing';
+import type { RouteRecordRaw } from 'vue-router';
+import { createRouter, createWebHashHistory } from 'vue-router';
+import type { MenuDataItem } from './typing';
 import Layout from '@/layouts/index.vue';
 import { useUserStore } from '@/store/modules/user/user';
 import type { MenuInfo } from '@/store/modules/user/typing';
-import { RouteRecordRaw, createRouter, createWebHashHistory } from 'vue-router';
 
 const modules = import.meta.glob('@/views/**/**.vue');
 
@@ -143,32 +144,19 @@ router.beforeEach((to, _from, next) => {
 	} else {
 		next({ name: 'login' });
 	}
-	console.log(`router:`, router.options.routes);
+	console.log('router:', router.options.routes);
 });
 
 const addRouter = () => {
 	const userStore = useUserStore();
 	if (userStore.getMenuInfo?.length) {
-		let roleInfo = userStore.getRoleInfo;
-		if (
-			roleInfo?.roleCode !== 'super_super' &&
-			!roleInfo?.permissionList?.length
-		) {
+		const roleInfo = userStore.getRoleInfo;
+		if (roleInfo?.roleCode !== 'super_super' && !roleInfo?.permissionList?.length) {
 			return;
 		}
 		userStore.getMenuInfo.forEach((item: MenuInfo) => {
-			if (
-				judgePermission(
-					roleInfo?.permissionList,
-					item?.permissionCode,
-					roleInfo.roleCode,
-				)
-			) {
-				let newRouter = getChildren(
-					item,
-					roleInfo?.permissionList,
-					roleInfo.roleCode,
-				);
+			if (judgePermission(roleInfo?.permissionList, item?.permissionCode, roleInfo.roleCode)) {
+				const newRouter = getChildren(item, roleInfo?.permissionList, roleInfo.roleCode);
 				if (!router.hasRoute(newRouter.name)) {
 					router.addRoute(newRouter);
 					dynamicRouter.push(newRouter);
@@ -180,18 +168,16 @@ const addRouter = () => {
 	}
 };
 
-const getChildren = (
-	item: MenuInfo,
-	permissionList: any[],
-	roleCode: string,
-): any => {
-	let component =
-		item.component == null ? modules[pageInfo[404]]
-		: 'Layout' === item.component ? Layout
-		: modules[item.component];
-	let routeInfo: RouteRecordRaw = {
+const getChildren = (item: MenuInfo, permissionList: any[], roleCode: string): any => {
+	const component =
+		item.component == null
+			? modules[pageInfo[404]]
+			: 'Layout' === item.component
+				? Layout
+				: modules[item.component];
+	const routeInfo: RouteRecordRaw = {
 		path: item.path,
-		component: component,
+		component,
 		redirect: item.redirect,
 		name: item.name,
 		meta: {
@@ -205,10 +191,8 @@ const getChildren = (
 	};
 	if (item?.children?.length) {
 		item.children.forEach((childItem: any) => {
-			if (
-				judgePermission(permissionList, childItem?.permissionCode, roleCode)
-			) {
-				let cur = getChildren(childItem, permissionList, roleCode);
+			if (judgePermission(permissionList, childItem?.permissionCode, roleCode)) {
+				const cur = getChildren(childItem, permissionList, roleCode);
 				if (!router.hasRoute(routeInfo?.name || '')) {
 					routeInfo.children?.push(cur);
 				}
@@ -220,11 +204,7 @@ const getChildren = (
 
 router.afterEach(() => {});
 
-const judgePermission = (
-	permissionList: any[],
-	permissionCode: string,
-	roleCode: string,
-) => {
+const judgePermission = (permissionList: any[], permissionCode: string, roleCode: string) => {
 	if (roleCode === 'super_super') {
 		return true;
 	}
@@ -242,7 +222,7 @@ const judgePermission = (
 export const refreshRouter = () => {
 	dynamicRouter.forEach((route) => {
 		router.removeRoute(route.name);
-		let index = routes.findIndex((item) => item.name === route.name);
+		const index = routes.findIndex((item) => item.name === route.name);
 		if (index > -1) {
 			routes.splice(index);
 		}

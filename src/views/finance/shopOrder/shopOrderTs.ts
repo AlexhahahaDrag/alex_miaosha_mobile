@@ -1,4 +1,6 @@
-import { Dayjs } from 'dayjs';
+import type { Dayjs } from 'dayjs';
+import { type PageInfo } from '@/views/common/config/index';
+
 export interface SearchInfo {
 	saleOrderCode?: string | null;
 	saleOrderName?: string;
@@ -10,20 +12,7 @@ export interface SearchInfo {
 	saleCount?: number;
 }
 
-export interface pageInfo {
-	current?: number;
-	pageSize?: number;
-	total?: number;
-	showTotal: Function;
-	showSizeChanger: boolean;
-	pageSizeOptions: string[];
-	showSizeChange: Function;
-	size: string;
-	showQuickJumper: boolean;
-	defaultPageSize: number;
-}
-
-export let pagination = ref<pageInfo>({
+export const pagination = ref<PageInfo>({
 	// 数据总数
 	total: 0,
 	// 当前页数
@@ -37,7 +26,7 @@ export let pagination = ref<pageInfo>({
 	// 设置每页可以展示多少条的选项
 	pageSizeOptions: ['10', '20', '50', '100'],
 	// 改变pageSize后触发
-	showSizeChange: (current: number, pageSize: any) => (
+	showSizeChange: (current: number, pageSize: number) => (
 		(pagination.value.current = current),
 		(pagination.value.pageSize = pageSize)
 	),
@@ -49,55 +38,6 @@ export let pagination = ref<pageInfo>({
 	defaultPageSize: 10,
 });
 
-export const columns = [
-	{
-		title: '订单编码',
-		dataIndex: 'saleOrderCode',
-		key: 'saleOrderCode',
-	},
-	{
-		title: '订单名称',
-		dataIndex: 'saleOrderName',
-		key: 'saleOrderName',
-	},
-	{
-		title: '总销售金额',
-		dataIndex: 'saleAmount',
-		key: 'saleAmount',
-	},
-	{
-		title: '状态',
-		dataIndex: 'isValid',
-		key: 'isValid',
-	},
-	{
-		title: '销售日期',
-		dataIndex: 'saleDate',
-		key: 'saleDate',
-	},
-	{
-		title: '描述',
-		dataIndex: 'description',
-		key: 'description',
-	},
-	{
-		title: '支付方式',
-		dataIndex: 'payWay',
-		key: 'payWay',
-	},
-	{
-		title: '销售数量',
-		dataIndex: 'saleCount',
-		key: 'saleCount',
-	},
-	{
-		title: '操作',
-		key: 'operation',
-		fixed: 'right',
-		width: '8',
-	},
-];
-
 export interface DataItem {
 	saleOrderCode: string;
 	saleOrderName: string;
@@ -107,16 +47,4 @@ export interface DataItem {
 	description: string;
 	payWay: string;
 	saleCount: number;
-}
-
-export interface ModelInfo {
-	title?: string;
-	width?: string;
-	id?: number | undefined;
-	confirmLoading?: boolean;
-}
-
-export interface dictInfo {
-	typeCode?: string | number | undefined;
-	typeName?: string | undefined;
 }

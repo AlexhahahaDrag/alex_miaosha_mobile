@@ -2,14 +2,22 @@
 	<div class="consume-water-page">
 		<!-- 标题栏 -->
 		<div class="header-section">
-			<div class="back-button" @click="handleBack">←</div>
+			<div
+				class="back-button"
+				@click="handleBack"
+			>
+				←
+			</div>
 			<div class="page-title">流水详情</div>
 		</div>
 
 		<!-- 消费卡选择区域 -->
 		<div class="card-selection-section">
 			<div class="selection-label">选择消费卡</div>
-			<div class="card-dropdown" @click="showCardPicker = true">
+			<div
+				class="card-dropdown"
+				@click="showCardPicker = true"
+			>
 				<div class="selected-card">
 					<div class="card-indicator"></div>
 					<div class="card-name">工作餐卡</div>
@@ -52,9 +60,7 @@
 			<div class="record-item">
 				<div class="record-left">
 					<div class="merchant-name">公司食堂 · 午餐</div>
-					<div class="transaction-details">
-						12:30 · 订单号: 2024121012301001
-					</div>
+					<div class="transaction-details"> 12:30 · 订单号: 2024121012301001 </div>
 				</div>
 				<div class="record-right">
 					<div class="transaction-amount expense">-￥18.50</div>
@@ -66,9 +72,7 @@
 			<div class="record-item">
 				<div class="record-left">
 					<div class="merchant-name">充值 · 银行卡转入</div>
-					<div class="transaction-details">
-						09:15 · 订单号: 2024121009151002
-					</div>
+					<div class="transaction-details"> 09:15 · 订单号: 2024121009151002 </div>
 				</div>
 				<div class="record-right">
 					<div class="transaction-amount income">+￥200.00</div>
@@ -83,9 +87,7 @@
 			<div class="record-item">
 				<div class="record-left">
 					<div class="merchant-name">星巴克 · 咖啡</div>
-					<div class="transaction-details">
-						14:20 · 订单号: 2024120914201003
-					</div>
+					<div class="transaction-details"> 14:20 · 订单号: 2024120914201003 </div>
 				</div>
 				<div class="record-right">
 					<div class="transaction-amount expense">-￥35.00</div>

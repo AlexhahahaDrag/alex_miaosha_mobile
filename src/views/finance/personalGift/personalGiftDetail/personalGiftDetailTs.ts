@@ -12,32 +12,32 @@ export const rulesRef = reactive({
 	eventName: [
 		{
 			required: true,
-			message: label.eventName + '不能为空！',
+			message: `${label.eventName}不能为空！`,
 		},
 	],
 	amount: [
 		{
 			required: true,
-			message: label.amount + '不能为空！',
+			message: `${label.amount}不能为空！`,
 		},
-		{ pattern: /^\d+(\.\d+)?$/, message: `请输入正确的金额` },
+		{ pattern: /^\d+(\.\d+)?$/, message: '请输入正确的金额' },
 	],
 	otherPerson: [
 		{
 			required: true,
-			message: label.otherPerson + '不能为空！',
+			message: `${label.otherPerson}不能为空！`,
 		},
 	],
 	eventTime: [
 		{
 			required: true,
-			message: label.eventTime + '不能为空！',
+			message: `${label.eventTime}不能为空！`,
 		},
 	],
 	action: [
 		{
 			required: true,
-			message: label.action + '不能为空！',
+			message: `${label.action}不能为空！`,
 		},
 	],
 });

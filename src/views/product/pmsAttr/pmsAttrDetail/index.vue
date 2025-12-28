@@ -1,6 +1,10 @@
 <template>
 	<NavBar :info="info"></NavBar>
-	<van-form @submit="onSubmit" :rules="rulesRef" required="auto">
+	<van-form
+		@submit="onSubmit"
+		:rules="rulesRef"
+		required="auto"
+	>
 		<van-cell-group>
 			<van-field
 				v-model="formInfo.attrName"
@@ -68,7 +72,12 @@
 			/>
 		</van-cell-group>
 		<div class="subButton">
-			<van-button round block type="primary" native-type="submit">
+			<van-button
+				round
+				block
+				type="primary"
+				native-type="submit"
+			>
 				提交
 			</van-button>
 		</div>
@@ -77,20 +86,17 @@
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-import {
-	addOrEditPmsAttr,
-	getPmsAttrDetail,
-} from '@/api/product/pmsAttr/pmsAttrTs';
 import { label, rulesRef } from './pmsAttrDetailTs';
+import { addOrEditPmsAttr, getPmsAttrDetail } from '@/api/product/pmsAttr/pmsAttrTs';
 
-let route = useRoute();
-let router = useRouter();
+const route = useRoute();
+const router = useRouter();
 const info = ref<any>({
 	title: route?.meta?.title || '商品属性',
 	leftPath: '/product/pmsAttr',
 });
 
-let formInfo = ref<any>({});
+const formInfo = ref<any>({});
 
 const onSubmit = () => {
 	let method = 'post';
@@ -108,7 +114,7 @@ const onSubmit = () => {
 };
 
 function init() {
-	let id: any = route?.query?.id;
+	const id: any = route?.query?.id;
 	if (id) {
 		Promise.all([getPmsAttrDetail(id || '-1')])
 			.then((res: any) => {
@@ -128,7 +134,7 @@ function init() {
 
 init();
 </script>
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .subButton {
 	margin: 16px;
 }

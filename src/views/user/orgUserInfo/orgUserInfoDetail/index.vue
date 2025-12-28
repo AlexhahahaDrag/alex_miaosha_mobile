@@ -1,6 +1,10 @@
 <template>
 	<NavBar :info="info"></NavBar>
-	<van-form @submit="onSubmit" :rules="rulesRef" required="auto">
+	<van-form
+		@submit="onSubmit"
+		:rules="rulesRef"
+		required="auto"
+	>
 		<van-cell-group>
 			<van-field
 				v-model="formInfo.orgId"
@@ -37,12 +41,17 @@
 			/>
 			<selectPop
 				:info="popInfo"
-				@selectInfo="selectInfo"
-				@cancelInfo="cancelInfo"
+				@select-info="selectInfo"
+				@cancel-info="cancelInfo"
 			></selectPop>
 		</van-cell-group>
 		<div class="subButton">
-			<van-button round block type="primary" native-type="submit">
+			<van-button
+				round
+				block
+				type="primary"
+				native-type="submit"
+			>
 				提交
 			</van-button>
 		</div>
@@ -51,28 +60,26 @@
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-import {
-	addOrEditOrgUserInfo,
-	getOrgUserInfoDetail,
-} from '@/api/user/orgUserInfo/orgUserInfoTs';
-import { Info } from '@/views/common/pop/selectPop.vue';
-import { getDictList } from '@/api/finance/dict/dictManager';
 import { label, rulesRef } from './orgUserInfoDetailTs';
+import { getListName } from '@/views/common/config';
+import { addOrEditOrgUserInfo, getOrgUserInfoDetail } from '@/api/user/orgUserInfo/orgUserInfoTs';
+import type { Info } from '@/views/common/pop/selectPop.vue';
+import { getDictList } from '@/api/finance/dict/dictManager';
 
-let route = useRoute();
-let router = useRouter();
+const route = useRoute();
+const router = useRouter();
 const info = ref<any>({
 	title: route?.meta?.title || '用户公司信息表',
 	leftPath: '/user/orgUserInfo',
 });
 
-let formInfo = ref<any>({});
+const formInfo = ref<any>({});
 
-let popInfo = ref<Info>({ showFlag: false });
+const popInfo = ref<Info>({ showFlag: false });
 
-let statusName = ref<string>('');
+const statusName = ref<string>('');
 
-let statusInfo = ref<Info>({
+const statusInfo = ref<Info>({
 	label: 'status',
 	labelName: label.status,
 	rule: rulesRef.status,
@@ -106,30 +113,10 @@ const cancelInfo = () => {
 	popInfo.value.showFlag = false;
 };
 
-const getListName = (list: any[], value: any, code: string, name: string) => {
-	if (!list?.length) {
-		return '';
-	}
-	let listName = '';
-	list.forEach((item) => {
-		if (item[code] == value) {
-			listName = item[name];
-		}
-	});
-	return listName;
-};
-
 function getDictInfoList(res: any) {
 	if (res?.code == '200') {
-		statusInfo.value.list = res.data.filter(
-			(item: { belongTo: string }) => item.belongTo == 'is_valid',
-		);
-		statusName.value = getListName(
-			statusInfo.value.list || [],
-			formInfo.value.status,
-			'typeCode',
-			'typeName',
-		);
+		statusInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'is_valid');
+		statusName.value = getListName(statusInfo.value.list || [], formInfo.value.status, 'typeCode', 'typeName');
 	} else {
 		showFailToast(res?.message || '查询失败，请联系管理员!');
 	}
@@ -151,7 +138,7 @@ const onSubmit = () => {
 };
 
 function init() {
-	let id: any = route?.query?.id;
+	const id: any = route?.query?.id;
 	if (id) {
 		Promise.all([getOrgUserInfoDetail(id || '-1'), getDictList('is_valid')])
 			.then((res: any) => {
@@ -175,7 +162,7 @@ function init() {
 
 init();
 </script>
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .subButton {
 	margin: 16px;
 }

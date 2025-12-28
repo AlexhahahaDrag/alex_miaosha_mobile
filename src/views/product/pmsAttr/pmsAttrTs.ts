@@ -1,3 +1,5 @@
+import { type PageInfo } from '@/views/common/config/index';
+
 export interface SearchInfo {
 	attrName?: string;
 	searchType?: number;
@@ -9,20 +11,7 @@ export interface SearchInfo {
 	showDesc?: number;
 }
 
-export interface pageInfo {
-	current?: number;
-	pageSize?: number;
-	total?: number;
-	showTotal: Function;
-	showSizeChanger: boolean;
-	pageSizeOptions: string[];
-	showSizeChange: Function;
-	size: string;
-	showQuickJumper: boolean;
-	defaultPageSize: number;
-}
-
-export let pagination = ref<pageInfo>({
+export const pagination = ref<PageInfo>({
 	// 数据总数
 	total: 0,
 	// 当前页数
@@ -36,7 +25,7 @@ export let pagination = ref<pageInfo>({
 	// 设置每页可以展示多少条的选项
 	pageSizeOptions: ['10', '20', '50', '100'],
 	// 改变pageSize后触发
-	showSizeChange: (current: number, pageSize: any) => (
+	showSizeChange: (current: number, pageSize: number) => (
 		(pagination.value.current = current),
 		(pagination.value.pageSize = pageSize)
 	),
@@ -48,55 +37,6 @@ export let pagination = ref<pageInfo>({
 	defaultPageSize: 10,
 });
 
-export const columns = [
-	{
-		title: '属性名',
-		dataIndex: 'attrName',
-		key: 'attrName',
-	},
-	{
-		title: '是否需要检索[0-不需要，1-需要]',
-		dataIndex: 'searchType',
-		key: 'searchType',
-	},
-	{
-		title: '属性图标',
-		dataIndex: 'icon',
-		key: 'icon',
-	},
-	{
-		title: '可选值列表[用逗号分隔]',
-		dataIndex: 'valueSelect',
-		key: 'valueSelect',
-	},
-	{
-		title: '属性类型[0-销售属性，1-基本属性，2-既是销售属性又是基本属性]',
-		dataIndex: 'attrType',
-		key: 'attrType',
-	},
-	{
-		title: '启用状态[0 - 禁用，1 - 启用]',
-		dataIndex: 'enable',
-		key: 'enable',
-	},
-	{
-		title: '所属分类',
-		dataIndex: 'catelogId',
-		key: 'catelogId',
-	},
-	{
-		title: '快速展示【是否展示在介绍上；0-否 1-是】，在sku中仍然可以调整',
-		dataIndex: 'showDesc',
-		key: 'showDesc',
-	},
-	{
-		title: '操作',
-		key: 'operation',
-		fixed: 'right',
-		width: '8',
-	},
-];
-
 export interface DataItem {
 	attrName: string;
 	searchType: number;
@@ -106,16 +46,4 @@ export interface DataItem {
 	enable: number;
 	catelogId: number;
 	showDesc: number;
-}
-
-export interface ModelInfo {
-	title?: string;
-	width?: string;
-	id?: number | undefined;
-	confirmLoading?: boolean;
-}
-
-export interface dictInfo {
-	typeCode?: string | number | undefined;
-	typeName?: string | undefined;
 }
