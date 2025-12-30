@@ -270,7 +270,8 @@ const getPrepaidCardInfoDetailInfo = async () => {
 		} else {
 			showToast(messageInfo?.description || '获取信息失败，请联系管理员！');
 		}
-	} catch (error) {
+	} catch (error: unknown) {
+		console.log('错误信息：', error);
 		console.error('获取预付卡信息失败:', error);
 		showToast('获取信息失败，请稍后重试');
 	}

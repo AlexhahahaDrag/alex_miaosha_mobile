@@ -19,26 +19,6 @@ export const useCartStore = defineStore({
 			this.shoppingCart = shoppings;
 			localStorage.setItem('shoppingCart', JSON.stringify(this.shoppingCart));
 		},
-		// async login(
-		//   params: LoginParams & {
-		//     goHome?: boolean;
-		//   }
-		// ) {
-		//   try {
-		//     const { goHome = true, ...loginParams } = params;
-		//     const data = await loginApi(loginParams);
-		//     if (data?.code == '200') {
-		//       const { token, admin } = data.data;
-		//       this.setUserInfo(admin);
-		//       return admin;
-		//     } else {
-		//       showFailToast((data?.message) || '登录失败！');
-		//     }
-		//   } catch (error) {
-		//     // message.error("系统错误，请联系管理员！", 3);
-		//     return Promise.reject(error);
-		//   }
-		// },
 	},
 	persist: piniaPersistConfig('app-cart'),
 });

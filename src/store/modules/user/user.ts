@@ -7,8 +7,7 @@ import type { LoginParams } from '@/api/user/login';
 import { piniaPersistConfig } from '@/config/piniaPersist';
 import { refreshRouter } from '@/router';
 
-export const useUserStore = defineStore({
-	id: 'app-user',
+export const useUserStore = defineStore('app-user', {
 	state: (): UserState => ({
 		userInfo: null,
 		token: undefined,
@@ -63,9 +62,9 @@ export const useUserStore = defineStore({
 			this.menuInfo = info ? info : null;
 			localStorage.setItem('menuInfo', JSON.stringify(this.menuInfo));
 		},
-		changeRouteStatus(state: any) {
+		changeRouteStatus(state: boolean) {
 			this.hasMenu = state;
-			localStorage.setItem('hasRoute', state);
+			localStorage.setItem('hasRoute', state.toString() || 'false');
 		},
 		//设置用户信息
 		setRoleInfo(roleInfo: any) {
@@ -97,8 +96,8 @@ export const useUserStore = defineStore({
 				} else {
 					showFailToast(data?.message || '登录失败！');
 				}
-			} catch (error) {
-				// message.error("系统错误，请联系管理员！", 3);
+			} catch (error: unknown) {
+				console.log('错误信息：', error);
 				return Promise.reject(error);
 			}
 		},

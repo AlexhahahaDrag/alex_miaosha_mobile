@@ -409,7 +409,8 @@ async function fetchTransactionData(isLoadMore = false) {
 			finished.value = true;
 			showFailToast(message || '查询失败，请联系管理员');
 		}
-	} catch (error) {
+	} catch (error: unknown) {
+		console.log('错误信息：', error);
 		pagination.value.total = 0;
 		hasMore.value = false;
 		finished.value = true;
@@ -439,7 +440,8 @@ async function onRefresh() {
 	finished.value = false;
 	try {
 		await fetchTransactionData(false);
-	} catch (error) {
+	} catch (error: unknown) {
+		console.log('错误信息：', error);
 		console.error('刷新失败:', error);
 		showFailToast('刷新失败，请稍后重试');
 	} finally {
@@ -459,7 +461,8 @@ async function onLoad() {
 	pagination.value?.pageNum ? pagination.value.pageNum++ : 0;
 	try {
 		await fetchTransactionData(true);
-	} catch (error) {
+	} catch (error: unknown) {
+		console.log('错误信息：', error);
 		console.error('加载更多失败:', error);
 		showFailToast('加载失败，请稍后重试');
 		pagination.value?.pageNum ? pagination.value.pageNum-- : 0; // 回退页码

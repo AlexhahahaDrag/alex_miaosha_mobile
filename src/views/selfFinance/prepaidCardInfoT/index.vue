@@ -289,15 +289,14 @@ const fetchData = async () => {
 		await getCardList();
 		// 获取交易记录分页数据
 		await getCardDetail();
-	} catch (error: any) {
-		console.error('获取数据失败', error);
-		showToast('获取数据失败，请重试');
-		cardsLoading.value = false;
-		transactionsLoading.value = false;
-	} finally {
-		loading.value = false;
-		closeToast();
+	} catch (error: unknown) {
+		console.log('错误信息：', error);
+		showFailToast(`获取数据失败，请重试！${(error as Error).message}` || '未知错误');
 	}
+	cardsLoading.value = false;
+	transactionsLoading.value = false;
+	loading.value = false;
+	closeToast();
 };
 
 // 金额格式拆分（整数与小数）
