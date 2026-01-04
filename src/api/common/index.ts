@@ -6,7 +6,7 @@ export function postData<T = unknown>(
 	params: unknown,
 	queryParams?: Record<string, unknown>,
 ): Promise<T> {
-	return request.post<Params, T>(url, params, queryParams);
+	return request.post<Params, T>(url, params, { params: queryParams });
 }
 
 export function putData<T = unknown>(url: string, params: unknown): Promise<T> {
@@ -14,11 +14,11 @@ export function putData<T = unknown>(url: string, params: unknown): Promise<T> {
 }
 
 export function getData<T = unknown>(url: string, params?: Record<string, unknown>): Promise<T> {
-	return request.get<Params, T>(url, params);
+	return request.get<Params, T>(url, { params });
 }
 
 export function deleteData<T = unknown>(url: string, params?: Record<string, unknown>): Promise<T> {
-	return request.delete<Params, T>(url, params);
+	return request.delete<Params, T>(url, { params });
 }
 
 export function postFileData<T = unknown>(url: string, params: unknown): Promise<T> {

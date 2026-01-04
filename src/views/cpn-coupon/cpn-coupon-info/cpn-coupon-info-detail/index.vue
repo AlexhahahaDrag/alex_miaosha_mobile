@@ -105,7 +105,7 @@ import { getDictList } from '@/api/finance/dict/dictManager';
 import { getUserManagerList } from '@/api/user/userManager';
 import { useUserStore } from '@/store/modules/user/user';
 import type { Info } from '@/views/common/pop/selectPop.vue';
-import { addOrEditFinanceManger, getFinanceMangerDetail } from '@/views/finance/financeManager/api';
+import { addFinanceManger, editFinanceManger, getFinanceMangerDetail } from '@/views/finance/financeManager/api';
 import { useNavBar } from '@/composables/useNavBar';
 
 const route = useRoute();
@@ -264,11 +264,11 @@ const isValidName = ref<string>('');
 const belongToName = ref<string>('');
 
 const onSubmit = () => {
-	let method = 'post';
+	let api = addFinanceManger;
 	if (formInfo.value.id) {
-		method = 'put';
+		api = editFinanceManger;
 	}
-	addOrEditFinanceManger(method, formInfo.value).then((res: any) => {
+	api(formInfo.value).then((res: any) => {
 		if (res?.code == '200') {
 			showSuccessToast(res?.message || '保存成功!');
 			// todo 是否修改成返回列表对应的位置

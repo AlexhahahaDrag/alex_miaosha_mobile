@@ -175,21 +175,20 @@ const resetData = () => {
 // 获取财务数据
 const getFinancePage = async (param: FinanceManagerData, cur: PageInfo) => {
 	loading.value = true;
-	try {
-		const { code, data, message } = await getFinanceMangerPage(param, cur?.current || 1, cur?.pageSize || 10);
-		if (code === '200') {
-			dataSource.value = [...dataSource.value, ...(data?.records || [])];
-			pagination.value.total = data?.total || 0;
-			const total = pagination.value.total || 0;
-			const current = pagination.value.current || 1;
-			const pageSize = pagination.value.pageSize || 10;
-			finished.value = total < current * pageSize;
-		} else {
-			showFailToast(message || '查询列表失败！');
-		}
-	} finally {
-		loading.value = false;
-		isRefresh.value = false;
+	const { code, data, message } = await getFinanceMangerPage(param, cur?.current || 1, cur?.pageSize || 10).finally(
+		() => {
+			loading.value = false;
+			isRefresh.value = false;
+		},
+	);
+	if (code === '200') {
+		dataSource.value = [...dataSource.value, ...(data?.records || [])];
+		pagination.value.total = data?.total || 0;
+		pagination.value.current = (pagination.value.current || 0) + 1;
+		pagination.value.pageSize = pagination.value.pageSize || 10;
+		finished.value = pagination.value.total < pagination.value.current * pagination.value.pageSize;
+	} else {
+		showFailToast(message || '查询列表失败！');
 	}
 };
 
@@ -215,7 +214,7 @@ const onRefreshData = () => {
 
 // 加载更多
 const onLoadMore = () => {
-	if (!loading.value && !finished.value) {
+	if (!finished.value) {
 		pagination.value.current = (pagination.value.current || 0) + 1;
 		getFinancePage(searchInfo.value, pagination.value);
 	}
