@@ -3,15 +3,15 @@
 		v-model:show="showFlag"
 		position="bottom"
 		:style="{ width: '100%' }"
-		@click-overlay="onClickOverlay"
+		@click-overlay="onCancel"
 	>
 		<van-picker
-			v-model="cur.selectValue"
-			:title="cur.labelName"
-			:columns="cur.list"
-			:columns-field-names="customFieldName"
-			@confirm="confirm"
-			@cancel="cancel"
+			v-model="curSelectValue"
+			:title="info.labelName"
+			:columns="info.list"
+			:columns-field-names="info.customFieldName || defaultCustomFieldName"
+			@confirm="onConfirm"
+			@cancel="onCancel"
 		/>
 	</van-popup>
 </template>
@@ -22,7 +22,7 @@ export interface FieldInfo {
 	text: string;
 }
 
-export interface Info<> {
+export interface Info {
 	label?: string;
 	labelName?: string;
 	rule?: unknown;
@@ -36,46 +36,51 @@ interface Props {
 	info: Info;
 }
 
-const emit = defineEmits(['selectInfo', 'cancelInfo']);
-
 const props = defineProps<Props>();
 
 const showFlag = ref<boolean>(false);
+const curSelectValue = ref<any[]>([]);
 
-const confirm = ({ selectedOptions }) => {
+const defaultCustomFieldName = {
+	text: 'typeName',
+	value: 'typeCode',
+};
+
+/**
+ * 确认选择
+ */
+const onConfirm = ({ selectedOptions }: { selectedOptions: any[] }) => {
 	showFlag.value = false;
+	const fieldNames = props.info.customFieldName || defaultCustomFieldName;
 	emit(
-		'selectInfo',
+		'select-info',
 		props.info.label,
-		selectedOptions ? selectedOptions[0][customFieldName.value] : '',
-		selectedOptions ? selectedOptions[0][customFieldName.text] : '',
+		selectedOptions ? selectedOptions[0][fieldNames.value] : '',
+		selectedOptions ? selectedOptions[0][fieldNames.text] : '',
 	);
 };
 
-const cancel = () => {
+/**
+ * 取消选择
+ */
+const onCancel = () => {
 	showFlag.value = false;
-	emit('cancelInfo', false);
+	emit('cancel-info', false);
 };
 
-const onClickOverlay = () => {
-	cancel();
-};
-
-let customFieldName = ref<any>({
-	text: 'typeName',
-	value: 'typeCode',
-});
-
-const cur = ref<Info>({});
-
+/**
+ * 监听 info 的变化，同步状态
+ */
 watch(
 	() => props.info.showFlag,
-	() => {
-		if (props.info.showFlag) {
-			cur.value = props.info;
-			showFlag.value = props.info.showFlag;
-			customFieldName = props.info.customFieldName;
+	(newVal) => {
+		showFlag.value = !!newVal;
+		if (newVal) {
+			curSelectValue.value = props.info.selectValue ? [props.info.selectValue] : [];
 		}
 	},
+	{ immediate: true },
 );
+
+const emit = defineEmits(['select-info', 'cancel-info']);
 </script>

@@ -29,12 +29,12 @@
 					readonly
 				/>
 			</template>
-			<selectPop
+			<select-pop
 				:info="popInfo"
 				@select-info="selectInfo"
 				@cancel-info="cancelInfo"
 			>
-			</selectPop>
+			</select-pop>
 			<datePop
 				:info="chooseDateInfo"
 				@select-date-info="selectDateInfo"
