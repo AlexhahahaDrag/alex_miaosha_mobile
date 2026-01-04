@@ -5,73 +5,30 @@
 		required="auto"
 	>
 		<van-cell-group inset>
-			<van-field
-				v-model="formInfo.name"
-				name="name"
-				:label="label.name + '：'"
-				:placeholder="'请输入' + label.name"
-				:rules="rulesRef.name"
-			/>
-			<van-field
-				v-model="formInfo.typeCode"
-				name="typeCode"
-				:label="label.typeCode + '：'"
-				:placeholder="'请输入' + label.typeCode"
-				:rules="rulesRef.typeCode"
-			/>
-			<van-field
-				v-model="formInfo.amount"
-				type="number"
-				name="amount"
-				:label="label.amount + '：'"
-				:placeholder="'请输入' + label.amount"
-				:rules="rulesRef.amount"
-			/>
-			<van-field
-				v-model="nameRefMap.fromSource.value"
-				name="fromSource"
-				:label="label.fromSource + '：'"
-				:placeholder="'请输入' + label.fromSource"
-				:rules="rulesRef.fromSource"
-				@click="choose('fromSource')"
-				readonly
-			/>
-			<van-field
-				v-model="nameRefMap.incomeAndExpenses.value"
-				name="incomeAndExpenses"
-				:label="label.incomeAndExpenses + '：'"
-				:placeholder="'请输入' + label.incomeAndExpenses"
-				:rules="rulesRef.incomeAndExpenses"
-				@click="choose('incomeAndExpenses')"
-				readonly
-			/>
-			<van-field
-				v-model="nameRefMap.isValid.value"
-				name="isValid"
-				:label="label.isValid + '：'"
-				:placeholder="'请输入' + label.isValid"
-				:rules="rulesRef.isValid"
-				@click="choose('isValid')"
-				readonly
-			/>
-			<van-field
-				v-model="nameRefMap.infoDate.value"
-				name="infoDate"
-				:label="label.infoDate + '：'"
-				:placeholder="'请输入' + label.infoDate"
-				:rules="rulesRef.infoDate"
-				@click="chooseDate"
-				readonly
-			/>
-			<van-field
-				v-model="nameRefMap.belongTo.value"
-				name="belongTo"
-				:label="label.belongTo + '：'"
-				:placeholder="'请输入' + label.belongTo"
-				:rules="rulesRef.belongTo"
-				@click="choose('belongTo')"
-				readonly
-			/>
+			<template
+				v-for="field in formFields"
+				:key="field.name"
+			>
+				<van-field
+					v-if="field.type === 'input'"
+					v-model="formInfo[field.name]"
+					:name="field.name"
+					:label="field.label + '：'"
+					:placeholder="'请输入' + field.label"
+					:rules="rulesRef[field.name]"
+					:type="field.inputType || 'text'"
+				/>
+				<van-field
+					v-else
+					v-model="nameRefMap[field.name as keyof typeof nameRefMap].value"
+					:name="field.name"
+					:label="field.label + '：'"
+					:placeholder="'请选择' + field.label"
+					:rules="rulesRef[field.name]"
+					@click="field.type === 'date' ? chooseDate() : choose(field.name)"
+					readonly
+				/>
+			</template>
 			<selectPop
 				:info="popInfo"
 				@select-info="selectInfo"
@@ -137,6 +94,23 @@ const label = reactive({
 	infoDate: '业务时间',
 	belongTo: '属于',
 });
+
+// 表单字段配置，用于循环渲染
+const formFields: {
+	name: string;
+	label: string;
+	type: 'input' | 'select' | 'date';
+	inputType?: 'text' | 'number' | 'tel' | 'digit' | 'password';
+}[] = [
+	{ name: 'name', label: label.name, type: 'input' },
+	{ name: 'typeCode', label: label.typeCode, type: 'input' },
+	{ name: 'amount', label: label.amount, type: 'input', inputType: 'number' },
+	{ name: 'fromSource', label: label.fromSource, type: 'select' },
+	{ name: 'incomeAndExpenses', label: label.incomeAndExpenses, type: 'select' },
+	{ name: 'isValid', label: label.isValid, type: 'select' },
+	{ name: 'infoDate', label: label.infoDate, type: 'date' },
+	{ name: 'belongTo', label: label.belongTo, type: 'select' },
+];
 
 const popInfo = ref<Info>({ showFlag: false });
 
