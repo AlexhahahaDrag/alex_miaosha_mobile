@@ -9,14 +9,14 @@ const ShopStockBatchUrl = {
 
 export function getShopStockBatchPage(
 	params: any,
-	pageNo: number | null | undefined,
+	pageNum: number | null | undefined,
 	pageSize: number | null | undefined,
 ): Promise<any> {
-	const url = `${baseService.finance + baseShopStockBatch + ShopStockBatchUrl.page}?pageNum=${
-		pageNo ? pageNo : 1
-	}&pageSize=${pageSize ? pageSize : 10}`;
-	console.log('getShopStockBatchPage   params:', params);
-	return postData(url, params);
+	const url = `${baseService.finance + baseShopStockBatch + ShopStockBatchUrl.page}`;
+	return postData(url, params, {
+		pageNum: pageNum ? pageNum : 1,
+		pageSize: pageSize ? pageSize : 10,
+	});
 }
 
 export function getShopStockBatchDetail(id: number): Promise<any> {

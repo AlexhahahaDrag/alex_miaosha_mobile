@@ -43,13 +43,16 @@ export function getPrepaidCardInfoList(params: any): Promise<any> {
 
 export function getPrepaidCardInfoPage(
 	params: any,
-	pageNo: number | null | undefined,
+	pageNum: number | null | undefined,
 	pageSize: number | null | undefined,
 ): Promise<any> {
 	const url = `${
 		baseService.finance + basePrepaidCardInfo + PrepaidCardInfoUrl.page
-	}?pageNum=${pageNo ? pageNo : 1}&pageSize=${pageSize ? pageSize : 10}`;
-	return postData(url, params);
+	}?pageNum=${pageNum ? pageNum : 1}&pageSize=${pageSize ? pageSize : 10}`;
+	return postData(url, params, {
+		pageNum: pageNum ? pageNum : 1,
+		pageSize: pageSize ? pageSize : 10,
+	});
 }
 
 export function prepaidCardConsumeAndRecharge(params: any): Promise<any> {
@@ -84,11 +87,14 @@ export function deletePrepaidConsumeRecord(ids: string): Promise<any> {
 
 export function getPrepaidConsumeRecordPage(
 	params: any,
-	pageNo: number | null | undefined,
+	pageNum: number | null | undefined,
 	pageSize: number | null | undefined,
 ): Promise<any> {
 	const url = `${
 		baseService.finance + basePrepaidConsumeRecord + PrepaidConsumeRecordUrl.page
-	}?pageNum=${pageNo ? pageNo : 1}&pageSize=${pageSize ? pageSize : 10}`;
-	return postData(url, params);
+	}?pageNum=${pageNum ? pageNum : 1}&pageSize=${pageSize ? pageSize : 10}`;
+	return postData(url, params, {
+		pageNum: pageNum ? pageNum : 1,
+		pageSize: pageSize ? pageSize : 10,
+	});
 }

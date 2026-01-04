@@ -22,10 +22,10 @@ export interface FieldInfo {
 	text: string;
 }
 
-export interface Info {
+export interface Info<> {
 	label?: string;
 	labelName?: string;
-	rule?: any;
+	rule?: unknown;
 	list?: any[];
 	selectValue?: any;
 	showFlag?: boolean;

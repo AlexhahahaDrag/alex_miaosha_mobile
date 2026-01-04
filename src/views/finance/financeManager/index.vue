@@ -9,68 +9,60 @@
 			action-text="清空"
 		/>
 	</form>
-	<van-divider :style="{ color: '#1989fa', borderColor: 'grey', margin: '0 0 10px 0' }" />
+	<van-divider class="divider-style" />
 	<van-pull-refresh
 		pulling-text="加载中。。。"
-		:style="{}"
 		class="refresh-info"
 		v-model="isRefresh"
-		@refresh="refresh"
+		@refresh="onRefreshData"
 		ref="pullRefresh"
-		immediate-check="false"
+		:immediate-check="false"
 	>
-		<div style="height: 100%; overflow-y: auto">
+		<div class="list-container">
 			<van-empty
-				v-if="dataSource.length == 0"
+				v-if="!dataSource?.length"
 				description="暂无数据"
-			></van-empty>
+			/>
 			<van-list
 				v-else
 				v-model:loading="loading"
 				:finished="finished"
 				finished-text="没有更多了"
-				@load="onRefresh"
+				@load="onLoadMore"
 			>
 				<van-cell-group>
 					<van-swipe-cell
-						v-for="(item, index) in dataSource"
-						:before-close="beforeClose"
-						:key="index"
+						v-for="item in dataSource"
+						:key="item.id"
 					>
 						<van-cell
-							:title-class="item.isValid == '1' ? 'validClass' : 'notValidClass'"
-							:title="userMap[item.belongTo] + '的' + item.name + '(' + item.typeCode + ')'"
-							:key="index"
+							:title-class="getTitleClass(item.isValid)"
+							:title="getCellTitle(item)"
 							is-link
-							:to="{
-								path: '/selfFinance/financeManager/financeManagerDetail',
-								query: { id: item.id },
-							}"
+							:to="getDetailRoute(item.id)"
 						>
 							<template #label>
 								<div class="svgInfo">
 									<div
 										class="svgDiv"
-										v-for="(fromSource, index) in fromSourceTransferList"
-										:key="index"
+										v-for="fromSource in fromSourceTransferList"
+										:key="fromSource.value"
 									>
 										<SvgIcon
-											v-if="item.fromSource.indexOf(fromSource.value) >= 0 && fromSource.value != ''"
+											v-if="shouldShowIcon(item.fromSource, fromSource.value)"
 											:name="fromSource.label"
 											class="svg"
-										></SvgIcon>
+										/>
 									</div>
 								</div>
 							</template>
 							<template #right-icon>
 								<div class="text-right">
-									<div style="display: flex">
-										<div class="van-ellipsis">
-											{{ item?.infoDate ? String(item.infoDate).substring(0, 10) : '--' }}
-										</div>
+									<div class="date-text">
+										{{ formatDate(item.infoDate) }}
 									</div>
-									<div :class="item.incomeAndExpenses === 'income' ? 'rightGreenDiv' : 'rightRedDiv'">
-										{{ item.amount ? (item.incomeAndExpenses === 'income' ? item.amount : -item.amount) + '元' : '--' }}
+									<div :class="getAmountClass(item.incomeAndExpenses)">
+										{{ formatAmount(item) }}
 									</div>
 								</div>
 							</template>
@@ -78,142 +70,176 @@
 						<template #right>
 							<van-button
 								class="right_info"
-								@click="delFinance(item.id)"
+								@click="onDeleteFinance(item.id)"
 								square
 								type="danger"
 								text="删除"
 							/>
 						</template>
-						<van-divider
-							:style="{
-								color: '#1989fa',
-								borderColor: 'grey',
-								padding: '0 16px',
-								'margin-top': '0px',
-								'margin-bottom': '0px',
-							}"
-						></van-divider>
+						<van-divider class="item-divider-style" />
 					</van-swipe-cell>
 				</van-cell-group>
 			</van-list>
 		</div>
 	</van-pull-refresh>
-	<van-back-top></van-back-top>
+	<van-back-top />
 </template>
 <script lang="ts" setup>
+import type { Dayjs } from 'dayjs';
 import { showSuccessToast, showFailToast } from 'vant';
-import type { SearchInfo, PageInfo } from './financeManager';
-import { pagination, fromSourceTransferList } from './financeManager';
-import { getFinanceMangerPage, deleteFinanceManager } from '@/api/finance/financeManager';
-import { getUserManagerList } from '@/api/user/userManager';
+import { pagination, fromSourceTransferList, type FinanceManagerData } from './config';
+import { getRoutePathByName } from '@/utils/router';
+import { getFinanceMangerPage, deleteFinanceManager } from '@/views/finance/financeManager/api';
 import { useNavBar } from '@/composables/useNavBar';
+import type { PageInfo } from '@/views/common/config/index';
 
 const router = useRouter();
 const route = useRoute();
 
-// 定义addFinance函数
-const addFinance = () => {
-	router.push({ path: '/selfFinance/financeManager/financeManagerDetail' });
+// 通过路由解析获取详情页路径，使用公共工具方法
+const getDetailRoutePath = () => {
+	return getRoutePathByName(router, 'financeManagerDetail', '/selfFinance/financeManager/financeManagerDetail');
 };
 
-// 使用新的NavBar系统
+// 获取详情页路由配置
+const getDetailRoute = (id?: number) => {
+	const path = getDetailRoutePath();
+	return {
+		path,
+		query: { id },
+	};
+};
+
+// 导航栏配置
 useNavBar({
 	title: (route?.meta?.title as string) || '财务管理',
 	rightButton: '新增',
 	leftPath: '/',
 	visible: true,
-	onRightClick: addFinance,
+	onRightClick: () => {
+		const path = getDetailRoutePath();
+		router.push({ path });
+	},
 });
 
+// 响应式数据
 const loading = ref<boolean>(false);
-const dataSource = ref<any[]>([]);
-const searchInfo = ref<SearchInfo>({});
+const dataSource = ref<FinanceManagerData[]>([]);
+const searchInfo = ref<FinanceManagerData>({});
+const finished = ref<boolean>(false);
+const isRefresh = ref<boolean>(false);
 
-const finished = ref<boolean>(false); //加载是否已经没有更多数据
-const isRefresh = ref<boolean>(false); //是否下拉刷新
+// 计算属性和工具函数
+const getTitleClass = (isValid?: string) => {
+	return isValid === '1' ? 'validClass' : 'notValidClass';
+};
 
+const getCellTitle = (item: FinanceManagerData) => {
+	const userName = item.belongToName || '未知用户';
+	return `${userName}的${item.name || ''}(${item.typeCode || ''})`;
+};
+
+const shouldShowIcon = (fromSource?: string, value?: string) => {
+	if (!fromSource || !value || value === '') {
+		return false;
+	}
+	return fromSource.indexOf(value) >= 0;
+};
+
+const formatDate = (infoDate?: string | Dayjs | null): string => {
+	if (!infoDate) {
+		return '--';
+	}
+	const dateStr = typeof infoDate === 'string' ? infoDate : infoDate.toString();
+	return dateStr.substring(0, 10);
+};
+
+const getAmountClass = (incomeAndExpenses?: string) => {
+	return incomeAndExpenses === 'income' ? 'rightGreenDiv' : 'rightRedDiv';
+};
+
+const formatAmount = (item: FinanceManagerData) => {
+	if (!item.amount) {
+		return '--';
+	}
+	const amount = item.incomeAndExpenses === 'income' ? item.amount : -item.amount;
+	return `${amount}元`;
+};
+
+// 统一重置数据函数
+const resetData = () => {
+	dataSource.value = [];
+	pagination.value.current = 0;
+};
+
+// 获取财务数据
+const getFinancePage = async (param: FinanceManagerData, cur: PageInfo) => {
+	loading.value = true;
+	try {
+		const { code, data, message } = await getFinanceMangerPage(param, cur?.current || 1, cur?.pageSize || 10);
+		if (code === '200') {
+			dataSource.value = [...dataSource.value, ...(data?.records || [])];
+			pagination.value.total = data?.total || 0;
+			const total = pagination.value.total || 0;
+			const current = pagination.value.current || 1;
+			const pageSize = pagination.value.pageSize || 10;
+			finished.value = total < current * pageSize;
+		} else {
+			showFailToast(message || '查询列表失败！');
+		}
+	} finally {
+		loading.value = false;
+		isRefresh.value = false;
+	}
+};
+
+// 搜索处理
 const onSearch = () => {
 	pagination.value.current = 1;
 	dataSource.value = [];
-	onRefresh();
+	onLoadMore();
 };
+
+// 取消搜索
 const onCancel = () => {
 	searchInfo.value.bigTypeCode = '';
-	pagination.value.current = 0;
-	dataSource.value = [];
+	resetData();
 	getFinancePage(searchInfo.value, pagination.value);
 };
 
-function getFinancePage(param: SearchInfo, cur: PageInfo) {
-	loading.value = true;
-	getFinanceMangerPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
-		.then((res) => {
-			if (res?.code == '200') {
-				dataSource.value = [...dataSource.value, ...res.data.records];
-				pagination.value.current = res.data.current + 1;
-				pagination.value.pageSize = res.data.size;
-				pagination.value.total = res.data.total;
-				if ((pagination.value.total || 0) < (pagination.value.current || 1) * (pagination.value.pageSize || 10)) {
-					finished.value = true;
-				}
-			} else {
-				showFailToast((res && res.message) || '查询列表失败！');
-			}
-		})
-		.finally(() => {
-			isRefresh.value = false;
-			loading.value = false;
-		});
-}
-
-const userMap = {};
-function getUserInfoList() {
-	getUserManagerList({}).then((res) => {
-		if (res.code == '200') {
-			if (res?.data) {
-				res.data.forEach((user: { id: string | number; nickName: any }) => {
-					userMap[user.id] = user.nickName;
-				});
-			}
-		} else {
-			showFailToast((res && res.message) || '查询列表失败！');
-		}
-	});
-}
-
-const refresh = () => {
-	pagination.value.current = 0;
-	dataSource.value = [];
+// 下拉刷新
+const onRefreshData = () => {
+	resetData();
 	getFinancePage(searchInfo.value, pagination.value);
 };
 
-const onRefresh = () => {
+// 加载更多
+const onLoadMore = () => {
+	if (!loading.value && !finished.value) {
+		pagination.value.current = (pagination.value.current || 0) + 1;
+		getFinancePage(searchInfo.value, pagination.value);
+	}
+};
+
+// 删除财务记录
+const onDeleteFinance = async (id?: number) => {
+	if (!id) {
+		return;
+	}
+	const { code, message } = await deleteFinanceManager(`${id}`);
+	if (code === '200') {
+		onRefreshData();
+		showSuccessToast(message || '删除成功！');
+	} else {
+		showFailToast(message || '删除失败，请联系管理员！');
+	}
+};
+
+// 初始化
+const init = () => {
+	resetData();
 	getFinancePage(searchInfo.value, pagination.value);
 };
-
-const beforeClose = (e: any) => {
-	console.log(e);
-};
-
-const delFinance = (id: number) => {
-	deleteFinanceManager(id).then((res: any) => {
-		if (res?.code == '200') {
-			refresh();
-			showSuccessToast((res && res.message) || '删除成功！');
-		} else {
-			showFailToast((res && res.message) || '删除失败，请联系管理员！');
-		}
-	});
-};
-
-function init() {
-	dataSource.value = [];
-	pagination.value.current = 0;
-	//获取财务管理页面数据
-	getFinancePage(searchInfo.value, pagination.value);
-	//获取用户信息
-	getUserInfoList();
-}
 
 init();
 </script>
@@ -222,17 +248,48 @@ init();
 .refresh-info {
 	height: calc(100% - 64px);
 }
+
+.list-container {
+	height: 100%;
+	overflow-y: auto;
+}
+
+.divider-style {
+	color: #1989fa;
+	border-color: grey;
+	margin: 0 0 10px 0;
+}
+
+.item-divider-style {
+	color: #1989fa;
+	border-color: grey;
+	padding: 0 16px;
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
 .right_info {
 	height: 100%;
 }
+
+.text-right {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+}
+
+.date-text {
+	width: 130px;
+	text-align: right;
+}
+
 .svgInfo {
 	margin-top: 10px;
 	display: flex;
+
 	.svgDiv {
 		height: 30px;
-		.svgClass {
-			height: 100%;
-		}
+
 		.svg {
 			width: 1.5em;
 			height: 1.5em;
@@ -241,16 +298,6 @@ init();
 			vertical-align: middle;
 		}
 	}
-}
-
-.van-ellipsis {
-	width: 130px;
-	text-align: right;
-}
-
-.rightDiv {
-	margin-top: 10px;
-	text-align: right;
 }
 
 .rightGreenDiv {

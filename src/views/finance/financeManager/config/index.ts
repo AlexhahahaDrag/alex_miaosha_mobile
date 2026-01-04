@@ -1,3 +1,4 @@
+import type { Dayjs } from 'dayjs';
 import { type PageInfo } from '@/views/common/config/index';
 
 export interface SearchInfo {
@@ -5,7 +6,7 @@ export interface SearchInfo {
 	typeCode?: string;
 	fromSource?: string;
 	isValid?: number;
-	pageNo?: number;
+	pageNum?: number;
 	pageSize?: number;
 	incomeAndExpenses?: string;
 	belongTo?: number;
@@ -40,14 +41,21 @@ export const pagination = ref<PageInfo>({
 	defaultPageSize: 10,
 });
 
-export interface DataItem {
-	name: string;
-	typeCode: string;
-	typeName: string;
-	amount: number;
-	fromSource: string;
-	fromSourceName: string;
-	isValid: number;
+export interface FinanceManagerData {
+	id?: number;
+	name?: string;
+	typeCode?: string;
+	typeName?: string;
+	amount?: number;
+	fromSource?: string;
+	fromSourceName?: string;
+	isValid?: string;
+	bigTypeCode?: string;
+	belongTo?: number;
+	belongToName?: string;
+	incomeAndExpenses?: string;
+	incomeAndExpensesName?: string;
+	infoDate?: string | Dayjs | null;
 }
 
 export const fromSourceTransferList = [

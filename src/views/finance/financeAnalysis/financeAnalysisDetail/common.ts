@@ -5,9 +5,9 @@ export interface ItemInfo {
 	value: number | string;
 }
 
-export interface barItem {
+export interface barItem<T> {
 	xAxis?: string[];
-	series?: string[][];
+	series?: T[][];
 	yTitle?: string[];
 	xTile: string;
 	yNameGap?: number;

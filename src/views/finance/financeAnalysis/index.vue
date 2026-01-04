@@ -1,20 +1,11 @@
 <template>
-	<div
-		class="check-title-info"
-		style="display: flex; align-items: center; justify-content: flex-end; margin-right: 10px"
-	>
-		<span
-			name="belongTo"
-			@click="choose"
-		>
+	<div class="check-title-info">
+		<span @click="choose">
 			<a>{{ belongToName }}</a>
 		</span>
 		的
-		<span
-			name="infoDate"
-			@click="chooseDate"
-		>
-			<a> {{ infoDateName }}</a>
+		<span @click="chooseDate">
+			<a>{{ infoDateName }}</a>
 		</span>
 		账单
 	</div>
@@ -62,71 +53,55 @@ import type { Info } from '@/views/common/pop/selectPop.vue';
 import { getListName } from '@/views/common/config';
 import { useUserStore } from '@/store/modules/user/user';
 import { getUserManagerList } from '@/api/user/userManager';
+import { datePickerFormatter } from '@/utils/dayjs';
+import type { DatePickerInfo } from '@/utils/common';
+import type { UserManagerData } from '@/api/user/userManager';
 import { useNavBar } from '@/composables/useNavBar';
 
 const route = useRoute();
 
-// 使用新的NavBar系统
+// 导航栏配置
 useNavBar({
 	title: (route?.meta?.title as string) || '财务分析',
 	leftPath: '/',
 	visible: true,
 });
 
+// 常量定义
+const DATE_FORMATTER = 'YYYY年MM月';
+const DATE_FORMAT_YYYYMM = 'YYYY-MM';
+const ALL_USER_OPTION = { id: '0', nickName: '所有人' };
+
+// 响应式数据
 const userInfo = useUserStore()?.getUserInfo;
-const dateFormatter = 'YYYY年MM月';
-const YYYYMM = 'YYYY-MM';
-
 const belongTo = ref<number | null>(userInfo?.id ? Number(userInfo.id) : null);
-
 const activeTab = ref<number>(2);
+const infoDateName = ref<string>(dayjs().format(DATE_FORMATTER));
+const belongToName = ref<string>();
 
-const props = reactive<any>({
+// Props 接口定义
+interface FinanceAnalysisProps {
+	activeTab: number;
+	dateStr: string;
+	belongTo: number | null;
+}
+
+const props = reactive<FinanceAnalysisProps>({
 	activeTab: activeTab.value,
-	dateStr: dayjs().format(YYYYMM),
+	dateStr: dayjs().format(DATE_FORMAT_YYYYMM),
 	belongTo: belongTo.value,
 });
 
-const changeTab = (name: number) => {
-	props.activeTab = name;
-	activeTab.value = name;
-};
-
-const infoDateName = ref<string>(dayjs().format(dateFormatter));
-
-const chooseDate = () => {
-	chooseDateInfo.value.showFlag = true;
-};
-
-const chooseDateInfo = ref<any>({
+const chooseDateInfo = ref<DatePickerInfo<Dayjs>>({
 	label: 'infoDate',
 	labelName: '月份选择',
 	selectValue: dayjs(),
 	showFlag: false,
 	columnsType: ['year', 'month'],
-	formatter: (type: string, option: any) => {
-		if (type === 'year') {
-			option.text += '年';
-		}
-		if (type === 'month') {
-			option.text += '月';
-		}
-		return option;
-	},
+	formatter: datePickerFormatter,
 });
 
-const selectDateInfo = (dateInfo: Dayjs, dateName: string) => {
-	chooseDateInfo.value.showFlag = false;
-	props.dateStr = dayjs(dateInfo).format(YYYYMM);
-	infoDateName.value = dateName;
-	chooseDateInfo.value.selectValue = dateInfo;
-};
-
-const cancelDateInfo = () => {
-	chooseDateInfo.value.showFlag = false;
-};
-
-const belongToName = ref<string>();
+// 用户选择器信息
 const popInfo = ref<Info>({
 	showFlag: false,
 	label: 'belongTo',
@@ -135,18 +110,44 @@ const popInfo = ref<Info>({
 		text: 'nickName',
 		value: 'id',
 	},
-	list: [{ id: '0', nickName: '所有人' }],
+	list: [ALL_USER_OPTION],
 	selectValue: [belongTo.value],
 });
 
-const selectInfo = (type: string, value: any, name: string) => {
+// Tab 切换处理
+const changeTab = (name: number) => {
+	props.activeTab = name;
+	activeTab.value = name;
+};
+
+// 日期选择处理
+const chooseDate = () => {
+	chooseDateInfo.value.showFlag = true;
+};
+
+const selectDateInfo = (dateInfo: Dayjs, dateName: string) => {
+	chooseDateInfo.value.showFlag = false;
+	props.dateStr = dayjs(dateInfo).format(DATE_FORMAT_YYYYMM);
+	infoDateName.value = dateName;
+	chooseDateInfo.value.selectValue = dateInfo;
+};
+
+const cancelDateInfo = () => {
+	chooseDateInfo.value.showFlag = false;
+};
+
+// 用户选择处理
+const choose = () => {
+	popInfo.value.showFlag = true;
+};
+
+const selectInfo = (type: string, value: string | number | null, name: string) => {
 	popInfo.value.showFlag = false;
-	switch (type) {
-		case 'belongTo':
-			belongTo.value = value || null;
-			belongToName.value = name;
-			props.belongTo = value || null;
-			break;
+	if (type === 'belongTo') {
+		const numValue = value ? Number(value) : null;
+		belongTo.value = numValue;
+		belongToName.value = name;
+		props.belongTo = numValue;
 	}
 };
 
@@ -154,21 +155,22 @@ const cancelInfo = () => {
 	popInfo.value.showFlag = false;
 };
 
-const choose = () => {
-	popInfo.value.showFlag = true;
-};
-
-const getUserInfoListInfo = () => {
-	getUserManagerList({}).then((res: any) => {
-		if (res.code == '200') {
+// 获取用户列表
+const getUserInfoListInfo = async () => {
+	try {
+		const res = await getUserManagerList({});
+		if (res?.code === '200') {
 			popInfo.value.list = [...(popInfo.value?.list || []), ...(res?.data || [])];
-			belongToName.value = getListName(res.data, belongTo.value, 'id', 'nickName');
+			belongToName.value = getListName<UserManagerData>(res.data || [], belongTo.value, 'id', 'nickName');
 		} else {
-			showFailToast(res[2]?.message || '查询失败，请联系管理员!');
+			showFailToast(res?.message || '查询失败，请联系管理员!');
 		}
-	});
+	} catch (error) {
+		showFailToast('查询失败，请联系管理员!');
+	}
 };
 
+// 初始化
 const init = () => {
 	getUserInfoListInfo();
 };
@@ -176,6 +178,13 @@ const init = () => {
 init();
 </script>
 <style lang="less" scoped>
+.check-title-info {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	margin-right: 10px;
+}
+
 .topRow {
 	padding-top: 10px;
 }

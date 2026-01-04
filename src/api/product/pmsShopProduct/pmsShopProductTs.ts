@@ -11,24 +11,26 @@ const PmsShopProductUrl = {
 
 export function getPmsShopProductPage(
 	params: any,
-	pageNo: number | null | undefined,
+	pageNum: number | null | undefined,
 	pageSize: number | null | undefined,
 ): Promise<any> {
-	const url = `${baseService.product + basePmsShopProduct + PmsShopProductUrl.page}?pageNum=${
-		pageNo ? pageNo : 1
-	}&pageSize=${pageSize ? pageSize : 10}`;
-	return postData(url, params);
+	const url = `${baseService.product + basePmsShopProduct + PmsShopProductUrl.page}`;
+	return postData(url, params, {
+		pageNum: pageNum ? pageNum : 1,
+		pageSize: pageSize ? pageSize : 10,
+	});
 }
 
 export function getNewestPmsShopProductPage(
 	params: any,
-	pageNo: number | null | undefined,
+	pageNum: number | null | undefined,
 	pageSize: number | null | undefined,
 ): Promise<any> {
-	const url = `${baseService.product + basePmsShopProduct + PmsShopProductUrl.newestPage}?pageNum=${
-		pageNo ? pageNo : 1
-	}&pageSize=${pageSize ? pageSize : 10}`;
-	return postData(url, params);
+	const url = `${baseService.product + basePmsShopProduct + PmsShopProductUrl.newestPage}`;
+	return postData(url, params, {
+		pageNum: pageNum ? pageNum : 1,
+		pageSize: pageSize ? pageSize : 10,
+	});
 }
 
 export function getPmsShopProductDetail(id: number): Promise<any> {

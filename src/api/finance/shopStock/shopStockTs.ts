@@ -10,13 +10,14 @@ const ShopStockUrl = {
 
 export function getShopStockPage(
 	params: any,
-	pageNo: number | null | undefined,
+	pageNum: number | null | undefined,
 	pageSize: number | null | undefined,
 ): Promise<any> {
-	const url = `${baseService.finance + baseShopStock + ShopStockUrl.page}?pageNum=${
-		pageNo ? pageNo : 1
-	}&pageSize=${pageSize ? pageSize : 10}`;
-	return postData(url, params);
+	const url = `${baseService.finance + baseShopStock + ShopStockUrl.page}`;
+	return postData(url, params, {
+		pageNum: pageNum ? pageNum : 1,
+		pageSize: pageSize ? pageSize : 10,
+	});
 }
 
 export function getShopStockDetail(id: number): Promise<any> {

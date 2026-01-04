@@ -32,3 +32,4 @@ yarn.lock
 stats.html
 components.d.ts
 /src/auto-imports.d.ts
+.editorconfig

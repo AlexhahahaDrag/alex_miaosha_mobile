@@ -63,6 +63,20 @@ const formatAmount = (amount: number | Decimal, digit: number, unit: string) => 
 	);
 };
 
+/**
+ * 日期选择器信息接口定义
+ * @template T - 选择值的类型（通常是 Dayjs）
+ */
+export interface DatePickerInfo<T> {
+	label: string;
+	labelName: string;
+	rule?: unknown;
+	selectValue: T;
+	showFlag: boolean;
+	formatter: (type: string, option: { text: string }) => { text: string };
+	columnsType?: string[];
+}
+
 export default {
 	formatAmount,
 	plus,

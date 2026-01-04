@@ -9,13 +9,14 @@ const PmsSkuInfoUrl = {
 
 export function getPmsSkuInfoPage(
 	params: any,
-	pageNo: number | null | undefined,
+	pageNum: number | null | undefined,
 	pageSize: number | null | undefined,
 ): Promise<any> {
-	const url = `${baseService.product + basePmsSkuInfo + PmsSkuInfoUrl.page}?pageNum=${
-		pageNo ? pageNo : 1
-	}&pageSize=${pageSize ? pageSize : 10}`;
-	return postData(url, params);
+	const url = `${baseService.product + basePmsSkuInfo + PmsSkuInfoUrl.page}`;
+	return postData(url, params, {
+		pageNum: pageNum ? pageNum : 1,
+		pageSize: pageSize ? pageSize : 10,
+	});
 }
 
 export function getPmsSkuInfoDetail(id: number): Promise<any> {

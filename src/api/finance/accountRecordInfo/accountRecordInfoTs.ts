@@ -8,14 +8,15 @@ const AccountRecordInfoUrl = {
 };
 
 export function getAccountRecordInfoPage(
-	params: any,
-	pageNo: number | null | undefined,
+	params: number | null | undefined,
+	pageNum: number | null | undefined,
 	pageSize: number | null | undefined,
 ): Promise<any> {
-	const url = `${baseService.finance + baseAccountRecordInfo + AccountRecordInfoUrl.page}?pageNum=${
-		pageNo ? pageNo : 1
-	}&pageSize=${pageSize ? pageSize : 10}`;
-	return postData(url, params);
+	const url = `${baseService.finance + baseAccountRecordInfo + AccountRecordInfoUrl.page}`;
+	return postData(url, params, {
+		pageNum: pageNum ? pageNum : 1,
+		pageSize: pageSize ? pageSize : 10,
+	});
 }
 
 export function getAccountRecordInfoDetail(id: number): Promise<any> {

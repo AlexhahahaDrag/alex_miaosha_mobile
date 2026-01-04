@@ -1,13 +1,5 @@
 import { type PageInfo } from '@/views/common/config/index';
 
-export interface SearchInfo {
-	couponName?: string;
-	endDate?: string;
-	onlyValidAndNotFullyRedeemed?: boolean;
-	pageNo?: number;
-	pageSize?: number;
-}
-
 export const pagination = ref<PageInfo>({
 	// 数据总数
 	total: 50,

@@ -119,7 +119,7 @@
 import { showSuccessToast, showFailToast } from 'vant';
 import type { SearchInfo, PageInfo } from './config';
 import { pagination } from './config';
-import { getCpnCouponInfoPage, deleteCpnCouponInfo } from '@/api/finance/cpnCouponInfo';
+import { getCpnCouponInfoPage, deleteCpnCouponInfo } from '@/views/cpn-coupon/cpn-coupon-info/api';
 import { useNavBar } from '@/composables/useNavBar';
 
 const router = useRouter();
@@ -141,7 +141,7 @@ useNavBar({
 
 const loading = ref<boolean>(false);
 const dataSource = ref<any[]>([]);
-// AI Agent：默认查询有效的数据
+// 默认查询有效的数据
 const searchInfo = ref<SearchInfo>({
 	onlyValidAndNotFullyRedeemed: true,
 });
@@ -149,7 +149,7 @@ const searchInfo = ref<SearchInfo>({
 const finished = ref<boolean>(false); //加载是否已经没有更多数据
 const isRefresh = ref<boolean>(false); //是否下拉刷新
 
-// AI Agent：获取过期状态颜色
+// 获取过期状态颜色
 const getExpireStatusColor = (status: number | undefined): string => {
 	if (status === undefined) return '#333';
 	switch (status) {
@@ -172,7 +172,7 @@ const onSearch = () => {
 
 const onCancel = () => {
 	searchInfo.value.couponName = '';
-	searchInfo.value.onlyValidAndNotFullyRedeemed = true; // AI Agent：清空后恢复默认查询有效数据
+	searchInfo.value.onlyValidAndNotFullyRedeemed = true; // 清空后恢复默认查询有效数据
 	pagination.value.current = 0;
 	dataSource.value = [];
 	getCpnCouponInfoPage(searchInfo.value, pagination.value);
@@ -211,7 +211,7 @@ const onRefresh = () => {
 };
 
 const beforeClose = (_e: unknown) => {
-	// AI Agent：滑动关闭前的回调
+	// 滑动关闭前的回调
 };
 
 const delCpnCouponInfo = (id: number) => {

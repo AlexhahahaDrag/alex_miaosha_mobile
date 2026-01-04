@@ -1,4 +1,10 @@
+import type { CommonPageResult, ResponseBody } from '../../../types/api';
 import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
+
+export interface UserManagerData {
+	id?: number;
+	nickName?: string;
+}
 
 const baseUserManager = '/api/v1/user';
 
@@ -9,33 +15,34 @@ const userMangerUrl = {
 };
 
 export function getUserManagerPage(
-	params: any,
-	pageNo: number | null | undefined,
+	params: UserManagerData,
+	pageNum: number | null | undefined,
 	pageSize: number | null | undefined,
-): Promise<any> {
-	const url = `${baseService.user + baseUserManager + userMangerUrl.page}?pageNum=${
-		pageNo ? pageNo : 1
-	}&pageSize=${pageSize ? pageSize : 10}`;
-	return postData(url, params);
+): Promise<ResponseBody<CommonPageResult<UserManagerData>>> {
+	const url = `${baseService.user + baseUserManager + userMangerUrl.page}`;
+	return postData(url, params, {
+		pageNum: pageNum ? pageNum : 1,
+		pageSize: pageSize ? pageSize : 10,
+	});
 }
 
-export function getUserManagerDetail(id: number): Promise<any> {
-	return getData(`${baseService.user + baseUserManager + userMangerUrl.url}?id=${id}`);
+export function getUserManagerDetail(id: number): Promise<ResponseBody<UserManagerData>> {
+	return getData(`${baseService.user + baseUserManager + userMangerUrl.url}`, { id });
 }
 
-export function deleteUserManager(ids: string): Promise<any> {
-	return deleteData(`${baseService.user + baseUserManager + userMangerUrl.url}?ids=${ids}`);
+export function deleteUserManager(ids: string): Promise<ResponseBody<boolean>> {
+	return deleteData(`${baseService.user + baseUserManager + userMangerUrl.url}`, { ids });
 }
 
-export function addOrEditUserManager(method: string, params: any): Promise<any> {
-	if ('put' == method) {
-		return putData(baseService.user + baseUserManager + userMangerUrl.url, params);
-	} else {
-		return postData(baseService.user + baseUserManager + userMangerUrl.url, params);
-	}
+export function addUserManager(params: UserManagerData): Promise<ResponseBody<boolean>> {
+	return postData(baseService.user + baseUserManager + userMangerUrl.url, params);
 }
 
-export function getUserManagerList(params: any): Promise<any> {
+export function editUserManager(params: UserManagerData): Promise<ResponseBody<boolean>> {
+	return putData(baseService.user + baseUserManager + userMangerUrl.url, params);
+}
+
+export function getUserManagerList(params: unknown): Promise<ResponseBody<UserManagerData[]>> {
 	const url = baseService.user + baseUserManager + userMangerUrl.list;
 	return postData(url, params);
 }

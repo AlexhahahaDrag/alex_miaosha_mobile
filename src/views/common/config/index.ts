@@ -73,7 +73,7 @@ export interface DictInfo {
 	typeName?: string | undefined;
 }
 
-export const getListName = (list: any[], value: any, code: string, name: string) => {
+export const getListName = <T>(list: T[], value: unknown, code: string, name: string): string => {
 	if (!list?.length) {
 		return '';
 	}

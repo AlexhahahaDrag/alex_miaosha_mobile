@@ -1,24 +1,28 @@
 import type { Params } from '@/types/global';
 import request, { requestFile } from '@/utils/request/request';
 
-export function postData(url: string, params: any): Promise<any> {
-	return request.post<Params, any>(url, params);
+export function postData<T = unknown>(
+	url: string,
+	params: unknown,
+	queryParams?: Record<string, unknown>,
+): Promise<T> {
+	return request.post<Params, T>(url, params, queryParams);
 }
 
-export function putData(url: string, params: any): Promise<any> {
-	return request.put<Params, any>(url, params);
+export function putData<T = unknown>(url: string, params: unknown): Promise<T> {
+	return request.put<Params, T>(url, params);
 }
 
-export function getData(url: string, params?: any): Promise<any> {
-	return request.get<Params, any>(url, params);
+export function getData<T = unknown>(url: string, params?: Record<string, unknown>): Promise<T> {
+	return request.get<Params, T>(url, params);
 }
 
-export function deleteData(url: string): Promise<any> {
-	return request.delete<Params, any>(url);
+export function deleteData<T = unknown>(url: string, params?: Record<string, unknown>): Promise<T> {
+	return request.delete<Params, T>(url, params);
 }
 
-export function postFileData(url: string, params: any): Promise<any> {
-	return requestFile.post<Params, any>(url, params);
+export function postFileData<T = unknown>(url: string, params: unknown): Promise<T> {
+	return requestFile.post<Params, T>(url, params);
 }
 
 export const baseService = {

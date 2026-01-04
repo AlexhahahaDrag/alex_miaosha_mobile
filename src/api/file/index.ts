@@ -15,12 +15,12 @@ const fileUrl = {
 };
 
 export function getFilePage(
-	params: any,
-	pageNo: number | null | undefined,
+	params: number | null | undefined,
+	pageNum: number | null | undefined,
 	pageSize: number | null | undefined,
 ): Promise<any> {
 	const url = `${baseService.file + baseFileManager + fileUrl.page}?pageNum=${
-		pageNo ? pageNo : 1
+		pageNum ? pageNum : 1
 	}&pageSize=${pageSize ? pageSize : 10}`;
 	return postData(url, params);
 }

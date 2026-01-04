@@ -100,12 +100,12 @@
 import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
 import { getListName } from '@/views/common/config';
-import { rulesRef } from '@/views/finance/financeManager/financeManager';
+import { rulesRef } from '@/views/finance/financeManager/config';
 import { getDictList } from '@/api/finance/dict/dictManager';
 import { getUserManagerList } from '@/api/user/userManager';
 import { useUserStore } from '@/store/modules/user/user';
 import type { Info } from '@/views/common/pop/selectPop.vue';
-import { addOrEditFinanceManger, getFinanceMangerDetail } from '@/api/finance/financeManager';
+import { addOrEditFinanceManger, getFinanceMangerDetail } from '@/views/finance/financeManager/api';
 import { useNavBar } from '@/composables/useNavBar';
 
 const route = useRoute();

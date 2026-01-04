@@ -31,7 +31,7 @@
 <script lang="ts" setup>
 import { showNotify } from 'vant';
 import type { barItem } from './common';
-import { getDayExpense, getMonthExpense } from '@/api/finance/financeAnalysis';
+import { getDayExpense, getMonthExpense } from '@/views/finance/financeAnalysis/api';
 
 interface Props {
 	activeTab: number | string;
@@ -40,7 +40,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const dayConfig = ref<barItem>({
+const dayConfig = ref<barItem<number>>({
 	xAxis: [],
 	series: [[]],
 	xTile: '天数',
@@ -53,7 +53,7 @@ const dayConfig = ref<barItem>({
 
 const monthData = ref<any>([]);
 
-const monthConfig = ref<barItem>({
+const monthConfig = ref<barItem<number>>({
 	xAxis: [],
 	series: [[]],
 	xTile: '月份',
@@ -66,52 +66,43 @@ const monthConfig = ref<barItem>({
 
 const dayData = ref<any>([]);
 
-function getDayExpenseInfo(userId: number | string | null, dateStr: string) {
-	getDayExpense(userId, dateStr).then((res: { code: string; data: any[]; message: any }) => {
-		if (res.code == '200') {
-			if (res.data) {
-				const series = [] as any;
-				const xAxis = [] as any;
-				res.data.forEach((item) => {
-					series.push(item.amount);
-					xAxis.push(item.infoDate);
-				});
-				const seriesAll = [] as any[];
-				seriesAll[0] = series;
-				dayConfig.value = {
-					xAxis,
-					series: seriesAll,
-					xTile: '天数',
-					yTitle: ['金钱(元)'],
-					yNameGap: 50,
-					tooltip: {
-						trigger: 'axis',
-						axisPointer: {
-							type: 'shadow',
-						},
-						formatter(param: any) {
-							let tip = '';
-							const unit = '元';
-							const name = '花费';
-							tip += `<p style="margin: 0;text-align: left">${param[0].axisValue}日</p>`;
-							param.forEach((element: { axisValue: any; marker: any; value: any; seriesName: any }) => {
-								tip += `<p style="margin: 0;text-align: left">${element.marker}${name}: ${element.value ? element.value : 0.0}${unit}</p>`;
-							});
-							return tip;
-						},
+const getDayExpenseInfo = async (userId: number | string | null, dateStr: string) => {
+	const { code, data, message } = await getDayExpense(userId, dateStr);
+	if (code == '200') {
+		if (data?.length) {
+			dayConfig.value = {
+				xAxis: data.map((item) => item.infoDate ?? ''),
+				series: [data.map((item) => item.amount ?? 0)],
+				xTile: '天数',
+				yTitle: ['金钱(元)'],
+				yNameGap: 50,
+				tooltip: {
+					trigger: 'axis',
+					axisPointer: {
+						type: 'shadow',
 					},
-					color: '#aa55ff',
-				};
-				dayData.value = seriesAll;
-			}
-		} else {
-			showNotify({
-				type: 'danger',
-				message: (res && res.message) || '查询列表失败！',
-			});
+					formatter(param: any) {
+						let tip = '';
+						const unit = '元';
+						const name = '花费';
+						tip += `<p style="margin: 0;text-align: left">${param[0].axisValue}日</p>`;
+						param.forEach((element: { axisValue: any; marker: any; value: any; seriesName: any }) => {
+							tip += `<p style="margin: 0;text-align: left">${element.marker}${name}: ${element.value ? element.value : 0.0}${unit}</p>`;
+						});
+						return tip;
+					},
+				},
+				color: '#aa55ff',
+			};
+			dayData.value = data.map((item) => item.amount ?? 0);
 		}
-	});
-}
+	} else {
+		showNotify({
+			type: 'danger',
+			message: message || '查询列表失败！',
+		});
+	}
+};
 
 function getMonthExpenseInfo(userId: number | string | null, dateStr: string) {
 	getMonthExpense(userId, dateStr).then((res: { code: string; data: any[]; message: any }) => {

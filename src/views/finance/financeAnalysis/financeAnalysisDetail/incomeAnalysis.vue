@@ -6,7 +6,7 @@
 					title="当月收入分析"
 					height="100%"
 					width="100%"
-					:data="pieIncomeData"
+					:data="pieData.income"
 					:tooltip="tooltip"
 				>
 				</pieChart>
@@ -19,7 +19,7 @@
 					title="当月支出分析"
 					height="100%"
 					width="100%"
-					:data="pieExpenseData"
+					:data="pieData.expense"
 					:tooltip="tooltip"
 				>
 				</pieChart>
@@ -31,10 +31,7 @@
 <script lang="ts" setup>
 import { showNotify } from 'vant';
 import { number } from 'mathjs';
-import type { ItemInfo } from './common';
-import { getIncomeAndExpense } from '@/api/finance/financeAnalysis';
-
-const pieExpenseData = ref<object[]>([]);
+import { getIncomeAndExpense, type BalanceData } from '@/views/finance/financeAnalysis/api';
 
 interface Props {
 	activeTab: number | string;
@@ -42,36 +39,43 @@ interface Props {
 	belongTo?: number | string | null;
 }
 
-const pieIncomeData = ref<object[]>([]);
-
 const props = defineProps<Props>();
 
-const getIncomeAndExpenseInfo = (userId: number | null, dateStr: string) => {
-	getIncomeAndExpense(userId, dateStr).then((res: { code: string; data: any[]; message: any }) => {
-		if (res.code == '200') {
-			if (res.data) {
-				const dd: ItemInfo[] = [];
-				res.data
-					.filter((item) => item.incomeAndExpenses == 'income')
-					.forEach((item: { typeCode: string; amount: any }) => {
-						dd.push({ name: item.typeCode, value: item.amount });
-					});
-				pieIncomeData.value = dd;
-				const expense: ItemInfo[] = [];
-				res.data
-					.filter((item) => item.incomeAndExpenses == 'expense')
-					.forEach((item: { typeCode: string; amount: any }) => {
-						expense.push({ name: item.typeCode, value: item.amount });
-					});
-				pieExpenseData.value = expense;
-			}
-		} else {
-			showNotify({
-				type: 'danger',
-				message: (res && res.message) || '查询列表失败！',
-			});
-		}
-	});
+// 饼图数据接口定义
+interface PieChartData {
+	name: string;
+	value: number;
+}
+
+// 统一管理收入和支出数据
+const pieData = ref<{
+	income: PieChartData[];
+	expense: PieChartData[];
+}>({
+	income: [],
+	expense: [],
+});
+
+// 将数据转换为饼图格式
+const transformToPieData = (data: BalanceData[], type: 'income' | 'expense'): PieChartData[] => {
+	return (
+		data
+			?.filter((item) => item.incomeAndExpenses === type)
+			.map((item) => ({ name: item.typeCode || '', value: item.amount || 0 })) || []
+	);
+};
+
+const getIncomeAndExpenseInfo = async (userId: number | null, dateStr: string) => {
+	const res = await getIncomeAndExpense(userId, dateStr);
+	if (res.code === '200') {
+		const data = res.data || [];
+		pieData.value = {
+			income: transformToPieData(data, 'income'),
+			expense: transformToPieData(data, 'expense'),
+		};
+	} else {
+		showNotify({ type: 'danger', message: res.message || '查询列表失败！' });
+	}
 };
 
 const tooltip = ref({

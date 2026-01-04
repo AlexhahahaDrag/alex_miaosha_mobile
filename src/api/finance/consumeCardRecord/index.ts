@@ -42,18 +42,19 @@ export interface TransactionQueryParams {
 /**
  * 获取消费卡交易记录表分页
  * @param params 查询参数
- * @param pageNo 页码
+ * @param pageNum 页码
  * @param pageSize 每页大小
  */
 export function getConsumeCardRecordPage(
 	params: TransactionQueryParams,
-	pageNo: number | null | undefined,
+	pageNum: number | null | undefined,
 	pageSize: number | null | undefined,
 ): Promise<any> {
-	const url = `${baseService.finance + baseConsumeCardRecord + ConsumeCardRecordUrl.page}?pageNum=${
-		pageNo ? pageNo : 1
-	}&pageSize=${pageSize ? pageSize : 10}`;
-	return postData(url, params);
+	const url = `${baseService.finance + baseConsumeCardRecord + ConsumeCardRecordUrl.page}`;
+	return postData(url, params, {
+		pageNum: pageNum ? pageNum : 1,
+		pageSize: pageSize ? pageSize : 10,
+	});
 }
 
 /**
