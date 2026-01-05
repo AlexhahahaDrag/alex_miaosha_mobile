@@ -2,27 +2,27 @@
 	<van-row gutter="20">
 		<div class="mainGrid">
 			<div class="div2">
-				<pieChart
+				<pie-chart
 					title="当月收入分析"
 					height="100%"
 					width="100%"
 					:data="pieData.income"
 					:tooltip="tooltip"
 				>
-				</pieChart>
+				</pie-chart>
 			</div>
 		</div>
 		<van-divider />
 		<div class="mainGrid">
 			<div class="div2">
-				<pieChart
+				<pie-chart
 					title="当月支出分析"
 					height="100%"
 					width="100%"
 					:data="pieData.expense"
 					:tooltip="tooltip"
 				>
-				</pieChart>
+				</pie-chart>
 			</div>
 		</div>
 	</van-row>
@@ -30,13 +30,13 @@
 
 <script lang="ts" setup>
 import { showNotify } from 'vant';
-import { number } from 'mathjs';
-import { getIncomeAndExpense, type BalanceData } from '@/views/finance/financeAnalysis/api';
+import type { FinanceDetail } from './common';
+import { getIncomeAndExpense } from '@/views/finance/financeAnalysis/api';
 
 interface Props {
 	activeTab: number | string;
 	dateStr: string;
-	belongTo?: number | string | null;
+	belongTo?: string | null;
 }
 
 const props = defineProps<Props>();
@@ -57,7 +57,7 @@ const pieData = ref<{
 });
 
 // 将数据转换为饼图格式
-const transformToPieData = (data: BalanceData[], type: 'income' | 'expense'): PieChartData[] => {
+const transformToPieData = (data: FinanceDetail[], type: 'income' | 'expense'): PieChartData[] => {
 	return (
 		data
 			?.filter((item) => item.incomeAndExpenses === type)
@@ -65,16 +65,15 @@ const transformToPieData = (data: BalanceData[], type: 'income' | 'expense'): Pi
 	);
 };
 
-const getIncomeAndExpenseInfo = async (userId: number | null, dateStr: string) => {
-	const res = await getIncomeAndExpense(userId, dateStr);
-	if (res.code === '200') {
-		const data = res.data || [];
+const getIncomeAndExpenseInfo = async (userId: string | null, dateStr: string) => {
+	const { code, data, message } = await getIncomeAndExpense(userId, dateStr);
+	if (code === '200') {
 		pieData.value = {
-			income: transformToPieData(data, 'income'),
-			expense: transformToPieData(data, 'expense'),
+			income: transformToPieData(data || [], 'income'),
+			expense: transformToPieData(data || [], 'expense'),
 		};
 	} else {
-		showNotify({ type: 'danger', message: res.message || '查询列表失败！' });
+		showNotify({ type: 'danger', message: message || '查询列表失败！' });
 	}
 };
 
@@ -83,7 +82,7 @@ const tooltip = ref({
 	formatter: '{b} : {c}元({d}%)',
 });
 
-const init = (dateStr: string, belongTo: number | null) => {
+const init = (dateStr: string, belongTo: string | null) => {
 	getIncomeAndExpenseInfo(belongTo, dateStr);
 };
 
@@ -91,7 +90,7 @@ watch(
 	() => [props.activeTab, props.dateStr, props.belongTo],
 	() => {
 		if (props.activeTab === '2' && props.dateStr) {
-			init(props.dateStr, props.belongTo ? number(props.belongTo) : null);
+			init(props.dateStr, props.belongTo ?? '');
 		}
 	},
 	{ immediate: true },

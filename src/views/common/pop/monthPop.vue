@@ -9,7 +9,7 @@
 			v-model="curSelectValue"
 			:title="info.labelName"
 			:formatter="info.formatter"
-			:columns-type="info.columnsType as any"
+			:columns-type="info.columnsType || ['year', 'month']"
 			@confirm="onConfirm"
 			@cancel="onCancel"
 		/>

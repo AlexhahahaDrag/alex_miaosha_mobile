@@ -42,7 +42,7 @@ export const pagination = ref<PageInfo>({
 });
 
 export interface FinanceManagerData {
-	id?: number;
+	id?: string;
 	name?: string;
 	typeCode?: string;
 	typeName?: string;

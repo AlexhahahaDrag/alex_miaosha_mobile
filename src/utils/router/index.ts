@@ -10,7 +10,7 @@ import type { Router } from 'vue-router';
 export const getRoutePathByName = (
 	router: Router,
 	routeName: string | symbol,
-	fallbackPath: string,
+	fallbackPath?: string,
 ): string => {
 	try {
 		const resolved = router.resolve({ name: routeName });
@@ -21,5 +21,5 @@ export const getRoutePathByName = (
 		// 路由名称不存在时忽略错误
 	}
 	// 回退到默认路径
-	return fallbackPath;
+	return fallbackPath || '';
 };

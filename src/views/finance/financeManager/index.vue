@@ -23,10 +23,12 @@
 				v-if="!dataSource?.length"
 				description="暂无数据"
 			/>
+			<!-- 有数据时显示列表 -->
 			<van-list
 				v-else
 				v-model:loading="loading"
 				:finished="finished"
+				:immediate-check="false"
 				finished-text="没有更多了"
 				@load="onLoadMore"
 			>
@@ -98,7 +100,7 @@ const route = useRoute();
 
 // 通过路由解析获取详情页路径，使用公共工具方法
 const getDetailRoutePath = () => {
-	return getRoutePathByName(router, 'financeManagerDetail', '/selfFinance/financeManager/financeManagerDetail');
+	return getRoutePathByName(router, 'financeManagerDetail');
 };
 
 // 获取详情页路由配置
@@ -135,8 +137,7 @@ const getTitleClass = (isValid?: string) => {
 };
 
 const getCellTitle = (item: FinanceManagerData) => {
-	const userName = item.belongToName || '未知用户';
-	return `${userName}的${item.name || ''}(${item.typeCode || ''})`;
+	return `${item.belongToName || '未知用户'}的${item.name || ''}(${item.typeCode || ''})`;
 };
 
 const shouldShowIcon = (fromSource?: string, value?: string) => {
@@ -169,24 +170,25 @@ const formatAmount = (item: FinanceManagerData) => {
 // 统一重置数据函数
 const resetData = () => {
 	dataSource.value = [];
-	pagination.value.current = 0;
+	pagination.value.current = 1;
+	pagination.value.pageSize = 10;
 };
 
 // 获取财务数据
 const getFinancePage = async (param: FinanceManagerData, cur: PageInfo) => {
 	loading.value = true;
-	const { code, data, message } = await getFinanceMangerPage(param, cur?.current || 1, cur?.pageSize || 10).finally(
-		() => {
+	const { code, data, message } = await getFinanceMangerPage(param, cur?.current || 1, cur?.pageSize || 10)
+		.catch((error: unknown) => {
+			throw error;
+		})
+		.finally(() => {
 			loading.value = false;
 			isRefresh.value = false;
-		},
-	);
+		});
 	if (code === '200') {
 		dataSource.value = [...dataSource.value, ...(data?.records || [])];
 		pagination.value.total = data?.total || 0;
-		pagination.value.current = (pagination.value.current || 0) + 1;
-		pagination.value.pageSize = pagination.value.pageSize || 10;
-		finished.value = pagination.value.total < pagination.value.current * pagination.value.pageSize;
+		finished.value = pagination.value.total < ((pagination.value.current || 0) + 1) * (pagination.value.pageSize || 10);
 	} else {
 		showFailToast(message || '查询列表失败！');
 	}
@@ -214,14 +216,12 @@ const onRefreshData = () => {
 
 // 加载更多
 const onLoadMore = () => {
-	if (!finished.value) {
-		pagination.value.current = (pagination.value.current || 0) + 1;
-		getFinancePage(searchInfo.value, pagination.value);
-	}
+	pagination.value.current = (pagination.value.current || 0) + 1;
+	getFinancePage(searchInfo.value, pagination.value);
 };
 
 // 删除财务记录
-const onDeleteFinance = async (id?: number) => {
+const onDeleteFinance = async (id?: string) => {
 	if (!id) {
 		return;
 	}
@@ -235,12 +235,10 @@ const onDeleteFinance = async (id?: number) => {
 };
 
 // 初始化
-const init = () => {
+onMounted(() => {
 	resetData();
 	getFinancePage(searchInfo.value, pagination.value);
-};
-
-init();
+});
 </script>
 
 <style lang="less" scoped>
@@ -251,6 +249,14 @@ init();
 .list-container {
 	height: 100%;
 	overflow-y: auto;
+}
+
+.loading-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 30%;
+	min-height: 200px;
 }
 
 .divider-style {

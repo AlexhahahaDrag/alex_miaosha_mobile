@@ -34,16 +34,16 @@
 			<incomeDetail v-bind="props"></incomeDetail>
 		</van-tab>
 	</van-tabs>
-	<monthPop
+	<date-pop
 		:info="chooseDateInfo"
 		@select-info="selectDateInfo"
 		@cancel-info="cancelDateInfo"
-	></monthPop>
-	<selectPop
+	></date-pop>
+	<select-pop
 		:info="popInfo"
 		@select-info="selectInfo"
 		@cancel-info="cancelInfo"
-	></selectPop>
+	></select-pop>
 </template>
 
 <script lang="ts" setup>
@@ -74,7 +74,7 @@ const ALL_USER_OPTION = { id: '0', nickName: '所有人' };
 
 // 响应式数据
 const userInfo = useUserStore()?.getUserInfo;
-const belongTo = ref<number | null>(userInfo?.id ? Number(userInfo.id) : null);
+const belongTo = ref<string | null>(userInfo?.id ? userInfo.id.toString() : null);
 const activeTab = ref<number>(2);
 const infoDateName = ref<string>(dayjs().format(DATE_FORMATTER));
 const belongToName = ref<string>();
@@ -83,7 +83,7 @@ const belongToName = ref<string>();
 interface FinanceAnalysisProps {
 	activeTab: number;
 	dateStr: string;
-	belongTo: number | null;
+	belongTo: string | null;
 }
 
 const props = reactive<FinanceAnalysisProps>({
@@ -141,13 +141,12 @@ const choose = () => {
 	popInfo.value.showFlag = true;
 };
 
-const selectInfo = (type: string, value: string | number | null, name: string) => {
+const selectInfo = (type: string, value: string | null, name: string) => {
 	popInfo.value.showFlag = false;
 	if (type === 'belongTo') {
-		const numValue = value ? Number(value) : null;
-		belongTo.value = numValue;
+		belongTo.value = value;
 		belongToName.value = name;
-		props.belongTo = numValue;
+		props.belongTo = value;
 	}
 };
 
@@ -158,12 +157,12 @@ const cancelInfo = () => {
 // 获取用户列表
 const getUserInfoListInfo = async () => {
 	try {
-		const res = await getUserManagerList({});
-		if (res?.code === '200') {
-			popInfo.value.list = [...(popInfo.value?.list || []), ...(res?.data || [])];
-			belongToName.value = getListName<UserManagerData>(res.data || [], belongTo.value, 'id', 'nickName');
+		const { code, data, message } = await getUserManagerList({});
+		if (code === '200') {
+			popInfo.value.list = [...(popInfo.value?.list || []), ...(data || [])];
+			belongToName.value = getListName<UserManagerData>(data || [], belongTo.value || 0, 'id', 'nickName');
 		} else {
-			showFailToast(res?.message || '查询失败，请联系管理员!');
+			showFailToast(message || '查询失败，请联系管理员!');
 		}
 	} catch (error) {
 		showFailToast('查询失败，请联系管理员!');

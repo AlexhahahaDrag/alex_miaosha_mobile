@@ -26,6 +26,14 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
 	const env = loadEnv(mode, process.cwd(), 'VITE_');
 
 	return {
+		optimizeDeps: {
+			esbuildOptions: {
+				// 抑制 Node.js 弃用警告
+				define: {
+					global: 'globalThis',
+				},
+			},
+		},
 		plugins: [
 			vue(),
 			AutoImport({
@@ -39,6 +47,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
 			Components({
 				resolvers: [VantResolver()],
 				dirs: ['src/views'],
+				dts: true, // 生成类型定义文件，默认生成在根目录的 components.d.ts
 			}),
 			createSvgIconsPlugin({
 				iconDirs: [

@@ -21,7 +21,7 @@ export function getFinanceMangerPage(
 	});
 }
 
-export function getFinanceMangerDetail(id: number): Promise<ResponseBody<FinanceManagerData>> {
+export function getFinanceMangerDetail(id: string): Promise<ResponseBody<FinanceManagerData>> {
 	return getData(`${baseService.finance + baseFinanceManager + financeMangerUrl.url}`, { id });
 }
 

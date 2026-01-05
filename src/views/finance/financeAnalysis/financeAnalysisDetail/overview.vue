@@ -17,27 +17,27 @@
 <script lang="ts" setup>
 import { showNotify } from 'vant';
 import * as math from 'mathjs';
-import type { BalanceData } from '@/views/finance/financeAnalysis/api';
-import { getIncomeAndExpense } from '@/views/finance/financeAnalysis/api';
+import type { FinanceDetail } from './common';
+import { getBalance } from '@/views/finance/financeAnalysis/api';
 
 interface Props {
 	activeTab: number | string;
 	dateStr: string;
-	belongTo?: number | string | null;
+	belongTo?: string | null;
 }
 
 const props = defineProps<Props>();
 
-const balanceList = ref<BalanceData[]>([]);
+const balanceList = ref<FinanceDetail[]>([]);
 const sum = ref<math.BigNumber>();
 
 const getBalanceInfo = async (userId: number | string | null, dateStr: string) => {
-	const { code, data, message } = await getIncomeAndExpense(userId, dateStr);
+	const { code, data, message } = await getBalance(userId, dateStr);
 	if (code == '200') {
 		balanceList.value = data ?? [];
 		// 使用 reduce 简化金额累加逻辑
 		sum.value = (data || []).reduce(
-			(acc: math.BigNumber, item: BalanceData) => math.add(acc, math.bignumber(item.amount ?? 0)),
+			(acc: math.BigNumber, item: FinanceDetail) => math.add(acc, math.bignumber(item.amount ?? 0)),
 			math.bignumber(0),
 		);
 	} else {

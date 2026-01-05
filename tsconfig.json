@@ -42,6 +42,7 @@
 		"mock/**/*.ts",
 		"eslint.config.mjs",
 		"env.d.ts",
+		"components.d.ts",
 		"src/main.ts"
 	],
 	"references": [

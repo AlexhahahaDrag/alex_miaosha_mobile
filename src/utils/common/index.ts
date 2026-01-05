@@ -1,4 +1,5 @@
 import { Decimal } from 'decimal.js';
+import type { DatePickerColumnType } from 'vant/lib/date-picker/DatePicker';
 
 // 加
 const plus = (x: number | string, y: number | string) => {
@@ -74,7 +75,7 @@ export interface DatePickerInfo<T> {
 	selectValue: T;
 	showFlag: boolean;
 	formatter: (type: string, option: { text: string }) => { text: string };
-	columnsType?: string[];
+	columnsType?: DatePickerColumnType[];
 }
 
 export default {

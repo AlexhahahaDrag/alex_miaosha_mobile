@@ -9,7 +9,7 @@
 			v-model="curSelectValue"
 			:title="info.labelName"
 			:formatter="info.formatter"
-			:columns-type="info.columnsType as any"
+			:columns-type="info.columnsType || ['year', 'month', 'day']"
 			@confirm="onConfirm"
 			@cancel="onCancel"
 		/>
@@ -35,22 +35,13 @@ const curSelectValue = ref<string[]>([]);
  */
 const onConfirm = ({ selectedValues }: { selectedValues: string[] }) => {
 	showFlag.value = false;
-	// 根据选择的列数构造日期字符串
-	let dateName = '';
-	if (selectedValues.length > 3) {
-		dateName = `${selectedValues[0]}-${selectedValues[1]}-${selectedValues[2]}`;
-		if (selectedValues.length >= 5) {
-			dateName += ` ${selectedValues[3]}:${selectedValues[4]}`;
-			if (selectedValues.length >= 6) {
-				dateName += `:${selectedValues[5]}`;
-			}
-		}
+	let dateStr = '';
+	if (selectedValues?.length) {
+		dateStr = selectedValues.join('-');
 	} else {
-		dateName = selectedValues.join('-');
+		dateStr = '';
 	}
-
-	const date = dayjs(dateName);
-	emit('select-date-info', date, dateName, props.info.label);
+	emit('select-date-info', dayjs(dateStr), dateStr, props.info.label);
 };
 
 /**
@@ -77,7 +68,7 @@ watch(
 		showFlag.value = !!newVal;
 		if (newVal && props.info.selectValue) {
 			const date = dayjs(props.info.selectValue);
-			const columnsType = props.info.columnsType || ['year', 'month', 'day'];
+			const columnsType = (props.info.columnsType || ['year', 'month', 'day']) as string[];
 			const values: string[] = [];
 
 			// 根据 columnsType 初始化选中的值

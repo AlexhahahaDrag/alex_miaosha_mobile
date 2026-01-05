@@ -25,11 +25,12 @@
 			<ShopStockAnalysisDetail v-bind="props"></ShopStockAnalysisDetail>
 		</van-tab>
 	</van-tabs>
-	<monthPop
+	<date-pop
 		:info="chooseDateInfo"
 		@select-info="selectDateInfo"
 		@cancel-info="cancelDateInfo"
-	></monthPop>
+	>
+	</date-pop>
 </template>
 
 <script lang="ts" setup>

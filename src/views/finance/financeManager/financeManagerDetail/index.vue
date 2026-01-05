@@ -70,15 +70,21 @@ import type { DictInfo } from '@/api/finance/dict/dictManager';
 import type { UserManagerData } from '@/api/user/userManager';
 import { addFinanceManger, editFinanceManger, getFinanceMangerDetail } from '@/views/finance/financeManager/api';
 import { useNavBar } from '@/composables/useNavBar';
+import { getRoutePathByName } from '@/utils/router';
 
 const route = useRoute();
 const router = useRouter();
 const userInfo = useUserStore()?.getUserInfo;
 
+// 获取左侧路径
+const getLeftPath = computed(() => {
+	return getRoutePathByName(router, 'financeManager');
+});
+
 // 使用新的NavBar系统
 useNavBar({
 	title: (route?.meta?.title as string) || '财务明细',
-	leftPath: '/selfFinance/financeManager',
+	leftPath: getLeftPath.value,
 	visible: true,
 });
 
@@ -137,7 +143,7 @@ const dictFieldConfig = [
 		belongTo: 'is_valid',
 		formKey: 'isValid' as keyof FinanceManagerData,
 	},
-] as const;
+];
 
 // 动态创建字典信息 ref
 const dictInfoMap = dictFieldConfig.reduce(
@@ -237,7 +243,7 @@ const onSubmit = async () => {
 	const { code, message } = await api(formInfo.value);
 	if (code == '200') {
 		showSuccessToast(message || '保存成功!');
-		router.push({ path: '/selfFinance/financeManager' });
+		router.push({ path: getLeftPath.value });
 	} else {
 		showFailToast(message || '保存失败，请联系管理员!');
 	}
@@ -278,11 +284,10 @@ const init = async () => {
 	const id: string = route?.query?.id as string;
 	// 统一获取用户和字典数据，无论是否有 id
 	const [detailRes, userRes, dictRes] = await Promise.all([
-		id ? getFinanceMangerDetail(Number(id) || -1) : Promise.resolve({ code: '200', data: {} }),
+		id ? getFinanceMangerDetail(id || '0') : Promise.resolve({ code: '200', data: {} }),
 		getUserManagerList({}),
 		getDictList('pay_way,income_expense_type,is_valid'),
 	]);
-
 	if (id) {
 		if (detailRes.code == '200') {
 			formInfo.value = detailRes?.data || {};
