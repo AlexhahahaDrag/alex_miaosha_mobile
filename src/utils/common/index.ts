@@ -54,13 +54,13 @@ const divide = (x: number | string, y: number | string) => {
 };
 
 const formatAmount = (amount: number | Decimal, digit: number, unit: string) => {
-	if (amount == null || amount == undefined) {
+	if (amount == null) {
 		return '--';
 	}
 	return (
 		String(amount.toFixed(digit))
 			.replace(/(?<!\.\d*)\B(?=(\d{3})+(?!\d)) /g, ',')
-			.replace(/^(\-)*(\d+)\.(\d\d).*$/, '$1$2.$3') + unit
+			.replace(/^(-)*(\d+)\.(\d\d).*$/, '$1$2.$3') + unit
 	);
 };
 

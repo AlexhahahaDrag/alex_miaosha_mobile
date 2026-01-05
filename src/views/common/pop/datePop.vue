@@ -35,7 +35,7 @@ const curSelectValue = ref<string[]>([]);
  */
 const onConfirm = ({ selectedValues }: { selectedValues: string[] }) => {
 	showFlag.value = false;
-	let dateStr = '';
+	let dateStr: string;
 	if (selectedValues?.length) {
 		dateStr = selectedValues.join('-');
 	} else {

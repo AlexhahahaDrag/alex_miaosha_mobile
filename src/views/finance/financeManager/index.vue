@@ -93,7 +93,7 @@ import { pagination, fromSourceTransferList, type FinanceManagerData } from './c
 import { getRoutePathByName } from '@/utils/router';
 import { getFinanceMangerPage, deleteFinanceManager } from '@/views/finance/financeManager/api';
 import { useNavBar } from '@/composables/useNavBar';
-import type { PageInfo } from '@/views/common/config/index';
+import type { PageInfo } from '@/views/common/config';
 
 const router = useRouter();
 const route = useRoute();

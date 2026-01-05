@@ -1,5 +1,5 @@
 import type { Dayjs } from 'dayjs';
-import { type PageInfo } from '@/views/common/config/index';
+import { type PageInfo } from '@/views/common/config';
 
 export interface SearchInfo {
 	name?: string;
