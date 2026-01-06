@@ -5,83 +5,38 @@
 		required="auto"
 	>
 		<van-cell-group inset>
-			<van-field
-				v-model="formInfo.name"
-				name="name"
-				:label="label.name + '：'"
-				:placeholder="'请输入' + label.name"
-				:rules="rulesRef.name"
-			/>
-			<van-field
-				v-model="formInfo.typeCode"
-				name="typeCode"
-				:label="label.typeCode + '：'"
-				:placeholder="'请输入' + label.typeCode"
-				:rules="rulesRef.typeCode"
-			/>
-			<van-field
-				v-model="formInfo.amount"
-				type="number"
-				name="amount"
-				:label="label.amount + '：'"
-				:placeholder="'请输入' + label.amount"
-				:rules="rulesRef.amount"
-			/>
-			<van-field
-				v-model="fromSourceName"
-				name="fromSource"
-				:label="label.fromSource + '：'"
-				:placeholder="'请输入' + label.fromSource"
-				:rules="rulesRef.fromSource"
-				@click="choose('fromSource')"
-				readonly
-			/>
-			<van-field
-				v-model="incomeAndExpensesName"
-				name="incomeAndExpenses"
-				:label="label.incomeAndExpenses + '：'"
-				:placeholder="'请输入' + label.incomeAndExpenses"
-				:rules="rulesRef.incomeAndExpenses"
-				@click="choose('incomeAndExpenses')"
-				readonly
-			/>
-			<van-field
-				v-model="isValidName"
-				name="isValid"
-				:label="label.isValid + '：'"
-				:placeholder="'请输入' + label.isValid"
-				:rules="rulesRef.isValid"
-				@click="choose('isValid')"
-				readonly
-			/>
-			<van-field
-				v-model="infoDateName"
-				name="infoDate"
-				:label="label.infoDate + '：'"
-				:placeholder="'请输入' + label.infoDate"
-				:rules="rulesRef.infoDate"
-				@click="chooseDate"
-				readonly
-			/>
-			<van-field
-				v-model="belongToName"
-				name="belongTo"
-				:label="label.belongTo + '：'"
-				:placeholder="'请输入' + label.belongTo"
-				:rules="rulesRef.belongTo"
-				@click="choose('belongTo')"
-				readonly
-			/>
-			<selectPop
-				:info="popInfo"
-				@select-info="selectInfo"
-				@cancel-info="cancelInfo"
-			></selectPop>
+			<template
+				v-for="field in formFields"
+				:key="field.name"
+			>
+				<van-field
+					v-if="field.type === 'input'"
+					v-model="formInfo[field.name]"
+					:name="field.name"
+					:label="field.label + '：'"
+					:placeholder="'请输入' + field.label"
+					:rules="rulesRef[field.name]"
+					:type="field.inputType || 'text'"
+				/>
+				<van-field
+					v-else
+					v-model="nameRefMap[field.name as keyof typeof nameRefMap].value"
+					:name="field.name"
+					:label="field.label + '：'"
+					:placeholder="'请选择' + field.label"
+					:rules="rulesRef[field.name]"
+					@click="field.type === 'date' ? chooseDate(field.name) : choose(field.name)"
+					readonly
+				/>
+			</template>
 			<datePop
-				:info="chooseDateInfo"
-				@select-date-info="selectDateInfo"
-				@cancel-date-info="cancelDateInfo"
-			></datePop>
+				v-for="(dateInfo, key) in dateInfoMap"
+				:key="key"
+				:info="dateInfo.value"
+				@select-date-info="(date: Dayjs, dateName: string) => selectDateInfo(key, date, dateName)"
+				@cancel-date-info="() => cancelDateInfo(key)"
+			>
+			</datePop>
 		</van-cell-group>
 		<div style="margin: 16px">
 			<van-button
@@ -99,268 +54,176 @@
 <script setup lang="ts">
 import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
-import { getListName } from '@/views/common/config';
-import { rulesRef } from '@/views/finance/financeManager/config';
-import { getDictList } from '@/api/finance/dict/dictManager';
-import { getUserManagerList } from '@/api/user/userManager';
-import { useUserStore } from '@/store/modules/user/user';
-import type { Info } from '@/views/common/pop/selectPop.vue';
-import { addFinanceManger, editFinanceManger, getFinanceMangerDetail } from '@/views/finance/financeManager/api';
+import { rulesRef, type CpnCouponInfoData } from '@/views/cpn-coupon/cpn-coupon-info/config';
+import { datePickerFormatter } from '@/utils/dayjs';
+import type { DatePickerInfo } from '@/utils/common';
+import { addCpnCouponInfo, editCpnCouponInfo, getCpnCouponInfoDetail } from '@/views/cpn-coupon/cpn-coupon-info/api';
 import { useNavBar } from '@/composables/useNavBar';
+import { getRoutePathByName } from '@/utils/router';
 
 const route = useRoute();
 const router = useRouter();
-const userInfo = useUserStore()?.getUserInfo;
+
+// 获取左侧路径
+const getLeftPath = computed(() => {
+	return getRoutePathByName(router, 'cpnCouponInfo');
+});
 
 // 使用新的NavBar系统
 useNavBar({
-	title: (route?.meta?.title as string) || '财务明细',
-	leftPath: '/selfFinance/financeManager',
+	title: (route?.meta?.title as string) || '消费券明细',
+	leftPath: getLeftPath.value,
 	visible: true,
 });
 
-const formInfo = ref<any>({});
+const formInfo = ref<CpnCouponInfoData>({});
 
 const label = reactive({
-	name: '名称',
-	amount: '金额',
-	typeCode: '类别',
-	fromSource: '支付方式',
-	incomeAndExpenses: '收支类型',
-	isValid: '状态',
-	infoDate: '业务时间',
-	belongTo: '属于',
+	couponName: '消费券名称',
+	totalQuantity: '总数量',
+	unitValue: '面值',
+	minSpend: '最低消费',
+	startDate: '开始日期',
+	endDate: '结束日期',
 });
 
-const popInfo = ref<Info>({ showFlag: false });
+// 表单字段配置，用于循环渲染
+const formFields: {
+	name: string;
+	label: string;
+	type: 'input' | 'date';
+	inputType?: 'text' | 'number' | 'tel' | 'digit' | 'password';
+}[] = [
+	{ name: 'couponName', label: label.couponName, type: 'input' },
+	{ name: 'totalQuantity', label: label.totalQuantity, type: 'input', inputType: 'number' },
+	{ name: 'unitValue', label: label.unitValue, type: 'input', inputType: 'number' },
+	{ name: 'startDate', label: label.startDate, type: 'date' },
+	{ name: 'endDate', label: label.endDate, type: 'date' },
+];
 
-const fromSourceInfo = ref<Info>({
-	label: 'fromSource',
-	labelName: '支付方式',
-	rule: rulesRef.fromSource,
-	customFieldName: {
-		text: 'typeName',
-		value: 'typeCode',
-	},
-	selectValue: formInfo.value.fromSource,
-});
-
-const incomeAndExpensesInfo = ref<Info>({
-	label: 'incomeAndExpenses',
-	labelName: '收支类型',
-	rule: rulesRef.incomeAndExpenses,
-	customFieldName: {
-		text: 'typeName',
-		value: 'typeCode',
-	},
-	selectValue: formInfo.value.incomeAndExpenses,
-});
-
-const isValidInfo = ref<Info>({
-	label: 'isValid',
-	labelName: '状态',
-	rule: rulesRef.isValid,
-	customFieldName: {
-		text: 'typeName',
-		value: 'typeCode',
-	},
-	selectValue: formInfo.value.isValid,
-});
-
-const belongToInfo = ref<Info>({
-	label: 'belongTo',
-	labelName: '属于',
-	rule: rulesRef.belongTo,
-	customFieldName: {
-		text: 'nickName',
-		value: 'id',
-	},
-	selectValue: formInfo.value.belongTo,
-});
-
-const infoDateName = ref<string>('');
-
-const choose = (type: string) => {
-	switch (type) {
-		case 'fromSource':
-			popInfo.value = fromSourceInfo.value;
-			break;
-		case 'incomeAndExpenses':
-			popInfo.value = incomeAndExpensesInfo.value;
-			break;
-		case 'isValid':
-			popInfo.value = isValidInfo.value;
-			break;
-		case 'belongTo':
-			popInfo.value = belongToInfo.value;
-			break;
-	}
-	popInfo.value.showFlag = true;
+// 创建名称 ref 映射，统一管理所有字段的显示名称
+const nameRefMap = {
+	startDate: ref<string>(''),
+	endDate: ref<string>(''),
 };
 
-const selectInfo = (type: string, value: any, name: string) => {
-	popInfo.value.showFlag = false;
-	switch (type) {
-		case 'fromSource':
-			formInfo.value.fromSource = value;
-			fromSourceName.value = name;
-			break;
-		case 'incomeAndExpenses':
-			formInfo.value.incomeAndExpenses = value;
-			incomeAndExpensesName.value = name;
-			break;
-		case 'isValid':
-			formInfo.value.isValid = value;
-			isValidName.value = name;
-			break;
-		case 'belongTo':
-			formInfo.value.belongTo = value;
-			belongToName.value = name;
-			break;
+// 日期选择器配置映射
+const dateFieldConfig = [
+	{
+		key: 'startDate',
+		labelName: '开始日期',
+		formKey: 'startDate' as keyof CpnCouponInfoData,
+	},
+	{
+		key: 'endDate',
+		labelName: '结束日期',
+		rule: rulesRef.endDate,
+		formKey: 'endDate' as keyof CpnCouponInfoData,
+	},
+];
+
+// 动态创建日期信息 ref
+const dateInfoMap = dateFieldConfig.reduce(
+	(acc, config) => {
+		acc[config.key] = ref<DatePickerInfo<Dayjs>>({
+			label: config.key,
+			labelName: config.labelName,
+			rule: config.rule,
+			selectValue: dayjs(),
+			showFlag: false,
+			formatter: datePickerFormatter,
+		});
+		return acc;
+	},
+	{} as Record<string, Ref<DatePickerInfo<Dayjs>>>,
+);
+
+// 选择日期
+const chooseDate = (type: string) => {
+	const dateInfo = dateInfoMap[type];
+	if (dateInfo) {
+		dateInfo.value.showFlag = true;
 	}
 };
 
-const cancelInfo = () => {
-	popInfo.value.showFlag = false;
+// 选择日期信息
+const selectDateInfo = (type: string, date: Dayjs, dateName: string) => {
+	const config = dateFieldConfig.find((c) => c.key === type);
+	if (config) {
+		formInfo.value[config.formKey] = date as never;
+		nameRefMap[config.key as keyof typeof nameRefMap].value = dateName;
+	}
+	const dateInfo = dateInfoMap[type];
+	if (dateInfo) {
+		dateInfo.value.showFlag = false;
+	}
 };
 
-const chooseDateInfo = ref<any>({
-	label: 'infoDate',
-	labelName: '业务日期',
-	rule: rulesRef.infoDate,
-	selectValue: dayjs(),
-	showFlag: false,
-	formatter: (type: string, option: any) => {
-		if (type === 'year') {
-			option.text += '年';
-		}
-		if (type === 'month') {
-			option.text += '月';
-		}
-		if (type === 'day') {
-			option.text += '日';
-		}
-		return option;
-	},
-});
-
-const chooseDate = () => {
-	chooseDateInfo.value.showFlag = true;
+// 取消日期选择
+const cancelDateInfo = (type: string) => {
+	const dateInfo = dateInfoMap[type];
+	if (dateInfo) {
+		dateInfo.value.showFlag = false;
+	}
 };
 
-const selectDateInfo = (date: Dayjs, dateName: string) => {
-	formInfo.value.infoDate = date;
-	infoDateName.value = dateName;
-	chooseDateInfo.value.showFlag = false;
+// 占位函数，用于兼容 choose 方法
+const choose = (_type: string) => {
+	// 消费券明细页面没有下拉选择字段，此方法保留用于扩展
 };
 
-const cancelDateInfo = () => {
-	chooseDateInfo.value.showFlag = false;
-};
-
-const fromSourceName = ref<string>('');
-const incomeAndExpensesName = ref<string>('');
-const isValidName = ref<string>('');
-const belongToName = ref<string>('');
-
-const onSubmit = () => {
-	let api = addFinanceManger;
+// 提交表单
+const onSubmit = async () => {
+	let api = addCpnCouponInfo;
 	if (formInfo.value.id) {
-		api = editFinanceManger;
+		api = editCpnCouponInfo;
 	}
-	api(formInfo.value).then((res: any) => {
-		if (res?.code == '200') {
-			showSuccessToast(res?.message || '保存成功!');
-			// todo 是否修改成返回列表对应的位置
-			router.push({ path: '/selfFinance/financeManager' });
-		} else {
-			showFailToast(res?.message || '保存失败，请联系管理员!');
+	const { code, message } = await api(formInfo.value);
+	if (code == '200') {
+		showSuccessToast(message || '保存成功!');
+		router.push({ path: getLeftPath.value });
+	} else {
+		showFailToast(message || '保存失败，请联系管理员!');
+	}
+};
+
+// 初始化日期显示
+const initDateInfo = (dateValue: Dayjs | string | null | undefined, type: string) => {
+	if (dateValue) {
+		const date = typeof dateValue === 'string' ? dayjs(dateValue) : dateValue;
+		if (date && dayjs.isDayjs(date)) {
+			nameRefMap[type as keyof typeof nameRefMap].value = date.format('YYYY-MM-DD');
+			const dateInfo = dateInfoMap[type];
+			if (dateInfo) {
+				dateInfo.value.selectValue = date;
+			}
 		}
-	});
-};
-
-function getDictInfoList(res: any) {
-	if (res?.code == '200') {
-		fromSourceInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'pay_way');
-		incomeAndExpensesInfo.value.list = res.data.filter(
-			(item: { belongTo: string }) => item.belongTo == 'income_expense_type',
-		);
-		isValidInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'is_valid');
-		fromSourceName.value = getListName(
-			fromSourceInfo.value.list || [],
-			formInfo.value.fromSource,
-			'typeCode',
-			'typeName',
-		);
-		incomeAndExpensesName.value = getListName(
-			incomeAndExpensesInfo.value.list || [],
-			formInfo.value.incomeAndExpenses,
-			'typeCode',
-			'typeName',
-		);
-		isValidName.value = getListName(isValidInfo.value.list || [], formInfo.value.isValid, 'typeCode', 'typeName');
-	} else {
-		showFailToast(res?.message || '查询失败，请联系管理员!');
-	}
-}
-
-function getUserInfoList(res: any) {
-	if (res.code == '200') {
-		belongToInfo.value.list = res.data;
-		belongToName.value = getListName(res.data, formInfo.value.belongTo, 'id', 'nickName');
-	} else {
-		showFailToast(res[2]?.message || '查询失败，请联系管理员!');
-	}
-}
-
-const initInfoDate = (infoDate: Dayjs) => {
-	if (infoDate) {
-		infoDateName.value = infoDate.format('YYYY-MM-DD');
-		chooseDateInfo.value.selectValue = infoDate;
 	}
 };
 
-function init() {
-	const id: any = route?.query?.id;
+// 统一数据获取逻辑
+const init = async () => {
+	const id: string = route?.query?.id as string;
 	if (id) {
-		Promise.all([
-			getFinanceMangerDetail(id || '-1'),
-			getUserManagerList({}),
-			getDictList('pay_way,income_expense_type,is_valid'),
-		])
-			.then((res: any[]) => {
-				if (res[0].code == '200') {
-					formInfo.value = res[0].data;
-					formInfo.value.infoDate = dayjs(formInfo.value.infoDate);
-					initInfoDate(formInfo.value.infoDate);
-				} else {
-					showFailToast(res[0]?.message || '查询详情失败，请联系管理员!');
-				}
-				getUserInfoList(res[1]);
-				getDictInfoList(res[2]);
-			})
-			.catch(() => {
-				showFailToast('系统问题，请联系管理员！');
-			});
+		const { code, data, message } = await getCpnCouponInfoDetail(id || '0');
+		if (code == '200') {
+			formInfo.value = data || {};
+			formInfo.value.startDate = dayjs(formInfo.value.startDate);
+			formInfo.value.endDate = dayjs(formInfo.value.endDate);
+			initDateInfo(formInfo.value.startDate, 'startDate');
+			initDateInfo(formInfo.value.endDate, 'endDate');
+		} else {
+			showFailToast(message || '查询详情失败，请联系管理员!');
+		}
 	} else {
 		formInfo.value = {
-			isValid: '1',
-			incomeAndExpenses: 'expense',
-			infoDate: dayjs(),
-			belongTo: userInfo ? `${userInfo.id}` : '2',
-			fromSource: 'wx',
+			startDate: dayjs(),
+			endDate: dayjs(),
 		};
-		//获取用户信息
-		getUserManagerList({}).then((res: any) => {
-			getUserInfoList(res);
-		});
-		//获取字典信息
-		getDictList('pay_way,income_expense_type,is_valid').then((res: any) => {
-			getDictInfoList(res);
-		});
-		initInfoDate(formInfo.value.infoDate);
+		initDateInfo(formInfo.value.startDate, 'startDate');
+		initDateInfo(formInfo.value.endDate, 'endDate');
 	}
-}
+};
 
 init();
 </script>

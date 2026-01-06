@@ -35,12 +35,12 @@
 				@cancel-info="cancelInfo"
 			>
 			</select-pop>
-			<datePop
+			<date-pop
 				:info="chooseDateInfo"
 				@select-date-info="selectDateInfo"
 				@cancel-date-info="cancelDateInfo"
 			>
-			</datePop>
+			</date-pop>
 		</van-cell-group>
 		<div style="margin: 16px">
 			<van-button

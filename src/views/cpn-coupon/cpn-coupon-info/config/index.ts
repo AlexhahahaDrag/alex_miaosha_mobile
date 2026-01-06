@@ -1,4 +1,5 @@
-import { type PageInfo } from '@/views/common/config/index';
+import type { Dayjs } from 'dayjs';
+import { type PageInfo } from '@/views/common/config';
 
 export const pagination = ref<PageInfo>({
 	// 数据总数
@@ -8,30 +9,19 @@ export const pagination = ref<PageInfo>({
 	// 每页条数
 	pageSize: 10,
 	// 展示总数
-	showTotal: (total: number) => `共 ${total} 条`,
-	// 是否可以改变pageSize
-	showSizeChanger: true,
-	// 设置每页可以展示多少条的选项
-	pageSizeOptions: ['10', '20', '50', '100'],
-	// 改变pageSize后触发
-	showSizeChange: (current: number, pageSize: number) => (
-		(pagination.value.current = current),
-		(pagination.value.pageSize = pageSize)
-	),
-	// 小尺寸分页
-	size: 'small',
-	// 是否可以快速跳转至某页
-	showQuickJumper: true,
-	//默认条数
-	defaultPageSize: 10,
 });
+
+export interface SearchInfo {
+	couponName?: string;
+	onlyValidAndNotFullyRedeemed?: boolean;
+}
 
 export interface CpnCouponInfoData {
 	id?: number;
 	couponName?: string;
 	totalQuantity?: number;
-	startDate?: string;
-	endDate?: string;
+	startDate?: string | Dayjs | null;
+	endDate?: string | Dayjs | null;
 	unitValue?: number;
 	minSpend?: number;
 	expireStatus?: string;
@@ -40,3 +30,24 @@ export interface CpnCouponInfoData {
 	consumedQuantity?: number;
 	paymentStatus?: number;
 }
+
+export const rulesRef = reactive({
+	couponName: [
+		{
+			required: true,
+			message: '消费券名称不能为空！',
+		},
+	],
+	totalQuantity: [
+		{
+			required: true,
+			message: '总数量不能为空！',
+		},
+	],
+	endDate: [
+		{
+			required: true,
+			message: '结束日期不能为空！',
+		},
+	],
+});

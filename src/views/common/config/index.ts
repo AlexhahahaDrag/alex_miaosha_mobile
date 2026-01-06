@@ -50,13 +50,6 @@ export interface PageInfo {
 	current?: number;
 	pageSize?: number;
 	total?: number;
-	showTotal: (total: number) => string;
-	showSizeChanger: boolean;
-	pageSizeOptions: string[];
-	showSizeChange: (current: number, pageSize: number) => void;
-	size: string;
-	showQuickJumper: boolean;
-	defaultPageSize: number;
 }
 
 // 模态框信息
