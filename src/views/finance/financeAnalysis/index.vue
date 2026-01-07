@@ -36,8 +36,8 @@
 	</van-tabs>
 	<date-pop
 		:info="chooseDateInfo"
-		@select-info="selectDateInfo"
-		@cancel-info="cancelDateInfo"
+		@select-date-info="selectDateInfo"
+		@cancel-date-info="cancelDateInfo"
 	></date-pop>
 	<select-pop
 		:info="popInfo"

@@ -8,7 +8,6 @@ export const pagination = ref<PageInfo>({
 	current: 1,
 	// 每页条数
 	pageSize: 10,
-	// 展示总数
 });
 
 export interface SearchInfo {

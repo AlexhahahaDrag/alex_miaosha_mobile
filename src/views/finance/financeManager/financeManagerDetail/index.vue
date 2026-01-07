@@ -274,7 +274,7 @@ const getUserInfoList = async (data: UserManagerData[]) => {
 
 const initInfoDate = (infoDate: Dayjs) => {
 	if (infoDate) {
-		nameRefMap.infoDate.value = infoDate.format('YYYY-MM-DD');
+		nameRefMap.infoDate.value = infoDate.format('YYYY年MM月DD日');
 		chooseDateInfo.value.selectValue = infoDate;
 	}
 };

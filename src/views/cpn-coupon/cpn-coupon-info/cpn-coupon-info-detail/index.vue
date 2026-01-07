@@ -29,14 +29,14 @@
 					readonly
 				/>
 			</template>
-			<datePop
+			<date-pop
 				v-for="(dateInfo, key) in dateInfoMap"
 				:key="key"
 				:info="dateInfo.value"
 				@select-date-info="(date: Dayjs, dateName: string) => selectDateInfo(key, date, dateName)"
 				@cancel-date-info="() => cancelDateInfo(key)"
 			>
-			</datePop>
+			</date-pop>
 		</van-cell-group>
 		<div style="margin: 16px">
 			<van-button
@@ -150,7 +150,8 @@ const chooseDate = (type: string) => {
 const selectDateInfo = (type: string, date: Dayjs, dateName: string) => {
 	const config = dateFieldConfig.find((c) => c.key === type);
 	if (config) {
-		formInfo.value[config.formKey] = date as never;
+		const finalDate = config.key === 'endDate' ? date.hour(23).minute(59).second(59) : date;
+		formInfo.value[config.formKey] = finalDate as never;
 		nameRefMap[config.key as keyof typeof nameRefMap].value = dateName;
 	}
 	const dateInfo = dateInfoMap[type];

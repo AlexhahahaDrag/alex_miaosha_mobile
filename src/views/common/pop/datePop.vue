@@ -34,14 +34,22 @@ const curSelectValue = ref<string[]>([]);
  * @param param0 - 选择的结果
  */
 const onConfirm = ({ selectedValues }: { selectedValues: string[] }) => {
-	showFlag.value = false;
 	let dateStr: string;
+	let dateName: string;
 	if (selectedValues?.length) {
 		dateStr = selectedValues.join('-');
+		dateName = `${selectedValues[0]}年${selectedValues[1]}月`;
+		if (selectedValues.length > 2) {
+			dateName += ` ${selectedValues[2]}日`;
+		}
+		if (selectedValues.length > 3) {
+			dateName += ` ${selectedValues[3]}时${selectedValues[4]}分${selectedValues[5]}秒`;
+		}
 	} else {
 		dateStr = '';
+		dateName = '';
 	}
-	emit('select-date-info', dayjs(dateStr), dateStr, props.info.label);
+	emit('select-date-info', dayjs(dateStr), dateName, props.info.label);
 };
 
 /**
