@@ -36,10 +36,15 @@
 						v-for="item in dataSource"
 						:key="item.id"
 					>
-						<van-cell
-							:title-class="getTitleClass(item.status)"
-							:title="getCellTitle(item)"
-						>
+						<van-cell :title-class="getTitleClass(item.status)">
+							<template #title>
+								<div class="title-container">
+									<span>{{ getCellTitle(item) }}</span>
+									<van-tag :type="item.status === 'USED' ? 'success' : 'default'">
+										{{ formatStatus(item.status) }}
+									</van-tag>
+								</div>
+							</template>
 							<template #label>
 								<div class="coupon-info">
 									<div class="info-item">
@@ -49,10 +54,6 @@
 									<div class="info-item">
 										<span class="label">核销数量：</span>
 										<span class="value">{{ item.redemptionQuantity ?? 0 }}</span>
-									</div>
-									<div class="info-item">
-										<span class="label">状态：</span>
-										<span class="value">{{ formatStatus(item.status) }}</span>
 									</div>
 								</div>
 							</template>
@@ -264,6 +265,12 @@ onMounted(() => {
 			font-weight: 500;
 		}
 	}
+}
+
+.title-container {
+	display: flex;
+	align-items: center;
+	gap: 8px;
 }
 
 .validClass {

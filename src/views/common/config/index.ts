@@ -1,8 +1,10 @@
+import { Dayjs } from 'dayjs';
+
 // 格式化时间显示
-export const formatTime = (timeStr: string) => {
+export const formatTime = (timeStr: string | Dayjs | undefined): string => {
 	if (!timeStr) return '';
 
-	const date = new Date(timeStr);
+	const date = timeStr instanceof Dayjs ? timeStr.toDate() : new Date(timeStr);
 	const now = new Date();
 	const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 	const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);

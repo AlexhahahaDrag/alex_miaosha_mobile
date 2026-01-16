@@ -25,6 +25,10 @@
 				title="总数量"
 				:value="couponInfo.totalQuantity ?? 0"
 			/>
+			<van-cell
+				title="核销时间"
+				:value="formatTime(redeemTime)"
+			/>
 		</van-cell-group>
 
 		<!-- 核销表单 -->
@@ -84,16 +88,20 @@
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
+import dayjs from 'dayjs';
 import { getCpnCouponInfoDetail } from '@/views/cpn-coupon/cpn-coupon-info/api';
 import { redeemCpnUserCouponInfo } from '@/views/cpn-coupon/cpn-user-coupon-info/api';
 import { getUserManagerList } from '@/api/user/userManager';
 import type { Info } from '@/views/common/pop/selectPop.vue';
 import { useNavBar } from '@/composables/useNavBar';
 import { getRoutePathByName } from '@/utils/router';
+import { useUserStore } from '@/store/modules/user/user';
+import { formatTime } from '@/utils/dayjs';
 import type { CpnCouponInfoData } from '@/views/cpn-coupon/cpn-coupon-info/config';
 
 const route = useRoute();
 const router = useRouter();
+const currentUser = useUserStore()?.getUserInfo;
 
 // 获取左侧路径
 const getLeftPath = computed(() => {
@@ -109,6 +117,9 @@ useNavBar({
 
 // 消费券信息
 const couponInfo = ref<CpnCouponInfoData | null>(null);
+
+// 核销时间，默认为当前时间
+const redeemTime = ref<dayjs.Dayjs>(dayjs());
 
 // 核销表单数据
 const redeemForm = ref<{
@@ -187,10 +198,6 @@ const cancelUser = () => {
 
 // 提交核销
 const onSubmit = async () => {
-	if (!redeemForm.value.userId || !redeemForm.value.couponId) {
-		showFailToast('请选择核销用户');
-		return;
-	}
 	if (!redeemForm.value.redemptionQuantity || redeemForm.value.redemptionQuantity <= 0) {
 		showFailToast('请输入有效的核销数量');
 		return;
@@ -226,6 +233,8 @@ const initUserList = async () => {
 		const { code, data } = await getUserManagerList({});
 		if (code === '200') {
 			userInfo.value.list = data || [];
+		} else {
+			userInfo.value.list = [];
 		}
 	} catch (error) {
 		showFailToast('获取用户列表失败！');
@@ -261,6 +270,10 @@ const initCouponInfo = async () => {
 
 // 初始化
 onMounted(async () => {
+	if (currentUser) {
+		userName.value = currentUser.nickName;
+		redeemForm.value.userId = currentUser.id;
+	}
 	await Promise.all([initCouponInfo(), initUserList()]);
 });
 </script>

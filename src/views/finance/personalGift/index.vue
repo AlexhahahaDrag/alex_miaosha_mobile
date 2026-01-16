@@ -1,11 +1,11 @@
 <template>
 	<van-pull-refresh
-		pulling-text="加载中。。。"
-		:style="{ height: 'calc(100% - 44px)' }"
+		pulling-text="加载中..."
+		class="pull-refresh-container"
 		v-model="isRefresh"
 		@refresh="refresh"
 		ref="pullRefresh"
-		immediate-check="false"
+		:immediate-check="false"
 	>
 		<form action="/">
 			<van-search
@@ -19,7 +19,7 @@
 			/>
 		</form>
 		<van-empty
-			v-if="dataSource.length == 0"
+			v-if="!loading && dataSource.length === 0"
 			description="暂无数据"
 		/>
 		<van-list
@@ -27,16 +27,15 @@
 			v-model:loading="loading"
 			:finished="finished"
 			finished-text="没有更多了"
+			:immediate-check="false"
 			@load="onRefresh"
 		>
 			<van-cell-group>
 				<van-swipe-cell
-					v-for="(item, index) in dataSource"
-					:before-close="beforeClose"
-					:key="index"
+					v-for="item in dataSource"
+					:key="item.id"
 				>
 					<van-cell
-						:key="index"
 						is-link
 						:to="{
 							path: '/selfFinance/personalGift/personalGiftDetail',
@@ -46,17 +45,22 @@
 						<template #title>
 							<div class="text-left">
 								<van-space size="4px">
-									<span class="custom-title">{{ item.otherPerson + item.eventName }}</span>
-									<van-tag type="primary">{{ item.noticeNum }}</van-tag>
+									<span class="custom-title">{{ item?.otherPerson || '' + item?.eventName || '' }}</span>
+									<van-tag
+										v-if="item.noticeNum"
+										type="primary"
+									>
+										{{ item.noticeNum }}
+									</van-tag>
 									<van-tag
 										type="success"
-										v-if="item.action === 'recieve'"
+										v-if="item?.action === 1"
 									>
 										收礼
 									</van-tag>
 									<van-tag
 										type="warning"
-										v-if="item.action === 'give'"
+										v-if="item?.action === 2"
 									>
 										随礼
 									</van-tag>
@@ -64,38 +68,38 @@
 							</div>
 						</template>
 						<template #label>
-							<div class="iconClass">
-								<div
-									class="icon"
-									style="background-color: #ffcc00"
-								>
+							<div
+								v-if="item.remarks"
+								class="remarks-container"
+							>
+								<div class="remarks-icon">
 									{{ item.remarks }}
 								</div>
 							</div>
 						</template>
 						<template #right-icon>
 							<div class="text-right">
-								<div style="display: flex">
-									<div class="van-ellipsis">
-										{{ item.amount }}
+								<div class="amount-container">
+									<div class="amount-text">
+										{{ formatAmount(item.amount) }}
 									</div>
 								</div>
-								<div :class="true ? 'rightDiv' : 'rightRedDiv'">
-									{{ dayjs(item.eventTime).format('YYYY-MM-DD') }}
+								<div :class="getDateClass(item.eventTime)">
+									{{ formatTime(item.eventTime) }}
 								</div>
 							</div>
 						</template>
 					</van-cell>
 					<template #right>
 						<van-button
-							class="right_info"
-							@click="delPersonalGift(item.id)"
+							class="delete-button"
+							@click="handleDelete(item)"
 							square
 							type="danger"
 							text="删除"
 						/>
 					</template>
-					<van-divider class="dividerClass"></van-divider>
+					<van-divider class="divider-class"></van-divider>
 				</van-swipe-cell>
 			</van-cell-group>
 		</van-list>
@@ -103,20 +107,22 @@
 	<van-back-top />
 </template>
 <script lang="ts" setup>
-import { showSuccessToast, showFailToast } from 'vant';
-import dayjs from 'dayjs';
-import type { SearchInfo } from './personalGiftTs';
-import { pagination } from './personalGiftTs';
-import { getPersonalGiftPage, deletePersonalGift } from '@/api/finance/personalGift/personalGiftTs';
-import { getUserManagerList } from '@/api/user/userManager';
+import { showSuccessToast, showFailToast, showConfirmDialog } from 'vant';
+import { type Dayjs } from 'dayjs';
+import type { PersonalGiftData } from './config';
+import { pagination } from './config';
+import { getPersonalGiftPage, deletePersonalGift } from './api/personalGiftTs';
 import type { PageInfo } from '@/views/common/config/index';
 import { useNavBar } from '@/composables/useNavBar';
+import { getRoutePathByName } from '@/utils/router';
+import { formatTime } from '@/views/common/config';
 
 const router = useRouter();
 const route = useRoute();
 
-const addPersonalGift = (): void => {
-	router.push({ path: '/selfFinance/personalGift/personalGiftDetail' });
+// 通过路由解析获取详情页路径，使用公共工具方法
+const getDetailRoutePath = (): string => {
+	return getRoutePathByName(router, 'personalGiftDetail');
 };
 
 useNavBar({
@@ -124,131 +130,198 @@ useNavBar({
 	rightButton: '新增',
 	leftPath: '/',
 	visible: true,
-	onRightClick: addPersonalGift,
+	onRightClick: () => {
+		const path = getDetailRoutePath();
+		router.push({ path });
+	},
 });
+
 const loading = ref<boolean>(false);
-const dataSource = ref<any[]>([]);
-const searchInfo = ref<SearchInfo>({});
+const dataSource = ref<PersonalGiftData[]>([]);
+const searchInfo = ref<PersonalGiftData>({});
+const finished = ref<boolean>(false);
+const isRefresh = ref<boolean>(false);
 
-const finished = ref<boolean>(false); //加载是否已经没有更多数据
-const isRefresh = ref<boolean>(false); //是否下拉刷新
+// 格式化金额
+const formatAmount = (amount: number | string | undefined): string => {
+	if (amount === undefined || amount === null) return '--';
+	const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+	if (isNaN(numAmount)) return '--';
+	return `¥${numAmount.toFixed(2)}`;
+};
 
-const onSearch = () => {
+// 根据日期判断样式类（可以根据业务需求调整判断逻辑）
+const getDateClass = (date: string | Dayjs | undefined): string => {
+	if (!date) return 'date-text';
+	// 可以根据业务需求判断是否过期等，这里暂时返回默认样式
+	// 例如：如果日期已过期，返回 'date-text date-expired'
+	return 'date-text';
+};
+
+// 搜索
+const onSearch = (): void => {
 	pagination.value.current = 0;
 	dataSource.value = [];
+	finished.value = false;
 	onRefresh();
 };
-const onCancel = () => {
+
+// 取消搜索
+const onCancel = (): void => {
 	searchInfo.value.keyword = '';
 	pagination.value.current = 0;
 	dataSource.value = [];
+	finished.value = false;
 	query(searchInfo.value, pagination.value);
 };
 
-const query = (param: SearchInfo, cur: PageInfo): void => {
+// 查询数据
+const query = async (param: PersonalGiftData, cur: PageInfo): Promise<void> => {
+	if (loading.value) return;
+
 	loading.value = true;
-	getPersonalGiftPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
-		.then((res: any) => {
-			if (res?.code == '200') {
-				dataSource.value = [...dataSource.value, ...res.data.records];
-				pagination.value.current = res.data.current + 1;
-				pagination.value.pageSize = res.data.size;
-				pagination.value.total = res.data.total;
-				if ((pagination.value.total || 0) < (pagination.value.current || 1) * (pagination.value.pageSize || 10)) {
-					finished.value = true;
-				}
-			} else {
-				showFailToast(res?.message || '查询列表失败！');
-			}
-		})
-		.finally(() => {
-			isRefresh.value = false;
-			loading.value = false;
-		});
-};
-
-const userMap = {};
-const getUserInfoList = (): void => {
-	getUserManagerList({}).then((res: any) => {
-		if (res?.code == '200') {
-			if (res?.data) {
-				res.data.forEach((user: { id: string | number; nickName: any }) => {
-					userMap[user.id] = user.nickName;
-				});
-			}
-		} else {
-			showFailToast(res?.message || '查询列表失败！');
-		}
+	const { code, message, data } = await getPersonalGiftPage(
+		param,
+		cur?.current ? cur.current : 1,
+		cur?.pageSize || 10,
+	).finally(() => {
+		loading.value = false;
+		isRefresh.value = false;
 	});
+
+	if (code === '200' && data) {
+		dataSource.value.push(...(data.records || []));
+		pagination.value.pageSize = data.size || 0;
+		pagination.value.total = data.total || 0;
+		// 判断是否已加载完所有数据
+		finished.value = pagination.value.total < ((pagination.value.current || 0) + 1) * (pagination.value.pageSize || 10);
+	} else {
+		showFailToast(message || '查询列表失败！');
+	}
 };
 
+// 下拉刷新
 const refresh = (): void => {
 	pagination.value.current = 0;
 	dataSource.value = [];
+	finished.value = false;
 	query(searchInfo.value, pagination.value);
 };
 
+// 上拉加载更多
 const onRefresh = (): void => {
-	query(searchInfo.value, pagination.value);
+	if (!finished.value) {
+		query(searchInfo.value, pagination.value);
+	}
 };
 
-const beforeClose = (e: any): void => {
-	console.log(e);
-};
+// 处理删除
+const handleDelete = async (item: PersonalGiftData): Promise<void> => {
+	if (!item.id) {
+		showFailToast('删除失败，缺少必要参数！');
+		return;
+	}
 
-const delPersonalGift = (id: number): void => {
-	deletePersonalGift(`${id}`).then((res: any) => {
-		if (res?.code == '200') {
-			refresh();
-			showSuccessToast(res?.message || '删除成功！');
+	try {
+		await showConfirmDialog({
+			title: '确认删除',
+			message: `确定要删除"${item.otherPerson}${item.eventName}"这条记录吗？`,
+		});
+	} catch {
+		// 用户取消删除
+		return;
+	}
+
+	try {
+		const { code, message } = await deletePersonalGift(String(item.id));
+		if (code === '200') {
+			showSuccessToast(message || '删除成功！');
+			// 从列表中移除已删除的项，避免重新加载
+			const index = dataSource.value.findIndex((i) => i.id === item.id);
+			if (index > -1) {
+				dataSource.value.splice(index, 1);
+			}
 		} else {
-			showFailToast(res?.message || '删除失败，请联系管理员！');
+			showFailToast(message || '删除失败，请联系管理员！');
 		}
-	});
+	} catch (error) {
+		showFailToast('删除失败，请稍后重试！');
+	}
 };
 
+// 初始化
 const init = (): void => {
 	dataSource.value = [];
 	pagination.value.current = 0;
+	finished.value = false;
 	query(searchInfo.value, pagination.value);
-	//获取用户信息
-	getUserInfoList();
 };
 
 init();
 </script>
 
 <style lang="less" scoped>
-.right_info {
-	height: 100%;
+.pull-refresh-container {
+	height: calc(100% - 44px);
 }
 
-.rightDiv {
-	margin-top: 10px;
+.text-left {
+	text-align: left;
+}
+
+.text-right {
 	text-align: right;
 }
 
-.rightRedDiv {
-	margin-top: 10px;
-	text-align: right;
-	color: red;
+.custom-title {
+	font-weight: 500;
 }
 
-.iconClass {
+.remarks-container {
 	margin-top: 10px;
 	display: flex;
 }
 
-.van-ellipsis {
-	width: 130px;
-	text-align: right;
+.remarks-icon {
+	background-color: #ffcc00;
+	padding: 2px 8px;
+	border-radius: 4px;
+	font-size: 12px;
+	color: #333;
 }
 
-.dividerClass {
+.amount-container {
+	display: flex;
+	justify-content: flex-end;
+}
+
+.amount-text {
+	width: 130px;
+	text-align: right;
+	font-weight: 600;
+	color: #ee0a24;
+	font-size: 16px;
+}
+
+.date-text {
+	margin-top: 10px;
+	text-align: right;
+	color: #969799;
+	font-size: 12px;
+}
+
+.date-expired {
+	color: #ee0a24;
+}
+
+.delete-button {
+	height: 100%;
+}
+
+.divider-class {
 	color: #1989fa;
-	border-color: grey;
+	border-color: #ebedf0;
 	padding: 0 16px;
-	margin-top: 0px;
-	margin-bottom: 0px;
+	margin: 0;
 }
 </style>

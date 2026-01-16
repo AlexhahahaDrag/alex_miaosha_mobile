@@ -2,8 +2,7 @@ import type { CartState } from './typing';
 import { piniaPersistConfig } from '@/config/piniaPersist';
 import type { ShopStockInfo } from '@/views/finance/shopStock/shopStockTs';
 
-export const useCartStore = defineStore({
-	id: 'app-cart',
+export const useCartStore = defineStore('app-cart', {
 	state: (): CartState => ({
 		shoppingCart: [] as ShopStockInfo[],
 	}),

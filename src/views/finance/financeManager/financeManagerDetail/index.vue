@@ -1,65 +1,106 @@
 <template>
-	<van-form
-		@submit="onSubmit"
-		:rules="rulesRef"
-		required="auto"
-	>
-		<van-cell-group inset>
+	<div class="finance-detail-container">
+		<!-- Header Section
+		<div class="page-header">
+			<div class="header-icon">
+				<van-icon
+					name="orders-o"
+					size="32"
+					color="#1989fa"
+				/>
+			</div>
+			<div class="header-text">请填写下方的交易明细以完成记录</div>
+		</div> -->
+
+		<van-form
+			@submit="onSubmit"
+			:rules="rulesRef"
+			required="auto"
+			class="custom-form"
+		>
 			<template
 				v-for="field in formFields"
 				:key="field.name"
 			>
-				<van-field
-					v-if="field.type === 'input'"
-					v-model="formInfo[field.name]"
-					:name="field.name"
-					:label="field.label + '：'"
-					:placeholder="'请输入' + field.label"
-					:rules="rulesRef[field.name]"
-					:type="field.inputType || 'text'"
-				/>
-				<van-field
-					v-else
-					v-model="nameRefMap[field.name as keyof typeof nameRefMap].value"
-					:name="field.name"
-					:label="field.label + '：'"
-					:placeholder="'请选择' + field.label"
-					:rules="rulesRef[field.name]"
-					@click="field.type === 'date' ? chooseDate() : choose(field.name)"
-					readonly
-				/>
+				<div class="custom-field-container">
+					<div
+						class="field-label"
+						:class="{ required: isRequired(field.name) }"
+					>
+						{{ field.label }}
+					</div>
+
+					<!-- INPUT Type -->
+					<van-field
+						v-if="field.type === 'input'"
+						v-model="formInfo[field.name]"
+						:name="field.name"
+						:type="field.inputType || 'text'"
+						:placeholder="'请输入' + field.label"
+						:rules="rulesRef[field.name as keyof typeof rulesRef]"
+						class="custom-input"
+						:class="{ 'money-input': field.name === 'amount' }"
+					>
+						<template
+							#left-icon
+							v-if="field.name === 'amount'"
+						>
+							<span class="currency-symbol">¥</span>
+						</template>
+					</van-field>
+
+					<!-- SELECT / DATE Type -->
+					<van-field
+						v-else
+						v-model="nameRefMap[field.name as keyof typeof nameRefMap].value"
+						:name="field.name"
+						:placeholder="field.type === 'date' ? 'yyyy年mm月dd日' : '请选择' + field.label"
+						readonly
+						:rules="rulesRef[field.name as keyof typeof rulesRef]"
+						@click="field.type === 'date' ? chooseDate() : choose(field.name)"
+						class="custom-input"
+					>
+						<template #right-icon>
+							<van-icon :name="field.type === 'date' ? 'calendar-o' : 'arrow-down'" />
+						</template>
+					</van-field>
+				</div>
 			</template>
-			<select-pop
-				:info="popInfo"
-				@select-info="selectInfo"
-				@cancel-info="cancelInfo"
-			>
-			</select-pop>
-			<date-pop
-				:info="chooseDateInfo"
-				@select-date-info="selectDateInfo"
-				@cancel-date-info="cancelDateInfo"
-			>
-			</date-pop>
-		</van-cell-group>
-		<div style="margin: 16px">
-			<van-button
-				round
-				block
-				type="primary"
-				native-type="submit"
-			>
-				提交
-			</van-button>
-		</div>
-	</van-form>
+
+			<div class="submit-btn-container">
+				<van-button
+					round
+					block
+					type="primary"
+					native-type="submit"
+					class="custom-submit-btn"
+				>
+					提交
+				</van-button>
+			</div>
+		</van-form>
+
+		<!-- Popups -->
+		<select-pop
+			:info="popInfo"
+			@select-info="selectInfo"
+			@cancel-info="cancelInfo"
+		>
+		</select-pop>
+		<date-pop
+			:info="chooseDateInfo"
+			@select-date-info="selectDateInfo"
+			@cancel-date-info="cancelDateInfo"
+		>
+		</date-pop>
+	</div>
 </template>
 
 <script setup lang="ts">
 import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
 import { getListName } from '@/views/common/config';
-import { rulesRef, type FinanceManagerData } from '@/views/finance/financeManager/config';
+import { rulesRef, type FinanceManagerData, type DictFieldConfig } from '@/views/finance/financeManager/config';
 import { getDictList } from '@/api/finance/dict/dictManager';
 import { getUserManagerList } from '@/api/user/userManager';
 import { useUserStore } from '@/store/modules/user/user';
@@ -92,8 +133,8 @@ const formInfo = ref<FinanceManagerData>({});
 
 const label = reactive({
 	name: '名称',
-	amount: '金额',
 	typeCode: '类别',
+	amount: '金额',
 	fromSource: '支付方式',
 	incomeAndExpenses: '收支类型',
 	isValid: '状态',
@@ -102,26 +143,34 @@ const label = reactive({
 });
 
 // 表单字段配置，用于循环渲染
-const formFields: {
-	name: string;
-	label: string;
-	type: 'input' | 'select' | 'date';
-	inputType?: 'text' | 'number' | 'tel' | 'digit' | 'password';
-}[] = [
-	{ name: 'name', label: label.name, type: 'input' },
-	{ name: 'typeCode', label: label.typeCode, type: 'input' },
-	{ name: 'amount', label: label.amount, type: 'input', inputType: 'number' },
-	{ name: 'fromSource', label: label.fromSource, type: 'select' },
-	{ name: 'incomeAndExpenses', label: label.incomeAndExpenses, type: 'select' },
-	{ name: 'isValid', label: label.isValid, type: 'select' },
-	{ name: 'infoDate', label: label.infoDate, type: 'date' },
-	{ name: 'belongTo', label: label.belongTo, type: 'select' },
-];
+const formFields = computed(() => {
+	const infoDateLabel = formInfo.value.incomeAndExpenses === 'income' ? '收入时间' : '支出时间';
+	return [
+		{ name: 'name', label: label.name, type: 'input' },
+		{ name: 'typeCode', label: label.typeCode, type: 'input' },
+		{ name: 'amount', label: label.amount, type: 'input', inputType: 'number' },
+		{ name: 'fromSource', label: label.fromSource, type: 'select' },
+		{ name: 'incomeAndExpenses', label: label.incomeAndExpenses, type: 'select' },
+		{ name: 'isValid', label: label.isValid, type: 'select' },
+		{ name: 'infoDate', label: infoDateLabel, type: 'date' },
+		{ name: 'belongTo', label: label.belongTo, type: 'select' },
+	] as {
+		name: string;
+		label: string;
+		type: 'input' | 'select' | 'date';
+		inputType?: 'text' | 'number' | 'tel' | 'digit' | 'password';
+	}[];
+});
+
+const isRequired = (name: string) => {
+	const rule = rulesRef[name as keyof typeof rulesRef];
+	return rule && rule.some((r: { required: boolean }) => r.required);
+};
 
 const popInfo = ref<Info>({ showFlag: false });
 
-// 统一字典信息配置，使用映射创建，减少重复代码
-const dictFieldConfig = [
+// 统一字典信息配置
+const dictFieldConfig: DictFieldConfig[] = [
 	{
 		key: 'fromSource',
 		labelName: '支付方式',
@@ -174,7 +223,7 @@ const belongToInfo = ref<Info>({
 	selectValue: formInfo.value.belongTo,
 });
 
-// 创建名称 ref 映射，统一管理所有字段的显示名称
+// 创建名称 ref 映射
 const nameRefMap = {
 	fromSource: ref<string>(''),
 	incomeAndExpenses: ref<string>(''),
@@ -183,7 +232,6 @@ const nameRefMap = {
 	infoDate: ref<string>(''),
 };
 
-// 使用映射替代 switch-case，简化代码
 const choose = (type: string) => {
 	const info = dictInfoMap[type] || (type === 'belongTo' ? belongToInfo : null);
 	if (info) {
@@ -192,7 +240,6 @@ const choose = (type: string) => {
 	}
 };
 
-// 使用映射替代 switch-case，统一处理逻辑
 const selectInfo = (type: string, value: string, name: string) => {
 	popInfo.value.showFlag = false;
 	const info = dictInfoMap[type];
@@ -249,14 +296,11 @@ const onSubmit = async () => {
 	}
 };
 
-// 合并过滤和名称获取逻辑，统一处理字典信息
 const getDictInfoList = async (data: DictInfo[]) => {
 	dictFieldConfig.forEach((config) => {
 		const info = dictInfoMap[config.key];
 		if (info) {
-			// 过滤数据
 			info.value.list = data.filter((item: DictInfo) => item.belongTo === config.belongTo);
-			// 获取名称
 			nameRefMap[config.key as keyof typeof nameRefMap].value = getListName<DictInfo>(
 				info.value.list || [],
 				formInfo.value[config.formKey] as string,
@@ -279,10 +323,8 @@ const initInfoDate = (infoDate: Dayjs) => {
 	}
 };
 
-// 统一数据获取逻辑，减少重复代码
 const init = async () => {
 	const id: string = route?.query?.id as string;
-	// 统一获取用户和字典数据，无论是否有 id
 	const [detailRes, userRes, dictRes] = await Promise.all([
 		id ? getFinanceMangerDetail(id || '0') : Promise.resolve({ code: '200', data: {} }),
 		getUserManagerList({}),
@@ -311,4 +353,105 @@ const init = async () => {
 
 init();
 </script>
-<style lang="less" scoped></style>
+
+<style lang="less" scoped>
+.finance-detail-container {
+	padding: 16px 20px;
+	height: 100%;
+	overflow-y: auto;
+	background-color: #fff;
+}
+
+.page-header {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin-bottom: 24px;
+
+	.header-icon {
+		width: 48px;
+		height: 48px;
+		background-color: #e8f3ff;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-bottom: 12px;
+	}
+
+	.header-text {
+		color: #969799;
+		font-size: 12px;
+	}
+}
+
+.custom-form {
+	.custom-field-container {
+		margin-bottom: 20px;
+
+		.field-label {
+			font-size: 14px;
+			font-weight: bold;
+			color: #323233;
+			margin-bottom: 8px;
+
+			&.required::after {
+				content: '*';
+				color: #ee0a24;
+				margin-left: 2px;
+			}
+
+			.optional {
+				font-size: 12px;
+				color: #969799;
+				font-weight: normal;
+				margin-left: 4px;
+			}
+		}
+
+		:deep(.van-cell) {
+			padding: 0;
+			overflow: visible;
+
+			&::after {
+				display: none;
+			}
+		}
+
+		:deep(.custom-input) {
+			background-color: #f7f8fa;
+			border-radius: 8px;
+			padding: 10px 12px;
+
+			.van-field__control {
+				height: 24px;
+				line-height: 24px;
+			}
+
+			&.textarea-input {
+				.van-field__control {
+					height: auto;
+				}
+			}
+		}
+
+		:deep(.money-input) {
+			.currency-symbol {
+				color: #969799;
+				margin-right: 4px;
+				font-size: 16px;
+			}
+		}
+	}
+}
+
+.submit-btn-container {
+	margin-top: 32px;
+
+	.custom-submit-btn {
+		height: 44px;
+		font-size: 16px;
+		font-weight: 600;
+	}
+}
+</style>

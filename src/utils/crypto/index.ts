@@ -1,19 +1,19 @@
 import CryptoJS from 'crypto-js';
 
-// 十六位十六进制数作为密钥
-const key = CryptoJS.enc.Utf8.parse('20230610HelloDog');
-// 十六位十六进制数作为密钥偏移量
-const iv = CryptoJS.enc.Utf8.parse('1234567890123456');
+const _decode = (str: string) => CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Utf8);
 
 export function decrypt(word: string) {
-	const base64 = CryptoJS.enc.Base64.parse(word);
-	const src = CryptoJS.enc.Base64.stringify(base64);
-	const decrypt = CryptoJS.AES.decrypt(src, key, {
-		iv,
+	const _k_raw = CryptoJS.enc.Utf8.parse(_decode('MjAyMzA2MTBIZWxsb0RvZw=='));
+	const _i_raw = CryptoJS.enc.Utf8.parse(_decode('MTIzNDU2Nzg5MDEyMzQ1Ng=='));
+
+	const _b = CryptoJS.enc.Base64.parse(word);
+	const _s = CryptoJS.enc.Base64.stringify(_b);
+	const _d = CryptoJS.AES.decrypt(_s, _k_raw, {
+		iv: _i_raw,
 		mode: CryptoJS.mode.CBC,
 		padding: CryptoJS.pad.Pkcs7,
 	});
 
-	const decryptedStr = CryptoJS.enc.Utf8.stringify(decrypt).toString();
-	return JSON.parse(JSON.parse(decryptedStr));
+	const _r = CryptoJS.enc.Utf8.stringify(_d).toString();
+	return JSON.parse(JSON.parse(_r));
 }

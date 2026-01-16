@@ -1,17 +1,8 @@
 import { defineStore } from 'pinia';
-
-interface NavBarInfo {
-	title?: string;
-	leftButton?: string;
-	rightButton?: string;
-	noShowLeft?: boolean;
-	showRight?: boolean;
-	leftPath?: string;
-	visible?: boolean; // 控制是否显示NavBar
-}
+import type { NavBarConfig } from '@/composables/useNavBar';
 
 interface NavBarState {
-	info: NavBarInfo;
+	info: NavBarConfig;
 	rightClickHandler: (() => void) | null;
 }
 
@@ -27,7 +18,7 @@ export const useNavBarStore = defineStore('navbar', {
 	}),
 
 	actions: {
-		setNavBarInfo(info: NavBarInfo) {
+		setNavBarInfo(info: NavBarConfig) {
 			this.info = { ...this.info, ...info };
 		},
 

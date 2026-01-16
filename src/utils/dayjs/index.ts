@@ -15,6 +15,8 @@ const defaultDateFormat = 'YYYY-MM-DD';
 
 const defaultTimeFormat = 'YYYY-MM-DD HH:mm:ss';
 
+const dataTimeFormat = 'YYYY-MM-DD HH:mm';
+
 const dateFormatYYYYMM = 'YYYY-MM';
 
 dayjs.prototype.toISOString = function () {
@@ -38,11 +40,14 @@ const formatDayjs = (date: string | Dayjs | undefined | null): Dayjs | string | 
  * @param date 日期
  * @returns 格式化后的日期
  */
-const formatDate = (date: string | Dayjs | undefined | null) => {
+const formatDate = (
+	date: string | Dayjs | undefined | null,
+	dateFormat: string = defaultDateFormat,
+) => {
 	if (!date) {
 		return '';
 	}
-	return dayjs(date).format(defaultDateFormat);
+	return dayjs(date).format(dateFormat);
 };
 
 /**
@@ -87,6 +92,7 @@ export {
 	defaultDateFormat,
 	defaultTimeFormat,
 	dateFormatYYYYMM,
+	dataTimeFormat,
 	formatDate,
 	formatDayjs,
 	formatTime,

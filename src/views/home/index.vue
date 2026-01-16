@@ -1,30 +1,28 @@
 <template>
-	<div style="height: calc(100vh - 50px)">
-		<div style="overflow-y: auto; height: calc(100% - 46px)">
-			<van-grid
-				:column-num="3"
-				:square="true"
+	<div>
+		<van-grid
+			:column-num="3"
+			:square="true"
+		>
+			<van-grid-item
+				v-for="item in homeList"
+				:key="item.id"
+				:text="item?.meta?.title"
+				:to="item.path"
 			>
-				<van-grid-item
-					v-for="item in homeList"
-					:key="item.id"
-					:text="item?.meta?.title"
-					:to="item.path"
-				>
-					<SvgIcon
-						class="homeSvgClass"
-						:name="item?.meta?.icon"
-					></SvgIcon>
-					<span class="homeFontClass">{{ item?.meta?.title || 'null' }}</span>
-				</van-grid-item>
-			</van-grid>
-		</div>
+				<SvgIcon
+					class="homeSvgClass"
+					:name="item?.meta?.icon"
+				></SvgIcon>
+				<span class="homeFontClass">{{ item?.meta?.title || 'null' }}</span>
+			</van-grid-item>
+		</van-grid>
 	</div>
-	<Tabbar :data="useTabBar"></Tabbar>
 </template>
 
 <script setup lang="ts">
 import { useNavBar } from '@/composables/useNavBar';
+import { useTabBar } from '@/composables/useTabBar';
 
 const route = useRoute();
 const router = useRouter();
@@ -36,6 +34,12 @@ useNavBar({
 	noShowLeft: true,
 	showRight: false,
 	visible: true,
+});
+
+useTabBar({
+	visible: true,
+	data: ['dashboard', 'message', 'myself'],
+	active: 1,
 });
 
 const getHomeList = (arr: readonly any[] | null) => {
@@ -59,24 +63,6 @@ const init = () => {
 };
 
 init();
-
-const useTabBar = reactive([
-	{
-		title: '主控台',
-		to: '/dashboard',
-		icon: 'home-o',
-	},
-	{
-		title: '消息',
-		to: '/message',
-		icon: 'user-o',
-	},
-	{
-		title: '我的',
-		to: '/myself',
-		icon: 'user-o',
-	},
-]);
 </script>
 
 <style lang="less" scoped>

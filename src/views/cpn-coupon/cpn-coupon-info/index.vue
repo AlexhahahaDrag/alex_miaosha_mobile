@@ -38,37 +38,32 @@
 					>
 						<van-cell
 							:title-class="getTitleClass(item.remainingQuantity)"
-							:title="item.couponName || '未命名消费券'"
 							is-link
 							:to="getDetailRoute(item.id)"
 						>
+							<template #title>
+								<div class="title-container">
+									<span>{{ item.couponName || '未命名消费券' }}</span>
+									<van-tag
+										v-if="item.expireStatus"
+										:style="{
+											color: getExpireStatusColor(item.expireRangeStatus),
+											borderColor: getExpireStatusColor(item.expireRangeStatus),
+										}"
+										plain
+									>
+										{{ item.expireStatus }}
+									</van-tag>
+									<van-tag :type="item.paymentStatus === 1 ? 'success' : 'default'">
+										{{ item.paymentStatus === 1 ? '已支付' : '未支付' }}
+									</van-tag>
+								</div>
+							</template>
 							<template #label>
 								<div class="coupon-info">
 									<div class="info-item">
 										<span class="label">面值：</span>
 										<span class="value">{{ item.unitValue ? '￥' + item.unitValue : '--' }}</span>
-									</div>
-									<div class="info-item">
-										<span class="label">剩余数量：</span>
-										<span class="value">{{ item.remainingQuantity ?? 0 }}</span>
-									</div>
-									<div
-										class="info-item"
-										v-if="item.expireStatus"
-									>
-										<span class="label">过期状态：</span>
-										<span
-											class="value"
-											:style="{
-												color: getExpireStatusColor(item.expireRangeStatus),
-											}"
-										>
-											{{ item.expireStatus }}
-										</span>
-									</div>
-									<div class="info-item">
-										<span class="label">支付状态：</span>
-										<span class="value">{{ item.paymentStatus === 1 ? '已支付' : '未支付' }}</span>
 									</div>
 								</div>
 							</template>
@@ -77,28 +72,31 @@
 									<div class="date-text">
 										{{ formatDate(item.endDate) }}
 									</div>
-									<div class="rightDiv">
-										<span>总数量：{{ item.totalQuantity ?? 0 }}</span>
+									<div class="info-item">
+										<span class="label">剩余数量：</span>
+										<span class="value">{{ item.remainingQuantity ?? 0 }}</span>
 									</div>
 								</div>
 							</template>
 						</van-cell>
 						<template #right>
-							<van-button
-								v-if="item.remainingQuantity && item.remainingQuantity > 0"
-								class="right_info redeem-btn"
-								@click="onRedeem(item.id)"
-								square
-								type="primary"
-								text="核销"
-							/>
-							<van-button
-								class="right_info"
-								@click="onDeleteCpnCouponInfo(item.id)"
-								square
-								type="danger"
-								text="删除"
-							/>
+							<div class="right-buttons">
+								<van-button
+									v-if="item.remainingQuantity && item.remainingQuantity > 0"
+									class="right_info redeem-btn"
+									@click="onRedeem(item.id)"
+									square
+									type="primary"
+									text="核销"
+								/>
+								<van-button
+									class="right_info"
+									@click="onDeleteCpnCouponInfo(item.id)"
+									square
+									type="danger"
+									text="删除"
+								/>
+							</div>
 						</template>
 						<van-divider class="item-divider-style" />
 					</van-swipe-cell>
@@ -110,11 +108,11 @@
 </template>
 <script lang="ts" setup>
 import { showSuccessToast, showFailToast, showConfirmDialog } from 'vant';
-import type { Dayjs } from 'dayjs';
 import type { SearchInfo, CpnCouponInfoData } from './config';
 import { pagination } from './config';
 import type { PageInfo } from '@/views/common/config';
 import { getRoutePathByName } from '@/utils/router';
+import { formatDate } from '@/utils/dayjs';
 import { getCpnCouponInfoPage, deleteCpnCouponInfo } from '@/views/cpn-coupon/cpn-coupon-info/api';
 import { useNavBar } from '@/composables/useNavBar';
 
@@ -164,14 +162,6 @@ const isRefresh = ref<boolean>(false);
 // 计算属性和工具函数
 const getTitleClass = (remainingQuantity?: number) => {
 	return remainingQuantity && remainingQuantity > 0 ? 'validClass' : 'notValidClass';
-};
-
-const formatDate = (endDate?: string | Dayjs | null): string => {
-	if (!endDate) {
-		return '--';
-	}
-	const dateStr = typeof endDate === 'string' ? endDate : endDate.toString();
-	return dateStr.substring(0, 16);
 };
 
 // 获取过期状态颜色
@@ -308,8 +298,14 @@ onMounted(() => {
 	margin-bottom: 0;
 }
 
+.right-buttons {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
 .right_info {
-	height: 50%;
+	flex: 1;
 }
 
 .redeem-btn {
@@ -350,6 +346,13 @@ onMounted(() => {
 	text-align: right;
 	font-size: 12px;
 	color: #333;
+}
+
+.title-container {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
 }
 
 .validClass {

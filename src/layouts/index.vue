@@ -10,19 +10,29 @@
 		<!-- 页面内容 -->
 		<div
 			class="content-container"
-			:class="{ 'with-navbar': navBarStore.getNavBarInfo.visible }"
+			:class="{
+				'with-tabbar': tabBarStore.getTabBarInfo.visible,
+			}"
 		>
 			<router-view />
 		</div>
+
+		<!-- 全局TabBar -->
+		<tab-bar
+			v-if="tabBarStore.getTabBarInfo.visible"
+			v-bind="tabBarStore.getTabBarInfo"
+		/>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { useNavBarStore } from '@/store/modules/navbar';
-import NavBar from '@/views/common/navBar/index.vue';
+import { useTabBarStore } from '@/store/modules/tabbar';
 
 const navBarStore = useNavBarStore();
-
+const tabBarStore = useTabBarStore();
+console.log('tabBarStore.getTabBarInfo ooooooooooooooooooo:', tabBarStore.getTabBarInfo);
+console.log('tabBarStore.getNavBarInfo ooooooooooooooooooo:', navBarStore.getNavBarInfo);
 const handleRightClick = () => {
 	const handler = navBarStore.getRightClickHandler;
 	if (handler) {
@@ -45,8 +55,11 @@ const handleRightClick = () => {
 	height: 0;
 }
 
-.content-container.with-navbar {
-	/* NavBar存在时，内容区域高度需要减去NavBar高度 */
-	height: calc(100vh - 46px);
+.content-container.with-tabbar {
+	/* TabBar存在时，内容区域高度需要减去TabBar高度(50px) */
+	/* Note: Flex layout handles top navbar naturally.
+	   Standard van-tabbar is fixed at bottom, so we add padding-bottom to prevent content cover.
+	*/
+	padding-bottom: 50px;
 }
 </style>

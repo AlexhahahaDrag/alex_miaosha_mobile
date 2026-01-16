@@ -2,14 +2,12 @@
 	<form action="/">
 		<van-search
 			v-model="searchInfo.bigTypeCode"
-			show-action
-			placeholder="请输入搜索关键词"
+			placeholder="搜索账单..."
 			@search="onSearch"
-			@cancel="onCancel"
-			action-text="清空"
+			@clear="onCancel"
+			class="search-bar"
 		/>
 	</form>
-	<van-divider class="divider-style" />
 	<van-pull-refresh
 		pulling-text="加载中。。。"
 		class="refresh-info"
@@ -18,7 +16,10 @@
 		ref="pullRefresh"
 		:immediate-check="false"
 	>
-		<div class="list-container">
+		<div
+			class="list-container"
+			id="finance-manager-list"
+		>
 			<van-empty
 				v-if="!dataSource?.length"
 				description="暂无数据"
@@ -32,65 +33,75 @@
 				finished-text="没有更多了"
 				@load="onLoadMore"
 			>
-				<van-cell-group>
+				<div class="card-list">
 					<van-swipe-cell
 						v-for="item in dataSource"
 						:key="item.id"
+						class="card-swipe-item"
 					>
-						<van-cell
-							:title-class="getTitleClass(item.isValid)"
-							:title="getCellTitle(item)"
-							is-link
-							:to="getDetailRoute(item.id)"
+						<div
+							class="finance-card"
+							@click="router.push(getDetailRoute(item.id))"
 						>
-							<template #label>
-								<div class="svgInfo">
-									<div
-										class="svgDiv"
-										v-for="fromSource in fromSourceTransferList"
-										:key="fromSource.value"
+							<div class="card-left">
+								<div class="title-row">
+									<span class="title">{{ getCellTitle(item) }}</span>
+									<span
+										class="tag"
+										v-if="item.incomeAndExpenses"
+										:class="item.incomeAndExpenses"
 									>
-										<SvgIcon
-											v-if="shouldShowIcon(item.fromSource, fromSource.value)"
-											:name="fromSource.label"
-											class="svg"
+										{{ getIncomeExpenseText(item.incomeAndExpenses) }}
+									</span>
+								</div>
+								<div class="date-text">
+									{{ formatDate(item.infoDate, dataTimeFormat) }}
+								</div>
+							</div>
+
+							<div class="card-right">
+								<div
+									class="amount-text"
+									:class="getAmountClass(item.incomeAndExpenses)"
+								>
+									{{ formatAmount(item) }}
+								</div>
+								<div class="source-info">
+									<div
+										class="svg-wrapper"
+										v-if="item?.fromSource"
+									>
+										<svg-icon
+											:name="getSourceIconName(item)?.label || ''"
+											class="source-icon"
 										/>
 									</div>
+									<span class="source-text">{{ getSourceIconName(item)?.name || '未知' }}</span>
 								</div>
-							</template>
-							<template #right-icon>
-								<div class="text-right">
-									<div class="date-text">
-										{{ formatDate(item.infoDate) }}
-									</div>
-									<div :class="getAmountClass(item.incomeAndExpenses)">
-										{{ formatAmount(item) }}
-									</div>
-								</div>
-							</template>
-						</van-cell>
+							</div>
+						</div>
+
 						<template #right>
 							<van-button
-								class="right_info"
+								class="right_info delete-btn"
 								@click="onDeleteFinance(item.id)"
 								square
 								type="danger"
 								text="删除"
 							/>
 						</template>
-						<van-divider class="item-divider-style" />
 					</van-swipe-cell>
-				</van-cell-group>
+				</div>
 			</van-list>
 		</div>
 	</van-pull-refresh>
-	<van-back-top />
+	<van-back-top target="#finance-manager-list" />
 </template>
 <script lang="ts" setup>
-import type { Dayjs } from 'dayjs';
 import { showSuccessToast, showFailToast } from 'vant';
-import { pagination, fromSourceTransferList, type FinanceManagerData } from './config';
+import { pagination, fromSourceTransferList, type FinanceManagerData, type FromSourceTransferItem } from './config';
 import { getRoutePathByName } from '@/utils/router';
+import { formatDate, dataTimeFormat } from '@/utils/dayjs';
 import { getFinanceMangerPage, deleteFinanceManager } from '@/views/finance/financeManager/api';
 import { useNavBar } from '@/composables/useNavBar';
 import type { PageInfo } from '@/views/common/config';
@@ -99,12 +110,12 @@ const router = useRouter();
 const route = useRoute();
 
 // 通过路由解析获取详情页路径，使用公共工具方法
-const getDetailRoutePath = () => {
+const getDetailRoutePath = (): string => {
 	return getRoutePathByName(router, 'financeManagerDetail');
 };
 
 // 获取详情页路由配置
-const getDetailRoute = (id?: number) => {
+const getDetailRoute = (id?: string) => {
 	const path = getDetailRoutePath();
 	return {
 		path,
@@ -115,7 +126,7 @@ const getDetailRoute = (id?: number) => {
 // 导航栏配置
 useNavBar({
 	title: (route?.meta?.title as string) || '财务管理',
-	rightButton: '新增',
+	rightIcon: 'plus',
 	leftPath: '/',
 	visible: true,
 	onRightClick: () => {
@@ -132,39 +143,31 @@ const finished = ref<boolean>(false);
 const isRefresh = ref<boolean>(false);
 
 // 计算属性和工具函数
-const getTitleClass = (isValid?: string) => {
-	return isValid === '1' ? 'validClass' : 'notValidClass';
-};
-
 const getCellTitle = (item: FinanceManagerData) => {
-	return `${item.belongToName || '未知用户'}的${item.name || ''}(${item.typeCode || ''})`;
+	return item.name || '未命名';
 };
 
-const shouldShowIcon = (fromSource?: string, value?: string) => {
-	if (!fromSource || !value || value === '') {
-		return false;
-	}
-	return fromSource.indexOf(value) >= 0;
+// Helper for Tag Text
+const getIncomeExpenseText = (type?: string) => {
+	return type === 'income' ? '收入' : '支出';
 };
 
-const formatDate = (infoDate?: string | Dayjs | null): string => {
-	if (!infoDate) {
-		return '--';
-	}
-	const dateStr = typeof infoDate === 'string' ? infoDate : infoDate.toString();
-	return dateStr.substring(0, 10);
+const getSourceIconName = (item: FinanceManagerData): FromSourceTransferItem | null => {
+	if (!item.fromSource) return null;
+	const source = fromSourceTransferList.find((s) => item.fromSource?.includes(s.value));
+	return source || null;
 };
 
 const getAmountClass = (incomeAndExpenses?: string) => {
-	return incomeAndExpenses === 'income' ? 'rightGreenDiv' : 'rightRedDiv';
+	return incomeAndExpenses === 'income' ? 'amount-income' : 'amount-expense';
 };
 
 const formatAmount = (item: FinanceManagerData) => {
-	if (!item.amount) {
+	if (item.amount === undefined || item.amount === null) {
 		return '--';
 	}
-	const amount = item.incomeAndExpenses === 'income' ? item.amount : -item.amount;
-	return `${amount}元`;
+	const prefix = item.incomeAndExpenses === 'income' ? '+' : '-';
+	return `${prefix}¥${Number(item.amount).toFixed(2)}`;
 };
 
 // 统一重置数据函数
@@ -242,86 +245,140 @@ onMounted(() => {
 </script>
 
 <style lang="less" scoped>
+.search-bar {
+	--van-search-input-height: 48px; // Increase height
+}
+
 .refresh-info {
 	height: calc(100% - 64px);
+	background-color: #f7f8fa; // Light background
 }
 
 .list-container {
 	height: 100%;
 	overflow-y: auto;
+	padding-top: 10px;
 }
 
-.loading-container {
+.card-list {
+	padding: 0 12px;
+}
+
+.card-swipe-item {
+	margin-bottom: 12px;
+	border-radius: 12px;
+	overflow: hidden; // For radius on swipe
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+	background-color: #fff;
+}
+
+.finance-card {
+	background: #fff;
+	padding: 16px;
 	display: flex;
-	justify-content: center;
+	justify-content: space-between;
 	align-items: center;
-	height: 30%;
-	min-height: 200px;
+	position: relative;
+	/* Ensure the card keeps its shape */
+	min-height: 50px;
 }
 
-.divider-style {
-	color: #1989fa;
-	border-color: grey;
-	margin: 0 0 10px 0;
-}
-
-.item-divider-style {
-	color: #1989fa;
-	border-color: grey;
-	padding: 0 16px;
-	margin-top: 0;
-	margin-bottom: 0;
-}
-
-.right_info {
-	height: 100%;
-}
-
-.text-right {
+.card-left {
 	display: flex;
 	flex-direction: column;
-	align-items: flex-end;
+	justify-content: space-between;
+	gap: 12px; // Space between title row and date
+	flex: 1;
 }
 
-.date-text {
-	width: 130px;
-	text-align: right;
-}
-
-.svgInfo {
-	margin-top: 10px;
+.title-row {
 	display: flex;
+	align-items: center;
+	gap: 8px;
 
-	.svgDiv {
-		height: 30px;
+	.title {
+		font-size: 16px;
+		font-weight: bold;
+		color: #323233;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		max-width: 140px;
+	}
 
-		.svg {
-			width: 1.5em;
-			height: 1.5em;
-			font-size: 18px;
-			cursor: pointer;
-			vertical-align: middle;
+	.tag {
+		font-size: 10px;
+		padding: 2px 6px;
+		border-radius: 4px;
+		background-color: #f5f5f5;
+		color: #969799;
+		line-height: 1;
+
+		&.income {
+			background-color: #e8f5e9; // Light green bg
+			color: #4caf50;
+		}
+		// Default (expense) style
+		&:not(.income) {
+			background-color: #ffebee; // Light red bg? Or just gray as image?
+			// Image shows "Expense" tag with gray background but maybe red text?
+			// Actually image expense tag looks like light gray bg, dark gray text.
+			// Let's stick to gray for expense as default.
 		}
 	}
 }
 
-.rightGreenDiv {
-	margin-top: 10px;
-	text-align: right;
-	color: green;
+.date-text {
+	font-size: 12px;
+	color: #969799;
 }
 
-.rightRedDiv {
-	margin-top: 10px;
-	text-align: right;
-	color: red;
+.card-right {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 12px;
 }
 
-.validClass {
-	font-weight: bolder;
+.amount-text {
+	font-size: 16px;
+	font-weight: 600;
+
+	&.amount-income {
+		color: #4caf50; // Green
+	}
+
+	&.amount-expense {
+		color: #ee0a24; // Red
+	}
 }
 
-.notValidClass {
-	color: gray;
+.source-info {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	color: #969799;
+	font-size: 12px;
+
+	.svg-wrapper {
+		display: flex;
+		align-items: center;
+	}
+
+	.source-icon {
+		width: 16px;
+		height: 16px;
+		vertical-align: middle;
+	}
+
+	.source-text {
+		vertical-align: middle;
+	}
+}
+
+.delete-btn {
+	height: 100%;
+	border: none;
 }
 </style>

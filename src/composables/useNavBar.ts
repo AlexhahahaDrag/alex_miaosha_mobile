@@ -1,10 +1,11 @@
 import { onMounted, onUnmounted } from 'vue';
 import { useNavBarStore } from '@/store/modules/navbar';
 
-interface NavBarConfig {
+export interface NavBarConfig {
 	title?: string;
 	leftButton?: string;
 	rightButton?: string;
+	rightIcon?: string;
 	noShowLeft?: boolean;
 	showRight?: boolean;
 	leftPath?: string;
@@ -23,11 +24,14 @@ export function useNavBar(config?: NavBarConfig) {
 		if (newConfig.rightButton === undefined) {
 			newConfig.rightButton = '';
 		}
+		if (newConfig.rightIcon === undefined) {
+			newConfig.rightIcon = '';
+		}
 		// 设置NavBar信息
 		if (newConfig.onRightClick) {
 			navBarStore.setRightClickHandler(newConfig.onRightClick);
 			// 移除onRightClick，因为store不需要存储这个函数引用在info中
-			const { onRightClick, ...infoConfig } = newConfig;
+			const { ...infoConfig } = newConfig;
 			navBarStore.setNavBarInfo(infoConfig);
 		} else {
 			navBarStore.setNavBarInfo(newConfig);
