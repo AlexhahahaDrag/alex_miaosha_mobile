@@ -112,7 +112,7 @@ import { type Dayjs } from 'dayjs';
 import type { PersonalGiftData } from './config';
 import { pagination } from './config';
 import { getPersonalGiftPage, deletePersonalGift } from './api/personalGiftTs';
-import type { PageInfo } from '@/views/common/config/index';
+import type { PageInfo } from '@/views/common/config';
 import { useNavBar } from '@/composables/useNavBar';
 import { getRoutePathByName } from '@/utils/router';
 import { formatTime } from '@/views/common/config';
