@@ -41,70 +41,110 @@
 					@load="onLoadMore"
 					class="coupon-list"
 				>
-					<van-swipe-cell
-						v-for="(item, index) in dataSource"
-						:key="item.id"
-					>
-						<div
-							class="coupon-card"
-							:class="getBorderColorClass(index)"
-							@click="onCardClick(item.id)"
+					<transition-group name="card-list">
+						<van-swipe-cell
+							v-for="(item, index) in dataSource"
+							:key="item.id"
+							class="card-item"
 						>
-							<!-- 左侧图标 -->
-							<div class="coupon-icon">
-								<img
-									:src="getCouponImage(index)"
-									alt="coupon"
-								/>
-							</div>
+							<div
+								class="coupon-card"
+								:class="getBorderColorClass(index)"
+								@click="onCardClick(item.id)"
+							>
+								<!-- 左侧图标 -->
+								<div class="coupon-icon">
+									<img
+										:src="getCouponImage(index)"
+										alt="coupon"
+									/>
+								</div>
 
-							<!-- 中间内容 -->
-							<div class="coupon-content">
-								<div class="coupon-name">{{ item.couponName || '未命名消费券' }}</div>
-								<div class="coupon-validity">{{ getValidityText(item) }}</div>
-								<div class="coupon-price">¥ {{ item.unitValue?.toFixed(2) || '0.00' }}</div>
+								<!-- 中间内容 -->
+								<div class="coupon-content">
+									<div class="coupon-name">{{ item.couponName || '未命名消费券' }}</div>
+									<div class="coupon-validity">{{ getValidityText(item) }}</div>
+									<div class="coupon-price">¥ {{ item.unitValue?.toFixed(2) || '0.00' }}</div>
+								</div>
+								<!-- 右侧进度 -->
+								<div class="coupon-progress">
+									<van-circle
+										v-model:current-rate="item.currentRate"
+										:rate="getProgressRate(item)"
+										:speed="100"
+										:text="getProgressText(item)"
+										:color="getProgressColor(index)"
+										:stroke-width="50"
+										size="50px"
+									/>
+									<div class="remaining-text">剩余数量</div>
+								</div>
 							</div>
-
-							<!-- 右侧进度 -->
-							<div class="coupon-progress">
-								<van-circle
-									v-model:current-rate="item.currentRate"
-									:rate="getProgressRate(item)"
-									:speed="100"
-									:text="getProgressText(item)"
-									:color="getProgressColor(index)"
-									:stroke-width="60"
-									size="50px"
+							<template #right>
+								<van-button
+									v-if="item.remainingQuantity && item.remainingQuantity > 0"
+									class="redeem-button"
+									@click="onRedeem(item.id)"
+									square
+									type="primary"
+									text="核销"
 								/>
-								<div class="remaining-text">剩余数量</div>
-							</div>
-						</div>
-						<template #right>
-							<van-button
-								v-if="item.remainingQuantity && item.remainingQuantity > 0"
-								class="redeem-button"
-								@click="onRedeem(item.id)"
-								square
-								type="primary"
-								text="核销"
-							/>
-							<van-button
-								class="delete-button"
-								@click="onDeleteCpnCouponInfo(item.id)"
-								square
-								type="danger"
-								text="删除"
-							/>
-						</template>
-					</van-swipe-cell>
+								<van-button
+									class="delete-button"
+									@click="onDeleteCpnCouponInfo(item.id)"
+									square
+									type="danger"
+									text="删除"
+								/>
+							</template>
+						</van-swipe-cell>
+					</transition-group>
 				</van-list>
 			</div>
 		</van-pull-refresh>
-		<van-back-top />
+
+		<!-- 删除确认弹窗 -->
+		<van-popup
+			v-model:show="showDeletePopup"
+			position="bottom"
+			round
+			:style="{ padding: '20px' }"
+		>
+			<div class="delete-popup-content">
+				<div class="delete-icon">
+					<van-icon
+						name="delete-o"
+						size="40"
+						color="#ee0a24"
+					/>
+				</div>
+				<div class="delete-title">确认删除该优惠券吗？</div>
+				<div class="delete-message">删除后将无法恢复此优惠券，请确认是否继续操作。</div>
+				<div class="delete-buttons">
+					<van-button
+						class="cancel-btn"
+						block
+						round
+						@click="cancelDelete"
+					>
+						取消
+					</van-button>
+					<van-button
+						class="confirm-btn"
+						block
+						round
+						type="danger"
+						@click="confirmDelete"
+					>
+						删除
+					</van-button>
+				</div>
+			</div>
+		</van-popup>
 	</div>
 </template>
 <script lang="ts" setup>
-import { showFailToast, showSuccessToast, showConfirmDialog } from 'vant';
+import { showFailToast, showSuccessToast } from 'vant';
 import type { SearchInfo, CpnCouponInfoData } from './config';
 import { pagination } from './config';
 import type { PageInfo } from '@/views/common/config';
@@ -149,6 +189,8 @@ const searchInfo = ref<SearchInfo>({
 });
 const finished = ref<boolean>(false);
 const isRefresh = ref<boolean>(false);
+const showDeletePopup = ref<boolean>(false);
+const deleteTargetId = ref<string | undefined>(undefined);
 
 // 卡片边框颜色类（循环使用）
 const getBorderColorClass = (index: number) => {
@@ -289,14 +331,23 @@ const onDeleteCpnCouponInfo = async (id?: string) => {
 	if (!id) {
 		return;
 	}
-	try {
-		await showConfirmDialog({
-			title: '确认删除',
-			message: '确认要删除该优惠券吗？',
-		});
-	} catch {
+	deleteTargetId.value = id;
+	showDeletePopup.value = true;
+};
+
+// 取消删除
+const cancelDelete = () => {
+	showDeletePopup.value = false;
+	deleteTargetId.value = undefined;
+};
+
+// 确认删除
+const confirmDelete = async () => {
+	const id = deleteTargetId.value;
+	if (!id) {
 		return;
 	}
+	showDeletePopup.value = false;
 	const { code, message } = await deleteCpnCouponInfo(String(id));
 	if (code === '200') {
 		onRefreshData();
@@ -304,6 +355,7 @@ const onDeleteCpnCouponInfo = async (id?: string) => {
 	} else {
 		showFailToast(message || '删除失败，请联系管理员！');
 	}
+	deleteTargetId.value = undefined;
 };
 
 // 初始化
@@ -476,5 +528,109 @@ onMounted(() => {
 // 如果只有删除按钮时占满高度和位置
 .van-swipe-cell__right .delete-button:only-child {
 	width: 65px;
+}
+
+.delete-popup-content {
+	text-align: center;
+	animation: popup-in 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+	@keyframes popup-in {
+		0% {
+			opacity: 0;
+			transform: translateY(20px);
+		}
+		100% {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	.delete-icon {
+		width: 60px;
+		height: 60px;
+		margin: 0 auto 16px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background-color: #fee;
+		border-radius: 50%;
+		animation: icon-bounce 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.2s backwards;
+
+		@keyframes icon-bounce {
+			0% {
+				transform: scale(0);
+			}
+			50% {
+				transform: scale(1.1);
+			}
+			100% {
+				transform: scale(1);
+			}
+		}
+	}
+
+	.delete-title {
+		font-size: 18px;
+		font-weight: 600;
+		color: #323233;
+		margin-bottom: 12px;
+		animation: fade-in 0.4s ease 0.3s backwards;
+	}
+
+	.delete-message {
+		font-size: 14px;
+		color: #969799;
+		line-height: 20px;
+		margin-bottom: 24px;
+		padding: 0 10px;
+		animation: fade-in 0.4s ease 0.4s backwards;
+
+		@keyframes fade-in {
+			from {
+				opacity: 0;
+			}
+			to {
+				opacity: 1;
+			}
+		}
+	}
+
+	.delete-buttons {
+		display: flex;
+		gap: 12px;
+		animation: fade-in 0.4s ease 0.5s backwards;
+
+		.cancel-btn,
+		.confirm-btn {
+			transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+			&:active {
+				transform: scale(0.95);
+			}
+		}
+
+		.cancel-btn {
+			background-color: #f7f8fa;
+			color: #323233;
+			border: none;
+
+			&:hover {
+				background-color: #ebedf0;
+			}
+		}
+
+		.confirm-btn {
+			background-color: #ee0a24;
+			border: none;
+
+			&:hover {
+				background-color: #d9001b;
+			}
+
+			&:active {
+				background-color: #c00018;
+			}
+		}
+	}
 }
 </style>

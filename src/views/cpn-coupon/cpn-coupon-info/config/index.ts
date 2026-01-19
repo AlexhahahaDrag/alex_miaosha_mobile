@@ -28,7 +28,7 @@ export interface CpnCouponInfoData {
 	remainingQuantity?: number;
 	consumedQuantity?: number;
 	paymentStatus?: number;
-	// 当前进度,用于环形进度条
+	// 为了列表的环形图展示
 	currentRate?: number;
 }
 
