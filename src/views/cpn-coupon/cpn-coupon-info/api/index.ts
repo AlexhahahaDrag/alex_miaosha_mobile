@@ -9,6 +9,7 @@ const cpnCouponInfoUrl = {
 	url: '',
 };
 
+// 获取优惠券信息分页
 export const getCpnCouponInfoPage = async (
 	params: CpnCouponInfoData,
 	pageNum?: number,
