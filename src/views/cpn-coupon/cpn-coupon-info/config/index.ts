@@ -28,6 +28,8 @@ export interface CpnCouponInfoData {
 	remainingQuantity?: number;
 	consumedQuantity?: number;
 	paymentStatus?: number;
+	// 当前进度,用于环形进度条
+	currentRate?: number;
 }
 
 export const rulesRef = reactive({

@@ -68,6 +68,7 @@
 							<!-- 右侧进度 -->
 							<div class="coupon-progress">
 								<van-circle
+									v-model:current-rate="item.currentRate"
 									:rate="getProgressRate(item)"
 									:speed="100"
 									:text="getProgressText(item)"
@@ -200,7 +201,7 @@ const getProgressColor = (index: number) => {
 };
 
 // 点击卡片 - 跳转到详情页
-const onCardClick = (id?: number) => {
+const onCardClick = (id?: string) => {
 	if (!id) return;
 	const path = getRoutePathByName(router, 'cpnCouponInfoDetail', '/selfFinance/cpnCouponInfo/cpnCouponInfoDetail');
 	router.push({
@@ -233,6 +234,9 @@ const getCpnCouponInfoPageData = async (param: SearchInfo, cur: PageInfo) => {
 			isRefresh.value = false;
 		});
 	if (code === '200') {
+		data?.records?.forEach((item: CpnCouponInfoData) => {
+			item.currentRate = 0;
+		});
 		dataSource.value = [...dataSource.value, ...(data?.records || [])];
 		pagination.value.total = data?.total || 0;
 		finished.value = pagination.value.total < ((pagination.value.current || 0) + 1) * (pagination.value.pageSize || 10);
