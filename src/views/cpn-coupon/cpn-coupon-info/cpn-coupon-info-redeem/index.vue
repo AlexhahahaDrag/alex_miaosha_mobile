@@ -123,8 +123,8 @@ const redeemTime = ref<dayjs.Dayjs>(dayjs());
 
 // 核销表单数据
 const redeemForm = ref<{
-	userId?: number;
-	couponId?: number;
+	userId?: string;
+	couponId?: string;
 	redemptionQuantity?: number;
 	remarks?: string;
 }>({
@@ -186,7 +186,7 @@ const chooseUser = () => {
 const selectUser = (type: string, value: string, name: string) => {
 	userInfo.value.showFlag = false;
 	if (type === 'userId') {
-		redeemForm.value.userId = Number(value);
+		redeemForm.value.userId = value;
 		userName.value = name;
 	}
 };
@@ -253,7 +253,7 @@ const initCouponInfo = async () => {
 		const { code, data, message } = await getCpnCouponInfoDetail(couponId);
 		if (code === '200') {
 			couponInfo.value = data || null;
-			redeemForm.value.couponId = Number(couponId);
+			redeemForm.value.couponId = couponId;
 			if (couponInfo.value && (!couponInfo.value.remainingQuantity || couponInfo.value.remainingQuantity <= 0)) {
 				showFailToast('该消费券已无剩余数量，无法核销！');
 				router.push({ path: getLeftPath.value });

@@ -32,8 +32,8 @@ export const getCpnUserCouponInfoDetail = async (
 
 // 核销消费券（按数量核销）
 export const redeemCpnUserCouponInfo = async (params: {
-	userId?: number;
-	couponId?: number;
+	userId?: string;
+	couponId?: string;
 	redemptionQuantity?: number;
 	remarks?: string;
 }): Promise<ResponseBody<boolean>> => {

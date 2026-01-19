@@ -8,16 +8,21 @@ export interface TabBarItem {
 	name: string;
 }
 
+export interface TabBarItemConfig {
+	name: string;
+	title?: string;
+	icon?: string;
+}
+
 export interface TabBarInfo {
 	visible?: boolean;
-	data?: string[];
+	data?: (string | TabBarItemConfig)[];
 	active?: number | string;
 }
 
 export const useTabBar = (config: Partial<TabBarInfo>) => {
 	const tabBarStore = useTabBarStore();
 	const updateTabBar = () => {
-		console.log('set config gggggggggggg:', config);
 		tabBarStore.setTabBarInfo(config);
 	};
 

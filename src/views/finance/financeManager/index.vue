@@ -11,7 +11,7 @@
 	<van-pull-refresh
 		pulling-text="加载中。。。"
 		class="refresh-info"
-		v-model="isRefresh"
+		v-model:model-value="isRefresh"
 		@refresh="onRefreshData"
 		ref="pullRefresh"
 		:immediate-check="false"
@@ -104,6 +104,7 @@ import { getRoutePathByName } from '@/utils/router';
 import { formatDate, dataTimeFormat } from '@/utils/dayjs';
 import { getFinanceMangerPage, deleteFinanceManager } from '@/views/finance/financeManager/api';
 import { useNavBar } from '@/composables/useNavBar';
+import { useTabBar } from '@/composables/useTabBar';
 import type { PageInfo } from '@/views/common/config';
 
 const router = useRouter();
@@ -133,6 +134,18 @@ useNavBar({
 		const path = getDetailRoutePath();
 		router.push({ path });
 	},
+});
+
+// TabBar配置
+useTabBar({
+	visible: true,
+	data: [
+		{ name: 'dashboard', title: '首页', icon: 'homepage' },
+		{ name: 'financeManager', title: '财务', icon: 'finance' },
+		{ name: 'financeAnalysis', title: '分析', icon: 'financeAnalysis' },
+		{ name: 'myself', title: '个人', icon: 'user' },
+	],
+	active: 1,
 });
 
 // 响应式数据

@@ -1,113 +1,109 @@
 <template>
-	<form action="/">
+	<div class="coupon-page">
+		<!-- 搜索栏 -->
 		<van-search
 			v-model="searchInfo.couponName"
-			show-action
-			placeholder="请输入消费券名称"
+			placeholder="搜索优惠券"
 			@search="onSearch"
-			@cancel="onCancel"
-			action-text="清空"
+			@clear="onCancel"
 		/>
-	</form>
-	<van-divider class="divider-style" />
-	<van-pull-refresh
-		pulling-text="加载中。。。"
-		class="refresh-info"
-		v-model="isRefresh"
-		@refresh="onRefreshData"
-		ref="pullRefresh"
-		:immediate-check="false"
-	>
-		<div class="list-container">
-			<van-empty
-				v-if="!dataSource?.length"
-				description="暂无数据"
-			/>
-			<van-list
-				v-else
-				v-model:loading="loading"
-				:finished="finished"
-				:immediate-check="false"
-				finished-text="没有更多了"
-				@load="onLoadMore"
-			>
-				<van-cell-group>
+
+		<!-- 下拉刷新容器 -->
+		<van-pull-refresh
+			v-model="isRefresh"
+			@refresh="onRefreshData"
+			class="refresh-container"
+		>
+			<div class="content-wrapper">
+				<div class="section-header">
+					<span class="section-title">可用优惠券</span>
+					<span
+						class="view-all"
+						@click="onViewAll"
+					>
+						查看全部
+					</span>
+				</div>
+
+				<!-- 空状态 -->
+				<van-empty
+					v-if="!dataSource?.length"
+					description="暂无数据"
+				/>
+
+				<!-- 优惠券列表 -->
+				<van-list
+					v-else
+					v-model:loading="loading"
+					:finished="finished"
+					:immediate-check="false"
+					finished-text="没有更多了"
+					@load="onLoadMore"
+					class="coupon-list"
+				>
 					<van-swipe-cell
-						v-for="item in dataSource"
+						v-for="(item, index) in dataSource"
 						:key="item.id"
 					>
-						<van-cell
-							:title-class="getTitleClass(item.remainingQuantity)"
-							is-link
-							:to="getDetailRoute(item.id)"
+						<div
+							class="coupon-card"
+							:class="getBorderColorClass(index)"
+							@click="onCardClick(item.id)"
 						>
-							<template #title>
-								<div class="title-container">
-									<span>{{ item.couponName || '未命名消费券' }}</span>
-									<van-tag
-										v-if="item.expireStatus"
-										:style="{
-											color: getExpireStatusColor(item.expireRangeStatus),
-											borderColor: getExpireStatusColor(item.expireRangeStatus),
-										}"
-										plain
-									>
-										{{ item.expireStatus }}
-									</van-tag>
-									<van-tag :type="item.paymentStatus === 1 ? 'success' : 'default'">
-										{{ item.paymentStatus === 1 ? '已支付' : '未支付' }}
-									</van-tag>
-								</div>
-							</template>
-							<template #label>
-								<div class="coupon-info">
-									<div class="info-item">
-										<span class="label">面值：</span>
-										<span class="value">{{ item.unitValue ? '￥' + item.unitValue : '--' }}</span>
-									</div>
-								</div>
-							</template>
-							<template #right-icon>
-								<div class="text-right">
-									<div class="date-text">
-										{{ formatDate(item.endDate) }}
-									</div>
-									<div class="info-item">
-										<span class="label">剩余数量：</span>
-										<span class="value">{{ item.remainingQuantity ?? 0 }}</span>
-									</div>
-								</div>
-							</template>
-						</van-cell>
-						<template #right>
-							<div class="right-buttons">
-								<van-button
-									v-if="item.remainingQuantity && item.remainingQuantity > 0"
-									class="right_info redeem-btn"
-									@click="onRedeem(item.id)"
-									square
-									type="primary"
-									text="核销"
-								/>
-								<van-button
-									class="right_info"
-									@click="onDeleteCpnCouponInfo(item.id)"
-									square
-									type="danger"
-									text="删除"
+							<!-- 左侧图标 -->
+							<div class="coupon-icon">
+								<img
+									:src="getCouponImage(index)"
+									alt="coupon"
 								/>
 							</div>
+
+							<!-- 中间内容 -->
+							<div class="coupon-content">
+								<div class="coupon-name">{{ item.couponName || '未命名消费券' }}</div>
+								<div class="coupon-validity">{{ getValidityText(item) }}</div>
+								<div class="coupon-price">¥ {{ item.unitValue?.toFixed(2) || '0.00' }}</div>
+							</div>
+
+							<!-- 右侧进度 -->
+							<div class="coupon-progress">
+								<van-circle
+									:rate="getProgressRate(item)"
+									:speed="100"
+									:text="getProgressText(item)"
+									:color="getProgressColor(index)"
+									:stroke-width="60"
+									size="50px"
+								/>
+								<div class="remaining-text">剩余数量</div>
+							</div>
+						</div>
+						<template #right>
+							<van-button
+								v-if="item.remainingQuantity && item.remainingQuantity > 0"
+								class="redeem-button"
+								@click="onRedeem(item.id)"
+								square
+								type="primary"
+								text="核销"
+							/>
+							<van-button
+								class="delete-button"
+								@click="onDeleteCpnCouponInfo(item.id)"
+								square
+								type="danger"
+								text="删除"
+							/>
 						</template>
-						<van-divider class="item-divider-style" />
 					</van-swipe-cell>
-				</van-cell-group>
-			</van-list>
-		</div>
-	</van-pull-refresh>
-	<van-back-top />
+				</van-list>
+			</div>
+		</van-pull-refresh>
+		<van-back-top />
+	</div>
 </template>
 <script lang="ts" setup>
-import { showSuccessToast, showFailToast, showConfirmDialog } from 'vant';
+import { showFailToast, showSuccessToast, showConfirmDialog } from 'vant';
 import type { SearchInfo, CpnCouponInfoData } from './config';
 import { pagination } from './config';
 import type { PageInfo } from '@/views/common/config';
@@ -115,28 +111,10 @@ import { getRoutePathByName } from '@/utils/router';
 import { formatDate } from '@/utils/dayjs';
 import { getCpnCouponInfoPage, deleteCpnCouponInfo } from '@/views/cpn-coupon/cpn-coupon-info/api';
 import { useNavBar } from '@/composables/useNavBar';
+import { useTabBar } from '@/composables/useTabBar';
 
 const router = useRouter();
 const route = useRoute();
-
-// 通过路由解析获取详情页路径，使用公共工具方法
-const getDetailRoutePath = () => {
-	return getRoutePathByName(router, 'cpnCouponInfoDetail', '/selfFinance/cpnCouponInfo/cpnCouponInfoDetail');
-};
-
-// 获取详情页路由配置
-const getDetailRoute = (id?: number) => {
-	const path = getDetailRoutePath();
-	return {
-		path,
-		query: { id },
-	};
-};
-
-// 获取核销页路径
-const getRedeemRoutePath = () => {
-	return getRoutePathByName(router, 'cpnCouponInfoRedeem', '/selfFinance/cpnCouponInfo/redeem');
-};
 
 // 导航栏配置
 useNavBar({
@@ -145,9 +123,21 @@ useNavBar({
 	leftPath: '/',
 	visible: true,
 	onRightClick: () => {
-		const path = getDetailRoutePath();
+		const path = getRoutePathByName(router, 'cpnCouponInfoDetail', '/selfFinance/cpnCouponInfo/cpnCouponInfoDetail');
 		router.push({ path });
 	},
+});
+
+// TabBar配置
+useTabBar({
+	visible: true,
+	data: [
+		{ name: 'dashboard', title: '首页', icon: 'homepage' },
+		{ name: 'cpnCouponInfo', title: '消费券', icon: 'cpnCouponInfo' },
+		{ name: 'cpnUserCouponInfo', title: '记录', icon: 'cpnUserCouponInfo' },
+		{ name: 'myself', title: '个人', icon: 'user' },
+	],
+	active: 1,
 });
 
 // 响应式数据
@@ -159,24 +149,69 @@ const searchInfo = ref<SearchInfo>({
 const finished = ref<boolean>(false);
 const isRefresh = ref<boolean>(false);
 
-// 计算属性和工具函数
-const getTitleClass = (remainingQuantity?: number) => {
-	return remainingQuantity && remainingQuantity > 0 ? 'validClass' : 'notValidClass';
+// 卡片边框颜色类（循环使用）
+const getBorderColorClass = (index: number) => {
+	const colors = ['border-green', 'border-orange', 'border-blue', 'border-red'];
+	return colors[index % colors.length];
 };
 
-// 获取过期状态颜色
-const getExpireStatusColor = (status: number | undefined): string => {
-	if (status === undefined) return '#333';
-	switch (status) {
-		case 0:
-			return 'red';
-		case 1:
-			return 'green';
-		case 2:
-			return 'orange';
-		default:
-			return '#333';
-	}
+// 获取优惠券图片（使用占位图）
+const getCouponImage = (index: number) => {
+	const images = [
+		'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjN2NiMzQyIiByeD0iOCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjI0IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuKYlTwvdGV4dD48L3N2Zz4=',
+		'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjZmY5ODAwIiByeD0iOCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjI0IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuKYljwvdGV4dD48L3N2Zz4=',
+		'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjNTY5ZGZmIiByeD0iOCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjI0IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuKYhTwvdGV4dD48L3N2Zz4=',
+		'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjZmY0NTU3IiByeD0iOCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjI0IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuKYhjwvdGV4dD48L3N2Zz4=',
+	];
+	return images[index % images.length];
+};
+
+// 获取有效期文本
+const getValidityText = (item: CpnCouponInfoData) => {
+	if (!item.endDate) return '无限期';
+	const endDate = formatDate(item.endDate);
+	const today = new Date();
+	const end = new Date(item.endDate.toString());
+	const daysLeft = Math.ceil((end.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+	if (daysLeft < 0) return '已过期';
+	if (daysLeft === 0) return '今天到期';
+	if (daysLeft <= 3) return `${daysLeft}天后到期`;
+	if (daysLeft <= 30) return `有效期至${endDate.slice(5)}`;
+	return `有效期至${endDate.slice(5)}`;
+};
+
+// 获取进度百分比（剩余数量占总数的百分比）
+const getProgressRate = (item: CpnCouponInfoData): number => {
+	if (!item.totalQuantity) return 0;
+	if (!item.remainingQuantity) return 0;
+	return (item.remainingQuantity / item.totalQuantity) * 100;
+};
+
+// 获取进度文本
+const getProgressText = (item: CpnCouponInfoData) => {
+	return `${item.remainingQuantity || 0}/${item.totalQuantity || 0}`;
+};
+
+// 获取进度颜色
+const getProgressColor = (index: number) => {
+	const colors = ['#07c160', '#ff9800', '#1989fa', '#ff4557'];
+	return colors[index % colors.length];
+};
+
+// 点击卡片 - 跳转到详情页
+const onCardClick = (id?: number) => {
+	if (!id) return;
+	const path = getRoutePathByName(router, 'cpnCouponInfoDetail', '/selfFinance/cpnCouponInfo/cpnCouponInfoDetail');
+	router.push({
+		path,
+		query: { id },
+	});
+};
+
+// 查看全部
+const onViewAll = () => {
+	// 可以跳转到完整列表页或执行其他操作
 };
 
 // 统一重置数据函数
@@ -234,11 +269,11 @@ const onLoadMore = () => {
 };
 
 // 核销消费券
-const onRedeem = (id?: number) => {
+const onRedeem = (id?: string) => {
 	if (!id) {
 		return;
 	}
-	const path = getRedeemRoutePath();
+	const path = getRoutePathByName(router, 'cpnCouponInfoRedeem', '/selfFinance/cpnCouponInfo/redeem');
 	router.push({
 		path,
 		query: { couponId: id },
@@ -246,14 +281,14 @@ const onRedeem = (id?: number) => {
 };
 
 // 删除消费券
-const onDeleteCpnCouponInfo = async (id?: number) => {
+const onDeleteCpnCouponInfo = async (id?: string) => {
 	if (!id) {
 		return;
 	}
 	try {
 		await showConfirmDialog({
 			title: '确认删除',
-			message: '确定要删除该消费券吗？',
+			message: '确认要删除该优惠券吗？',
 		});
 	} catch {
 		return;
@@ -275,91 +310,167 @@ onMounted(() => {
 </script>
 
 <style lang="less" scoped>
-.refresh-info {
-	height: calc(100% - 64px);
+.coupon-page {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	background-color: #f7f8fa;
 }
 
-.list-container {
-	height: 100%;
+.refresh-container {
+	flex: 1;
 	overflow-y: auto;
 }
 
-.divider-style {
-	color: #1989fa;
-	border-color: grey;
-	margin: 0 0 10px 0;
+.content-wrapper {
+	padding: 12px 16px;
 }
 
-.item-divider-style {
-	color: #1989fa;
-	border-color: grey;
-	padding: 0 16px;
-	margin-top: 0;
-	margin-bottom: 0;
-}
-
-.right-buttons {
-	height: 100%;
+.section-header {
 	display: flex;
-	flex-direction: column;
-}
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 16px;
+	padding: 0 4px;
 
-.right_info {
-	flex: 1;
-}
+	.section-title {
+		font-size: 18px;
+		font-weight: 600;
+		color: #323233;
+	}
 
-.redeem-btn {
-	margin-bottom: 2px;
-}
-
-.text-right {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-end;
-}
-
-.date-text {
-	width: 130px;
-	text-align: right;
-	font-size: 12px;
-	color: #666;
-}
-
-.coupon-info {
-	margin-top: 10px;
-	.info-item {
-		margin-bottom: 4px;
-		.label {
-			color: #666;
-			font-size: 12px;
-		}
-		.value {
-			color: #333;
-			font-size: 12px;
-			font-weight: 500;
-		}
+	.view-all {
+		font-size: 14px;
+		color: #1989fa;
+		cursor: pointer;
 	}
 }
 
-.rightDiv {
-	margin-top: 10px;
-	text-align: right;
-	font-size: 12px;
-	color: #333;
+.coupon-list {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
 }
 
-.title-container {
+.coupon-card {
+	background: #fff;
+	border-radius: 12px;
+	padding: 16px;
 	display: flex;
 	align-items: center;
-	gap: 8px;
-	flex-wrap: wrap;
+	gap: 12px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+	position: relative;
+	cursor: pointer;
+	transition:
+		transform 0.2s,
+		box-shadow 0.2s;
+	border-left: 4px solid;
+
+	&:active {
+		transform: scale(0.98);
+	}
+
+	&.border-green {
+		border-left-color: #07c160;
+	}
+
+	&.border-orange {
+		border-left-color: #ff9800;
+	}
+
+	&.border-blue {
+		border-left-color: #1989fa;
+	}
+
+	&.border-red {
+		border-left-color: #ff4557;
+	}
 }
 
-.validClass {
-	font-weight: bolder;
+.coupon-icon {
+	flex-shrink: 0;
+	width: 60px;
+	height: 60px;
+	border-radius: 8px;
+	overflow: hidden;
+
+	img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
 }
 
-.notValidClass {
-	color: gray;
+.coupon-content {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 0;
+
+	.coupon-name {
+		font-size: 16px;
+		font-weight: 600;
+		color: #323233;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.coupon-validity {
+		font-size: 12px;
+		color: #969799;
+	}
+
+	.coupon-price {
+		font-size: 18px;
+		font-weight: 600;
+		color: #1989fa;
+		margin-top: 2px;
+	}
+}
+
+.coupon-progress {
+	flex-shrink: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+
+	.remaining-text {
+		font-size: 10px;
+		color: #969799;
+		text-align: center;
+	}
+}
+
+:deep(.van-circle__text) {
+	font-size: 12px;
+	font-weight: 600;
+}
+
+:deep(.van-swipe-cell__right) {
+	display: flex;
+	height: 100%;
+}
+
+.redeem-button {
+	width: 65px;
+	height: 100%;
+	border: none;
+}
+
+.delete-button {
+	width: 65px;
+	height: 100%;
+	border: none;
+	border-top-right-radius: 12px;
+	border-bottom-right-radius: 12px;
+}
+
+// 如果只有删除按钮时占满高度和位置
+.van-swipe-cell__right .delete-button:only-child {
+	width: 65px;
 }
 </style>

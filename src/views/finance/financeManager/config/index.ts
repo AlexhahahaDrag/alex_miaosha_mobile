@@ -1,20 +1,6 @@
 import type { Dayjs } from 'dayjs';
 import { type PageInfo } from '@/views/common/config';
 
-export interface SearchInfo {
-	name?: string;
-	typeCode?: string;
-	fromSource?: string;
-	isValid?: number;
-	pageNum?: number;
-	pageSize?: number;
-	incomeAndExpenses?: string;
-	belongTo?: number;
-	infoDateStart?: string | null;
-	infoDateEnd?: string | null;
-	bigTypeCode?: string;
-}
-
 export interface FieldRule {
 	required?: boolean;
 	message?: string;

@@ -6,27 +6,29 @@
 		>
 			<van-grid-item
 				v-for="item in homeList"
-				:key="item.id"
-				:text="item?.meta?.title"
+				:key="item?.name || ''"
+				:text="item?.meta?.title?.toString() || ''"
 				:to="item.path"
 			>
-				<SvgIcon
+				<svg-icon
 					class="homeSvgClass"
-					:name="item?.meta?.icon"
-				></SvgIcon>
-				<span class="homeFontClass">{{ item?.meta?.title || 'null' }}</span>
+					:name="item?.meta?.icon?.toString() || ''"
+				>
+				</svg-icon>
+				<span class="homeFontClass">{{ item?.meta?.title?.toString() || '' }}</span>
 			</van-grid-item>
 		</van-grid>
 	</div>
 </template>
 
 <script setup lang="ts">
+import type { RouteRecordRaw } from 'vue-router';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
 
 const route = useRoute();
 const router = useRouter();
-const homeList = ref<any>([]);
+const homeList = ref<RouteRecordRaw[]>([]);
 
 // 使用新的NavBar系统
 useNavBar({
@@ -38,28 +40,25 @@ useNavBar({
 
 useTabBar({
 	visible: true,
-	data: ['dashboard', 'message', 'myself'],
-	active: 1,
+	data: [
+		{ name: 'dashboard', title: '首页', icon: 'homepage' },
+		{ name: 'message', title: '消息', icon: 'message' },
+		{ name: 'myself', title: '个人', icon: 'user' },
+	],
+	active: 0,
 });
 
-const getHomeList = (arr: readonly any[] | null) => {
-	if (arr?.length) {
-		arr.forEach((item: any) => {
-			if (item) {
-				if (item?.meta?.showInHome) {
-					homeList.value.push(item);
-				}
-				if (item.children?.length) {
-					getHomeList(item.children);
-				}
-			}
-		});
-	}
+// 获取主页数据
+const getHomeList = (arr: readonly RouteRecordRaw[] | null): RouteRecordRaw[] => {
+	return (arr || []).flatMap((item) => [
+		...(item.meta?.showInHome ? [item] : []),
+		...(item.children ? getHomeList(item.children) : []),
+	]);
 };
 
+// 初始化数据
 const init = () => {
-	homeList.value = [];
-	getHomeList(router?.options?.routes || []);
+	homeList.value = getHomeList(router?.options?.routes || []);
 };
 
 init();

@@ -57,6 +57,7 @@ import { datePickerFormatter } from '@/utils/dayjs';
 import type { DatePickerInfo } from '@/utils/common';
 import type { UserManagerData } from '@/api/user/userManager';
 import { useNavBar } from '@/composables/useNavBar';
+import { useTabBar } from '@/composables/useTabBar';
 
 const route = useRoute();
 
@@ -65,6 +66,13 @@ useNavBar({
 	title: (route?.meta?.title as string) || '财务分析',
 	leftPath: '/',
 	visible: true,
+});
+
+// TabBar配置
+useTabBar({
+	visible: true,
+	data: ['dashboard', 'financeManager', 'financeAnalysis', 'myself'],
+	active: 2,
 });
 
 // 常量定义

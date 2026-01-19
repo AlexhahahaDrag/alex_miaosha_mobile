@@ -1,16 +1,22 @@
 <template>
 	<div class="finance-detail-container">
-		<!-- Header Section
-		<div class="page-header">
-			<div class="header-icon">
-				<van-icon
-					name="orders-o"
-					size="32"
-					color="#1989fa"
-				/>
+		<!-- Header Card -->
+		<div class="header-card">
+			<div class="header-content">
+				<div class="header-title">
+					<span class="title-main">{{ formInfo.id ? '编辑财务记录' : '新增财务记录' }}</span>
+					<span class="title-sub">FINANCIAL TRANSACTION ENTRY</span>
+				</div>
+				<div class="amount-display">
+					<van-icon
+						name="pending-payment"
+						class="amount-icon"
+					/>
+					<span class="currency">¥</span>
+					<span class="amount-value">{{ formInfo.amount || '0.00' }}</span>
+				</div>
 			</div>
-			<div class="header-text">请填写下方的交易明细以完成记录</div>
-		</div> -->
+		</div>
 
 		<van-form
 			@submit="onSubmit"
@@ -18,69 +24,176 @@
 			required="auto"
 			class="custom-form"
 		>
-			<template
-				v-for="field in formFields"
-				:key="field.name"
-			>
-				<div class="custom-field-container">
-					<div
-						class="field-label"
-						:class="{ required: isRequired(field.name) }"
-					>
-						{{ field.label }}
-					</div>
-
-					<!-- INPUT Type -->
+			<!-- Section 1: Basic Info -->
+			<div class="form-section-card">
+				<div class="section-title">基本信息</div>
+				<div class="field-item">
+					<div class="field-label required">名称</div>
 					<van-field
-						v-if="field.type === 'input'"
-						v-model="formInfo[field.name]"
-						:name="field.name"
-						:type="field.inputType || 'text'"
-						:placeholder="'请输入' + field.label"
-						:rules="rulesRef[field.name as keyof typeof rulesRef]"
+						v-model="formInfo.name"
+						name="name"
+						placeholder="输入记录名称"
+						:rules="rulesRef.name"
 						class="custom-input"
-						:class="{ 'money-input': field.name === 'amount' }"
-					>
-						<template
-							#left-icon
-							v-if="field.name === 'amount'"
-						>
-							<span class="currency-symbol">¥</span>
-						</template>
-					</van-field>
-
-					<!-- SELECT / DATE Type -->
+					/>
+				</div>
+				<div class="field-item">
+					<div class="field-label required">类别</div>
 					<van-field
-						v-else
-						v-model="nameRefMap[field.name as keyof typeof nameRefMap].value"
-						:name="field.name"
-						:placeholder="field.type === 'date' ? 'yyyy年mm月dd日' : '请选择' + field.label"
+						v-model="formInfo.typeCode"
+						name="typeCode"
+						placeholder="选择财务分类"
 						readonly
-						:rules="rulesRef[field.name as keyof typeof rulesRef]"
-						@click="field.type === 'date' ? chooseDate() : choose(field.name)"
+						:rules="rulesRef.typeCode"
+						@click="choose('typeCode')"
 						class="custom-input"
 					>
+						<template #left-icon>
+							<van-icon
+								name="apps-o"
+								class="input-icon"
+							/>
+						</template>
 						<template #right-icon>
-							<van-icon :name="field.type === 'date' ? 'calendar-o' : 'arrow-down'" />
+							<van-icon name="arrow-down" />
 						</template>
 					</van-field>
 				</div>
-			</template>
+			</div>
 
-			<div class="submit-btn-container">
+			<!-- Section 2: Transaction Details -->
+			<div class="form-section-card">
+				<div class="section-title">交易详情</div>
+				<div class="field-item">
+					<div class="field-label required">金额</div>
+					<van-field
+						v-model="formInfo.amount"
+						name="amount"
+						type="number"
+						placeholder="0.00"
+						:rules="rulesRef.amount"
+						class="custom-input money-input"
+					>
+						<template #left-icon>
+							<span class="currency-symbol">¥</span>
+						</template>
+					</van-field>
+				</div>
+				<div class="field-item">
+					<div class="field-label required">支付方式</div>
+					<van-field
+						v-model="nameRefMap.fromSource.value"
+						name="fromSource"
+						placeholder="选择支付方式"
+						readonly
+						:rules="rulesRef.fromSource"
+						@click="choose('fromSource')"
+						class="custom-input"
+					>
+						<template #right-icon>
+							<van-icon name="arrow-down" />
+						</template>
+					</van-field>
+				</div>
+				<div class="field-item">
+					<div class="field-label required">收支类型</div>
+					<van-field
+						v-model="nameRefMap.incomeAndExpenses.value"
+						name="incomeAndExpenses"
+						placeholder="选择收支类型"
+						readonly
+						:rules="rulesRef.incomeAndExpenses"
+						@click="choose('incomeAndExpenses')"
+						class="custom-input"
+					>
+						<template #right-icon>
+							<van-icon name="arrow-down" />
+						</template>
+					</van-field>
+				</div>
+			</div>
+
+			<!-- Section 3: System Info -->
+			<div class="form-section-card">
+				<div class="section-title">系统信息</div>
+				<div class="field-item">
+					<div class="field-label required">状态</div>
+					<van-field
+						v-model="nameRefMap.isValid.value"
+						name="isValid"
+						placeholder="选择状态"
+						readonly
+						:rules="rulesRef.isValid"
+						@click="choose('isValid')"
+						class="custom-input"
+					>
+						<template #right-icon>
+							<van-icon name="arrow-down" />
+						</template>
+					</van-field>
+				</div>
+				<div class="field-item">
+					<div class="field-label required">{{ formInfo.incomeAndExpenses === 'income' ? '收入时间' : '支出时间' }}</div>
+					<van-field
+						v-model="nameRefMap.infoDate.value"
+						name="infoDate"
+						placeholder="yyyy年mm月dd日"
+						readonly
+						:rules="rulesRef.infoDate"
+						@click="chooseDate"
+						class="custom-input"
+					>
+						<template #left-icon>
+							<van-icon
+								name="calendar-o"
+								class="input-icon"
+							/>
+						</template>
+						<template #right-icon>
+							<van-icon name="calendar-o" />
+						</template>
+					</van-field>
+				</div>
+				<div class="field-item">
+					<div class="field-label required">属于</div>
+					<van-field
+						v-model="nameRefMap.belongTo.value"
+						name="belongTo"
+						placeholder="选择归属"
+						readonly
+						:rules="rulesRef.belongTo"
+						@click="choose('belongTo')"
+						class="custom-input"
+					>
+						<template #right-icon>
+							<van-icon name="arrow-down" />
+						</template>
+					</van-field>
+				</div>
+			</div>
+
+			<div class="submit-btn-wrapper">
 				<van-button
 					round
 					block
 					type="primary"
 					native-type="submit"
-					class="custom-submit-btn"
+					class="gradient-submit-btn"
+					:loading="loading"
 				>
-					提交
+					<template #default>
+						<div class="btn-content">
+							<span>提交记录</span>
+							<van-icon
+								name="paper-plane"
+								class="btn-icon"
+							/>
+						</div>
+					</template>
 				</van-button>
 			</div>
 		</van-form>
 
-		<!-- Popups -->
 		<select-pop
 			:info="popInfo"
 			@select-info="selectInfo"
@@ -130,42 +243,8 @@ useNavBar({
 });
 
 const formInfo = ref<FinanceManagerData>({});
-
-const label = reactive({
-	name: '名称',
-	typeCode: '类别',
-	amount: '金额',
-	fromSource: '支付方式',
-	incomeAndExpenses: '收支类型',
-	isValid: '状态',
-	infoDate: '业务时间',
-	belongTo: '属于',
-});
-
-// 表单字段配置，用于循环渲染
-const formFields = computed(() => {
-	const infoDateLabel = formInfo.value.incomeAndExpenses === 'income' ? '收入时间' : '支出时间';
-	return [
-		{ name: 'name', label: label.name, type: 'input' },
-		{ name: 'typeCode', label: label.typeCode, type: 'input' },
-		{ name: 'amount', label: label.amount, type: 'input', inputType: 'number' },
-		{ name: 'fromSource', label: label.fromSource, type: 'select' },
-		{ name: 'incomeAndExpenses', label: label.incomeAndExpenses, type: 'select' },
-		{ name: 'isValid', label: label.isValid, type: 'select' },
-		{ name: 'infoDate', label: infoDateLabel, type: 'date' },
-		{ name: 'belongTo', label: label.belongTo, type: 'select' },
-	] as {
-		name: string;
-		label: string;
-		type: 'input' | 'select' | 'date';
-		inputType?: 'text' | 'number' | 'tel' | 'digit' | 'password';
-	}[];
-});
-
-const isRequired = (name: string) => {
-	const rule = rulesRef[name as keyof typeof rulesRef];
-	return rule && rule.some((r: { required: boolean }) => r.required);
-};
+// 提交按钮loading状态
+const loading = ref<boolean>(false);
 
 const popInfo = ref<Info>({ showFlag: false });
 
@@ -282,17 +361,23 @@ const cancelDateInfo = () => {
 	chooseDateInfo.value.showFlag = false;
 };
 
+// 提交表单
 const onSubmit = async () => {
-	let api = addFinanceManger;
-	if (formInfo.value.id) {
-		api = editFinanceManger;
-	}
-	const { code, message } = await api(formInfo.value);
-	if (code == '200') {
-		showSuccessToast(message || '保存成功!');
-		router.push({ path: getLeftPath.value });
-	} else {
-		showFailToast(message || '保存失败，请联系管理员!');
+	loading.value = true;
+	try {
+		let api = addFinanceManger;
+		if (formInfo.value.id) {
+			api = editFinanceManger;
+		}
+		const { code, message } = await api(formInfo.value);
+		if (code == '200') {
+			showSuccessToast(message || '保存成功!');
+			router.push({ path: getLeftPath.value });
+		} else {
+			showFailToast(message || '保存失败，请联系管理员!');
+		}
+	} finally {
+		loading.value = false;
 	}
 };
 
@@ -356,102 +441,200 @@ init();
 
 <style lang="less" scoped>
 .finance-detail-container {
-	padding: 16px 20px;
+	padding: 0;
 	height: 100%;
 	overflow-y: auto;
-	background-color: #fff;
+	background-color: #f7f9fc;
 }
 
-.page-header {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	margin-bottom: 24px;
+.header-card {
+	margin: 20px;
+	padding: 24px;
+	background: linear-gradient(135deg, #3d7fff 0%, #2b5cfd 100%);
+	border-radius: 16px;
+	box-shadow: 0 8px 20px rgba(43, 92, 253, 0.2);
+	color: #fff;
 
-	.header-icon {
-		width: 48px;
-		height: 48px;
-		background-color: #e8f3ff;
-		border-radius: 50%;
+	.header-title {
+		margin-bottom: 20px;
 		display: flex;
-		align-items: center;
-		justify-content: center;
-		margin-bottom: 12px;
+		flex-direction: column;
+
+		.title-main {
+			font-size: 20px;
+			font-weight: 700;
+			letter-spacing: 0.5px;
+		}
+
+		.title-sub {
+			font-size: 10px;
+			opacity: 0.7;
+			margin-top: 4px;
+			letter-spacing: 1px;
+		}
 	}
 
-	.header-text {
-		color: #969799;
-		font-size: 12px;
+	.amount-display {
+		display: flex;
+		align-items: baseline;
+		gap: 8px;
+
+		.amount-icon {
+			font-size: 24px;
+			margin-right: 4px;
+		}
+
+		.currency {
+			font-size: 20px;
+			font-weight: 600;
+		}
+
+		.amount-value {
+			font-size: 32px;
+			font-weight: 700;
+		}
 	}
 }
 
 .custom-form {
-	.custom-field-container {
-		margin-bottom: 20px;
+	padding: 0 16px 10px;
 
-		.field-label {
-			font-size: 14px;
-			font-weight: bold;
-			color: #323233;
-			margin-bottom: 8px;
+	.form-section-card {
+		background: #fff;
+		border-radius: 16px;
+		padding: 20px;
+		margin-bottom: 16px;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 
-			&.required::after {
-				content: '*';
-				color: #ee0a24;
-				margin-left: 2px;
-			}
+		.section-title {
+			font-size: 13px;
+			font-weight: 600;
+			color: #3d7fff;
+			margin-bottom: 20px;
+			padding-left: 0;
+			display: flex;
+			align-items: center;
 
-			.optional {
-				font-size: 12px;
-				color: #969799;
-				font-weight: normal;
-				margin-left: 4px;
-			}
-		}
-
-		:deep(.van-cell) {
-			padding: 0;
-			overflow: visible;
-
-			&::after {
+			&::before {
 				display: none;
 			}
 		}
 
-		:deep(.custom-input) {
-			background-color: #f7f8fa;
-			border-radius: 8px;
-			padding: 10px 12px;
+		.field-item {
+			display: flex;
+			align-items: center;
+			margin-bottom: 16px;
 
-			.van-field__control {
-				height: 24px;
-				line-height: 24px;
+			&:last-child {
+				margin-bottom: 0;
 			}
 
-			&.textarea-input {
+			.field-label {
+				font-size: 14px;
+				color: #64748b;
+				font-weight: 500;
+				width: 72px;
+				flex-shrink: 0;
+				margin-bottom: 0;
+
+				&.required::after {
+					content: '*';
+					color: #ee0a24;
+					margin-left: 2px;
+				}
+			}
+
+			:deep(.custom-input) {
+				flex: 1;
+				background-color: #f8fafc;
+				border-radius: 12px;
+				padding: 8px 12px;
+				border: 1px solid transparent;
+				transition: all 0.3s;
+
+				&::after {
+					display: none;
+				}
+
 				.van-field__control {
-					height: auto;
+					font-size: 14px;
+					color: #323233;
+					font-weight: 500;
+					text-align: left;
+
+					&::placeholder {
+						color: #c8c9cc;
+						font-weight: 400;
+					}
+				}
+
+				.input-icon {
+					color: #3d7fff;
+					margin-right: 8px;
+					font-size: 16px;
+				}
+
+				.van-icon-arrow-down,
+				.van-icon-calendar-o {
+					color: #94a3b8;
+					margin-left: 4px;
 				}
 			}
 		}
 
 		:deep(.money-input) {
 			.currency-symbol {
-				color: #969799;
-				margin-right: 4px;
-				font-size: 16px;
+				color: #3d7fff;
+				font-weight: 700;
+				font-size: 18px;
+				margin-right: 8px;
+			}
+
+			.van-field__control {
+				font-size: 20px;
+				color: #3d7fff;
+				font-weight: 700;
 			}
 		}
 	}
 }
 
-.submit-btn-container {
+.submit-btn-wrapper {
 	margin-top: 32px;
+	padding: 0 4px;
 
-	.custom-submit-btn {
-		height: 44px;
-		font-size: 16px;
-		font-weight: 600;
+	.gradient-submit-btn {
+		height: 52px;
+		background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+		border: none;
+		border-radius: 14px;
+		box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+
+		.btn-content {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 10px;
+
+			span {
+				font-size: 17px;
+				font-weight: 600;
+				letter-spacing: 1px;
+			}
+
+			.btn-icon {
+				font-size: 18px;
+			}
+		}
+	}
+
+	.footer-tips {
+		text-align: center;
+		font-size: 11px;
+		color: #94a3b8;
+		margin-top: 16px;
+		padding: 0 40px;
+		line-height: 1.5;
 	}
 }
 </style>

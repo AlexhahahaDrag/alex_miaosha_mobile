@@ -26,7 +26,7 @@ export const routes: MenuDataItem[] = [
 		component: Layout,
 		redirect: '/dashboard',
 		meta: {
-			title: '仪表盘',
+			title: '首页',
 			hiedInMenu: false,
 			showInHome: false,
 		},
@@ -35,7 +35,7 @@ export const routes: MenuDataItem[] = [
 				name: 'dashboard',
 				path: '/dashboard',
 				component: modules[pageInfo.dashboard],
-				meta: { title: '仪表盘', icon: 'dashboard' },
+				meta: { title: '首页', icon: 'dashboard' },
 			},
 		],
 	},
@@ -60,32 +60,12 @@ export const routes: MenuDataItem[] = [
 		],
 	},
 	{
-		path: '/test',
-		component: Layout,
-		redirect: '/test/testIndex',
-		name: 'test',
-		meta: {
-			title: '测试',
-			icon: 'messageManager',
-			hiedInMenu: false,
-			showInHome: false,
-		},
-		children: [
-			{
-				path: '/test/testIndex',
-				name: 'testIndex',
-				component: modules[pageInfo.testInfo],
-				meta: { title: '测试', icon: 'message', hiedInMenu: false },
-			},
-		],
-	},
-	{
 		path: '/myself',
 		component: Layout,
 		redirect: '/myself/about',
 		name: 'myself',
 		meta: {
-			title: '我的',
+			title: '个人',
 			icon: 'myself',
 			hiedInMenu: false,
 			showInHome: false,
@@ -95,7 +75,7 @@ export const routes: MenuDataItem[] = [
 				path: '/myself/about',
 				name: 'about',
 				component: modules[pageInfo.about],
-				meta: { title: '我的', icon: 'about', hiedInMenu: false },
+				meta: { title: '个人', icon: 'about', hiedInMenu: false },
 			},
 			{
 				path: '/myself/info',

@@ -8,7 +8,7 @@ interface TabBarState {
 export const useTabBarStore = defineStore('tabBar', {
 	state: (): TabBarState => ({
 		info: {
-			visible: true,
+			visible: false,
 			data: [],
 			active: 0,
 		},

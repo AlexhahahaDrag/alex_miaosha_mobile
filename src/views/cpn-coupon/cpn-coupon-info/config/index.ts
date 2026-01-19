@@ -16,7 +16,7 @@ export interface SearchInfo {
 }
 
 export interface CpnCouponInfoData {
-	id?: number;
+	id?: string;
 	couponName?: string;
 	totalQuantity?: number;
 	startDate?: string | Dayjs | null;
