@@ -22,7 +22,9 @@
 			<div class="card-row stats-row">
 				<div class="stat-item">
 					<div class="row-label highlight">剩余数量</div>
-					<div class="row-value number highlight">{{ couponInfo?.remainingQuantity ?? 0 }}</div>
+					<div class="row-value number highlight">
+						{{ (couponInfo?.remainingQuantity ?? 0) - (redeemForm.redemptionQuantity ?? 0) }}
+					</div>
 				</div>
 				<div class="stat-item align-right">
 					<div class="row-label">总数量</div>
@@ -182,7 +184,6 @@ import { useUserStore } from '@/store/modules/user/user';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
 import type { DatePickerInfo } from '@/utils/common';
-import datePop from '@/views/common/pop/datePop.vue';
 
 const route = useRoute();
 const router = useRouter();

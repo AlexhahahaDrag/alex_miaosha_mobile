@@ -15,15 +15,14 @@
 			class="refresh-container"
 		>
 			<div class="content-wrapper">
-				<div class="section-header">
-					<span class="section-title">可用优惠券</span>
-					<span
-						class="view-all"
-						@click="onViewAll"
-					>
-						查看全部
-					</span>
-				</div>
+				<!-- 下拉筛选菜单 -->
+				<van-dropdown-menu class="filter-dropdown">
+					<van-dropdown-item
+						v-model="searchInfo.onlyValidAndNotFullyRedeemed"
+						:options="filterOptions"
+						@click-option="onFilterChange"
+					/>
+				</van-dropdown-menu>
 
 				<!-- 空状态 -->
 				<van-empty
@@ -145,7 +144,8 @@
 </template>
 <script lang="ts" setup>
 import { showFailToast, showSuccessToast } from 'vant';
-import type { SearchInfo, CpnCouponInfoData } from './config';
+import { debounce } from 'lodash';
+import type { CpnCouponInfoData } from './config';
 import { pagination } from './config';
 import type { PageInfo } from '@/views/common/config';
 import { getRoutePathByName } from '@/utils/router';
@@ -160,7 +160,7 @@ const route = useRoute();
 // 导航栏配置
 useNavBar({
 	title: (route?.meta?.title as string) || '消费券管理',
-	rightButton: '新增',
+	rightIcon: 'plus',
 	leftPath: '/',
 	visible: true,
 	onRightClick: () => {
@@ -184,13 +184,19 @@ useTabBar({
 // 响应式数据
 const loading = ref<boolean>(false);
 const dataSource = ref<CpnCouponInfoData[]>([]);
-const searchInfo = ref<SearchInfo>({
+const searchInfo = ref<CpnCouponInfoData>({
 	onlyValidAndNotFullyRedeemed: true,
 });
 const finished = ref<boolean>(false);
 const isRefresh = ref<boolean>(false);
 const showDeletePopup = ref<boolean>(false);
 const deleteTargetId = ref<string | undefined>(undefined);
+
+// 下拉筛选选项
+const filterOptions = [
+	{ text: '可用优惠券', value: true },
+	{ text: '全部优惠券', value: false },
+];
 
 // 卡片边框颜色类（循环使用）
 const getBorderColorClass = (index: number) => {
@@ -252,9 +258,10 @@ const onCardClick = (id?: string) => {
 	});
 };
 
-// 查看全部
-const onViewAll = () => {
-	// 可以跳转到完整列表页或执行其他操作
+// 下拉筛选变更处理
+const onFilterChange = () => {
+	// v-model 已经自动更新了 searchInfo.onlyValidAndNotFullyRedeemed
+	// 这里可以添加额外的处理逻辑，比如记录用户行为等
 };
 
 // 统一重置数据函数
@@ -265,7 +272,7 @@ const resetData = () => {
 };
 
 // 获取消费券数据
-const getCpnCouponInfoPageData = async (param: SearchInfo, cur: PageInfo) => {
+const getCpnCouponInfoPageData = async (param: CpnCouponInfoData, cur: PageInfo) => {
 	loading.value = true;
 	const { code, data, message } = await getCpnCouponInfoPage(param, cur?.current || 1, cur?.pageSize || 10)
 		.catch((error: unknown) => {
@@ -361,8 +368,27 @@ const confirmDelete = async () => {
 // 初始化
 onMounted(() => {
 	resetData();
+	searchInfo.value.onlyValidAndNotFullyRedeemed = true;
 	getCpnCouponInfoPageData(searchInfo.value, pagination.value);
 });
+
+// 防抖查询函数
+const debouncedQuery = debounce(() => {
+	// 搜索条件发生变化时，重置数据并重新获取数据
+	resetData();
+	getCpnCouponInfoPageData(searchInfo.value, pagination.value);
+}, 300); // 300ms延迟
+
+watch(
+	() => searchInfo.value,
+	() => {
+		debouncedQuery();
+	},
+	{
+		deep: true,
+		immediate: true,
+	},
+);
 </script>
 
 <style lang="less" scoped>
@@ -380,26 +406,36 @@ onMounted(() => {
 
 .content-wrapper {
 	padding: 12px 16px;
+	position: relative;
 }
 
-.section-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 16px;
-	padding: 0 4px;
+.filter-dropdown {
+	position: absolute;
+	top: 0;
+	right: 16px;
+	z-index: 100;
+	background: transparent;
 
-	.section-title {
-		font-size: 18px;
-		font-weight: 600;
-		color: #323233;
+	:deep(.van-dropdown-menu__bar) {
+		background: transparent;
+		box-shadow: none;
+		height: 40px;
 	}
 
-	.view-all {
+	:deep(.van-dropdown-menu__title) {
+		padding: 0 8px;
 		font-size: 14px;
 		color: #1989fa;
-		cursor: pointer;
+
+		&::after {
+			border-color: transparent transparent #1989fa #1989fa;
+		}
 	}
+}
+
+.coupon-list,
+.van-empty {
+	margin-top: 24px;
 }
 
 .coupon-list {
