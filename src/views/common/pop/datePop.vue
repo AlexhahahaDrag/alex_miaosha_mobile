@@ -40,7 +40,7 @@ const onConfirm = ({ selectedValues }: { selectedValues: string[] }) => {
 		dateStr = selectedValues.join('-');
 		dateName = `${selectedValues[0]}年${selectedValues[1]}月`;
 		if (selectedValues.length > 2) {
-			dateName += ` ${selectedValues[2]}日`;
+			dateName += `${selectedValues[2]}日`;
 		}
 		if (selectedValues.length > 3) {
 			dateName += ` ${selectedValues[3]}时${selectedValues[4]}分${selectedValues[5]}秒`;

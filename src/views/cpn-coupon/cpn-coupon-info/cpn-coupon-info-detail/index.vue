@@ -54,7 +54,7 @@
 						label="有效期至"
 						placeholder="请选择有效期"
 						readonly
-						@click="showDatePicker = true"
+						@click="chooseDate"
 						:rules="[{ required: true, message: '请选择有效期' }]"
 					/>
 				</van-cell-group>
@@ -112,18 +112,12 @@
 			</van-form>
 
 			<!-- 日期选择器 -->
-			<van-popup
-				v-model:show="showDatePicker"
-				position="bottom"
+			<date-pop
+				:info="chooseDateInfo"
+				@select-date-info="selectDateInfo"
+				@cancel-date-info="cancelDateInfo"
 			>
-				<van-date-picker
-					v-model="selectedDate"
-					title="选择日期"
-					:min-date="new Date()"
-					@confirm="onDateConfirm"
-					@cancel="showDatePicker = false"
-				/>
-			</van-popup>
+			</date-pop>
 		</template>
 
 		<!-- 展示模式 -->
@@ -205,13 +199,15 @@
 </template>
 
 <script setup lang="ts">
-import dayjs from 'dayjs';
+import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
 import type { CpnCouponInfoData } from '@/views/cpn-coupon/cpn-coupon-info/config';
-import { formatDate } from '@/utils/dayjs';
+import { formatDate, datePickerFormatter } from '@/utils/dayjs';
 import { getCpnCouponInfoDetail, addCpnCouponInfo, editCpnCouponInfo } from '@/views/cpn-coupon/cpn-coupon-info/api';
-import { useNavBar } from '@/composables/useNavBar';
 import { getRoutePathByName } from '@/utils/router';
+import { useNavBar } from '@/composables/useNavBar';
+import { useTabBar } from '@/composables/useTabBar';
+import type { DatePickerInfo } from '@/utils/common';
 
 const route = useRoute();
 const router = useRouter();
@@ -241,9 +237,24 @@ useNavBar({
 	},
 });
 
+// TabBar配置
+useTabBar({
+	visible: false,
+});
+
 const formInfo = ref<CpnCouponInfoData>({});
-const showDatePicker = ref(false);
-const selectedDate = ref<Date>(new Date());
+
+const chooseDateInfo = ref<DatePickerInfo<Dayjs>>({
+	label: 'endDate',
+	labelName: '有效期至',
+	selectValue: dayjs(),
+	showFlag: false,
+	formatter: datePickerFormatter,
+});
+
+const chooseDate = () => {
+	chooseDateInfo.value.showFlag = true;
+};
 
 // 优惠券图片
 const couponImage = ref(
@@ -264,12 +275,14 @@ const consumedQuantity = computed(() => {
 });
 
 // 日期确认
-const onDateConfirm = ({ selectedValues }: any) => {
-	const [year, month, day] = selectedValues;
-	const date = dayjs(`${year}-${month}-${day}`).hour(23).minute(59).second(59);
-	formInfo.value.endDate = date;
-	selectedDate.value = date.toDate();
-	showDatePicker.value = false;
+const selectDateInfo = (date: Dayjs) => {
+	formInfo.value.endDate = date.hour(23).minute(59).second(59);
+	chooseDateInfo.value.selectValue = date;
+	chooseDateInfo.value.showFlag = false;
+};
+
+const cancelDateInfo = () => {
+	chooseDateInfo.value.showFlag = false;
 };
 
 // 提交表单
@@ -308,7 +321,7 @@ const init = async () => {
 		if (code == '200') {
 			formInfo.value = data || {};
 			if (formInfo.value.endDate) {
-				selectedDate.value = dayjs(formInfo.value.endDate).toDate();
+				chooseDateInfo.value.selectValue = dayjs(formInfo.value.endDate);
 			}
 		} else {
 			showFailToast(message || '查询详情失败，请联系管理员!');

@@ -31,7 +31,7 @@ export const getCpnCouponInfoDetail = async (
 
 // 删除优惠券信息
 export const deleteCpnCouponInfo = async (ids: string): Promise<ResponseBody<boolean>> => {
-	return deleteData(`${baseService.finance + baseCpnCouponInfo + cpnCouponInfoUrl.url}?ids=${ids}`);
+	return deleteData(`${baseService.finance + baseCpnCouponInfo + cpnCouponInfoUrl.url}`, { ids });
 };
 
 // 添加优惠券信息

@@ -42,10 +42,8 @@
 					<van-field
 						v-model="formInfo.typeCode"
 						name="typeCode"
-						placeholder="选择财务分类"
-						readonly
+						placeholder="输入财务分类"
 						:rules="rulesRef.typeCode"
-						@click="choose('typeCode')"
 						class="custom-input"
 					>
 						<template #left-icon>
@@ -53,9 +51,6 @@
 								name="apps-o"
 								class="input-icon"
 							/>
-						</template>
-						<template #right-icon>
-							<van-icon name="arrow-down" />
 						</template>
 					</van-field>
 				</div>
@@ -225,6 +220,7 @@ import type { UserManagerData } from '@/api/user/userManager';
 import { addFinanceManger, editFinanceManger, getFinanceMangerDetail } from '@/views/finance/financeManager/api';
 import { useNavBar } from '@/composables/useNavBar';
 import { getRoutePathByName } from '@/utils/router';
+import { useTabBar } from '@/composables/useTabBar';
 
 const route = useRoute();
 const router = useRouter();
@@ -240,6 +236,11 @@ useNavBar({
 	title: (route?.meta?.title as string) || '财务明细',
 	leftPath: getLeftPath.value,
 	visible: true,
+});
+
+// TabBar配置
+useTabBar({
+	visible: false,
 });
 
 const formInfo = ref<FinanceManagerData>({});
