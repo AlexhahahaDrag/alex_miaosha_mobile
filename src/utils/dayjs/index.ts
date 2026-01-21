@@ -60,7 +60,7 @@ const formatDate = (
 const formatTime = (
 	date: string | Dayjs | undefined | null,
 	dateFormat: string = defaultTimeFormat,
-) => {
+): string => {
 	if (!date) {
 		return '';
 	}
@@ -88,6 +88,31 @@ const datePickerFormatter = (type: string, option: { text: string }): { text: st
 	return option;
 };
 
+// 获取格式化时间信息（相对时间显示）
+const getFormatTimeInfo = (time?: string | dayjs.Dayjs): string => {
+	if (!time) return '--';
+
+	const now = dayjs();
+	const targetTime = dayjs(time);
+	const diffMinutes = now.diff(targetTime, 'minute');
+	const diffHours = now.diff(targetTime, 'hour');
+
+	// 3分钟内
+	if (diffMinutes < 3) {
+		return '刚刚';
+	}
+	// 1小时内
+	if (diffMinutes < 60) {
+		return `${diffMinutes}分钟前`;
+	}
+	// 1天内
+	if (diffHours < 24) {
+		return `${diffHours}小时前`;
+	}
+	// 超过1天，显示具体时间
+	return targetTime.format('YYYY-MM-DD HH:mm');
+};
+
 // 导出所有工具函数和常量
 export {
 	defaultDateFormat,
@@ -98,4 +123,5 @@ export {
 	formatDayjs,
 	formatTime,
 	datePickerFormatter,
+	getFormatTimeInfo,
 };

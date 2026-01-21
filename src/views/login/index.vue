@@ -34,6 +34,8 @@
 						block
 						type="primary"
 						native-type="submit"
+						:loading="submitLoading"
+						loading-text="登录中..."
 					>
 						提交
 					</van-button>
@@ -60,16 +62,26 @@ const loginForm = ref<LoginForm>({
 	password: '',
 });
 
+// 提交按钮加载状态
+const submitLoading = ref<boolean>(false);
+
 const onSubmit = async () => {
-	const param: LoginParams = {
-		type: 'account',
-		username: loginForm.value.username,
-		password: loginForm.value.password,
-		isRememberMe: true,
-	};
-	const res = await userStore.login(param);
-	if (res) {
-		router.push('/');
+	if (submitLoading.value) return;
+
+	submitLoading.value = true;
+	try {
+		const param: LoginParams = {
+			type: 'account',
+			username: loginForm.value.username,
+			password: loginForm.value.password,
+			isRememberMe: true,
+		};
+		const res = await userStore.login(param);
+		if (res) {
+			router.push('/');
+		}
+	} finally {
+		submitLoading.value = false;
 	}
 };
 

@@ -175,7 +175,7 @@ useTabBar({
 	data: [
 		{ name: 'dashboard', title: '首页', icon: 'homepage' },
 		{ name: 'cpnCouponInfo', title: '消费券', icon: 'cpnCouponInfo' },
-		{ name: 'cpnUserCouponInfo', title: '记录', icon: 'cpnUserCouponInfo' },
+		{ name: 'cpnUserCouponInfo', title: '核销记录', icon: 'cpnUserCouponInfo' },
 		{ name: 'myself', title: '个人', icon: 'user' },
 	],
 	active: 1,

@@ -21,7 +21,7 @@
 			id="finance-manager-list"
 		>
 			<van-empty
-				v-if="!dataSource?.length"
+				v-if="!loading && !dataSource?.length"
 				description="暂无数据"
 			/>
 			<!-- 有数据时显示列表 -->

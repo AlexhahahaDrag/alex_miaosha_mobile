@@ -10,6 +10,7 @@ const cpnUserCouponInfoUrl = {
 	cancelRedeem: '/redeem/cancel',
 };
 
+// 获取核销记录分页列表
 export const getCpnUserCouponInfoPage = async (
 	params: CpnUserCouponInfoData,
 	pageNum?: number,
@@ -22,6 +23,7 @@ export const getCpnUserCouponInfoPage = async (
 	});
 };
 
+// 获取核销记录详情
 export const getCpnUserCouponInfoDetail = async (
 	id: string,
 ): Promise<ResponseBody<CpnUserCouponInfoData>> => {
@@ -30,7 +32,7 @@ export const getCpnUserCouponInfoDetail = async (
 	});
 };
 
-// 核销消费券（按数量核销）
+// 核销消费券
 export const redeemCpnUserCouponInfo = async (params: {
 	userId?: string;
 	couponId?: string;
