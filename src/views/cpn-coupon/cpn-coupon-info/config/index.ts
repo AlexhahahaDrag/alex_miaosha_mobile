@@ -42,6 +42,12 @@ export const rulesRef = reactive({
 			message: '总数量不能为空！',
 		},
 	],
+	unitValue: [
+		{
+			required: true,
+			message: '面值不能为空！',
+		},
+	],
 	endDate: [
 		{
 			required: true,
