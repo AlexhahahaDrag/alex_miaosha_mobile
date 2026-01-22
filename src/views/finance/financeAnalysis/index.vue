@@ -1,19 +1,32 @@
 <template>
-	<div class="check-title-info">
-		<span @click="choose">
-			<a>{{ belongToName }}</a>
-		</span>
-		的
-		<span @click="chooseDate">
-			<a>{{ infoDateName }}</a>
-		</span>
-		账单
+	<div class="selector-container">
+		<div
+			class="selector-item"
+			@click="choose"
+		>
+			<span class="selector-text">{{ belongToName || '请选择' }}</span>
+			<van-icon
+				name="arrow-down"
+				class="selector-icon"
+			/>
+		</div>
+		<div
+			class="selector-item"
+			@click="chooseDate"
+		>
+			<span class="selector-text">{{ infoDateName }} 账单</span>
+			<van-icon
+				name="arrow-down"
+				class="selector-icon"
+			/>
+		</div>
 	</div>
 	<van-tabs
 		v-model:active="activeTab"
 		sticky
 		swipeable
 		@change="changeTab"
+		class="finance-tabs"
 	>
 		<van-tab
 			title="总览"
@@ -25,13 +38,13 @@
 			title="收支分析"
 			name="2"
 		>
-			<incomeAnalysis v-bind="props"></incomeAnalysis>
+			<income-analysis v-bind="props"></income-analysis>
 		</van-tab>
 		<van-tab
 			title="收支明细"
 			name="3"
 		>
-			<incomeDetail v-bind="props"></incomeDetail>
+			<income-detail v-bind="props"></income-detail>
 		</van-tab>
 	</van-tabs>
 	<date-pop
@@ -66,6 +79,7 @@ useNavBar({
 	title: (route?.meta?.title as string) || '财务分析',
 	leftPath: '/',
 	visible: true,
+	rightIcon: 'share-o',
 });
 
 // TabBar配置
@@ -83,13 +97,13 @@ const ALL_USER_OPTION = { id: '0', nickName: '所有人' };
 // 响应式数据
 const userInfo = useUserStore()?.getUserInfo;
 const belongTo = ref<string | null>(userInfo?.id ? userInfo.id.toString() : null);
-const activeTab = ref<number>(2);
+const activeTab = ref<string>('1');
 const infoDateName = ref<string>(dayjs().format(DATE_FORMATTER));
 const belongToName = ref<string>();
 
 // Props 接口定义
 interface FinanceAnalysisProps {
-	activeTab: number;
+	activeTab: string;
 	dateStr: string;
 	belongTo: string | null;
 }
@@ -123,7 +137,7 @@ const popInfo = ref<Info>({
 });
 
 // Tab 切换处理
-const changeTab = (name: number) => {
+const changeTab = (name: string) => {
 	props.activeTab = name;
 	activeTab.value = name;
 };
@@ -168,7 +182,13 @@ const getUserInfoListInfo = async () => {
 		const { code, data, message } = await getUserManagerList({});
 		if (code === '200') {
 			popInfo.value.list = [...(popInfo.value?.list || []), ...(data || [])];
-			belongToName.value = getListName<UserManagerData>(data || [], belongTo.value || 0, 'id', 'nickName');
+			const name = getListName<UserManagerData>(data || [], belongTo.value || 0, 'id', 'nickName');
+			belongToName.value = name || ALL_USER_OPTION.nickName;
+			// 如果没有选择用户，默认选择"所有人"
+			if (!belongTo.value) {
+				belongTo.value = ALL_USER_OPTION.id;
+				belongToName.value = ALL_USER_OPTION.nickName;
+			}
 		} else {
 			showFailToast(message || '查询失败，请联系管理员!');
 		}
@@ -185,19 +205,68 @@ const init = () => {
 init();
 </script>
 <style lang="less" scoped>
-.check-title-info {
+.selector-container {
 	display: flex;
 	align-items: center;
 	justify-content: flex-end;
-	margin-right: 10px;
+	padding: 8px 16px;
+	background-color: #fff;
+	gap: 12px;
 }
 
-.topRow {
-	padding-top: 10px;
+.selector-item {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	cursor: pointer;
 }
 
-a {
-	color: blue;
-	text-decoration: underline;
+.selector-text {
+	font-size: 16px;
+	color: #323233;
+	font-weight: 500;
+}
+
+.selector-icon {
+	font-size: 14px;
+	color: #969799;
+}
+
+.finance-tabs {
+	margin-top: 0;
+
+	:deep(.van-tabs__wrap) {
+		padding: 12px 20px;
+		height: auto;
+		background-color: #fff;
+	}
+
+	:deep(.van-tabs__nav) {
+		background-color: #f2f3f5;
+		padding: 4px;
+		border-radius: 12px;
+	}
+
+	:deep(.van-tab) {
+		flex: 1;
+		border-radius: 10px;
+		transition: all 0.2s ease;
+		color: #646566;
+		font-size: 16px;
+		font-weight: 400;
+		padding: 10px 0;
+		margin: 0;
+	}
+
+	:deep(.van-tab--active) {
+		background-color: #fff;
+		color: #1989fa;
+		font-weight: 600;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+	}
+
+	:deep(.van-tabs__line) {
+		display: none;
+	}
 }
 </style>

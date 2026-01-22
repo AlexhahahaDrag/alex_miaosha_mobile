@@ -17,4 +17,6 @@ export interface FinanceDetail {
 	infoDate?: Dayjs | string;
 	incomeAndExpenses?: string;
 	belongTo?: string;
+	yoyTrend?: string;
+	momTrend?: string;
 }
