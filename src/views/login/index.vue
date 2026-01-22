@@ -34,6 +34,8 @@
 						block
 						type="primary"
 						native-type="submit"
+						:loading="submitLoading"
+						loading-text="登录中..."
 					>
 						提交
 					</van-button>
@@ -60,16 +62,26 @@ const loginForm = ref<LoginForm>({
 	password: '',
 });
 
+// 提交按钮加载状态
+const submitLoading = ref<boolean>(false);
+
 const onSubmit = async () => {
-	const param: LoginParams = {
-		type: 'account',
-		username: loginForm.value.username,
-		password: loginForm.value.password,
-		isRememberMe: true,
-	};
-	const res = await userStore.login(param);
-	if (res) {
-		router.push('/');
+	if (submitLoading.value) return;
+
+	submitLoading.value = true;
+	try {
+		const param: LoginParams = {
+			type: 'account',
+			username: loginForm.value.username,
+			password: loginForm.value.password,
+			isRememberMe: true,
+		};
+		const res = await userStore.login(param);
+		if (res) {
+			router.push('/');
+		}
+	} finally {
+		submitLoading.value = false;
 	}
 };
 
@@ -164,15 +176,15 @@ const options = {
 
 		input {
 			background: transparent;
-			border: 0px;
+			border: 0;
 			-webkit-appearance: none;
-			border-radius: 0px;
+			border-radius: 0;
 			padding: 12px 5px 12px 15px;
 			color: @light_gray;
 			height: 47px;
 
 			&:-webkit-autofill {
-				-webkit-box-shadow: 0 0 0px 1000px @bg inset !important;
+				-webkit-box-shadow: 0 0 0 1000px @bg inset !important;
 				-webkit-text-fill-color: #fff !important;
 			}
 		}
@@ -200,9 +212,8 @@ const options = {
 
 	.title {
 		font-size: 26px;
-		font-weight: 400;
 		color: @light_gray;
-		margin: 0px auto 40px auto;
+		margin: 0 auto 40px auto;
 		text-align: center;
 		font-weight: bold;
 	}

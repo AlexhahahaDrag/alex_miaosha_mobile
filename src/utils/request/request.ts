@@ -1,13 +1,12 @@
 import type { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import axios from 'axios';
 import { useUserStore } from '@/store/modules/user/user';
-import type { ResponseBody } from '@/api/typing';
 import router from '@/router';
 import { decrypt } from '@/utils/crypto';
 
 const request = axios.create({
 	// baseURL: process.env.VUE_APP_API_BASE_URL,
-	timeout: 6000,
+	timeout: 10000,
 });
 
 axios.defaults.headers.post['Content-Type'] = 'application/json';
@@ -63,9 +62,7 @@ const requestHandlerFile = (
 request.interceptors.request.use(requestHandler, errorHandler);
 
 //响应拦截器
-const responseHandler = (
-	response: AxiosResponse<any>,
-): ResponseBody<any> | AxiosResponse<any> | Promise<any> | any => {
+const responseHandler = (response: AxiosResponse<any>): AxiosResponse<any> | Promise<any> | any => {
 	const { data } = response;
 	const resData = decrypt(data);
 	if (resData.code == 403) {

@@ -1,141 +1,216 @@
 <template>
-	<form action="/">
+	<div class="record-page">
+		<!-- 搜索栏 -->
 		<van-search
 			v-model="searchInfo.couponName"
-			show-action
-			placeholder="请输入消费券或用户名称"
+			placeholder="搜索卡券名称..."
 			@search="onSearch"
-			@cancel="onCancel"
-			action-text="清空"
+			@clear="onCancel"
+			class="search-bar"
 		/>
-	</form>
-	<van-divider class="divider-style" />
-	<van-pull-refresh
-		pulling-text="加载中。。。"
-		class="refresh-info"
-		v-model="isRefresh"
-		@refresh="onRefreshData"
-		ref="pullRefresh"
-		:immediate-check="false"
-	>
-		<div class="list-container">
-			<van-empty
-				v-if="!dataSource?.length"
-				description="暂无数据"
-			/>
-			<van-list
-				v-else
-				v-model:loading="loading"
-				:finished="finished"
-				:immediate-check="false"
-				finished-text="没有更多了"
-				@load="onLoadMore"
+
+		<!-- 状态筛选标签 -->
+		<div class="filter-tabs">
+			<div
+				v-for="option in statusOptions"
+				:key="option.value"
+				class="filter-tab"
+				:class="{ active: isFilterActive(option.value) }"
+				@click="onFilterChange(option.value)"
 			>
-				<van-cell-group>
+				{{ option.text }}
+			</div>
+		</div>
+
+		<!-- 下拉刷新容器 -->
+		<van-pull-refresh
+			v-model="isRefresh"
+			@refresh="onRefreshData"
+			class="refresh-container"
+		>
+			<div class="list-container">
+				<van-empty
+					v-if="!loading && !dataSource?.length"
+					description="暂无数据"
+				/>
+				<van-list
+					v-else
+					v-model:loading="loading"
+					:finished="finished"
+					:immediate-check="false"
+					finished-text="没有更多了"
+					@load="onLoadMore"
+					class="record-list"
+				>
 					<van-swipe-cell
 						v-for="item in dataSource"
 						:key="item.id"
+						class="record-item"
 					>
-						<van-cell :title-class="getTitleClass(item.status)">
-							<template #title>
-								<div class="title-container">
-									<span>{{ getCellTitle(item) }}</span>
-									<van-tag :type="item.status === 'USED' ? 'success' : 'default'">
-										{{ formatStatus(item.status) }}
-									</van-tag>
+						<div
+							class="record-card"
+							@click="onViewDetail(item.id)"
+						>
+							<!-- 右上角状态标签 -->
+							<van-tag
+								:type="getStatusType(item.status)"
+								round
+								class="status-tag"
+							>
+								{{ formatStatus(item.status) }}
+							</van-tag>
+
+							<!-- 左侧图标 -->
+							<div class="card-icon">
+								<div
+									class="icon-wrapper"
+									:class="getIconClass(item.status)"
+								>
+									<van-icon
+										:name="getIconName(item.status)"
+										size="24"
+									/>
 								</div>
-							</template>
-							<template #label>
-								<div class="coupon-info">
-									<div class="info-item">
-										<span class="label">核销用户：</span>
-										<span class="value">{{ item.userName || '--' }}</span>
-									</div>
-									<div class="info-item">
-										<span class="label">核销数量：</span>
-										<span class="value">{{ item.redemptionQuantity ?? 0 }}</span>
-									</div>
-								</div>
-							</template>
-							<template #right-icon>
-								<div class="text-right">
-									<div class="date-text">
-										{{ formatDate(item.receiveTime) }}
-									</div>
-								</div>
-							</template>
-						</van-cell>
+							</div>
+
+							<!-- 内容区域 -->
+							<div class="card-content">
+								<div class="card-title">{{ item.couponName || '未命名消费券' }}</div>
+								<div class="card-time">{{ getFormatTimeInfo(item.operateTime) }}</div>
+								<div class="card-id">ID: {{ item.id || '--' }}</div>
+							</div>
+						</div>
+
 						<template #right>
-							<van-button
+							<div
 								v-if="item.status === 'USED'"
-								class="right_info"
+								class="cancel-btn"
 								@click="onCancelRedeem(item)"
-								square
-								type="primary"
-								text="取消核销"
-							/>
+							>
+								<div class="cancel-icon">
+									<van-icon
+										name="cross"
+										size="12"
+										color="#ee0a24"
+									/>
+								</div>
+								<span class="cancel-text">取消核销</span>
+							</div>
 						</template>
-						<van-divider class="item-divider-style" />
 					</van-swipe-cell>
-				</van-cell-group>
-			</van-list>
-		</div>
-	</van-pull-refresh>
-	<van-back-top />
+				</van-list>
+			</div>
+		</van-pull-refresh>
+		<van-back-top />
+	</div>
 </template>
+
 <script lang="ts" setup>
 import { showSuccessToast, showFailToast, showConfirmDialog } from 'vant';
-import type { Dayjs } from 'dayjs';
-import type { SearchInfo, CpnUserCouponInfoData } from './config';
-import { pagination } from './config';
+import type { CpnUserCouponInfoData } from './config';
+import { pagination, statusOptions } from './config';
 import type { PageInfo } from '@/views/common/config';
+import { getFormatTimeInfo } from '@/utils/dayjs';
 import { getCpnUserCouponInfoPage, cancelRedeemCpnUserCouponInfo } from '@/views/cpn-coupon/cpn-user-coupon-info/api';
+import { getRoutePathByName } from '@/utils/router';
 import { useNavBar } from '@/composables/useNavBar';
+import { useTabBar } from '@/composables/useTabBar';
 
 const route = useRoute();
+const router = useRouter();
 
 useNavBar({
-	title: (route?.meta?.title as string) || '用户消费券核销',
+	title: (route?.meta?.title as string) || '核销记录',
 	leftPath: '/',
 	visible: true,
 });
 
+// TabBar配置
+useTabBar({
+	visible: true,
+	data: [
+		{ name: 'dashboard', title: '首页', icon: 'homepage' },
+		{ name: 'cpnCouponInfo', title: '消费券', icon: 'cpnCouponInfo' },
+		{ name: 'cpnUserCouponInfo', title: '核销记录', icon: 'cpnUserCouponInfo' },
+		{ name: 'myself', title: '个人', icon: 'user' },
+	],
+	active: 2,
+});
+
 const loading = ref<boolean>(false);
 const dataSource = ref<CpnUserCouponInfoData[]>([]);
-const searchInfo = ref<SearchInfo>({});
+const searchInfo = ref<CpnUserCouponInfoData>({
+	status: null,
+});
 const finished = ref<boolean>(false);
 const isRefresh = ref<boolean>(false);
 
-const getTitleClass = (status?: string) => {
-	return status === 'USED' ? 'validClass' : 'notValidClass';
+// 获取图标样式类
+const getIconClass = (status?: string | null) => {
+	if (status === 'USED') return 'icon-used';
+	if (status === 'CANCELLED') return 'icon-cancelled';
+	return 'icon-default';
 };
 
-const getCellTitle = (item: CpnUserCouponInfoData) => {
-	return item.couponName || '未命名消费券';
+// 获取图标名称
+const getIconName = (status?: string | null) => {
+	if (status === 'USED') return 'certificate';
+	if (status === 'CANCELLED') return 'close';
+	return 'coupon-o';
 };
 
-const formatStatus = (status?: string) => {
-	if (!status) return '未知状态';
+// 获取状态标签类型
+const getStatusType = (status?: string | null) => {
+	if (status === 'USED') return 'primary';
+	if (status === 'CANCELLED') return 'default';
+	return 'default';
+};
+
+// 格式化状态
+const formatStatus = (status?: string | null) => {
+	if (!status) return '未知';
 	if (status === 'USED') return '已核销';
-	if (status === 'UNUSED') return '未核销';
+	if (status === 'CANCELLED') return '已取消';
+	if (status === 'UNUSED') return '已取消';
 	return status;
 };
 
-const formatDate = (date?: string | Dayjs | null): string => {
-	if (!date) {
-		return '--';
+// 判断筛选选项是否选中
+const isFilterActive = (value: string): boolean => {
+	const currentStatus = searchInfo.value.status;
+	// 当 status 为空/null 时，"全部"(ALL) 选中
+	if (value === 'ALL') {
+		return !currentStatus || currentStatus === 'ALL';
 	}
-	const dateStr = typeof date === 'string' ? date : date.toString();
-	return dateStr.substring(0, 16);
+	return currentStatus === value;
 };
 
+// 查看详情
+const onViewDetail = (id?: string) => {
+	if (!id) return;
+	const path = getRoutePathByName(router, 'cpnUserCouponInfoDetail');
+	router.push({
+		path,
+		query: { id },
+	});
+};
+
+// 筛选变更
+const onFilterChange = (value: string) => {
+	searchInfo.value.status = value == 'ALL' ? null : value;
+	resetData();
+	getCpnUserCouponPageData(searchInfo.value, pagination.value);
+};
+
+// 重置数据
 const resetData = () => {
 	dataSource.value = [];
 	pagination.value.current = 1;
 	pagination.value.pageSize = 10;
 };
 
-const getCpnUserCouponPageData = async (param: SearchInfo, cur: PageInfo) => {
+// 获取数据
+const getCpnUserCouponPageData = async (param: CpnUserCouponInfoData, cur: PageInfo) => {
 	loading.value = true;
 	const { code, data, message } = await getCpnUserCouponInfoPage(param, cur?.current || 1, cur?.pageSize || 10)
 		.catch((error: unknown) => {
@@ -148,35 +223,38 @@ const getCpnUserCouponPageData = async (param: SearchInfo, cur: PageInfo) => {
 	if (code === '200') {
 		dataSource.value = [...dataSource.value, ...(data?.records || [])];
 		pagination.value.total = data?.total || 0;
-		finished.value = pagination.value.total < ((pagination.value.current || 0) + 1) * (pagination.value.pageSize || 10);
+		finished.value = pagination.value.total <= (pagination.value.current || 1) * (pagination.value.pageSize || 10);
 	} else {
 		showFailToast(message || '查询列表失败！');
 	}
 };
 
+// 搜索
 const onSearch = () => {
-	pagination.value.current = 1;
-	dataSource.value = [];
-	onLoadMore();
-};
-
-const onCancel = () => {
-	searchInfo.value.couponName = '';
-	searchInfo.value.userName = '';
 	resetData();
 	getCpnUserCouponPageData(searchInfo.value, pagination.value);
 };
 
+// 取消搜索
+const onCancel = () => {
+	searchInfo.value.couponName = '';
+	resetData();
+	getCpnUserCouponPageData(searchInfo.value, pagination.value);
+};
+
+// 下拉刷新
 const onRefreshData = () => {
 	resetData();
 	getCpnUserCouponPageData(searchInfo.value, pagination.value);
 };
 
+// 加载更多
 const onLoadMore = () => {
 	pagination.value.current = (pagination.value.current || 0) + 1;
 	getCpnUserCouponPageData(searchInfo.value, pagination.value);
 };
 
+// 取消核销
 const onCancelRedeem = async (item: CpnUserCouponInfoData) => {
 	if (!item.id || !item.userId || !item.couponId) {
 		showFailToast('缺少必要参数，无法取消核销');
@@ -210,74 +288,185 @@ onMounted(() => {
 	getCpnUserCouponPageData(searchInfo.value, pagination.value);
 });
 </script>
+
 <style lang="less" scoped>
-.refresh-info {
-	height: calc(100% - 64px);
+.record-page {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	background-color: #f5f6f7;
 }
 
-.list-container {
-	height: 100%;
+.search-bar {
+	background: #fff;
+
+	:deep(.van-search__content) {
+		background-color: #f5f6f7;
+		border-radius: 20px;
+	}
+}
+
+.filter-tabs {
+	display: flex;
+	gap: 12px;
+	padding: 12px 16px;
+	background: #fff;
+	border-bottom: 1px solid #f0f0f0;
+}
+
+.filter-tab {
+	padding: 6px 16px;
+	font-size: 14px;
+	color: #666;
+	background: #f5f6f7;
+	border-radius: 20px;
+	border: 1px solid transparent;
+	transition: all 0.2s;
+
+	&.active {
+		color: #1989fa;
+		background: #e8f4ff;
+		border-color: #1989fa;
+	}
+}
+
+.refresh-container {
+	flex: 1;
 	overflow-y: auto;
 }
 
-.divider-style {
-	color: #1989fa;
-	border-color: grey;
-	margin: 0 0 10px 0;
+.list-container {
+	padding: 12px 16px;
+	min-height: 100%;
 }
 
-.item-divider-style {
-	color: #1989fa;
-	border-color: grey;
-	padding: 0 16px;
-	margin-top: 0;
-	margin-bottom: 0;
-}
-
-.right_info {
-	height: 100%;
-}
-
-.text-right {
+.record-list {
 	display: flex;
 	flex-direction: column;
-	align-items: flex-end;
+	gap: 12px;
 }
 
-.date-text {
-	width: 130px;
-	text-align: right;
-	font-size: 12px;
-	color: #666;
+.record-item {
+	margin-bottom: 12px;
 }
 
-.coupon-info {
-	margin-top: 10px;
-	.info-item {
-		margin-bottom: 4px;
-		.label {
-			color: #666;
-			font-size: 12px;
+.record-card {
+	display: flex;
+	align-items: center;
+	padding: 16px;
+	background: #fff;
+	border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+	position: relative;
+
+	.status-tag {
+		position: absolute;
+		top: 12px;
+		right: 12px;
+		padding: 4px 12px;
+		font-size: 12px;
+	}
+}
+
+.card-icon {
+	flex-shrink: 0;
+	margin-right: 12px;
+
+	.icon-wrapper {
+		width: 48px;
+		height: 48px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 10px;
+		color: #fff;
+
+		&.icon-used {
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 		}
-		.value {
-			color: #333;
-			font-size: 12px;
-			font-weight: 500;
+
+		&.icon-cancelled {
+			background: linear-gradient(135deg, #a8a8a8 0%, #888 100%);
+		}
+
+		&.icon-default {
+			background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
 		}
 	}
 }
 
-.title-container {
+.card-content {
+	flex: 1;
+	min-width: 0;
+
+	.card-title {
+		font-size: 16px;
+		font-weight: 600;
+		color: #333;
+		margin-bottom: 4px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.card-time {
+		font-size: 13px;
+		color: #666;
+		margin-bottom: 2px;
+	}
+
+	.card-id {
+		font-size: 12px;
+		color: #999;
+	}
+}
+
+:deep(.van-swipe-cell__right) {
 	display: flex;
+	height: 100%;
+}
+
+.cancel-btn {
+	display: flex;
+	flex-direction: column;
 	align-items: center;
-	gap: 8px;
+	justify-content: center;
+	width: 80px;
+	height: 100%;
+	background: #ee0a24;
+	border: none;
+	border-radius: 0 12px 12px 0;
+	cursor: pointer;
+	gap: 6px;
+
+	.cancel-icon {
+		width: 20px;
+		height: 20px;
+		background: #fff;
+		border-radius: 50%;
+		position: relative;
+
+		:deep(.van-icon) {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			line-height: 1;
+		}
+	}
+
+	.cancel-text {
+		font-size: 12px;
+		color: #fff;
+		white-space: nowrap;
+	}
 }
 
-.validClass {
-	font-weight: bolder;
+:deep(.van-empty) {
+	padding-top: 100px;
 }
 
-.notValidClass {
-	color: gray;
+:deep(.van-list__finished-text) {
+	padding: 16px 0;
 }
 </style>

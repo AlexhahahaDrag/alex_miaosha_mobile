@@ -24,7 +24,9 @@ export function getIncomeAndExpense(
 export function getBalance(
 	belongTo?: number | string | null,
 	searchDate?: string,
-): Promise<ResponseBody<FinanceDetail[]>> {
+): Promise<
+	ResponseBody<FinanceDetail[] | { list: FinanceDetail[]; yoyTrend?: string; momTrend?: string }>
+> {
 	const url = `${baseService.finance + baseFinanceAnalysis + financeAnalysisUrl.getBalance}`;
 	return getData(url, { belongTo, searchDate });
 }
