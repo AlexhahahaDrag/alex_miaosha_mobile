@@ -21,7 +21,7 @@
 			id="finance-manager-list"
 		>
 			<van-empty
-				v-if="!loading && !dataSource?.length"
+				v-if="!loading && !isRefresh && !dataSource?.length"
 				description="暂无数据"
 			/>
 			<!-- 有数据时显示列表 -->
@@ -182,13 +182,17 @@ const formatAmount = (item: FinanceManagerData) => {
 // 统一重置数据函数
 const resetData = () => {
 	dataSource.value = [];
+	finished.value = false;
 	pagination.value.current = 1;
 	pagination.value.pageSize = 10;
 };
 
 // 获取财务数据
 const getFinancePage = async (param: FinanceManagerData, cur: PageInfo) => {
-	loading.value = true;
+	// 只有在非下拉刷新时才显示列表加载状态，避免出现两个加载动画
+	if (!isRefresh.value) {
+		loading.value = true;
+	}
 	const { code, data, message } = await getFinanceMangerPage(param, cur?.current || 1, cur?.pageSize || 10)
 		.catch((error: unknown) => {
 			throw error;
@@ -208,9 +212,8 @@ const getFinancePage = async (param: FinanceManagerData, cur: PageInfo) => {
 
 // 搜索处理
 const onSearch = () => {
-	pagination.value.current = 1;
-	dataSource.value = [];
-	onLoadMore();
+	resetData();
+	getFinancePage(searchInfo.value, pagination.value);
 };
 
 // 取消搜索
