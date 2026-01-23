@@ -20,7 +20,7 @@
 		</div>
 
 		<!-- Asset Grid -->
-		<div class="section-title">资产账户</div>
+		<div class="section-title">可动产</div>
 		<div class="asset-grid">
 			<div
 				v-for="item in assetList"
@@ -56,7 +56,7 @@
 			v-if="liabilityList.length > 0"
 			class="section-title"
 		>
-			待还款 / 支出
+			不动产
 		</div>
 		<div class="liability-list">
 			<div
@@ -221,16 +221,16 @@ const formattedSum = computed(() => {
 });
 
 const assetList = computed(() =>
-	balanceList.value.filter((item) => ['现金', '银行卡', '微信', '支付宝'].includes(item.typeName || '')),
+	balanceList.value.filter((item) => ['银行卡', '微信', '花呗', '白条'].includes(item.typeName || '')),
 );
 
 const liabilityList = computed(() =>
-	balanceList.value.filter((item) => ['花呗', '京东', '白条'].includes(item.typeName || '')),
+	balanceList.value.filter((item) => ['现金', '支付宝', '京东'].includes(item.typeName || '')),
 );
 
 const utilityList = computed(() =>
 	balanceList.value.filter(
-		(item) => !['现金', '银行卡', '微信', '支付宝', '花呗', '京东', '白条'].includes(item.typeName || ''),
+		(item) => !['银行卡', '微信', '花呗', '白条', '现金', '支付宝', '京东'].includes(item.typeName || ''),
 	),
 );
 
