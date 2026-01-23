@@ -45,15 +45,24 @@ const props = defineProps({
 
 const id = ref(`vue-echarts-${nanoid()}`);
 
-const style = ref({
+const style = computed(() => ({
 	height: props.height,
 	width: props.width,
-});
+}));
+
+const emit = defineEmits(['legend-change']);
+
 let chart: any = null;
 const initEcharts = () => {
 	disposeChart();
 	if (!chart) {
-		chart = echarts.init(document.getElementById(id.value)!);
+		const chartDom = document.getElementById(id.value);
+		if (chartDom) {
+			chart = echarts.init(chartDom);
+			chart.on('legendselectchanged', (params: { selected: Record<string, boolean> }) => {
+				emit('legend-change', params.selected);
+			});
+		}
 	} else {
 		return;
 	}
@@ -73,6 +82,7 @@ const disposeChart = () => {
 	chart?.dispose();
 	chart = null;
 };
+
 onMounted(() => {
 	watch(
 		() => props.options,
@@ -83,7 +93,22 @@ onMounted(() => {
 	);
 	initEcharts();
 });
+
+// 监听窗口大小变化
 onUnmounted(() => {
 	disposeChart();
+});
+
+watch(
+	() => [props.height, props.width],
+	() => {
+		nextTick(() => {
+			chart?.resize();
+		});
+	},
+);
+
+defineOptions({
+	name: 'BaseChart',
 });
 </script>

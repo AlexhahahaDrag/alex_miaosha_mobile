@@ -1,5 +1,5 @@
 <template>
-	<chart
+	<base-chart
 		:options="options"
 		:width="props.width"
 		:height="props.height"

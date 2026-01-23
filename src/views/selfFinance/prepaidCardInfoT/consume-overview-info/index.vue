@@ -105,7 +105,7 @@
 				</div>
 			</div>
 			<div class="trend-body">
-				<chart
+				<base-chart
 					:options="chartOptions"
 					width="100%"
 					height="256px"
@@ -202,7 +202,6 @@
 <script setup lang="ts">
 import { showToast } from 'vant';
 import { typeIconMap, type CardItem, getCardColor } from '../config/index';
-import Chart from '@/views/model/chart/index.vue';
 import SvgIcon from '@/views/common/icons/svgIcon.vue';
 import { useNavBar } from '@/composables/useNavBar';
 

@@ -51,7 +51,7 @@
 										v-if="item.incomeAndExpenses"
 										:class="item.incomeAndExpenses"
 									>
-										{{ getIncomeExpenseText(item.incomeAndExpenses) }}
+										{{ item.typeCode || '未知类别' }}
 									</span>
 								</div>
 								<div class="date-text">
@@ -157,14 +157,10 @@ const isRefresh = ref<boolean>(false);
 
 // 计算属性和工具函数
 const getCellTitle = (item: FinanceManagerData) => {
-	return item.name || '未命名';
+	return (item.belongToName ? `${item.belongToName} - ` : '') + (item.name || '未命名');
 };
 
-// Helper for Tag Text
-const getIncomeExpenseText = (type?: string) => {
-	return type === 'income' ? '收入' : '支出';
-};
-
+// Helper for Source Icon Name
 const getSourceIconName = (item: FinanceManagerData): FromSourceTransferItem | null => {
 	if (!item.fromSource) return null;
 	const source = fromSourceTransferList.find((s) => item.fromSource?.includes(s.value));
