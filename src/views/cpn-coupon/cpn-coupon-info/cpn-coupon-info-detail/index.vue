@@ -19,50 +19,65 @@
 			<!-- 编辑表单 -->
 			<van-form
 				@submit="onSubmit"
-				class="edit-form"
+				:rules="rulesRef"
+				required="auto"
+				class="custom-form"
 			>
-				<van-cell-group inset>
-					<van-field
-						v-model="formInfo.couponName"
-						name="couponName"
-						label="优惠券名称"
-						placeholder="请输入优惠券名称"
-						:rules="[{ required: true, message: '请输入优惠券名称' }]"
-					/>
+				<!-- Section 1: Basic Info -->
+				<div class="form-section-card">
+					<div class="field-item">
+						<div class="field-label required">名称</div>
+						<van-field
+							v-model="formInfo.couponName"
+							name="couponName"
+							placeholder="请输入优惠券名称"
+							:rules="rulesRef.couponName"
+							class="custom-input"
+						/>
+					</div>
 
-					<van-field
-						v-model="formInfo.unitValue"
-						name="unitValue"
-						label="面值"
-						placeholder="请输入面值"
-						type="number"
-						:rules="[{ required: true, message: '请输入面值' }]"
-					/>
+					<div class="field-item">
+						<div class="field-label required">面值</div>
+						<van-field
+							v-model="formInfo.unitValue"
+							name="unitValue"
+							placeholder="请输入面值"
+							type="number"
+							:rules="rulesRef.unitValue"
+							class="custom-input"
+						/>
+					</div>
 
-					<van-field
-						v-model="formInfo.totalQuantity"
-						name="totalQuantity"
-						label="有效期至"
-						placeholder="请输入数量"
-						type="number"
-						:rules="[{ required: true, message: '请输入总数量' }]"
-					/>
+					<div class="field-item">
+						<div class="field-label required">总数量</div>
+						<van-field
+							v-model="formInfo.totalQuantity"
+							name="totalQuantity"
+							placeholder="请输入数量"
+							type="number"
+							:rules="rulesRef.totalQuantity"
+							class="custom-input"
+						/>
+					</div>
 
-					<van-field
-						v-model="endDateDisplay"
-						name="endDate"
-						label="有效期至"
-						placeholder="请选择有效期"
-						readonly
-						@click="chooseDate"
-						:rules="[{ required: true, message: '请选择有效期' }]"
-					/>
-				</van-cell-group>
+					<div class="field-item">
+						<div class="field-label required">有效期至</div>
+						<van-field
+							v-model="nameRefMap.infoDate.value"
+							name="endDate"
+							placeholder="请选择有效期"
+							readonly
+							:rules="rulesRef.endDate"
+							@click="chooseDate"
+							class="custom-input"
+						/>
+					</div>
+				</div>
 
 				<!-- 最近活动 -->
 				<div class="recent-activities-edit">
 					<div class="activities-title">最近活动</div>
-					<van-cell-group>
+					<van-cell-group inset>
 						<van-cell
 							title="优惠券已领取"
 							:label="`共 ${formInfo.totalQuantity || 0} 张 已兑换 ${consumedQuantity} 张`"
@@ -102,11 +117,19 @@
 						type="primary"
 						block
 						round
-						size="large"
 						native-type="submit"
+						class="gradient-submit-btn"
+						:loading="loading"
 					>
-						<van-icon name="success" />
-						保存修改
+						<template #default>
+							<div class="btn-content">
+								<span>保存修改</span>
+								<van-icon
+									name="success"
+									class="btn-icon"
+								/>
+							</div>
+						</template>
 					</van-button>
 				</div>
 			</van-form>
@@ -202,6 +225,7 @@
 import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
 import type { CpnCouponInfoData } from '@/views/cpn-coupon/cpn-coupon-info/config';
+import { rulesRef } from '@/views/cpn-coupon/cpn-coupon-info/config';
 import { formatDate, datePickerFormatter } from '@/utils/dayjs';
 import { getCpnCouponInfoDetail, addCpnCouponInfo, editCpnCouponInfo } from '@/views/cpn-coupon/cpn-coupon-info/api';
 import { getRoutePathByName } from '@/utils/router';
@@ -243,6 +267,8 @@ useTabBar({
 });
 
 const formInfo = ref<CpnCouponInfoData>({});
+// 提交按钮loading状态
+const loading = ref<boolean>(false);
 
 const chooseDateInfo = ref<DatePickerInfo<Dayjs>>({
 	label: 'endDate',
@@ -251,6 +277,18 @@ const chooseDateInfo = ref<DatePickerInfo<Dayjs>>({
 	showFlag: false,
 	formatter: datePickerFormatter,
 });
+
+// 创建名称 ref 映射
+const nameRefMap = {
+	infoDate: ref<string>(''),
+};
+
+const initInfoDate = (infoDate: Dayjs) => {
+	if (infoDate) {
+		nameRefMap.infoDate.value = infoDate.format('YYYY年MM月DD日');
+		chooseDateInfo.value.selectValue = infoDate;
+	}
+};
 
 const chooseDate = () => {
 	chooseDateInfo.value.showFlag = true;
@@ -261,14 +299,6 @@ const couponImage = ref(
 	'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOnJnYigxODUsMzMsNDApO3N0b3Atb3BhY2l0eToxIiAvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6cmdiKDIyMCw1Myw2OSk7c3RvcC1vcGFjaXR5OjEiIC8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1zaXplPSI0MCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7wnY6I4oC854OfPC90ZXh0Pjwvc3ZnPg==',
 );
 
-// 日期显示
-const endDateDisplay = computed(() => {
-	if (formInfo.value.endDate) {
-		return formatDate(formInfo.value.endDate);
-	}
-	return '';
-});
-
 // 已使用数量
 const consumedQuantity = computed(() => {
 	return (formInfo.value.totalQuantity || 0) - (formInfo.value.remainingQuantity || 0);
@@ -277,7 +307,7 @@ const consumedQuantity = computed(() => {
 // 日期确认
 const selectDateInfo = (date: Dayjs) => {
 	formInfo.value.endDate = date.hour(23).minute(59).second(59);
-	chooseDateInfo.value.selectValue = date;
+	initInfoDate(date);
 	chooseDateInfo.value.showFlag = false;
 };
 
@@ -321,7 +351,7 @@ const init = async () => {
 		if (code == '200') {
 			formInfo.value = data || {};
 			if (formInfo.value.endDate) {
-				chooseDateInfo.value.selectValue = dayjs(formInfo.value.endDate);
+				formInfo.value.endDate = dayjs(formInfo.value.endDate);
 			}
 		} else {
 			showFailToast(message || '查询详情失败，请联系管理员!');
@@ -329,9 +359,10 @@ const init = async () => {
 	} else {
 		// 新增模式，默认为编辑模式
 		formInfo.value = {
-			endDate: dayjs().add(1, 'month'),
+			endDate: dayjs(),
 		};
 	}
+	initInfoDate((formInfo.value?.endDate as Dayjs) || dayjs());
 };
 
 init();
@@ -390,19 +421,73 @@ init();
 	}
 }
 
-.edit-form {
-	:deep(.van-cell-group--inset) {
-		margin: 0 0 16px 0;
+.custom-form {
+	padding: 0 0 10px;
+
+	.form-section-card {
+		background: #fff;
 		border-radius: 12px;
-	}
+		padding: 20px;
+		margin-bottom: 16px;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 
-	:deep(.van-field__label) {
-		color: #646566;
-		font-size: 14px;
-	}
+		.section-title {
+			font-size: 13px;
+			font-weight: 600;
+			color: #3d7fff;
+			margin-bottom: 20px;
+			display: flex;
+			align-items: center;
+		}
 
-	:deep(.van-field__control) {
-		color: #323233;
+		.field-item {
+			display: flex;
+			align-items: center;
+			margin-bottom: 16px;
+
+			&:last-child {
+				margin-bottom: 0;
+			}
+
+			.field-label {
+				font-size: 14px;
+				color: #64748b;
+				font-weight: 500;
+				width: 72px;
+				flex-shrink: 0;
+
+				&.required::after {
+					content: '*';
+					color: #ee0a24;
+					margin-left: 2px;
+				}
+			}
+
+			:deep(.custom-input) {
+				flex: 1;
+				background-color: #f8fafc;
+				border-radius: 12px;
+				padding: 8px 12px;
+				border: 1px solid transparent;
+				transition: all 0.3s;
+
+				&::after {
+					display: none;
+				}
+
+				.van-field__control {
+					font-size: 14px;
+					color: #323233;
+					font-weight: 500;
+					text-align: left;
+
+					&::placeholder {
+						color: #c8c9cc;
+						font-weight: 400;
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -430,19 +515,28 @@ init();
 	background: #fff;
 	box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
 
-	.van-button {
-		background: linear-gradient(135deg, #1989fa 0%, #1677ff 100%);
+	.gradient-submit-btn {
+		height: 52px;
+		background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
 		border: none;
-		font-size: 16px;
-		font-weight: 600;
-		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		border-radius: 14px;
+		box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
 
-		&:active {
-			transform: scale(0.98);
-		}
+		.btn-content {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 10px;
 
-		.van-icon {
-			margin-right: 8px;
+			span {
+				font-size: 17px;
+				font-weight: 600;
+				letter-spacing: 1px;
+			}
+
+			.btn-icon {
+				font-size: 18px;
+			}
 		}
 	}
 }

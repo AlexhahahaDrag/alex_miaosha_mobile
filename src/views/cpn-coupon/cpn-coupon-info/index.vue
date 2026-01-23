@@ -165,7 +165,7 @@ useNavBar({
 	visible: true,
 	onRightClick: () => {
 		const path = getRoutePathByName(router, 'cpnCouponInfoDetail', '/selfFinance/cpnCouponInfo/cpnCouponInfoDetail');
-		router.push({ path });
+		router.push({ path, query: { mode: 'edit' } });
 	},
 });
 
