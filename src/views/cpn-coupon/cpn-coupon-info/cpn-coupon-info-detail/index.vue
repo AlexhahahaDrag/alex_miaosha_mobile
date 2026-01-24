@@ -157,7 +157,7 @@
 
 				<div class="coupon-info-section">
 					<div class="coupon-amount">
-						¥{{ formInfo.unitValue?.toFixed(0) || '0' }} <span class="coupon-label">优惠券</span>
+						¥{{ Number(formInfo.unitValue || 0).toFixed(0) }} <span class="coupon-label">优惠券</span>
 					</div>
 					<div class="coupon-description">{{ formInfo.couponName || '限定兑换咖啡' }}</div>
 					<div class="coupon-validity">
@@ -324,10 +324,9 @@ const onSubmit = async () => {
 	const { code, message } = await api(formInfo.value);
 	if (code == '200') {
 		showSuccessToast(message || '保存成功!');
-		// 保存后切换回展示模式
+		// 保存后切换回列表模式
 		router.push({
-			path: route.path,
-			query: { id: formInfo.value.id },
+			path: getLeftPath.value,
 		});
 	} else {
 		showFailToast(message || '保存失败，请联系管理员!');

@@ -8,11 +8,11 @@
 				<span class="decimal">.{{ formattedSum.dec }}</span>
 			</div>
 			<div class="hero-trends">
-				<div class="trend-tag">
+				<div :class="['trend-tag', getTrendClass(totalYoy)]">
 					<van-icon :name="getTrendIcon(totalYoy)" />
 					<span>同比 {{ totalYoy || '+0.0%' }}</span>
 				</div>
-				<div class="trend-tag">
+				<div :class="['trend-tag', getTrendClass(totalMom)]">
 					<van-icon :name="getTrendIcon(totalMom)" />
 					<span>环比 {{ totalMom || '+0.0%' }}</span>
 				</div>
@@ -324,6 +324,15 @@ watch(
 			align-items: center;
 			gap: 4px;
 			backdrop-filter: blur(4px);
+
+			&.up {
+				background: rgba(238, 10, 36, 0.2);
+				color: #fff;
+			}
+			&.down {
+				background: rgba(7, 193, 96, 0.2);
+				color: #fff;
+			}
 		}
 	}
 }
