@@ -114,7 +114,7 @@ router.beforeEach((to, _from, next) => {
 	if (to.path == '/login') {
 		next();
 	} else if (userStore.getToken) {
-		if (!userStore.getRouteStatus || routes.length <= 6) {
+		if (!userStore.getRouteStatus || routes.length <= 5) {
 			dynamicRouter = [];
 			addRouter();
 			next({ ...to, replace: true });
