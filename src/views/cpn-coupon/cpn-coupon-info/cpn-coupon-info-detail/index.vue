@@ -72,6 +72,18 @@
 							class="custom-input"
 						/>
 					</div>
+
+					<div class="field-item">
+						<div class="field-label required">支付状态</div>
+						<van-radio-group
+							v-model="formInfo.paymentStatus"
+							direction="horizontal"
+							class="custom-input"
+						>
+							<van-radio :name="0">未支付</van-radio>
+							<van-radio :name="1">已支付</van-radio>
+						</van-radio-group>
+					</div>
 				</div>
 
 				<!-- 最近活动 -->
@@ -163,6 +175,14 @@
 					<div class="coupon-validity">
 						<van-icon name="clock-o" />
 						有效期至 {{ formatDate(formInfo.endDate) }}
+					</div>
+					<div
+						class="coupon-validity"
+						style="margin-top: 8px"
+					>
+						<van-tag :type="formInfo.paymentStatus === 1 ? 'success' : 'warning'">
+							{{ formInfo.paymentStatus === 1 ? '已支付' : '未支付' }}
+						</van-tag>
 					</div>
 				</div>
 			</div>
@@ -352,6 +372,9 @@ const init = async () => {
 			if (formInfo.value.endDate) {
 				formInfo.value.endDate = dayjs(formInfo.value.endDate);
 			}
+			if (formInfo.value.paymentStatus === undefined) {
+				formInfo.value.paymentStatus = 0;
+			}
 		} else {
 			showFailToast(message || '查询详情失败，请联系管理员!');
 		}
@@ -359,6 +382,7 @@ const init = async () => {
 		// 新增模式，默认为编辑模式
 		formInfo.value = {
 			endDate: dayjs(),
+			paymentStatus: 0,
 		};
 	}
 	initInfoDate((formInfo.value?.endDate as Dayjs) || dayjs());

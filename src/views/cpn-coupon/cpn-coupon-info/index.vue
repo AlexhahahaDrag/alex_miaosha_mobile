@@ -61,7 +61,16 @@
 
 								<!-- 中间内容 -->
 								<div class="coupon-content">
-									<div class="coupon-name">{{ item.couponName || '未命名消费券' }}</div>
+									<div class="coupon-name">
+										<span class="text">{{ item.couponName || '未命名消费券' }}</span>
+										<van-tag
+											:type="item.paymentStatus === 1 ? 'success' : 'warning'"
+											plain
+											size="medium"
+										>
+											{{ item.paymentStatus === 1 ? '已支付' : '未支付' }}
+										</van-tag>
+									</div>
 									<div class="coupon-validity">{{ getValidityText(item) }}</div>
 									<div class="coupon-price">¥ {{ item.unitValue?.toFixed(2) || '0.00' }}</div>
 								</div>
@@ -505,9 +514,17 @@ watch(
 		font-size: 16px;
 		font-weight: 600;
 		color: #323233;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+
+		.text {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			flex: 0 1 auto;
+			min-width: 0;
+		}
 	}
 
 	.coupon-validity {
