@@ -1,6 +1,6 @@
-import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
+﻿import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
 
-const basePmsShopProduct = '/api/v1//pms-shop-product';
+const basePmsShopProduct = '/pms-shop-product';
 
 const PmsShopProductUrl = {
 	page: '/page',
@@ -16,8 +16,8 @@ export function getPmsShopProductPage(
 ): Promise<any> {
 	const url = `${baseService.product + basePmsShopProduct + PmsShopProductUrl.page}`;
 	return postData(url, params, {
-		pageNum: pageNum ? pageNum : 1,
-		pageSize: pageSize ? pageSize : 10,
+		pageNum: pageNum ?? 1,
+		pageSize: pageSize ?? 10,
 	});
 }
 
@@ -28,8 +28,8 @@ export function getNewestPmsShopProductPage(
 ): Promise<any> {
 	const url = `${baseService.product + basePmsShopProduct + PmsShopProductUrl.newestPage}`;
 	return postData(url, params, {
-		pageNum: pageNum ? pageNum : 1,
-		pageSize: pageSize ? pageSize : 10,
+		pageNum: pageNum ?? 1,
+		pageSize: pageSize ?? 10,
 	});
 }
 

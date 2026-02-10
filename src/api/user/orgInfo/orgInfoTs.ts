@@ -1,6 +1,6 @@
-import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
+﻿import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
 
-const baseOrgInfo = '/api/v1//org-info';
+const baseOrgInfo = '/org-info';
 
 const OrgInfoUrl = {
 	page: '/page',
@@ -14,8 +14,8 @@ export function getOrgInfoPage(
 ): Promise<any> {
 	const url = `${baseService.user + baseOrgInfo + OrgInfoUrl.page}`;
 	return postData(url, params, {
-		pageNum: pageNum ? pageNum : 1,
-		pageSize: pageSize ? pageSize : 10,
+		pageNum: pageNum ?? 1,
+		pageSize: pageSize ?? 10,
 	});
 }
 

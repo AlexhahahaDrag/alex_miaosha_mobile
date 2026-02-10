@@ -1,8 +1,8 @@
-import type { FinanceDetail } from '../financeAnalysisDetail/common';
+﻿import type { FinanceDetail } from '../financeAnalysisDetail/common';
 import { getData, baseService } from '@/api/common';
 import type { ResponseBody } from '@/types/api';
 
-const baseFinanceAnalysis = '/api/v1/finance-analysis';
+const baseFinanceAnalysis = '/finance-analysis';
 
 const financeAnalysisUrl = {
 	getBalance: '/getBalance',

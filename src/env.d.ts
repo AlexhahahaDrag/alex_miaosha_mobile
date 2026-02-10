@@ -7,3 +7,13 @@ declare module '*.vue' {
 }
 
 declare module 'particles.vue3';
+
+interface ImportMetaEnv {
+	readonly VITE_APP_BASE_API: string;
+	readonly VITE_APP_TITLE: string;
+	readonly VITE_APP_API_PREFIX: string;
+}
+
+interface ImportMeta {
+	readonly env: ImportMetaEnv;
+}

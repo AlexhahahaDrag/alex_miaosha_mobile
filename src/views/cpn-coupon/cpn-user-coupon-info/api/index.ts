@@ -1,8 +1,8 @@
-import type { CpnUserCouponInfoData } from '../config';
+﻿import type { CpnUserCouponInfoData } from '../config';
 import { getData, postData, baseService } from '@/api/common';
 import type { ResponseBody, CommonPageResult } from '@/types/api';
 
-const baseCpnUserCouponInfo = '/api/v1/cpn-user-coupon-info';
+const baseCpnUserCouponInfo = '/cpn-user-coupon-info';
 
 const cpnUserCouponInfoUrl = {
 	page: '/page',

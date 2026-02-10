@@ -1,6 +1,6 @@
-import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
+﻿import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
 
-const basePermissionInfo = '/api/v1//permission-info';
+const basePermissionInfo = '/permission-info';
 
 const PermissionInfoUrl = {
 	page: '/page',
@@ -14,8 +14,8 @@ export function getPermissionInfoPage(
 ): Promise<any> {
 	const url = `${baseService.user + basePermissionInfo + PermissionInfoUrl.page}`;
 	return postData(url, params, {
-		pageNum: pageNum ? pageNum : 1,
-		pageSize: pageSize ? pageSize : 10,
+		pageNum: pageNum ?? 1,
+		pageSize: pageSize ?? 10,
 	});
 }
 

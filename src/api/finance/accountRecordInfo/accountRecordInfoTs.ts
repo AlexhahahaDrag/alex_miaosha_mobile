@@ -1,6 +1,6 @@
-import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
+﻿import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
 
-const baseAccountRecordInfo = '/api/v1/account-record-info';
+const baseAccountRecordInfo = '/account-record-info';
 
 const AccountRecordInfoUrl = {
 	page: '/page',
@@ -14,8 +14,8 @@ export function getAccountRecordInfoPage(
 ): Promise<any> {
 	const url = `${baseService.finance + baseAccountRecordInfo + AccountRecordInfoUrl.page}`;
 	return postData(url, params, {
-		pageNum: pageNum ? pageNum : 1,
-		pageSize: pageSize ? pageSize : 10,
+		pageNum: pageNum ?? 1,
+		pageSize: pageSize ?? 10,
 	});
 }
 

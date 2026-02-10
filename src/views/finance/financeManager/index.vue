@@ -106,6 +106,7 @@ import { getFinanceMangerPage, deleteFinanceManager } from '@/views/finance/fina
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
 import type { PageInfo } from '@/views/common/config';
+import type { ResponseBody } from '@/types/api';
 
 const router = useRouter();
 const route = useRoute();
@@ -194,7 +195,7 @@ const getFinancePage = async (param: FinanceManagerData, cur: PageInfo) => {
 		loading.value = true;
 	}
 	const { code, data, message } = await getFinanceMangerPage(param, cur?.current || 1, cur?.pageSize || 10)
-		.catch((error: unknown) => {
+		.catch((error: ResponseBody) => {
 			throw error;
 		})
 		.finally(() => {

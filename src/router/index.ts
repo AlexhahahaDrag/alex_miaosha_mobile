@@ -27,7 +27,7 @@ export const routes: MenuDataItem[] = [
 		redirect: '/dashboard',
 		meta: {
 			title: '首页',
-			hiedInMenu: false,
+			hideInMenu: false,
 			showInHome: false,
 		},
 		children: [
@@ -47,7 +47,7 @@ export const routes: MenuDataItem[] = [
 		meta: {
 			title: '消息管理',
 			icon: 'messageManager',
-			hiedInMenu: false,
+			hideInMenu: false,
 			showInHome: false,
 		},
 		children: [
@@ -55,7 +55,7 @@ export const routes: MenuDataItem[] = [
 				path: '/message/messageManager',
 				name: 'messageManager',
 				component: modules[pageInfo.test],
-				meta: { title: '消息管理', icon: 'message', hiedInMenu: false },
+				meta: { title: '消息管理', icon: 'message', hideInMenu: false },
 			},
 		],
 	},
@@ -67,7 +67,7 @@ export const routes: MenuDataItem[] = [
 		meta: {
 			title: '个人',
 			icon: 'myself',
-			hiedInMenu: false,
+			hideInMenu: false,
 			showInHome: false,
 		},
 		children: [
@@ -75,13 +75,13 @@ export const routes: MenuDataItem[] = [
 				path: '/myself/about',
 				name: 'about',
 				component: modules[pageInfo.about],
-				meta: { title: '个人', icon: 'about', hiedInMenu: false },
+				meta: { title: '个人', icon: 'about', hideInMenu: false },
 			},
 			{
 				path: '/myself/info',
 				name: 'myselfInfo',
 				component: modules[pageInfo.myself],
-				meta: { title: '个人信息', icon: 'userManager', hiedInMenu: false },
+				meta: { title: '个人信息', icon: 'userManager', hideInMenu: false },
 			},
 		],
 	},
@@ -92,7 +92,7 @@ export const routes: MenuDataItem[] = [
 		meta: {
 			title: '登录',
 			icon: 'login',
-			hiedInMenu: false,
+			hideInMenu: false,
 			showInHome: false,
 		},
 	},
@@ -163,7 +163,7 @@ const getChildren = (item: MenuInfo, permissionList: any[], roleCode: string): a
 		meta: {
 			title: item.title,
 			icon: item.icon,
-			hiedInMenu: item.hideInMenu != '0',
+			hideInMenu: item.hideInMenu != '0',
 			showInHome: item.showInHome == '1',
 			permissionCode: item.permissionCode,
 		},

@@ -15,7 +15,7 @@ class algorithmProxy implements ProxyAlgorithm {
 					key: v,
 				};
 			})
-			.filter((v) => v.meta && !v.meta.hiedInMenu);
+			.filter((v) => v.meta && !v.meta.hideInMenu);
 	}
 }
 

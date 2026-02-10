@@ -1,6 +1,6 @@
-import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
+﻿import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
 
-const baseShopStock = '/api/v1/shop-stock';
+const baseShopStock = '/shop-stock';
 
 const ShopStockUrl = {
 	page: '/page',
@@ -15,8 +15,8 @@ export function getShopStockPage(
 ): Promise<any> {
 	const url = `${baseService.finance + baseShopStock + ShopStockUrl.page}`;
 	return postData(url, params, {
-		pageNum: pageNum ? pageNum : 1,
-		pageSize: pageSize ? pageSize : 10,
+		pageNum: pageNum ?? 1,
+		pageSize: pageSize ?? 10,
 	});
 }
 

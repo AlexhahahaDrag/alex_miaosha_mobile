@@ -1,6 +1,6 @@
-import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
+﻿import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
 
-const basePmsAttr = '/api/v1//pms-attr';
+const basePmsAttr = '/pms-attr';
 
 const PmsAttrUrl = {
 	page: '/page',
@@ -14,8 +14,8 @@ export function getPmsAttrPage(
 ): Promise<any> {
 	const url = `${baseService.product + basePmsAttr + PmsAttrUrl.page}`;
 	return postData(url, params, {
-		pageNum: pageNum ? pageNum : 1,
-		pageSize: pageSize ? pageSize : 10,
+		pageNum: pageNum ?? 1,
+		pageSize: pageSize ?? 10,
 	});
 }
 

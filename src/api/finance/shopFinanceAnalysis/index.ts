@@ -1,6 +1,6 @@
-import { getData, baseService } from '@/api/common/index';
+﻿import { getData, baseService } from '@/api/common/index';
 
-const baseFinanceAnalysis = '/api/v1/shop-finance-analysis';
+const baseFinanceAnalysis = '/shop-finance-analysis';
 
 const financeAnalysisUrl = {
 	getDayShopFinanceInfo: '/getDayShopFinanceInfo',

@@ -9,7 +9,7 @@ type Lazy<T> = () => Promise<T>;
 
 export interface MenuRouteMeta {
 	hideChildrenInMenu?: boolean;
-	hiedInMenu?: boolean;
+	hideInMenu?: boolean;
 	icon?: string;
 	authority?: string | string[];
 	target?: '_blank' | '_self' | '_parent' | '_top';

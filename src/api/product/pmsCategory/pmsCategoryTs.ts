@@ -1,6 +1,6 @@
-import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
+﻿import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
 
-const basePmsCategory = '/api/v1//pms-category';
+const basePmsCategory = '/pms-category';
 
 const PmsCategoryUrl = {
 	page: '/page',
@@ -14,8 +14,8 @@ export function getPmsCategoryPage(
 ): Promise<any> {
 	const url = `${baseService.product + basePmsCategory + PmsCategoryUrl.page}`;
 	return postData(url, params, {
-		pageNum: pageNum ? pageNum : 1,
-		pageSize: pageSize ? pageSize : 10,
+		pageNum: pageNum ?? 1,
+		pageSize: pageSize ?? 10,
 	});
 }
 

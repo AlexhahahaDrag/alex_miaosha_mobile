@@ -115,6 +115,7 @@ import { getCpnUserCouponInfoPage, cancelRedeemCpnUserCouponInfo } from '@/views
 import { getRoutePathByName } from '@/utils/router';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
+import type { ResponseBody } from '@/types/api';
 
 const route = useRoute();
 const router = useRouter();
@@ -213,7 +214,7 @@ const resetData = () => {
 const getCpnUserCouponPageData = async (param: CpnUserCouponInfoData, cur: PageInfo) => {
 	loading.value = true;
 	const { code, data, message } = await getCpnUserCouponInfoPage(param, cur?.current || 1, cur?.pageSize || 10)
-		.catch((error: unknown) => {
+		.catch((error: ResponseBody) => {
 			throw error;
 		})
 		.finally(() => {

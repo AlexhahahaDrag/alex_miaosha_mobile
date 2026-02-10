@@ -1,4 +1,4 @@
-import type { CommonPageResult, ResponseBody } from '../../../types/api';
+﻿import type { CommonPageResult, ResponseBody } from '../../../types/api';
 import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
 
 export interface UserManagerData {
@@ -6,7 +6,7 @@ export interface UserManagerData {
 	nickName?: string;
 }
 
-const baseUserManager = '/api/v1/user';
+const baseUserManager = '/user';
 
 const userMangerUrl = {
 	page: '/page',
@@ -21,8 +21,8 @@ export function getUserManagerPage(
 ): Promise<ResponseBody<CommonPageResult<UserManagerData>>> {
 	const url = `${baseService.user + baseUserManager + userMangerUrl.page}`;
 	return postData(url, params, {
-		pageNum: pageNum ? pageNum : 1,
-		pageSize: pageSize ? pageSize : 10,
+		pageNum: pageNum ?? 1,
+		pageSize: pageSize ?? 10,
 	});
 }
 

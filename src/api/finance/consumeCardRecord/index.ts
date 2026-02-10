@@ -1,6 +1,6 @@
-import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
+﻿import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
 
-const baseConsumeCardRecord = '/api/v1/prepaid-consume-record-t';
+const baseConsumeCardRecord = '/prepaid-consume-record-t';
 
 const ConsumeCardRecordUrl = {
 	page: '/page',
@@ -52,8 +52,8 @@ export function getConsumeCardRecordPage(
 ): Promise<any> {
 	const url = `${baseService.finance + baseConsumeCardRecord + ConsumeCardRecordUrl.page}`;
 	return postData(url, params, {
-		pageNum: pageNum ? pageNum : 1,
-		pageSize: pageSize ? pageSize : 10,
+		pageNum: pageNum ?? 1,
+		pageSize: pageSize ?? 10,
 	});
 }
 

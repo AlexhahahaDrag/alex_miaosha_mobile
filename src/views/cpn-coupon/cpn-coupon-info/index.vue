@@ -153,6 +153,7 @@ import { formatDate } from '@/utils/dayjs';
 import { getCpnCouponInfoPage, deleteCpnCouponInfo } from '@/views/cpn-coupon/cpn-coupon-info/api';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
+import type { ResponseBody } from '@/types/api';
 
 const router = useRouter();
 const route = useRoute();
@@ -274,8 +275,8 @@ const resetData = () => {
 // 获取消费券数据
 const getCpnCouponInfoPageData = async (param: CpnCouponInfoData, cur: PageInfo) => {
 	loading.value = true;
-	const { code, data, message } = await getCpnCouponInfoPage(param, cur?.current || 1, cur?.pageSize || 10)
-		.catch((error: unknown) => {
+	const { code, data, message } = await getCpnCouponInfoPage(param, cur?.current, cur?.pageSize)
+		.catch((error: ResponseBody) => {
 			throw error;
 		})
 		.finally(() => {

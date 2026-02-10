@@ -1,6 +1,6 @@
-import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
+﻿import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
 
-const baseMenuInfo = '/api/v1//menu-info';
+const baseMenuInfo = '/menu-info';
 
 const MenuInfoUrl = {
 	page: '/page',
@@ -14,8 +14,8 @@ export function getMenuInfoPage(
 ): Promise<any> {
 	const url = `${baseService.user + baseMenuInfo + MenuInfoUrl.page}`;
 	return postData(url, params, {
-		pageNum: pageNum ? pageNum : 1,
-		pageSize: pageSize ? pageSize : 10,
+		pageNum: pageNum ?? 1,
+		pageSize: pageSize ?? 10,
 	});
 }
 

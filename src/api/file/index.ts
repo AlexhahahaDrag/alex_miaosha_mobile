@@ -1,4 +1,4 @@
-import {
+﻿import {
 	getData,
 	postData,
 	putData,
@@ -7,7 +7,7 @@ import {
 	postFileData,
 } from '@/api/common/index';
 
-const baseFileManager = '/api/v1/file-info';
+const baseFileManager = '/file-info';
 
 const fileUrl = {
 	page: '/page',
@@ -20,8 +20,8 @@ export function getFilePage(
 	pageSize: number | null | undefined,
 ): Promise<any> {
 	const url = `${baseService.file + baseFileManager + fileUrl.page}?pageNum=${
-		pageNum ? pageNum : 1
-	}&pageSize=${pageSize ? pageSize : 10}`;
+		pageNum ?? 1
+	}&pageSize=${pageSize ?? 10}`;
 	return postData(url, params);
 }
 

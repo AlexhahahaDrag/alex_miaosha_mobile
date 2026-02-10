@@ -1,7 +1,7 @@
-import type { ResponseBody, CommonPageResult } from '../../../types/api';
+﻿import type { ResponseBody, CommonPageResult } from '../../../types/api';
 import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
 
-const baseDictManager = '/api/v1/dict-info';
+const baseDictManager = '/dict-info';
 
 const dictUrl = {
 	page: '/page',

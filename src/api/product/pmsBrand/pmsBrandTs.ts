@@ -1,6 +1,6 @@
-import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
+﻿import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
 
-const basePmsBrand = '/api/v1//pms-brand';
+const basePmsBrand = '/pms-brand';
 
 const PmsBrandUrl = {
 	page: '/page',
@@ -14,8 +14,8 @@ export function getPmsBrandPage(
 ): Promise<any> {
 	const url = `${baseService.product + basePmsBrand + PmsBrandUrl.page}`;
 	return postData(url, params, {
-		pageNum: pageNum ? pageNum : 1,
-		pageSize: pageSize ? pageSize : 10,
+		pageNum: pageNum ?? 1,
+		pageSize: pageSize ?? 10,
 	});
 }
 

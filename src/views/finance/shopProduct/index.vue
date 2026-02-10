@@ -106,6 +106,7 @@ import { getUserManagerList } from '@/api/user/userManager';
 import { addOrEditShopCart } from '@/api/finance/shopCart/shopCartTs';
 import commonUtils from '@/utils/common/index';
 import { useUserStore } from '@/store/modules/user/user';
+import type { ResponseBody } from '@/types/api';
 
 const useTabBar = reactive([
 	{
@@ -216,7 +217,7 @@ const shoppingCart = (item: ShopStockInfo) => {
 				showFailToast(res?.message || '加入购物车失败，请联系管理员!');
 			}
 		})
-		.catch((error: any) => {
+		.catch((error: ResponseBody) => {
 			showFailToast(error?.message || '加入购物车失败，请联系管理员!');
 		});
 };

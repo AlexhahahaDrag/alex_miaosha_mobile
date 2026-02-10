@@ -1,6 +1,6 @@
-import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
+﻿import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
 
-const baseShopOrder = '/api/v1//shop-order';
+const baseShopOrder = '/shop-order';
 
 const ShopOrderUrl = {
 	page: '/page',
@@ -15,8 +15,8 @@ export function getShopOrderPage(
 ): Promise<any> {
 	const url = `${baseService.finance + baseShopOrder + ShopOrderUrl.page}`;
 	return postData(url, params, {
-		pageNum: pageNum ? pageNum : 1,
-		pageSize: pageSize ? pageSize : 10,
+		pageNum: pageNum ?? 1,
+		pageSize: pageSize ?? 10,
 	});
 }
 

@@ -1,8 +1,8 @@
-import type { PersonalGiftData } from '../config';
+﻿import type { PersonalGiftData } from '../config';
 import type { ResponseBody, CommonPageResult } from '@/types/api';
 import { getData, postData, putData, deleteData, baseService } from '@/api/common';
 
-const basePersonalGift = '/api/v1/personal-gift';
+const basePersonalGift = '/personal-gift';
 
 const PersonalGiftUrl = {
 	page: '/page',
@@ -16,8 +16,8 @@ export function getPersonalGiftPage(
 ): Promise<ResponseBody<CommonPageResult<PersonalGiftData>>> {
 	const url = `${baseService.finance + basePersonalGift + PersonalGiftUrl.page}`;
 	return postData(url, params, {
-		pageNum: pageNum ? pageNum : 1,
-		pageSize: pageSize ? pageSize : 10,
+		pageNum: pageNum ?? 1,
+		pageSize: pageSize ?? 10,
 	});
 }
 
