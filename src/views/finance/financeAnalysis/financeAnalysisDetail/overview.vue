@@ -18,7 +18,6 @@
 				</div>
 			</div>
 		</div>
-
 		<!-- Asset Grid -->
 		<div class="section-title">可动产</div>
 		<div class="asset-grid">
@@ -26,6 +25,8 @@
 				v-for="item in assetList"
 				:key="item.typeCode"
 				class="asset-card"
+				style="cursor: pointer"
+				@click="goToFinanceManager(item)"
 			>
 				<div class="card-header">
 					<div
@@ -63,6 +64,8 @@
 				v-for="item in liabilityList"
 				:key="item.typeCode"
 				class="liability-item"
+				style="cursor: pointer"
+				@click="goToFinanceManager(item)"
 			>
 				<div class="item-left">
 					<div
@@ -119,6 +122,8 @@
 					v-for="item in utilityList"
 					:key="item.typeCode"
 					class="utility-item"
+					style="cursor: pointer"
+					@click="goToFinanceManager(item)"
 				>
 					<div class="item-header">
 						<span
@@ -154,6 +159,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const router = useRouter();
 const balanceList = ref<FinanceDetail[]>([]);
 const sum = ref<math.BigNumber>(math.bignumber(0));
 
@@ -265,6 +271,13 @@ const getBalanceInfo = async (userId: number | string | null, dateStr: string) =
 
 const init = (dateStr: string, belongTo: number | string | null) => {
 	getBalanceInfo(belongTo, dateStr);
+};
+
+const goToFinanceManager = (item: FinanceDetail) => {
+	// 映射 typeName 到 fromSource 代码
+	// 如果 item.typeCode 已经是 yhk, wx 等，则可以直接使用
+	// 根据用户提示，这里使用 typeCode 或者是手动映射
+	router.push({ name: 'financeManager', query: { fromSource: item.typeCode } });
 };
 
 watch(

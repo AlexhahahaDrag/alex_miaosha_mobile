@@ -8,6 +8,18 @@
 			class="search-bar"
 		/>
 	</form>
+	<van-dropdown-menu>
+		<van-dropdown-item
+			v-model="searchInfo.fromSource"
+			:options="sourceOptions"
+			@change="onSearch"
+		/>
+		<van-dropdown-item
+			v-model="searchInfo.typeCode"
+			:options="categoryOptions"
+			@change="onSearch"
+		/>
+	</van-dropdown-menu>
 	<van-pull-refresh
 		pulling-text="加载中。。。"
 		class="refresh-info"
@@ -98,11 +110,14 @@
 	<van-back-top target="#finance-manager-list" />
 </template>
 <script lang="ts" setup>
+import { ref, computed, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { showSuccessToast, showFailToast } from 'vant';
 import { pagination, fromSourceTransferList, type FinanceManagerData, type FromSourceTransferItem } from './config';
 import { getRoutePathByName } from '@/utils/router';
 import { formatDate, dataTimeFormat } from '@/utils/dayjs';
 import { getFinanceMangerPage, deleteFinanceManager } from '@/views/finance/financeManager/api';
+import { getDictList } from '@/api/finance/dict/dictManager';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
 import type { PageInfo } from '@/views/common/config';
@@ -110,6 +125,31 @@ import type { ResponseBody } from '@/types/api';
 
 const router = useRouter();
 const route = useRoute();
+
+// Options for dropdowns
+const sourceOptions = computed(() => {
+	const options = fromSourceTransferList.map((item) => ({
+		text: item.name,
+		value: item.value,
+	}));
+	return [{ text: '支付方式 (全部)', value: null }, ...options];
+});
+
+const categoryList = ref<any[]>([]);
+const categoryOptions = computed(() => {
+	const options = categoryList.value.map((item) => ({
+		text: item.typeName,
+		value: item.typeCode,
+	}));
+	return [{ text: '类别 (全部)', value: '' }, ...options];
+});
+
+const fetchCategories = async () => {
+	const { code, data } = await getDictList('income_expense_type');
+	if (code === '200' && Array.isArray(data)) {
+		categoryList.value = data;
+	}
+};
 
 // 通过路由解析获取详情页路径，使用公共工具方法
 const getDetailRoutePath = (): string => {
@@ -194,7 +234,13 @@ const getFinancePage = async (param: FinanceManagerData, cur: PageInfo) => {
 	if (!isRefresh.value) {
 		loading.value = true;
 	}
-	const { code, data, message } = await getFinanceMangerPage(param, cur?.current || 1, cur?.pageSize || 10)
+	const query = {
+		...param,
+	};
+	if (!query.fromSource) {
+		delete query.fromSource;
+	}
+	const { code, data, message } = await getFinanceMangerPage(query, cur?.current || 1, cur?.pageSize || 10)
 		.catch((error: ResponseBody) => {
 			throw error;
 		})
@@ -253,6 +299,14 @@ const onDeleteFinance = async (id?: string) => {
 // 初始化
 onMounted(() => {
 	resetData();
+	fetchCategories();
+	// 如果有路由参数，则设置搜索条件
+	if (route.query.fromSource) {
+		searchInfo.value.fromSource = route.query.fromSource as string;
+	}
+	if (route.query.typeCode) {
+		searchInfo.value.typeCode = route.query.typeCode as string;
+	}
 	getFinancePage(searchInfo.value, pagination.value);
 });
 </script>
