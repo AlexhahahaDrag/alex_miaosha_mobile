@@ -5,7 +5,11 @@ import Layout from '@/layouts/index.vue';
 import { useUserStore } from '@/store/modules/user/user';
 import type { MenuInfo } from '@/store/modules/user/typing';
 
-const modules = import.meta.glob('@/views/**/**.vue');
+const modules = import.meta.glob([
+	'@/views/**/**.vue',
+	'!@/views/common/nav-bar/index.vue',
+	'!@/views/common/tab-bar/index.vue',
+]);
 
 const pageInfo = {
 	dashboard: '/src/views/home/index.vue',
