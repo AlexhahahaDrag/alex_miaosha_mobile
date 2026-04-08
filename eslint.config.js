@@ -22,6 +22,7 @@ const config = [
 			'**/.nyc_output/**',
 			'**/build/**',
 			'**/.eslintrc.*',
+			'**/eslint.config.js',
 			'**/postcss.config.js',
 			'**/components.d.ts',
 			'**/auto-imports.d.ts',

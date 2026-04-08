@@ -1,4 +1,5 @@
-import { resolve } from 'path';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
 import { defineConfig, loadEnv } from 'vite';
 import type { ConfigEnv, UserConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
@@ -9,6 +10,9 @@ import AutoImport from 'unplugin-auto-import/vite';
 import { visualizer } from 'rollup-plugin-visualizer';
 import viteCompression from 'vite-plugin-compression';
 import { qrcode } from 'vite-plugin-qrcode';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const pathResolve = (dir: string): string => {
 	return resolve(__dirname, './', dir);
@@ -101,16 +105,12 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
 				},
 			},
 		},
+		esbuild: {
+			drop: ['console', 'debugger'],
+		},
 		build: {
 			outDir: env.VITE_OUTPUT_DIR || 'dist',
 			chunkSizeWarningLimit: 800, // 将警告阈值提高到800KB
-			minify: 'terser',
-			terserOptions: {
-				compress: {
-					drop_console: true,
-					drop_debugger: true,
-				},
-			},
 			rollupOptions: {
 				output: {
 					//静态资源分类打包

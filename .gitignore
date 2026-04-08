@@ -33,3 +33,5 @@ stats.html
 components.d.ts
 /src/auto-imports.d.ts
 .editorconfig
+.agents
+.skills-lock.json
