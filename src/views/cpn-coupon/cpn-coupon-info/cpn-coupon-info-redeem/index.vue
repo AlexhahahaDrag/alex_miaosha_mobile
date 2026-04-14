@@ -333,7 +333,7 @@ const onSubmit = async () => {
 		} else {
 			showFailToast(message || '核销失败，请联系管理员！');
 		}
-	} catch (error) {
+	} catch {
 		showFailToast('核销失败，请稍后重试！');
 	} finally {
 		submitLoading.value = false;
@@ -349,7 +349,7 @@ const initUserList = async () => {
 		} else {
 			userInfo.value.list = [];
 		}
-	} catch (error) {
+	} catch {
 		showFailToast('获取用户列表失败！');
 	}
 };
@@ -375,7 +375,7 @@ const initCouponInfo = async () => {
 			showFailToast(message || '获取消费券信息失败！');
 			router.push({ path: getLeftPath.value });
 		}
-	} catch (error) {
+	} catch {
 		showFailToast('获取消费券信息失败！');
 		router.push({ path: getLeftPath.value });
 	}

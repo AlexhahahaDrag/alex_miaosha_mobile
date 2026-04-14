@@ -244,7 +244,7 @@ const handleDelete = async (item: PersonalGiftData): Promise<void> => {
 		} else {
 			showFailToast(message || '删除失败，请联系管理员！');
 		}
-	} catch (error) {
+	} catch {
 		showFailToast('删除失败，请稍后重试！');
 	}
 };

@@ -1,17 +1,15 @@
-// @ts-check
-
-import path from 'path';
-import { fileURLToPath } from 'url';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 import pluginVue from 'eslint-plugin-vue';
+// @ts-ignore - eslint-plugin-import might not have types in some environments
 import pluginImport from 'eslint-plugin-import';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-/** @type {import('eslint').Linter.FlatConfig[]} */
-const config = [
+export default [
 	{
 		ignores: [
 			'**/dist/**',
@@ -23,6 +21,7 @@ const config = [
 			'**/build/**',
 			'**/.eslintrc.*',
 			'**/eslint.config.js',
+			'**/eslint.config.ts',
 			'**/postcss.config.js',
 			'**/components.d.ts',
 			'**/auto-imports.d.ts',
@@ -111,7 +110,6 @@ const config = [
 			'vue/prop-name-casing': ['error', 'camelCase'],
 			'vue/attribute-hyphenation': ['error', 'always'],
 			'vue/v-on-event-hyphenation': ['error', 'always'],
-			'vue/v-on-function-call': ['error', 'never'],
 
 			// TypeScript specific rules
 			'@typescript-eslint/no-unused-vars': [
@@ -178,7 +176,7 @@ const config = [
 		files: ['**/*.vue'],
 		languageOptions: {
 			parserOptions: {
-				parser: '@typescript-eslint/parser',
+				parser: tseslint.parser,
 				project: './tsconfig.json',
 				tsconfigRootDir: __dirname,
 				extraFileExtensions: ['.vue'],
@@ -271,5 +269,3 @@ const config = [
 		},
 	},
 ];
-
-export default config;
