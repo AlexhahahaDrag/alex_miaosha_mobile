@@ -10,31 +10,31 @@ export const rulesRef = reactive({
 	permissionCode: [
 		{
 			required: true,
-			message: label.permissionCode + '不能为空！',
+			message: `${label.permissionCode}不能为空！`,
 		},
 	],
 	permissionName: [
 		{
 			required: true,
-			message: label.permissionName + '不能为空！',
+			message: `${label.permissionName}不能为空！`,
 		},
 	],
 	summary: [
 		{
 			required: true,
-			message: label.summary + '不能为空！',
+			message: `${label.summary}不能为空！`,
 		},
 	],
 	status: [
 		{
 			required: true,
-			message: label.status + '不能为空！',
+			message: `${label.status}不能为空！`,
 		},
 	],
 	options: [
 		{
 			required: true,
-			message: label.options + '不能为空！',
+			message: `${label.options}不能为空！`,
 		},
 	],
 });

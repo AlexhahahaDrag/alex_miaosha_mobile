@@ -28,13 +28,25 @@ const alias: Record<string, string> = {
 
 export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
 	const env = loadEnv(mode, process.cwd(), 'VITE_');
+	const isProd = mode === 'production';
 
 	return {
+		// 抑制 Node.js 全局变（global → globalThis）并根据环境移除调试语句
+		define: {
+			global: 'globalThis',
+			...(isProd
+				? { 'console.log': '(() => {})', 'console.debug': '(() => {})', debugger: '(() => {})' }
+				: {}),
+		},
 		optimizeDeps: {
-			esbuildOptions: {
-				// 抑制 Node.js 弃用警告
-				define: {
-					global: 'globalThis',
+			// 强制预构建常用依赖，避免冷启动时动态发现导致页面刷新
+			include: ['vue', 'vue-router', 'pinia', 'axios', 'dayjs', 'vant'],
+			// 自定义预构建阶段 Rolldown 打包器的行为
+			rolldownOptions: {
+				// 配置模块解析条件，确保 CJS 包被正确处理
+				// 注意：'module' 为非标准条件已移除
+				resolve: {
+					conditionNames: ['import', 'browser', 'default'],
 				},
 			},
 		},
@@ -44,9 +56,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
 				resolvers: [VantResolver()],
 				// 指定需要自动导入的库
 				imports: ['vue', 'vue-router', 'pinia'],
-				// Vite特定的配置
 				dts: 'src/auto-imports.d.ts', // 生成自动导入类型声明文件
-				// 其他配置...
 			}),
 			Components({
 				resolvers: [VantResolver()],
@@ -55,27 +65,31 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
 			}),
 			createSvgIconsPlugin({
 				iconDirs: [
-					pathResolve('src/assets/icons/menu'),
-					pathResolve('src/assets/icons/common'),
-					pathResolve('src/assets/icons/finance'),
-					pathResolve('src/assets/icons/soft'),
-					pathResolve('src/assets/icons/home'),
-					pathResolve('src/assets/icons'),
+					pathResolve('src/assets/icons'), // 根目录（1个）
+					pathResolve('src/assets/icons/common'), // 2个
+					pathResolve('src/assets/icons/finance'), // 14个
+					pathResolve('src/assets/icons/menu'), // 20个
+					pathResolve('src/assets/icons/shop'), // 11个（之前遗漏）
+					pathResolve('src/assets/icons/soft'), // 8个
 				],
 				symbolId: 'icon-[dir]-[name]',
-				inject: 'body-last', //body-last|body-first默认body-last
-				customDomId: '__svg__icons__dom__', //默认__svg__icons__dom__
+				inject: 'body-last',
+				customDomId: '__svg__icons__dom__',
 			}),
-			visualizer(),
-			viteCompression(),
+			// 仅在生产构建时生成包体积分析报告（输出到 dist/stats.html）
+			isProd && visualizer({ open: false, gzipSize: true, filename: 'stats.html' }),
+			// 仅在生产构建时启用 gzip 压缩，排除 stats.html（开发分析文件，无需压缩）
+			isProd &&
+				viteCompression({
+					filter: (file: string) => /\.(js|css|json|html|svg)$/i.test(file) && !file.includes('stats'),
+				}),
 			qrcode({
 				filter: (url: string) => {
-					// 过滤掉本地地址，只显示外网可访问的地址
+					// 过滤掉本地/内网地址，只显示外网可访问的地址
 					return (
 						!url.includes('localhost') &&
 						!url.includes('127.0.0.1') &&
 						!url.includes('0.0.0.0') &&
-						!url.includes('2.0.0.1') &&
 						!url.match(/192\.168\./) &&
 						!url.match(/172\.(1[6-9]|2[0-9]|3[0-1])\./)
 					);
@@ -94,7 +108,6 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
 		},
 		server: {
 			host: '0.0.0.0',
-			// port: VITE_PORT,
 			port: env.VITE_PORT ? parseInt(env.VITE_PORT) : 2000,
 			open: env.VITE_OPEN === 'true',
 			proxy: {
@@ -105,64 +118,66 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
 				},
 			},
 		},
-		esbuild: {
-			drop: ['console', 'debugger'],
-		},
+
 		build: {
 			outDir: env.VITE_OUTPUT_DIR || 'dist',
-			chunkSizeWarningLimit: 800, // 将警告阈值提高到800KB
-			rollupOptions: {
+			chunkSizeWarningLimit: 800,
+			// Vite 8 中 rollupOptions 已废弃，改用 rolldownOptions
+			rolldownOptions: {
+				checks: {
+					pluginTimings: false,
+				},
 				output: {
-					//静态资源分类打包
-					chunkFileNames: 'static/js/chunkName-[hash].js',
-					entryFileNames: 'static/js/chunkName-[hash].js',
-					assetFileNames: 'static/[ext]/chunkName-[hash].[ext]',
+					// 静态资源分类打包
+					chunkFileNames: 'static/js/[name]-[hash].js',
+					entryFileNames: 'static/js/[name]-[hash].js',
+					assetFileNames: 'static/[ext]/[name]-[hash].[ext]',
 					manualChunks(id: string) {
-						//静态资源分拆打包
-						if (id.includes('node_modules')) {
-							// 将大型库分别打包
-							if (id.includes('vue') || id.includes('@vue')) {
+						// 兼容 Windows 路径分隔符（将 \ 统一转为 /）
+						const normalizedId = id.replace(/\\/g, '/');
+						if (normalizedId.includes('node_modules')) {
+							// Vue 生态
+							if (normalizedId.includes('/vue') || normalizedId.includes('/@vue')) {
 								return 'vue-vendor';
 							}
-							if (id.includes('vant')) {
+							// Vant UI
+							if (normalizedId.includes('/vant')) {
 								return 'vant-vendor';
 							}
-							if (id.includes('echarts')) {
+							// ECharts
+							if (normalizedId.includes('/echarts')) {
 								return 'echarts-vendor';
 							}
-							if (id.includes('axios')) {
+							// Axios
+							if (normalizedId.includes('/axios')) {
 								return 'axios-vendor';
 							}
-							if (id.includes('dayjs') || id.includes('crypto-js') || id.includes('mathjs')) {
+							// 工具库
+							if (
+								normalizedId.includes('/dayjs') ||
+								normalizedId.includes('/crypto-js') ||
+								normalizedId.includes('/mathjs')
+							) {
 								return 'utils-vendor';
 							}
-							// 将小型工具库打包到一起，避免生成空chunks
+							// 小型工具库合并，避免生成空 chunk
 							if (
-								id.includes('javascript-natural-sort') ||
-								id.includes('tiny-emitter') ||
-								id.includes('lodash') ||
-								id.includes('classnames') ||
-								id.includes('normalize-wheel') ||
-								id.includes('resize-observer-polyfill')
+								normalizedId.includes('/javascript-natural-sort') ||
+								normalizedId.includes('/tiny-emitter') ||
+								normalizedId.includes('/lodash') ||
+								normalizedId.includes('/classnames') ||
+								normalizedId.includes('/normalize-wheel') ||
+								normalizedId.includes('/resize-observer-polyfill')
 							) {
 								return 'common-utils';
 							}
-							// 对于较大的第三方库，才创建单独的chunk
-							const packageName = id.toString().split('node_modules/')[1].split('/')[0].toString();
-							// 只为较大的包创建单独的chunk，小包归类到misc-vendor
-							const largePackages = [
-								'pinia',
-								'vue-router',
-								'typescript',
-								'@types',
-								'rollup',
-								'unplugin',
-								'particles.vue3',
-							];
+							// 其余较大的运行时库单独打包
+							const packageName = normalizedId.split('node_modules/')[1].split('/')[0];
+							const largePackages = ['pinia', 'vue-router', 'particles.vue3'];
 							if (largePackages.some((pkg) => packageName.includes(pkg))) {
 								return packageName;
 							}
-							// 其他小型库统一打包
+							// 其他小型库归入 misc-vendor
 							return 'misc-vendor';
 						}
 					},

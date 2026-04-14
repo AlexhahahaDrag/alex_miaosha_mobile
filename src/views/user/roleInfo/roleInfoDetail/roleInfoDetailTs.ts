@@ -9,25 +9,25 @@ export const rulesRef = reactive({
 	roleCode: [
 		{
 			required: true,
-			message: label.roleCode + '不能为空！',
+			message: `${label.roleCode}不能为空！`,
 		},
 	],
 	roleName: [
 		{
 			required: true,
-			message: label.roleName + '不能为空！',
+			message: `${label.roleName}不能为空！`,
 		},
 	],
 	summary: [
 		{
 			required: true,
-			message: label.summary + '不能为空！',
+			message: `${label.summary}不能为空！`,
 		},
 	],
 	status: [
 		{
 			required: true,
-			message: label.status + '不能为空！',
+			message: `${label.status}不能为空！`,
 		},
 	],
 });

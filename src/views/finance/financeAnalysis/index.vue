@@ -192,7 +192,7 @@ const getUserInfoListInfo = async () => {
 		} else {
 			showFailToast(message || '查询失败，请联系管理员!');
 		}
-	} catch (error) {
+	} catch {
 		showFailToast('查询失败，请联系管理员!');
 	}
 };

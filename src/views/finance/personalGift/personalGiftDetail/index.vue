@@ -210,7 +210,7 @@ const onSubmit = async () => {
 		} else {
 			showFailToast(message || '保存失败，请联系管理员!');
 		}
-	} catch (error) {
+	} catch {
 		showFailToast('保存失败，请稍后重试!');
 	} finally {
 		submitting.value = false;

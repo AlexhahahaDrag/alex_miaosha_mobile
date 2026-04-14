@@ -16,67 +16,67 @@ export const rulesRef = reactive({
 	name: [
 		{
 			required: true,
-			message: label.name + '不能为空！',
+			message: `${label.name}不能为空！`,
 		},
 	],
 	path: [
 		{
 			required: true,
-			message: label.path + '不能为空！',
+			message: `${label.path}不能为空！`,
 		},
 	],
 	title: [
 		{
 			required: true,
-			message: label.title + '不能为空！',
+			message: `${label.title}不能为空！`,
 		},
 	],
 	component: [
 		{
 			required: true,
-			message: label.component + '不能为空！',
+			message: `${label.component}不能为空！`,
 		},
 	],
 	redirect: [
 		{
 			required: true,
-			message: label.redirect + '不能为空！',
+			message: `${label.redirect}不能为空！`,
 		},
 	],
 	icon: [
 		{
 			required: true,
-			message: label.icon + '不能为空！',
+			message: `${label.icon}不能为空！`,
 		},
 	],
 	hideInMenu: [
 		{
 			required: true,
-			message: label.hideInMenu + '不能为空！',
+			message: `${label.hideInMenu}不能为空！`,
 		},
 	],
 	parentId: [
 		{
 			required: true,
-			message: label.parentId + '不能为空！',
+			message: `${label.parentId}不能为空！`,
 		},
 	],
 	summary: [
 		{
 			required: true,
-			message: label.summary + '不能为空！',
+			message: `${label.summary}不能为空！`,
 		},
 	],
 	status: [
 		{
 			required: true,
-			message: label.status + '不能为空！',
+			message: `${label.status}不能为空！`,
 		},
 	],
 	orderBy: [
 		{
 			required: true,
-			message: label.orderBy + '不能为空！',
+			message: `${label.orderBy}不能为空！`,
 		},
 	],
 });
