@@ -3,12 +3,14 @@
 		<van-search
 			v-model="searchInfo.bigTypeCode"
 			placeholder="搜索账单..."
+			shape="round"
+			background="#f7f8fa"
 			@search="onSearch"
 			@clear="onCancel"
 			class="search-bar"
 		/>
 	</form>
-	<van-dropdown-menu>
+	<van-dropdown-menu :active-color="'#1989fa'">
 		<van-dropdown-item
 			v-model="searchInfo.fromSource"
 			:options="sourceOptions"
@@ -20,21 +22,43 @@
 			@change="onSearch"
 		/>
 	</van-dropdown-menu>
-	<van-pull-refresh
-		pulling-text="加载中。。。"
+	<common-pull-refresh
 		class="refresh-info"
-		v-model:model-value="isRefresh"
+		v-model="isRefresh"
 		@refresh="onRefreshData"
 		ref="pullRefresh"
-		:immediate-check="false"
 	>
 		<div
 			class="list-container"
 			id="finance-manager-list"
 		>
+			<template v-if="loading && !isRefresh && !dataSource?.length">
+				<van-skeleton
+					title
+					:row="3"
+					class="skeleton-card"
+				/>
+				<van-skeleton
+					title
+					:row="3"
+					class="skeleton-card"
+				/>
+				<van-skeleton
+					title
+					:row="3"
+					class="skeleton-card"
+				/>
+				<van-skeleton
+					title
+					:row="3"
+					class="skeleton-card"
+				/>
+			</template>
+
 			<van-empty
-				v-if="!loading && !isRefresh && !dataSource?.length"
-				description="暂无数据"
+				v-else-if="!loading && !isRefresh && !dataSource?.length"
+				description="没有找到相关的账单记录"
+				image="search"
 			/>
 			<!-- 有数据时显示列表 -->
 			<van-list
@@ -42,7 +66,7 @@
 				v-model:loading="loading"
 				:finished="finished"
 				:immediate-check="false"
-				finished-text="没有更多了"
+				finished-text="- 已经到底啦 -"
 				@load="onLoadMore"
 			>
 				<div class="card-list">
@@ -53,7 +77,7 @@
 					>
 						<div
 							class="finance-card"
-							@click="router.push(getDetailRoute(item.id))"
+							@click="handleCardClick(item)"
 						>
 							<div class="card-left">
 								<div class="title-row">
@@ -106,7 +130,7 @@
 				</div>
 			</van-list>
 		</div>
-	</van-pull-refresh>
+	</common-pull-refresh>
 	<van-back-top target="#finance-manager-list" />
 </template>
 <script lang="ts" setup>
@@ -114,6 +138,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { showSuccessToast, showFailToast } from 'vant';
 import { pagination, fromSourceTransferList, type FinanceManagerData, type FromSourceTransferItem } from './config';
+import CommonPullRefresh from '@/components/CommonPullRefresh.vue';
 import { getRoutePathByName } from '@/utils/router';
 import { formatDate, dataTimeFormat } from '@/utils/dayjs';
 import { getFinanceMangerPage, deleteFinanceManager } from '@/views/finance/financeManager/api';
@@ -228,6 +253,15 @@ const resetData = () => {
 	pagination.value.pageSize = 10;
 };
 
+// 交互辅助：带有触觉反馈的点击事件
+const handleCardClick = (item: FinanceManagerData) => {
+	// 如果浏览器支持 Vibrate API，则提供轻微震动反馈以增强操作确定感
+	if (typeof navigator !== 'undefined' && navigator.vibrate) {
+		navigator.vibrate(50);
+	}
+	router.push(getDetailRoute(item.id));
+};
+
 // 获取财务数据
 const getFinancePage = async (param: FinanceManagerData, cur: PageInfo) => {
 	// 只有在非下拉刷新时才显示列表加载状态，避免出现两个加载动画
@@ -313,41 +347,61 @@ onMounted(() => {
 
 <style lang="less" scoped>
 .search-bar {
-	--van-search-input-height: 48px; // Increase height
+	--van-search-input-height: 44px;
+	padding: 8px 16px;
+	background-color: #fff;
+}
+
+:deep(.van-dropdown-menu__bar) {
+	box-shadow: none;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.02);
 }
 
 .refresh-info {
-	height: calc(100% - 64px);
-	background-color: #f7f8fa; // Light background
+	height: calc(100% - 104px);
+	background-color: #f5f7fa; // 柔和宽容的背景色
 }
 
 .list-container {
 	height: 100%;
 	overflow-y: auto;
-	padding-top: 10px;
+	padding-top: 12px;
+}
+
+.skeleton-card {
+	padding: 20px;
+	margin: 0 16px 16px;
+	background: #fff;
+	border-radius: 16px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
 .card-list {
-	padding: 0 12px;
+	padding: 0 16px; // 增加两侧留白
 }
 
 .card-swipe-item {
-	margin-bottom: 12px;
-	border-radius: 12px;
-	overflow: hidden; // For radius on swipe
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+	margin-bottom: 16px; // 增大间距
+	border-radius: 16px; // 增大圆角
+	overflow: hidden;
+	// 更柔和的现代阴影设计
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
 	background-color: #fff;
+	transition: transform 0.2s ease-out;
+
+	&:active {
+		transform: scale(0.98); // 类原生点击弹跳动效
+	}
 }
 
 .finance-card {
 	background: #fff;
-	padding: 16px;
+	padding: 18px 20px; // 加大卡片内边距
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
 	position: relative;
-	/* Ensure the card keeps its shape */
-	min-height: 50px;
+	min-height: 60px;
 }
 
 .card-left {
