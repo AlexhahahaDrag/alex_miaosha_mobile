@@ -3,7 +3,6 @@ import { fileURLToPath } from 'node:url';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 import pluginVue from 'eslint-plugin-vue';
-// @ts-ignore - eslint-plugin-import might not have types in some environments
 import pluginImport from 'eslint-plugin-import';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -51,7 +50,6 @@ export default [
 			},
 		},
 		rules: {
-			// 基本的 TypeScript 规则
 			'@typescript-eslint/no-unused-vars': [
 				'error',
 				{
@@ -82,7 +80,6 @@ export default [
 			import: pluginImport,
 		},
 		rules: {
-			// Import plugin rules
 			'import/order': [
 				'error',
 				{
@@ -90,7 +87,7 @@ export default [
 					'newlines-between': 'never',
 				},
 			],
-			'import/no-unresolved': 'off', // 暂时关闭，因为别名解析有问题
+			'import/no-unresolved': 'off',
 			'import/no-duplicates': 'error',
 			'import/no-unused-modules': 'warn',
 			'import/first': 'error',
@@ -98,7 +95,6 @@ export default [
 			'import/no-named-as-default': 'off',
 			'import/no-named-as-default-member': 'off',
 
-			// Vue specific rules
 			'vue/multi-word-component-names': 'off',
 			'vue/no-unused-vars': 'error',
 			'vue/no-unused-components': 'warn',
@@ -111,7 +107,6 @@ export default [
 			'vue/attribute-hyphenation': ['error', 'always'],
 			'vue/v-on-event-hyphenation': ['error', 'always'],
 
-			// TypeScript specific rules
 			'@typescript-eslint/no-unused-vars': [
 				'error',
 				{
@@ -132,10 +127,9 @@ export default [
 				},
 			],
 
-			// General rules
-			'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'warn',
-			'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'warn',
-			'no-unused-vars': 'off', // 使用 TypeScript 版本
+			'no-console': 'warn',
+			'no-debugger': 'warn',
+			'no-unused-vars': 'off',
 			'prefer-const': 'error',
 			'no-var': 'error',
 			'object-shorthand': 'error',
@@ -143,13 +137,13 @@ export default [
 			'template-curly-spacing': 'error',
 			'arrow-spacing': 'error',
 			'comma-dangle': ['error', 'always-multiline'],
-			semi: ['error', 'always'], // 改为要求使用分号
+			semi: ['error', 'always'],
 			quotes: ['error', 'single'],
 			indent: [
 				'error',
 				'tab',
 				{
-					SwitchCase: 1, // Switch cases缩进一个tab
+					SwitchCase: 1,
 					VariableDeclarator: 1,
 					outerIIFEBody: 1,
 					MemberExpression: 1,
@@ -183,13 +177,12 @@ export default [
 			},
 		},
 		rules: {
-			// Vue 文件特定规则
 			'vue/html-indent': ['error', 'tab'],
 			indent: [
 				'error',
 				'tab',
 				{
-					SwitchCase: 1, // Switch cases缩进一个tab
+					SwitchCase: 1,
 					VariableDeclarator: 1,
 					outerIIFEBody: 1,
 					MemberExpression: 1,
@@ -241,13 +234,12 @@ export default [
 			},
 		},
 		rules: {
-			// TypeScript 文件特定规则
 			'@typescript-eslint/no-inferrable-types': 'off',
 			indent: [
 				'error',
 				'tab',
 				{
-					SwitchCase: 1, // Switch cases缩进一个tab
+					SwitchCase: 1,
 					VariableDeclarator: 1,
 					outerIIFEBody: 1,
 					MemberExpression: 1,

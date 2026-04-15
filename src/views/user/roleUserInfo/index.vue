@@ -3,13 +3,11 @@
 		:info="info"
 		@click-right="addRoleUserInfo"
 	></NavBar>
-	<van-pull-refresh
-		pulling-text="加载中。。。"
+	<common-pull-refresh
 		:style="{ height: 'calc(100% - 44px)' }"
 		v-model="isRefresh"
 		@refresh="refresh"
 		ref="pullRefresh"
-		immediate-check="false"
 	>
 		<form action="/">
 			<!--
@@ -88,7 +86,7 @@
 				</van-swipe-cell>
 			</van-cell-group>
 		</van-list>
-	</van-pull-refresh>
+	</common-pull-refresh>
 	<van-back-top></van-back-top>
 </template>
 <script lang="ts" setup>

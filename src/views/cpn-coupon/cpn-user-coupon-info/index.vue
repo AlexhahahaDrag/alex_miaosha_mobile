@@ -23,7 +23,7 @@
 		</div>
 
 		<!-- 下拉刷新容器 -->
-		<van-pull-refresh
+		<common-pull-refresh
 			v-model="isRefresh"
 			@refresh="onRefreshData"
 			class="refresh-container"
@@ -100,7 +100,7 @@
 					</van-swipe-cell>
 				</van-list>
 			</div>
-		</van-pull-refresh>
+		</common-pull-refresh>
 		<van-back-top />
 	</div>
 </template>
@@ -187,7 +187,7 @@ const isFilterActive = (value: string): boolean => {
 };
 
 // 查看详情
-const onViewDetail = (id?: string) => {
+const onViewDetail = (id?: number) => {
 	if (!id) return;
 	const path = getRoutePathByName(router, 'cpnUserCouponInfoDetail');
 	router.push({

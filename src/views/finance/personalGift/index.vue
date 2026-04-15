@@ -1,11 +1,9 @@
 <template>
-	<van-pull-refresh
-		pulling-text="加载中..."
+	<common-pull-refresh
 		class="pull-refresh-container"
 		v-model="isRefresh"
 		@refresh="refresh"
 		ref="pullRefresh"
-		:immediate-check="false"
 	>
 		<form action="/">
 			<van-search
@@ -103,7 +101,7 @@
 				</van-swipe-cell>
 			</van-cell-group>
 		</van-list>
-	</van-pull-refresh>
+	</common-pull-refresh>
 	<van-back-top />
 </template>
 <script lang="ts" setup>

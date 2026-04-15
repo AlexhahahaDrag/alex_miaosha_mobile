@@ -113,6 +113,20 @@ const getFormatTimeInfo = (time?: string | dayjs.Dayjs): string => {
 	return targetTime.format('YYYY-MM-DD HH:mm');
 };
 
+/**
+ * 格式化列表头部日期（支持 今天/昨天/MM-DD）
+ * @param date 日期字符串
+ * @returns 格式化后的日期显示文本
+ */
+const formatHeaderDate = (date: string | dayjs.Dayjs): string => {
+	const now = dayjs().startOf('day');
+	const target = dayjs(date);
+	if (target.isSame(now, 'day')) return '今天 (Today)';
+	if (target.isSame(now.subtract(1, 'day'), 'day')) return '昨天 (Yesterday)';
+	if (target.isSame(now, 'year')) return target.format('MM月DD日');
+	return target.format('YYYY年MM月DD日');
+};
+
 // 导出所有工具函数和常量
 export {
 	defaultDateFormat,
@@ -124,4 +138,5 @@ export {
 	formatTime,
 	datePickerFormatter,
 	getFormatTimeInfo,
+	formatHeaderDate,
 };

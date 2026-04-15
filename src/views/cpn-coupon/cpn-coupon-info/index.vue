@@ -9,7 +9,7 @@
 		/>
 
 		<!-- 下拉刷新容器 -->
-		<van-pull-refresh
+		<common-pull-refresh
 			v-model="isRefresh"
 			@refresh="onRefreshData"
 			class="refresh-container"
@@ -109,7 +109,7 @@
 					</transition-group>
 				</van-list>
 			</div>
-		</van-pull-refresh>
+		</common-pull-refresh>
 
 		<!-- 删除确认弹窗 -->
 		<van-popup

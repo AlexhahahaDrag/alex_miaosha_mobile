@@ -1,3 +1,4 @@
+import { ref } from 'vue';
 import { type PageInfo } from '@/views/common/config/index';
 
 export interface SearchInfo {

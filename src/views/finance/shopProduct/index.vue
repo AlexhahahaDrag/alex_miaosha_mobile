@@ -1,12 +1,10 @@
 <template>
 	<NavBar :info="info"></NavBar>
-	<van-pull-refresh
-		pulling-text="加载中。。。"
+	<common-pull-refresh
 		:style="{ height: 'calc(100% - 44px)' }"
 		v-model="isRefresh"
 		@refresh="refresh"
 		ref="pullRefresh"
-		immediate-check="false"
 	>
 		<form action="/">
 			<van-search
@@ -92,7 +90,7 @@
 				</template>
 			</van-cell>
 		</van-list>
-	</van-pull-refresh>
+	</common-pull-refresh>
 	<van-back-top></van-back-top>
 	<Tabbar :data="useTabBar"></Tabbar>
 </template>

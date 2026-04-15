@@ -1,5 +1,5 @@
 <template>
-	<van-pull-refresh
+	<common-pull-refresh
 		v-model="refreshing"
 		@refresh="onRefresh"
 	>
@@ -15,7 +15,7 @@
 				:title="item"
 			/>
 		</van-list>
-	</van-pull-refresh>
+	</common-pull-refresh>
 </template>
 
 <script setup lang="ts">

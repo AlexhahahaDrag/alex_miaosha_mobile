@@ -43,7 +43,7 @@
 			</div>
 
 			<!-- Vant下拉刷新 + 触底加载 -->
-			<van-pull-refresh
+			<common-pull-refresh
 				v-model="refreshing"
 				@refresh="onRefresh"
 			>
@@ -118,7 +118,7 @@
 						</div>
 					</div>
 				</van-list>
-			</van-pull-refresh>
+			</common-pull-refresh>
 
 			<!-- 筛选弹窗：卡片与日期范围 -->
 			<van-popup

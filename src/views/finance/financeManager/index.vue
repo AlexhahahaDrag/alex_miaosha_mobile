@@ -4,7 +4,7 @@
 			v-model="searchInfo.bigTypeCode"
 			placeholder="搜索账单..."
 			shape="round"
-			background="#f7f8fa"
+			background="#ffffff"
 			@search="onSearch"
 			@clear="onCancel"
 			class="search-bar"
@@ -28,119 +28,106 @@
 		@refresh="onRefreshData"
 		ref="pullRefresh"
 	>
-		<div
-			class="list-container"
+		<common-list
 			id="finance-manager-list"
+			v-model="loading"
+			:loading="loading"
+			:refreshing="isRefresh"
+			:finished="finished"
+			:isEmpty="!dataSource?.length"
+			empty-text="没有找到相关的账单记录"
+			empty-image="search"
+			@load="onLoadMore"
 		>
-			<template v-if="loading && !isRefresh && !dataSource?.length">
-				<van-skeleton
-					title
-					:row="3"
-					class="skeleton-card"
-				/>
-				<van-skeleton
-					title
-					:row="3"
-					class="skeleton-card"
-				/>
-				<van-skeleton
-					title
-					:row="3"
-					class="skeleton-card"
-				/>
-				<van-skeleton
-					title
-					:row="3"
-					class="skeleton-card"
-				/>
+			<!-- [Premium Skeleton State] -->
+			<template #skeleton>
+				<div
+					v-for="g in 2"
+					:key="g"
+				>
+					<div class="skeleton-date-header">
+						<van-skeleton
+							title
+							:row="0"
+						/>
+					</div>
+					<div
+						v-for="i in 3"
+						:key="i"
+						class="skeleton-card"
+					>
+						<div class="skeleton-left">
+							<van-skeleton
+								title
+								:row="1"
+							/>
+						</div>
+						<div class="skeleton-right">
+							<van-skeleton :row="1" />
+						</div>
+					</div>
+				</div>
 			</template>
 
-			<van-empty
-				v-else-if="!loading && !isRefresh && !dataSource?.length"
-				description="没有找到相关的账单记录"
-				image="search"
-			/>
-			<!-- 有数据时显示列表 -->
-			<van-list
-				v-else
-				v-model:loading="loading"
-				:finished="finished"
-				:immediate-check="false"
-				finished-text="- 已经到底啦 -"
-				@load="onLoadMore"
-			>
-				<div class="card-list">
-					<van-swipe-cell
-						v-for="item in dataSource"
-						:key="item.id"
-						class="card-swipe-item"
+			<!-- [Enhanced Empty State] -->
+			<template #empty>
+				<div class="empty-state-container">
+					<van-empty
+						image="search"
+						description="没有找到相关的账单记录"
 					>
-						<div
-							class="finance-card"
-							@click="handleCardClick(item)"
+						<van-button
+							v-if="hasFilters"
+							round
+							type="primary"
+							class="clear-filters-btn"
+							@click="onClearAllFilters"
 						>
-							<div class="card-left">
-								<div class="title-row">
-									<span class="title">{{ getCellTitle(item) }}</span>
-									<span
-										class="tag"
-										v-if="item.incomeAndExpenses"
-										:class="item.incomeAndExpenses"
-									>
-										{{ item.typeCode || '未知类别' }}
-									</span>
-								</div>
-								<div class="date-text">
-									{{ formatDate(item.infoDate, dataTimeFormat) }}
-								</div>
-							</div>
-
-							<div class="card-right">
-								<div
-									class="amount-text"
-									:class="getAmountClass(item.incomeAndExpenses)"
-								>
-									{{ formatAmount(item) }}
-								</div>
-								<div class="source-info">
-									<div
-										class="svg-wrapper"
-										v-if="item?.fromSource"
-									>
-										<svg-icon
-											:name="getSourceIconName(item)?.label || ''"
-											class="source-icon"
-										/>
-									</div>
-									<span class="source-text">{{ getSourceIconName(item)?.name || '未知' }}</span>
-								</div>
-							</div>
-						</div>
-
-						<template #right>
-							<van-button
-								class="right_info delete-btn"
-								@click="onDeleteFinance(item.id)"
-								square
-								type="danger"
-								text="删除"
-							/>
-						</template>
-					</van-swipe-cell>
+							清除所有筛选
+						</van-button>
+					</van-empty>
 				</div>
-			</van-list>
-		</div>
+			</template>
+
+			<!-- [Main List Content] -->
+			<div class="card-list">
+				<div
+					v-for="group in groupedDataSource"
+					:key="group.date"
+					class="date-group"
+				>
+					<div class="date-header">
+						<span class="header-dot"></span>
+						{{ formatHeaderDate(group.date) }}
+					</div>
+					<!-- Card Transitions -->
+					<transition-group name="list">
+						<finance-card
+							v-for="item in group.items"
+							:key="item.id"
+							:item="item"
+							@click="handleCardClick"
+							@delete="onDeleteFinance"
+						/>
+					</transition-group>
+				</div>
+			</div>
+		</common-list>
 	</common-pull-refresh>
 	<van-back-top target="#finance-manager-list" />
 </template>
+
 <script lang="ts" setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { showSuccessToast, showFailToast } from 'vant';
-import { pagination, fromSourceTransferList, type FinanceManagerData, type FromSourceTransferItem } from './config';
-import CommonPullRefresh from '@/components/CommonPullRefresh.vue';
+import dayjs from 'dayjs';
+import { pagination, fromSourceTransferList, type FinanceManagerData } from './config';
+import CommonPullRefresh from '@/views/components/CommonPullRefresh.vue';
+import CommonList from '@/views/components/CommonList.vue';
+import FinanceCard from './components/FinanceCard.vue';
 import { getRoutePathByName } from '@/utils/router';
-import { formatDate, dataTimeFormat } from '@/utils/dayjs';
+import { formatHeaderDate } from '@/utils/dayjs';
 import { getFinanceMangerPage, deleteFinanceManager } from '@/views/finance/financeManager/api';
 import { getDictList } from '@/api/finance/dict/dictManager';
 import { useNavBar } from '@/composables/useNavBar';
@@ -175,6 +162,22 @@ const fetchCategories = async () => {
 		categoryList.value = data;
 	}
 };
+
+// [Grouping Logic]
+const groupedDataSource = computed(() => {
+	const groups: { date: string; items: FinanceManagerData[] }[] = [];
+	dataSource.value.forEach((item) => {
+		if (!item.infoDate) return;
+		const dateStr = dayjs(item.infoDate).format('YYYY-MM-DD');
+		let group = groups.find((g) => g.date === dateStr);
+		if (!group) {
+			group = { date: dateStr, items: [] };
+			groups.push(group);
+		}
+		group.items.push(item);
+	});
+	return groups;
+});
 
 // 通过路由解析获取详情页路径，使用公共工具方法
 const getDetailRoutePath = (): string => {
@@ -215,35 +218,17 @@ useTabBar({
 });
 
 // 响应式数据
-const loading = ref<boolean>(false);
+const loading = ref<boolean>(true); // 初始设为 true，加速骨架屏展示
 const dataSource = ref<FinanceManagerData[]>([]);
 const searchInfo = ref<FinanceManagerData>({});
 const finished = ref<boolean>(false);
 const isRefresh = ref<boolean>(false);
 
-// 计算属性和工具函数
-const getCellTitle = (item: FinanceManagerData) => {
-	return (item.belongToName ? `${item.belongToName} - ` : '') + (item.name || '未命名');
-};
-
-// Helper for Source Icon Name
-const getSourceIconName = (item: FinanceManagerData): FromSourceTransferItem | null => {
-	if (!item.fromSource) return null;
-	const source = fromSourceTransferList.find((s) => item.fromSource?.includes(s.value));
-	return source || null;
-};
-
-const getAmountClass = (incomeAndExpenses?: string) => {
-	return incomeAndExpenses === 'income' ? 'amount-income' : 'amount-expense';
-};
-
-const formatAmount = (item: FinanceManagerData) => {
-	if (item.amount === undefined || item.amount === null) {
-		return '--';
-	}
-	const prefix = item.incomeAndExpenses === 'income' ? '+' : '-';
-	return `${prefix}¥${Number(item.amount).toFixed(2)}`;
-};
+// [Computed: Multi-Filter Detection]
+const hasFilters = computed(() => {
+	const info = searchInfo.value;
+	return !!(info.bigTypeCode || info.fromSource || info.typeCode);
+});
 
 // 统一重置数据函数
 const resetData = () => {
@@ -253,18 +238,23 @@ const resetData = () => {
 	pagination.value.pageSize = 10;
 };
 
-// 交互辅助：带有触觉反馈的点击事件
+// 一键清除所有筛选
+const onClearAllFilters = () => {
+	searchInfo.value = {
+		bigTypeCode: '',
+		fromSource: '',
+		typeCode: '',
+	};
+	onRefreshData();
+};
+
+// 交互辅助
 const handleCardClick = (item: FinanceManagerData) => {
-	// 如果浏览器支持 Vibrate API，则提供轻微震动反馈以增强操作确定感
-	if (typeof navigator !== 'undefined' && navigator.vibrate) {
-		navigator.vibrate(50);
-	}
 	router.push(getDetailRoute(item.id));
 };
 
 // 获取财务数据
 const getFinancePage = async (param: FinanceManagerData, cur: PageInfo) => {
-	// 只有在非下拉刷新时才显示列表加载状态，避免出现两个加载动画
 	if (!isRefresh.value) {
 		loading.value = true;
 	}
@@ -334,7 +324,6 @@ const onDeleteFinance = async (id?: string) => {
 onMounted(() => {
 	resetData();
 	fetchCategories();
-	// 如果有路由参数，则设置搜索条件
 	if (route.query.fromSource) {
 		searchInfo.value.fromSource = route.query.fromSource as string;
 	}
@@ -347,159 +336,189 @@ onMounted(() => {
 
 <style lang="less" scoped>
 .search-bar {
-	--van-search-input-height: 44px;
-	padding: 8px 16px;
+	--van-search-padding: 10px 16px;
+	--van-search-content-background: #f7f8fa; // 让输入框区域呈浅灰色，而外层是白色
+	--van-search-input-height: 38px;
 	background-color: #fff;
+	transition: all 0.3s ease;
+
+	:deep(.van-field__control) {
+		font-weight: 500;
+		color: #323233;
+	}
+
+	&:focus-within {
+		--van-search-content-background: #f2f3f5; // 聚焦时颜色微变
+	}
 }
 
 :deep(.van-dropdown-menu__bar) {
-	box-shadow: none;
-	border-bottom: 1px solid rgba(0, 0, 0, 0.02);
+	height: 48px; // Slightly taller for better touch target/balance
+	background-color: #fff;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02); // 统一的底部阴影
+	border-bottom: 1px solid rgba(0, 0, 0, 0.01);
+
+	.van-dropdown-menu__title {
+		font-size: 14px;
+		font-weight: 500;
+		color: #323233;
+
+		&::after {
+			border-color: transparent transparent #969799 #969799; // Softer arrow
+		}
+
+		&--active {
+			color: #1989fa;
+			font-weight: 600;
+
+			&::after {
+				border-color: transparent transparent currentColor currentColor;
+			}
+		}
+	}
+
+	.van-dropdown-menu__item {
+		// 移除中间的分隔线
+		&::after {
+			display: none;
+		}
+	}
+}
+
+// [Animation/Style: Dropdown Content]
+:deep(.van-dropdown-item__content) {
+	border-radius: 0 0 20px 20px;
+	box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+	overflow: hidden;
+
+	.van-dropdown-item__option {
+		padding: 12px 16px;
+
+		&--active {
+			background-color: rgba(25, 137, 250, 0.03);
+			color: #1989fa;
+			font-weight: 600;
+		}
+
+		.van-dropdown-item__icon {
+			font-size: 18px;
+		}
+	}
 }
 
 .refresh-info {
 	height: calc(100% - 104px);
-	background-color: #f5f7fa; // 柔和宽容的背景色
+	background-color: #f7f8fa; // 列表底色采用浅灰色
 }
 
-.list-container {
-	height: 100%;
-	overflow-y: auto;
-	padding-top: 12px;
+// [Animation: List Transitions]
+.list-enter-active,
+.list-leave-active {
+	transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.list-enter-from {
+	opacity: 0;
+	transform: translateX(-20px);
+}
+
+.list-leave-to {
+	opacity: 0;
+	transform: translateX(20px);
+}
+
+.list-move {
+	transition: transform 0.4s ease;
+}
+
+// [Empty State Adjustments]
+.empty-state-container {
+	padding-bottom: 120px;
+
+	.clear-filters-btn {
+		margin-top: 16px;
+		padding: 0 32px;
+		height: 38px;
+		font-size: 14px;
+		box-shadow: 0 4px 12px rgba(25, 137, 250, 0.2);
+	}
+}
+
+.skeleton-date-header {
+	margin: 12px 0; // 与真实 header 边距对齐
+	width: 100px;
+	:deep(.van-skeleton__title) {
+		margin: 0;
+		height: 14px;
+	}
 }
 
 .skeleton-card {
-	padding: 20px;
-	margin: 0 16px 16px;
+	padding: 16px 18px; // 与 FinanceCard 填充一致
+	margin-bottom: 12px; // 与 FinanceCard 底部间距一致
 	background: #fff;
 	border-radius: 16px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+
+	.skeleton-left {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 8px; // 与 FinanceCard .card-left gap 一致
+
+		:deep(.van-skeleton__title) {
+			margin: 0;
+			height: 15px; // 匹配 .title 字体大小
+			width: 60%;
+		}
+		:deep(.van-skeleton__row) {
+			height: 11px; // 匹配 .date-text 字体大小
+			width: 40%;
+		}
+	}
+
+	.skeleton-right {
+		width: 60px;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		:deep(.van-skeleton__row) {
+			height: 17px; // 匹配 .amount-text 字体大小
+			width: 100%;
+		}
+	}
+
+	:deep(.van-skeleton) {
+		padding: 0;
+	}
 }
 
 .card-list {
-	padding: 0 16px; // 增加两侧留白
+	padding-top: 0;
 }
 
-.card-swipe-item {
-	margin-bottom: 16px; // 增大间距
-	border-radius: 16px; // 增大圆角
-	overflow: hidden;
-	// 更柔和的现代阴影设计
-	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
-	background-color: #fff;
-	transition: transform 0.2s ease-out;
-
-	&:active {
-		transform: scale(0.98); // 类原生点击弹跳动效
-	}
+.date-group {
+	margin-bottom: 0;
 }
 
-.finance-card {
-	background: #fff;
-	padding: 18px 20px; // 加大卡片内边距
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	position: relative;
-	min-height: 60px;
-}
-
-.card-left {
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
-	gap: 12px; // Space between title row and date
-	flex: 1;
-}
-
-.title-row {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-
-	.title {
-		font-size: 16px;
-		font-weight: bold;
-		color: #323233;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-		max-width: 140px;
-	}
-
-	.tag {
-		font-size: 10px;
-		padding: 2px 6px;
-		border-radius: 4px;
-		background-color: #f5f5f5;
-		color: #969799;
-		line-height: 1;
-
-		&.income {
-			background-color: #e8f5e9; // Light green bg
-			color: #4caf50;
-		}
-		// Default (expense) style
-		&:not(.income) {
-			background-color: #ffebee; // Light red bg? Or just gray as image?
-			// Image shows "Expense" tag with gray background but maybe red text?
-			// Actually image expense tag looks like light gray bg, dark gray text.
-			// Let's stick to gray for expense as default.
-		}
-	}
-}
-
-.date-text {
-	font-size: 12px;
-	color: #969799;
-}
-
-.card-right {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-end;
-	justify-content: space-between;
-	gap: 12px;
-}
-
-.amount-text {
-	font-size: 16px;
+.date-header {
+	padding: 4px 0;
+	margin: 12px 0; // 上下间距保持一致
+	font-size: 13px;
 	font-weight: 600;
-
-	&.amount-income {
-		color: #4caf50; // Green
-	}
-
-	&.amount-expense {
-		color: #ee0a24; // Red
-	}
-}
-
-.source-info {
+	color: #323233;
 	display: flex;
 	align-items: center;
-	gap: 4px;
-	color: #969799;
-	font-size: 12px;
+	gap: 6px;
 
-	.svg-wrapper {
-		display: flex;
-		align-items: center;
+	.header-dot {
+		width: 6px;
+		height: 6px;
+		background-color: #1989fa;
+		border-radius: 50%;
 	}
-
-	.source-icon {
-		width: 16px;
-		height: 16px;
-		vertical-align: middle;
-	}
-
-	.source-text {
-		vertical-align: middle;
-	}
-}
-
-.delete-btn {
-	height: 100%;
-	border: none;
 }
 </style>
