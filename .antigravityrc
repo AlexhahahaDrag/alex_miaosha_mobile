@@ -1,0 +1,14 @@
+# Alex Miaosha Mobile - Vue 代码规范
+
+所有新生成的 Vue 文件或对现有文件的修改必须严格遵守以下结构：
+
+1. [文件顺序]：<template> 必须在最上方，接着是 <script>，最后是 <style>。
+2. [Script 内部顺序]：
+   - Imports (外部引用) -> 常量/类型/API -> useHooks
+   - Variables (响应式变量)
+   - Methods (业务方法，init 必须在最后)
+   - Lifecycle (onMounted, onUnmounted)
+   - Watchers (监听器)
+   - Emits (事件声明)
+
+3. [文档同步]：每次增加或修改功能代码后，必须同步更新项目根目录下的 `FEATURES.md` 文件。

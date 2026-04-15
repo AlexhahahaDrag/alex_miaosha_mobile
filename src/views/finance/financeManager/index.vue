@@ -132,7 +132,7 @@ const sourceOptions = computed(() => {
 		text: item.name,
 		value: item.value,
 	}));
-	return [{ text: '支付方式 (全部)', value: null }, ...options];
+	return [{ text: '支付方式 (全部)', value: '' }, ...options];
 });
 
 const categoryList = ref<any[]>([]);
