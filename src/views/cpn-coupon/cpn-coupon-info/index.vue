@@ -155,7 +155,7 @@
 import { showFailToast, showSuccessToast } from 'vant';
 import { debounce } from 'lodash';
 import type { CpnCouponInfoData } from './config';
-import { pagination } from './config';
+import { usePagination } from '@/composables/usePagination';
 import type { PageInfo } from '@/views/common/config';
 import { getRoutePathByName } from '@/utils/router';
 import { formatDate } from '@/utils/dayjs';
@@ -199,6 +199,7 @@ const searchInfo = ref<CpnCouponInfoData>({
 });
 const finished = ref<boolean>(false);
 const isRefresh = ref<boolean>(false);
+const { pagination, resetPagination, setTotal, nextPage } = usePagination();
 const showDeletePopup = ref<boolean>(false);
 const deleteTargetId = ref<string | undefined>(undefined);
 
@@ -277,14 +278,13 @@ const onFilterChange = () => {
 // 统一重置数据函数
 const resetData = () => {
 	dataSource.value = [];
-	pagination.value.current = 1;
-	pagination.value.pageSize = 10;
+	resetPagination();
 };
 
 // 获取消费券数据
 const getCpnCouponInfoPageData = async (param: CpnCouponInfoData, cur: PageInfo) => {
 	loading.value = true;
-	const { code, data, message } = await getCpnCouponInfoPage(param, cur?.current, cur?.pageSize)
+	const { code, data, message } = await getCpnCouponInfoPage(param, cur?.current || 1, cur?.pageSize || 10)
 		.catch((error: ResponseBody) => {
 			throw error;
 		})
@@ -297,8 +297,11 @@ const getCpnCouponInfoPageData = async (param: CpnCouponInfoData, cur: PageInfo)
 			item.currentRate = 0;
 		});
 		dataSource.value = [...dataSource.value, ...(data?.records || [])];
-		pagination.value.total = data?.total || 0;
-		finished.value = pagination.value.total < ((pagination.value.current || 0) + 1) * (pagination.value.pageSize || 10);
+		setTotal(data?.total || 0);
+		nextPage();
+		if ((pagination.total || 0) <= dataSource.value.length) {
+			finished.value = true;
+		}
 	} else {
 		showFailToast(message || '查询列表失败！');
 	}
@@ -306,7 +309,7 @@ const getCpnCouponInfoPageData = async (param: CpnCouponInfoData, cur: PageInfo)
 
 // 搜索处理
 const onSearch = () => {
-	pagination.value.current = 1;
+	resetPagination();
 	dataSource.value = [];
 	onLoadMore();
 };
@@ -316,19 +319,18 @@ const onCancel = () => {
 	searchInfo.value.couponName = '';
 	searchInfo.value.onlyValidAndNotFullyRedeemed = true;
 	resetData();
-	getCpnCouponInfoPageData(searchInfo.value, pagination.value);
+	getCpnCouponInfoPageData(searchInfo.value, pagination);
 };
 
 // 下拉刷新
 const onRefreshData = () => {
 	resetData();
-	getCpnCouponInfoPageData(searchInfo.value, pagination.value);
+	getCpnCouponInfoPageData(searchInfo.value, pagination);
 };
 
 // 加载更多
 const onLoadMore = () => {
-	pagination.value.current = (pagination.value.current || 0) + 1;
-	getCpnCouponInfoPageData(searchInfo.value, pagination.value);
+	getCpnCouponInfoPageData(searchInfo.value, pagination);
 };
 
 // 核销消费券
@@ -379,14 +381,14 @@ const confirmDelete = async () => {
 onMounted(() => {
 	resetData();
 	searchInfo.value.onlyValidAndNotFullyRedeemed = true;
-	getCpnCouponInfoPageData(searchInfo.value, pagination.value);
+	getCpnCouponInfoPageData(searchInfo.value, pagination);
 });
 
 // 防抖查询函数
 const debouncedQuery = debounce(() => {
 	// 搜索条件发生变化时，重置数据并重新获取数据
 	resetData();
-	getCpnCouponInfoPageData(searchInfo.value, pagination.value);
+	getCpnCouponInfoPageData(searchInfo.value, pagination);
 }, 300); // 300ms延迟
 
 watch(

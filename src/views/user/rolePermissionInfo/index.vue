@@ -92,7 +92,7 @@
 <script lang="ts" setup>
 import { showSuccessToast, showFailToast } from 'vant';
 import type { SearchInfo } from './rolePermissionInfoTs';
-import { pagination } from './rolePermissionInfoTs';
+import { usePagination } from '@/composables/usePagination';
 import {
 	getRolePermissionInfoPage,
 	deleteRolePermissionInfo,
@@ -113,6 +113,7 @@ const searchInfo = ref<SearchInfo>({});
 
 const finished = ref<boolean>(false); //加载是否已经没有更多数据
 const isRefresh = ref<boolean>(false); //是否下拉刷新
+const { pagination, resetPagination, setTotal, nextPage } = usePagination();
 
 // const onSearch = () => {
 //  pagination.value.current = 1;
@@ -132,10 +133,9 @@ async function query(param: SearchInfo, cur: PageInfo) {
 		.then((res: any) => {
 			if (res?.code == '200') {
 				dataSource.value = [...dataSource.value, ...res.data.records];
-				pagination.value.current = res.data.current + 1;
-				pagination.value.pageSize = res.data.size;
-				pagination.value.total = res.data.total;
-				if ((pagination.value.total || 0) < (pagination.value.current || 1) * (pagination.value.pageSize || 10)) {
+				setTotal(res.data.total);
+				nextPage();
+				if ((pagination.total || 0) <= dataSource.value.length) {
 					finished.value = true;
 				}
 			} else {
@@ -168,13 +168,13 @@ function getUserInfoList() {
 }
 
 const refresh = () => {
-	pagination.value.current = 0;
+	resetPagination();
 	dataSource.value = [];
-	query(searchInfo.value, pagination.value);
+	query(searchInfo.value, pagination);
 };
 
 const onRefresh = () => {
-	query(searchInfo.value, pagination.value);
+	query(searchInfo.value, pagination);
 };
 
 const beforeClose = (e: any) => {
@@ -194,8 +194,8 @@ const delRolePermissionInfo = (id: number) => {
 
 function init() {
 	dataSource.value = [];
-	pagination.value.current = 0;
-	query(searchInfo.value, pagination.value);
+	resetPagination();
+	query(searchInfo.value, pagination);
 	//获取用户信息
 	getUserInfoList();
 }

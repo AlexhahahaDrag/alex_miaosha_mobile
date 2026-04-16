@@ -1,5 +1,4 @@
 import type { Dayjs } from 'dayjs';
-import { type PageInfo } from '@/views/common/config';
 
 // 操作记录项
 export interface OperationRecord {
@@ -40,9 +39,3 @@ export const statusOptions = [
 	{ text: '已核销', value: 'USED' },
 	{ text: '已取消', value: 'UNUSED' },
 ];
-
-export const pagination = ref<PageInfo>({
-	total: 0,
-	current: 1,
-	pageSize: 10,
-});

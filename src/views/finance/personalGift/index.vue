@@ -108,7 +108,7 @@
 import { showSuccessToast, showFailToast, showConfirmDialog } from 'vant';
 import { type Dayjs } from 'dayjs';
 import type { PersonalGiftData } from './config';
-import { pagination } from './config';
+import { usePagination } from '@/composables/usePagination';
 import { getPersonalGiftPage, deletePersonalGift } from './api/personalGiftTs';
 import type { PageInfo } from '@/views/common/config';
 import { useNavBar } from '@/composables/useNavBar';
@@ -139,6 +139,7 @@ const dataSource = ref<PersonalGiftData[]>([]);
 const searchInfo = ref<PersonalGiftData>({});
 const finished = ref<boolean>(false);
 const isRefresh = ref<boolean>(false);
+const { pagination, resetPagination, setTotal, nextPage } = usePagination();
 
 // 格式化金额
 const formatAmount = (amount: number | string | undefined): string => {
@@ -158,7 +159,7 @@ const getDateClass = (date: string | Dayjs | undefined): string => {
 
 // 搜索
 const onSearch = (): void => {
-	pagination.value.current = 0;
+	resetPagination();
 	dataSource.value = [];
 	finished.value = false;
 	onRefresh();
@@ -167,10 +168,10 @@ const onSearch = (): void => {
 // 取消搜索
 const onCancel = (): void => {
 	searchInfo.value.keyword = '';
-	pagination.value.current = 0;
+	resetPagination();
 	dataSource.value = [];
 	finished.value = false;
-	query(searchInfo.value, pagination.value);
+	query(searchInfo.value, pagination);
 };
 
 // 查询数据
@@ -189,10 +190,10 @@ const query = async (param: PersonalGiftData, cur: PageInfo): Promise<void> => {
 
 	if (code === '200' && data) {
 		dataSource.value.push(...(data.records || []));
-		pagination.value.pageSize = data.size || 0;
-		pagination.value.total = data.total || 0;
+		setTotal(data.total || 0);
+		nextPage();
 		// 判断是否已加载完所有数据
-		finished.value = pagination.value.total < ((pagination.value.current || 0) + 1) * (pagination.value.pageSize || 10);
+		finished.value = (pagination.total || 0) <= dataSource.value.length;
 	} else {
 		showFailToast(message || '查询列表失败！');
 	}
@@ -200,16 +201,16 @@ const query = async (param: PersonalGiftData, cur: PageInfo): Promise<void> => {
 
 // 下拉刷新
 const refresh = (): void => {
-	pagination.value.current = 0;
+	resetPagination();
 	dataSource.value = [];
 	finished.value = false;
-	query(searchInfo.value, pagination.value);
+	query(searchInfo.value, pagination);
 };
 
 // 上拉加载更多
 const onRefresh = (): void => {
 	if (!finished.value) {
-		query(searchInfo.value, pagination.value);
+		query(searchInfo.value, pagination);
 	}
 };
 
@@ -250,9 +251,9 @@ const handleDelete = async (item: PersonalGiftData): Promise<void> => {
 // 初始化
 const init = (): void => {
 	dataSource.value = [];
-	pagination.value.current = 0;
+	resetPagination();
 	finished.value = false;
-	query(searchInfo.value, pagination.value);
+	query(searchInfo.value, pagination);
 };
 
 init();

@@ -190,7 +190,7 @@ import { showFailToast } from 'vant';
 import { typeIconMap } from '../config/index';
 import { getPrepaidCardInfoList } from '../api/index';
 import { useNavBar } from '@/composables/useNavBar';
-import type { Pagination } from '@/views/common/config';
+import { usePagination } from '@/composables/usePagination';
 import {
 	getConsumeCardRecordPage,
 	type TransactionRecord,
@@ -213,7 +213,7 @@ const loading = ref<boolean>(false);
 const loadingMore = ref<boolean>(false);
 const refreshing = ref<boolean>(false); // 下拉刷新状态
 const transactionList = ref<TransactionRecord[]>([]);
-const pagination = ref<Pagination>({ pageNum: 1, pageSize: 10, total: 0 });
+const { pagination, resetPagination, setTotal, nextPage } = usePagination();
 const hasMore = ref<boolean>(true);
 const finished = ref(false); // List组件的完成状态
 
@@ -368,7 +368,7 @@ function applyFilters() {
 	}
 
 	// 重置分页并刷新
-	pagination.value.pageNum = 1;
+	resetPagination();
 	transactionList.value = [];
 	finished.value = false;
 	hasMore.value = true;
@@ -383,7 +383,7 @@ async function fetchTransactionData(isLoadMore = false) {
 			loadingMore.value = true;
 		} else {
 			loading.value = true;
-			pagination.value.pageNum = 1;
+			resetPagination();
 			finished.value = false; // 重置列表完成态，避免阻止后续加载
 		}
 		if (filterParams.type === 'all') {
@@ -391,8 +391,8 @@ async function fetchTransactionData(isLoadMore = false) {
 		}
 		const { code, data, message } = await getConsumeCardRecordPage(
 			filterParams,
-			pagination.value.pageNum,
-			pagination.value.pageSize,
+			pagination.current || 1,
+			pagination.pageSize || 10,
 		);
 		if (code === '200') {
 			if (isLoadMore) {
@@ -400,18 +400,18 @@ async function fetchTransactionData(isLoadMore = false) {
 			} else {
 				transactionList.value = data.records;
 			}
-			pagination.value.total = data.total || 0;
-			hasMore.value = transactionList.value.length < (pagination.value.total || 0);
+			setTotal(data.total || 0);
+			hasMore.value = transactionList.value.length < (pagination.total || 0);
 			finished.value = !hasMore.value; // 同步finished，防止List误判一直加载
 		} else {
-			pagination.value.total = 0;
+			setTotal(0);
 			hasMore.value = false;
 			finished.value = true;
 			showFailToast(message || '查询失败，请联系管理员');
 		}
 	} catch (error: unknown) {
 		console.log('错误信息：', error);
-		pagination.value.total = 0;
+		setTotal(0);
 		hasMore.value = false;
 		finished.value = true;
 		console.error('获取交易记录失败:', error);
@@ -426,7 +426,7 @@ function handleFilterClick(type: 'all' | 'income' | 'expense') {
 	activeFilter.value = type;
 	filterParams.type = type;
 	// 重置状态
-	pagination.value.pageNum = 1;
+	resetPagination();
 	finished.value = false;
 	transactionList.value = [];
 	// 重新加载数据
@@ -436,7 +436,7 @@ function handleFilterClick(type: 'all' | 'income' | 'expense') {
 // 下拉刷新
 async function onRefresh() {
 	refreshing.value = true;
-	pagination.value.pageNum = 1;
+	resetPagination();
 	finished.value = false;
 	try {
 		await fetchTransactionData(false);
@@ -458,14 +458,14 @@ async function onLoad() {
 		loadingMore.value = false;
 		return;
 	}
-	pagination.value?.pageNum ? pagination.value.pageNum++ : 0;
+	nextPage();
 	try {
 		await fetchTransactionData(true);
 	} catch (error: unknown) {
 		console.log('错误信息：', error);
 		console.error('加载更多失败:', error);
 		showFailToast('加载失败，请稍后重试');
-		pagination.value?.pageNum ? pagination.value.pageNum-- : 0; // 回退页码
+		pagination.current = Math.max(1, (pagination.current || 1) - 1); // 回退页码
 	} finally {
 		// 结束加载更多
 		loadingMore.value = false;

@@ -62,11 +62,7 @@
   - **状态字段**：`flowType`: `1`-收入, `2`-支出; `status`: `0`-待核对, `1`-已入账
   - **关联表/API**：`src/api/finance/`
 
-- **收款及票据管理 (`saleTicket`)**：
-  - **业务逻辑**：针对单笔业务进行销售小票的开具、重打补打与作废追踪。
-  - **代码路径**：`src/views/finance/saleTicket/`
-  - **状态字段**：`ticketStatus`: `0`-正常开具, `1`-已作废
-  - **关联表/API**：`src/api/finance/`
+
 
 - **个人礼金业务 (`personalGift`)**：
   - **业务逻辑**：管理平台用户互相交互或平台下发的人情礼金、红包沉淀独立财务。
@@ -74,32 +70,7 @@
   - **状态字段**：`giftType`: `1`-节日红包, `2`-积分兑换等
   - **关联表/API**：`src/api/finance/`
 
-## 3. 门店经营与进销存管理 (Shop & Inventory)
-**多门店模式下的闭环管控，从前端客流成单到后端库存履约深度结合。**
 
-- **门店财务及数据屏 (`shopFinance`, `shopFinanceAnalysis`)**：
-  - **业务逻辑**：单店视角的利润核算分析，方便总控评估单门店绩效表现。
-  - **代码路径**：`src/views/finance/shopFinance/`, `src/views/finance/shopFinanceAnalysis/`
-  - **状态字段**：依附于时间维度及 `shopId`
-  - **关联表/API**：`src/api/finance/`
-
-- **门店仓储作业 (`shopStock`, `shopStockBatch`, `shopStockAttrs`)**：
-  - **业务逻辑**：执行门店级别的扫码出/入库、盘点报损。基于批次(Batch)和库存属性(Attrs)管理效期预警和温区存放逻辑。
-  - **代码路径**：`src/views/finance/shopStock/`, `src/views/finance/shopStockBatch/`, `src/views/finance/shopStockAttrs/`
-  - **状态字段**：`stockStatus`: `0`-正常, `1`-临期预警, `2`-缺货; `actionType`: `入库/出库/盘亏/盘盈`
-  - **关联表/API**：`src/api/finance/` (含仓储流转)
-
-- **门店本地商品选品上架 (`shopProduct`)**：
-  - **业务逻辑**：基于总商品库，配置单个门店自身售卖的商品品类及可能存在的差异化定价池。
-  - **代码路径**：`src/views/finance/shopProduct/`
-  - **状态字段**：`putawayStatus`: `0`-下架, `1`-上架售卖
-  - **关联表/API**：`src/api/product/` 或 `src/api/goods/`
-
-- **门店终端订单处理 (`shopOrder`)**：
-  - **业务逻辑**：处理 C端下发到门店的订单业务，包含自提核销核验与状态扭转。
-  - **代码路径**：`src/views/finance/shopOrder/`
-  - **状态字段**：`orderStatus`: `10`-待支付, `20`-待发货/待自提, `30`-已完成, `40`-已取消/退款
-  - **关联表/API**：订单流转对应 API
 
 ## 4. 商品与产品体系 (Goods & Cart)
 **统一的平台标准库，为 C端交易与后台进销存提供规范的 SPU 模型。**
@@ -110,11 +81,7 @@
   - **状态字段**：`goodsStatus`: `0`-下架草稿, `1`-上架; `attrType`: `0`-规格, `1`-参数
   - **关联表/API**：`src/api/goods/`, `src/api/product/`
 
-- **在线购物车撮合 (`shoppingCart`)**：
-  - **业务逻辑**：用户选购商品的临时集合栈，负责本地/云端数量价格合并计算及向订单结算侧推进。
-  - **代码路径**：`src/views/finance/shoppingCart/` (根据原项目目录映射)
-  - **状态字段**：`checkedStatus`: `0`-未勾选, `1`-已勾选
-  - **关联表/API**：`CART_API`相关
+
 
 ## 5. 营销与促销中心 (Marketing)
 **核心促销玩法支撑，依托各类优惠券驱动用户转化。**

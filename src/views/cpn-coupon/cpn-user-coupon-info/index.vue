@@ -108,7 +108,8 @@
 <script lang="ts" setup>
 import { showSuccessToast, showFailToast, showConfirmDialog } from 'vant';
 import type { CpnUserCouponInfoData } from './config';
-import { pagination, statusOptions } from './config';
+import { statusOptions } from './config';
+import { usePagination } from '@/composables/usePagination';
 import type { PageInfo } from '@/views/common/config';
 import { getFormatTimeInfo } from '@/utils/dayjs';
 import { getCpnUserCouponInfoPage, cancelRedeemCpnUserCouponInfo } from '@/views/cpn-coupon/cpn-user-coupon-info/api';
@@ -145,6 +146,7 @@ const searchInfo = ref<CpnUserCouponInfoData>({
 });
 const finished = ref<boolean>(false);
 const isRefresh = ref<boolean>(false);
+const { pagination, resetPagination, setTotal, nextPage } = usePagination();
 
 // 获取图标样式类
 const getIconClass = (status?: string | null) => {
@@ -200,14 +202,13 @@ const onViewDetail = (id?: number) => {
 const onFilterChange = (value: string) => {
 	searchInfo.value.status = value == 'ALL' ? null : value;
 	resetData();
-	getCpnUserCouponPageData(searchInfo.value, pagination.value);
+	getCpnUserCouponPageData(searchInfo.value, pagination);
 };
 
 // 重置数据
 const resetData = () => {
 	dataSource.value = [];
-	pagination.value.current = 1;
-	pagination.value.pageSize = 10;
+	resetPagination();
 };
 
 // 获取数据
@@ -223,8 +224,11 @@ const getCpnUserCouponPageData = async (param: CpnUserCouponInfoData, cur: PageI
 		});
 	if (code === '200') {
 		dataSource.value = [...dataSource.value, ...(data?.records || [])];
-		pagination.value.total = data?.total || 0;
-		finished.value = pagination.value.total <= (pagination.value.current || 1) * (pagination.value.pageSize || 10);
+		setTotal(data?.total || 0);
+		nextPage();
+		if ((pagination.total || 0) <= dataSource.value.length) {
+			finished.value = true;
+		}
 	} else {
 		showFailToast(message || '查询列表失败！');
 	}
@@ -233,26 +237,25 @@ const getCpnUserCouponPageData = async (param: CpnUserCouponInfoData, cur: PageI
 // 搜索
 const onSearch = () => {
 	resetData();
-	getCpnUserCouponPageData(searchInfo.value, pagination.value);
+	getCpnUserCouponPageData(searchInfo.value, pagination);
 };
 
 // 取消搜索
 const onCancel = () => {
 	searchInfo.value.couponName = '';
 	resetData();
-	getCpnUserCouponPageData(searchInfo.value, pagination.value);
+	getCpnUserCouponPageData(searchInfo.value, pagination);
 };
 
 // 下拉刷新
 const onRefreshData = () => {
 	resetData();
-	getCpnUserCouponPageData(searchInfo.value, pagination.value);
+	getCpnUserCouponPageData(searchInfo.value, pagination);
 };
 
 // 加载更多
 const onLoadMore = () => {
-	pagination.value.current = (pagination.value.current || 0) + 1;
-	getCpnUserCouponPageData(searchInfo.value, pagination.value);
+	getCpnUserCouponPageData(searchInfo.value, pagination);
 };
 
 // 取消核销
@@ -286,7 +289,7 @@ const onCancelRedeem = async (item: CpnUserCouponInfoData) => {
 
 onMounted(() => {
 	resetData();
-	getCpnUserCouponPageData(searchInfo.value, pagination.value);
+	getCpnUserCouponPageData(searchInfo.value, pagination);
 });
 </script>
 

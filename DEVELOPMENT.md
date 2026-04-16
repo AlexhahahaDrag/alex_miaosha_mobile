@@ -56,7 +56,36 @@
 
 ---
 
+## 3. 公共 Hooks (Composables) 规范
+
+所有跨组件复用的组合式函数统一存放在 `src/composables/` 目录下。
+
+### 📌 `usePagination.ts` (标准化分页管理)
+- **位置**: `src/composables/usePagination.ts`
+- **功能设计**: 
+  统一接管所有列表分页数据的状态（当前页码、总数据量）控制，并提供标准的状态变动方法，抛弃传统各个业务组件内独立 `ref({ current: 1, pageSize: 10, total: 0 })` 的重复模板。
+- **使用样例**:
+  ```ts
+  import { usePagination } from '@/composables/usePagination';
+
+  const { pagination, resetPagination, setTotal, nextPage } = usePagination();
+  const finished = ref(false);
+
+  // 初始化或重新搜索时：
+  resetPagination(); // 重置 current=1, total=0
+
+  // 接口请求成功时：
+  setTotal(data.total); // 更新总数
+  nextPage();           // 自动将页码推移至下一页准备
+  
+  // 原则：判定当总数 <= 当前列表长度时即完成
+  finished.value = (pagination.total || 0) <= dataSource.value.length;
+  ```
+
+---
+
 ## 4. Vue SFC 代码规范与结构约束
+
 
 凡在该项目中编写或重构的 Vue 3 组件，必须严格遵循以下结构流转顺序，严禁随意编排。
 

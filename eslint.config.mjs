@@ -30,6 +30,7 @@ export default [
 			'**/*.lock',
 			'**/*.yml',
 			'**/*.yaml',
+			'**/*.md',
 			'**/.editorconfig',
 			'**/.gitignore',
 			'**/.eslintignore',

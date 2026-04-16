@@ -1,5 +1,4 @@
 import type { Dayjs } from 'dayjs';
-import { type PageInfo } from '@/views/common/config';
 
 export interface FieldRule {
 	required?: boolean;
@@ -22,15 +21,6 @@ export interface FromSourceTransferItem {
 	label: string;
 	name: string;
 }
-
-export const pagination = ref<PageInfo>({
-	// 数据总数
-	total: 50,
-	// 当前页数
-	current: 1,
-	// 每页条数
-	pageSize: 10,
-});
 
 export interface FinanceManagerData {
 	id?: string;

@@ -122,7 +122,8 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { showSuccessToast, showFailToast } from 'vant';
 import dayjs from 'dayjs';
-import { pagination, fromSourceTransferList, type FinanceManagerData } from './config';
+import { usePagination } from '@/composables/usePagination';
+import { fromSourceTransferList, type FinanceManagerData } from './config';
 import CommonPullRefresh from '@/views/components/CommonPullRefresh.vue';
 import CommonList from '@/views/components/CommonList.vue';
 import FinanceCard from './components/FinanceCard.vue';
@@ -223,6 +224,7 @@ const dataSource = ref<FinanceManagerData[]>([]);
 const searchInfo = ref<FinanceManagerData>({});
 const finished = ref<boolean>(false);
 const isRefresh = ref<boolean>(false);
+const { pagination, resetPagination, setTotal, nextPage } = usePagination();
 
 // [Computed: Multi-Filter Detection]
 const hasFilters = computed(() => {
@@ -234,8 +236,7 @@ const hasFilters = computed(() => {
 const resetData = () => {
 	dataSource.value = [];
 	finished.value = false;
-	pagination.value.current = 1;
-	pagination.value.pageSize = 10;
+	resetPagination();
 };
 
 // 一键清除所有筛选
@@ -274,8 +275,8 @@ const getFinancePage = async (param: FinanceManagerData, cur: PageInfo) => {
 		});
 	if (code === '200') {
 		dataSource.value = [...dataSource.value, ...(data?.records || [])];
-		pagination.value.total = data?.total || 0;
-		finished.value = pagination.value.total < ((pagination.value.current || 0) + 1) * (pagination.value.pageSize || 10);
+		setTotal(data?.total || 0);
+		finished.value = (pagination.total || 0) <= dataSource.value.length;
 	} else {
 		showFailToast(message || '查询列表失败！');
 	}
@@ -284,26 +285,26 @@ const getFinancePage = async (param: FinanceManagerData, cur: PageInfo) => {
 // 搜索处理
 const onSearch = () => {
 	resetData();
-	getFinancePage(searchInfo.value, pagination.value);
+	getFinancePage(searchInfo.value, pagination);
 };
 
 // 取消搜索
 const onCancel = () => {
 	searchInfo.value.bigTypeCode = '';
 	resetData();
-	getFinancePage(searchInfo.value, pagination.value);
+	getFinancePage(searchInfo.value, pagination);
 };
 
 // 下拉刷新
 const onRefreshData = () => {
 	resetData();
-	getFinancePage(searchInfo.value, pagination.value);
+	getFinancePage(searchInfo.value, pagination);
 };
 
 // 加载更多
 const onLoadMore = () => {
-	pagination.value.current = (pagination.value.current || 0) + 1;
-	getFinancePage(searchInfo.value, pagination.value);
+	nextPage();
+	getFinancePage(searchInfo.value, pagination);
 };
 
 // 删除财务记录
@@ -330,7 +331,7 @@ onMounted(() => {
 	if (route.query.typeCode) {
 		searchInfo.value.typeCode = route.query.typeCode as string;
 	}
-	getFinancePage(searchInfo.value, pagination.value);
+	getFinancePage(searchInfo.value, pagination);
 });
 </script>
 

@@ -1,14 +1,4 @@
 import type { Dayjs } from 'dayjs';
-import { type PageInfo } from '@/views/common/config';
-
-export const pagination = ref<PageInfo>({
-	// 数据总数
-	total: 0,
-	// 当前页数
-	current: 1,
-	// 每页条数
-	pageSize: 10,
-});
 
 export interface PersonalGiftData {
 	id?: string;
