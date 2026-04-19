@@ -148,7 +148,7 @@ const sourceOptions = computed(() => {
 	return [{ text: '支付方式 (全部)', value: '' }, ...options];
 });
 
-const categoryList = ref<any[]>([]);
+const categoryList = ref<Params[]>([]);
 const categoryOptions = computed(() => {
 	const options = categoryList.value.map((item) => ({
 		text: item.typeName,

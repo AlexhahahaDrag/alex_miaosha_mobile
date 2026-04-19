@@ -26,8 +26,8 @@ export interface Info {
 	label?: string;
 	labelName?: string;
 	rule?: unknown;
-	list?: any[];
-	selectValue?: any;
+	list?: Params[];
+	selectValue?: Params;
 	showFlag?: boolean;
 	customFieldName?: FieldInfo;
 }
@@ -39,7 +39,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const showFlag = ref<boolean>(false);
-const curSelectValue = ref<any[]>([]);
+const curSelectValue = ref<Params[]>([]);
 
 const defaultCustomFieldName = {
 	text: 'typeName',
@@ -49,7 +49,7 @@ const defaultCustomFieldName = {
 /**
  * 确认选择
  */
-const onConfirm = ({ selectedOptions }: { selectedOptions: any[] }) => {
+const onConfirm = ({ selectedOptions }: { selectedOptions: Params[] }) => {
 	showFlag.value = false;
 	const fieldNames = props.info.customFieldName || defaultCustomFieldName;
 	emit(

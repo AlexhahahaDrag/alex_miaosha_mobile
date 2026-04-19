@@ -241,7 +241,7 @@ const getCardList = async () => {
 	const { code, data, message } = await getPrepaidCardInfoList({});
 	if (code === '200') {
 		// 转换数据格式以匹配组件期望的结构
-		cardList.value = data.map((card: any, index: number) => ({
+		cardList.value = data.map((card: Params, index: number) => ({
 			name: card.cardName || `消费卡 ${index + 1}`,
 			balance: `￥ ${card.currentBalance || '0.00'}`,
 			bgColor: getCardColor(index), // 根据索引分配颜色
@@ -263,7 +263,7 @@ const getCardDetail = async () => {
 	if (code === '200') {
 		const records = data.records || [];
 		// 转换数据格式以匹配组件期望的结构
-		transactionList.value = records.map((record: any, index: number) => ({
+		transactionList.value = records.map((record: Params, index: number) => ({
 			name: record.cardName || record.description || '消费记录',
 			time: formatTime(record.createTime || record.transactionTime),
 			formattedAmount: formatAmount(record.amount, record.transactionType),
@@ -290,7 +290,7 @@ const fetchData = async () => {
 		// 获取交易记录分页数据
 		await getCardDetail();
 	} catch (error: unknown) {
-		console.log('错误信息：', error);
+		// console.log('错误信息：', error);
 		showFailToast(`获取数据失败，请重试！${(error as Error).message}` || '未知错误');
 	}
 	cardsLoading.value = false;

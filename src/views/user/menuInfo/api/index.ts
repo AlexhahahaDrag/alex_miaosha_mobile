@@ -1,4 +1,6 @@
-﻿import { getData, postData, putData, deleteData, baseService } from '@/views/common/api/index';
+﻿import type { MenuInfoData } from '../config';
+import { getData, postData, putData, deleteData, baseService } from '@/views/common/api/index';
+import type { CommonPageResult, ResponseBody } from '@/types/api';
 
 const baseMenuInfo = '/menu-info';
 
@@ -8,10 +10,10 @@ const MenuInfoUrl = {
 };
 
 export function getMenuInfoPage(
-	params: any,
+	params: MenuInfoData,
 	pageNum: number | null | undefined,
 	pageSize: number | null | undefined,
-): Promise<any> {
+): Promise<ResponseBody<CommonPageResult<MenuInfoData>>> {
 	const url = `${baseService.user + baseMenuInfo + MenuInfoUrl.page}`;
 	return postData(url, params, {
 		pageNum: pageNum ?? 1,
@@ -19,22 +21,18 @@ export function getMenuInfoPage(
 	});
 }
 
-export function getMenuInfoDetail(id: number): Promise<any> {
-	return getData(`${baseService.user + baseMenuInfo + MenuInfoUrl.url}?id=${id}`);
+export function getMenuInfoDetail(id: number): Promise<ResponseBody<MenuInfoData>> {
+	return getData(`${baseService.user + baseMenuInfo + MenuInfoUrl.url}`, { id });
 }
 
-export function deleteMenuInfo(ids: string): Promise<any> {
-	return deleteData(`${baseService.user + baseMenuInfo + MenuInfoUrl.url}?ids=${ids}`);
+export function deleteMenuInfo(ids: string): Promise<ResponseBody<boolean>> {
+	return deleteData(`${baseService.user + baseMenuInfo + MenuInfoUrl.url}`, { ids });
 }
 
-export function addMenuInfo(
-	params: any
-): Promise<any> {
+export function addMenuInfo(params: MenuInfoData): Promise<ResponseBody<MenuInfoData>> {
 	return postData(baseService.user + baseMenuInfo + MenuInfoUrl.url, params);
 }
 
-export function updateMenuInfo(
-	params: any
-): Promise<any> {
+export function updateMenuInfo(params: MenuInfoData): Promise<ResponseBody<MenuInfoData>> {
 	return putData(baseService.user + baseMenuInfo + MenuInfoUrl.url, params);
 }

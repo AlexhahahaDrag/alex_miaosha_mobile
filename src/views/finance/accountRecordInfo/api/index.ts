@@ -1,4 +1,6 @@
-﻿import { getData, postData, putData, deleteData, baseService } from '@/views/common/api/index';
+﻿import type { AccountRecordInfoData } from '../config';
+import { getData, postData, putData, deleteData, baseService } from '@/views/common/api/index';
+import type { CommonPageResult, ResponseBody } from '@/types/api';
 
 const baseAccountRecordInfo = '/account-record-info';
 
@@ -8,10 +10,10 @@ const AccountRecordInfoUrl = {
 };
 
 export function getAccountRecordInfoPage(
-	params: number | null | undefined,
+	params: AccountRecordInfoData,
 	pageNum: number | null | undefined,
 	pageSize: number | null | undefined,
-): Promise<any> {
+): Promise<ResponseBody<CommonPageResult<AccountRecordInfoData>>> {
 	const url = `${baseService.finance + baseAccountRecordInfo + AccountRecordInfoUrl.page}`;
 	return postData(url, params, {
 		pageNum: pageNum ?? 1,
@@ -19,26 +21,28 @@ export function getAccountRecordInfoPage(
 	});
 }
 
-export function getAccountRecordInfoDetail(id: number): Promise<any> {
+export function getAccountRecordInfoDetail(
+	id: number,
+): Promise<ResponseBody<AccountRecordInfoData>> {
 	return getData(
 		`${baseService.finance + baseAccountRecordInfo + AccountRecordInfoUrl.url}?id=${id}`,
 	);
 }
 
-export function deleteAccountRecordInfo(ids: string): Promise<any> {
+export function deleteAccountRecordInfo(ids: string): Promise<ResponseBody<boolean>> {
 	return deleteData(
 		`${baseService.finance + baseAccountRecordInfo + AccountRecordInfoUrl.url}?ids=${ids}`,
 	);
 }
 
 export function addAccountRecordInfo(
-	params: any
-): Promise<any> {
+	params: AccountRecordInfoData,
+): Promise<ResponseBody<AccountRecordInfoData>> {
 	return postData(baseService.finance + baseAccountRecordInfo + AccountRecordInfoUrl.url, params);
 }
 
 export function updateAccountRecordInfo(
-	params: any
-): Promise<any> {
+	params: AccountRecordInfoData,
+): Promise<ResponseBody<AccountRecordInfoData>> {
 	return putData(baseService.finance + baseAccountRecordInfo + AccountRecordInfoUrl.url, params);
 }

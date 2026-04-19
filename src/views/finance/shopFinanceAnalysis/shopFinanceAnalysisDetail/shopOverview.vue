@@ -49,7 +49,7 @@ const getChainAndYearInfo = (dateStr: string) => {
 		endDate: `${dateStr}-01`,
 		searchType: searchType.value,
 	};
-	getChainAndYear(params).then((res: { code: string; data: ShopFinanceChainYear; message: any }) => {
+	getChainAndYear(params).then((res: { code: string; data: ShopFinanceChainYear; message: Params }) => {
 		if (res.code == '200') {
 			const arr: Info[] = [];
 			arr.push({
@@ -92,7 +92,7 @@ const getBenefitInfo = (dateStr: string) => {
 		endDate: dayjs(`${dateStr}-01`).endOf('month').format(YYYYMMDD),
 		searchType: searchType.value,
 	};
-	getBenefit({ params }).then((res: { code: string; data: ShopFinanceChainYear; message: any }) => {
+	getBenefit({ params }).then((res: { code: string; data: ShopFinanceChainYear; message: Params }) => {
 		if (res.code == '200') {
 			const arr: Info[] = [];
 			arr.push({

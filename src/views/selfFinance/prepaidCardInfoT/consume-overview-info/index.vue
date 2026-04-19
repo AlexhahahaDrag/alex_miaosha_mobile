@@ -239,7 +239,7 @@ const handleSwitchPeriod = (period: Period) => {
 };
 
 // 图表
-const chartOptions = ref<Record<string, any>>({});
+const chartOptions = ref<Record<string, unknown>>({});
 const makeSeriesData = (period: Period) => {
 	if (period === 'week') return [120, 132, 101, 134, 90, 230, 210];
 	if (period === 'year') return [320, 282, 301, 334, 390, 330, 320, 220, 180, 260, 300, 420];

@@ -45,3 +45,7 @@ export const rulesRef = reactive({
 		},
 	],
 });
+
+export interface CpnCouponInfoData {
+	[key: string]: unknown;
+}

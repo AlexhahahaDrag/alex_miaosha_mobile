@@ -1,4 +1,6 @@
+import type { PmsShopProductData } from '../config';
 import { getData, postData, putData, deleteData, baseService } from '@/views/common/api/index';
+import type { CommonPageResult, ResponseBody } from '@/types/api';
 
 const basePmsShopProduct = '/pms-shop-product';
 
@@ -10,10 +12,10 @@ const PmsShopProductUrl = {
 };
 
 export function getPmsShopProductPage(
-	params: any,
+	params: PmsShopProductData,
 	pageNum: number | null | undefined,
 	pageSize: number | null | undefined,
-): Promise<any> {
+): Promise<ResponseBody<CommonPageResult<PmsShopProductData>>> {
 	const url = `${baseService.product + basePmsShopProduct + PmsShopProductUrl.page}`;
 	return postData(url, params, {
 		pageNum: pageNum ?? 1,
@@ -22,10 +24,10 @@ export function getPmsShopProductPage(
 }
 
 export function getNewestPmsShopProductPage(
-	params: any,
+	params: PmsShopProductData,
 	pageNum: number | null | undefined,
 	pageSize: number | null | undefined,
-): Promise<any> {
+): Promise<ResponseBody<CommonPageResult<PmsShopProductData>>> {
 	const url = `${baseService.product + basePmsShopProduct + PmsShopProductUrl.newestPage}`;
 	return postData(url, params, {
 		pageNum: pageNum ?? 1,
@@ -33,17 +35,20 @@ export function getNewestPmsShopProductPage(
 	});
 }
 
-export function getPmsShopProductDetail(id: number): Promise<any> {
-	return getData(`${baseService.product + basePmsShopProduct + PmsShopProductUrl.url}?id=${id}`);
+export function getPmsShopProductDetail(id: number): Promise<ResponseBody<PmsShopProductData>> {
+	return getData(`${baseService.product + basePmsShopProduct + PmsShopProductUrl.url}`, { id });
 }
 
-export function deletePmsShopProduct(ids: string): Promise<any> {
+export function deletePmsShopProduct(ids: string): Promise<ResponseBody<boolean>> {
 	return deleteData(
 		`${baseService.product + basePmsShopProduct + PmsShopProductUrl.url}?ids=${ids}`,
 	);
 }
 
-export function getProductHisInfo(skuId: string, startTime: string | null): Promise<any> {
+export function getProductHisInfo(
+	skuId: string,
+	startTime: string | null,
+): Promise<ResponseBody<PmsShopProductData>> {
 	return getData(
 		`${baseService.product + basePmsShopProduct + PmsShopProductUrl.hisInfo}?skuId=${
 			skuId
@@ -52,13 +57,13 @@ export function getProductHisInfo(skuId: string, startTime: string | null): Prom
 }
 
 export function addPmsShopProduct(
-	params: any
-): Promise<any> {
+	params: PmsShopProductData,
+): Promise<ResponseBody<PmsShopProductData>> {
 	return postData(baseService.product + basePmsShopProduct + PmsShopProductUrl.url, params);
 }
 
 export function updatePmsShopProduct(
-	params: any
-): Promise<any> {
+	params: PmsShopProductData,
+): Promise<ResponseBody<PmsShopProductData>> {
 	return putData(baseService.product + basePmsShopProduct + PmsShopProductUrl.url, params);
 }

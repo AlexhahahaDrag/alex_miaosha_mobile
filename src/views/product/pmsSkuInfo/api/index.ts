@@ -1,4 +1,6 @@
-﻿import { getData, postData, putData, deleteData, baseService } from '@/views/common/api/index';
+﻿import type { PmsSkuInfoData } from '../config';
+import { getData, postData, putData, deleteData, baseService } from '@/views/common/api/index';
+import type { CommonPageResult, ResponseBody } from '@/types/api';
 
 const basePmsSkuInfo = '/pms-sku-info';
 
@@ -8,10 +10,10 @@ const PmsSkuInfoUrl = {
 };
 
 export function getPmsSkuInfoPage(
-	params: any,
+	params: PmsSkuInfoData,
 	pageNum: number | null | undefined,
 	pageSize: number | null | undefined,
-): Promise<any> {
+): Promise<ResponseBody<CommonPageResult<PmsSkuInfoData>>> {
 	const url = `${baseService.product + basePmsSkuInfo + PmsSkuInfoUrl.page}`;
 	return postData(url, params, {
 		pageNum: pageNum ?? 1,
@@ -19,22 +21,18 @@ export function getPmsSkuInfoPage(
 	});
 }
 
-export function getPmsSkuInfoDetail(id: number): Promise<any> {
-	return getData(`${baseService.product + basePmsSkuInfo + PmsSkuInfoUrl.url}?id=${id}`);
+export function getPmsSkuInfoDetail(id: number): Promise<ResponseBody<PmsSkuInfoData>> {
+	return getData(`${baseService.product + basePmsSkuInfo + PmsSkuInfoUrl.url}`, { id });
 }
 
-export function deletePmsSkuInfo(ids: string): Promise<any> {
-	return deleteData(`${baseService.product + basePmsSkuInfo + PmsSkuInfoUrl.url}?ids=${ids}`);
+export function deletePmsSkuInfo(ids: string): Promise<ResponseBody<boolean>> {
+	return deleteData(`${baseService.product + basePmsSkuInfo + PmsSkuInfoUrl.url}`, { ids });
 }
 
-export function addPmsSkuInfo(
-	params: any
-): Promise<any> {
+export function addPmsSkuInfo(params: PmsSkuInfoData): Promise<ResponseBody<PmsSkuInfoData>> {
 	return postData(baseService.product + basePmsSkuInfo + PmsSkuInfoUrl.url, params);
 }
 
-export function updatePmsSkuInfo(
-	params: any
-): Promise<any> {
+export function updatePmsSkuInfo(params: PmsSkuInfoData): Promise<ResponseBody<PmsSkuInfoData>> {
 	return putData(baseService.product + basePmsSkuInfo + PmsSkuInfoUrl.url, params);
 }

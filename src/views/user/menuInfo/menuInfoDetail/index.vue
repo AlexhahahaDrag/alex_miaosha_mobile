@@ -125,12 +125,12 @@ import { getDictList } from '@/views/finance/dict/api/index';
 
 const route = useRoute();
 const router = useRouter();
-const info = ref<any>({
+const info = ref<Params>({
 	title: route?.meta?.title || '菜单管理表',
 	leftPath: '/user/menuInfo',
 });
 
-const formInfo = ref<any>({});
+const formInfo = ref<Params>({});
 
 const popInfo = ref<Info>({ showFlag: false });
 
@@ -171,7 +171,7 @@ const choose = (type: string) => {
 	popInfo.value.showFlag = true;
 };
 
-const selectInfo = (type: string, value: any, name: string) => {
+const selectInfo = (type: string, value: Params, name: string) => {
 	popInfo.value.showFlag = false;
 	switch (type) {
 		case 'hideInMenu':
@@ -189,7 +189,7 @@ const cancelInfo = () => {
 	popInfo.value.showFlag = false;
 };
 
-function getDictInfoList(res: any) {
+function getDictInfoList(res: Params) {
 	if (res.code == '200') {
 		hideInMenuInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'true_or_false');
 		hideInMenuName.value = getListName(
@@ -210,7 +210,7 @@ const onSubmit = () => {
 	if (formInfo.value.id) {
 		method = 'put';
 	}
-	(method === 'put' ? updateMenuInfo : addMenuInfo)( formInfo.value).then((res: any) => {
+	(method === 'put' ? updateMenuInfo : addMenuInfo)(formInfo.value).then((res: Params) => {
 		if (res?.code == '200') {
 			showSuccessToast(res?.message || '保存成功!');
 			router.push({ path: '/user/menuInfo' });
@@ -221,10 +221,10 @@ const onSubmit = () => {
 };
 
 function init() {
-	const id: any = route?.query?.id;
+	const id: Params = route?.query?.id;
 	if (id) {
 		Promise.all([getMenuInfoDetail(id || '-1'), getDictList('true_or_false,is_valid')])
-			.then((res: any) => {
+			.then((res: Params) => {
 				if (res[0].code == '200') {
 					formInfo.value = res[0].data;
 				} else {
@@ -236,7 +236,7 @@ function init() {
 				showFailToast('系统问题，请联系管理员！');
 			});
 	} else {
-		getDictList('true_or_false,is_valid').then((res: any) => {
+		getDictList('true_or_false,is_valid').then((res: Params) => {
 			getDictInfoList(res);
 		});
 		formInfo.value = {};

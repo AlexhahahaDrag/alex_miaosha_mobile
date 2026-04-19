@@ -81,7 +81,7 @@ const props = defineProps<Props>();
 // State
 const dayData = ref<{ date: string; value: number }[]>([]);
 const monthData = ref<{ date: string; value: number }[]>([]);
-const highValueList = ref<any[]>([]);
+const highValueList = ref<Params[]>([]);
 
 // Color Palette
 const colorPalette = [

@@ -1,4 +1,6 @@
-﻿import { getData, postData, putData, deleteData, baseService } from '@/views/common/api/index';
+﻿import type { ConsumeCardRecordData } from '../config';
+import { getData, postData, putData, deleteData, baseService } from '@/views/common/api/index';
+import type { CommonPageResult, ResponseBody } from '@/types/api';
 
 const baseConsumeCardRecord = '/prepaid-consume-record-t';
 const ConsumeCardRecordUrl = {
@@ -45,7 +47,7 @@ export function getConsumeCardRecordPage(
 	params: TransactionQueryParams,
 	pageNum: number | null | undefined,
 	pageSize: number | null | undefined,
-): Promise<any> {
+): Promise<ResponseBody<CommonPageResult<ConsumeCardRecordData>>> {
 	const url = `${baseService.finance + baseConsumeCardRecord + ConsumeCardRecordUrl.page}`;
 	return postData(url, params, {
 		pageNum: pageNum ?? 1,
@@ -65,7 +67,7 @@ export function getConsumeCardRecordDetail(id: number): Promise<TransactionRecor
  * 删除交易记录
  * @param ids 记录ID列表
  */
-export function deleteConsumeCardRecord(ids: string): Promise<any> {
+export function deleteConsumeCardRecord(ids: string): Promise<ResponseBody<boolean>> {
 	return deleteData(
 		`${baseService.finance + baseConsumeCardRecord + ConsumeCardRecordUrl.url}?ids=${ids}`,
 	);
@@ -76,8 +78,8 @@ export function deleteConsumeCardRecord(ids: string): Promise<any> {
  * @param params 参数
  */
 export function addConsumeCardRecord(
-	params: TransactionRecord
-): Promise<any> {
+	params: TransactionRecord,
+): Promise<ResponseBody<ConsumeCardRecordData>> {
 	return postData(baseService.finance + baseConsumeCardRecord + ConsumeCardRecordUrl.url, params);
 }
 
@@ -87,7 +89,7 @@ export function addConsumeCardRecord(
  * @param params 参数
  */
 export function updateConsumeCardRecord(
-	params: TransactionRecord
-): Promise<any> {
+	params: TransactionRecord,
+): Promise<ResponseBody<ConsumeCardRecordData>> {
 	return putData(baseService.finance + baseConsumeCardRecord + ConsumeCardRecordUrl.url, params);
 }

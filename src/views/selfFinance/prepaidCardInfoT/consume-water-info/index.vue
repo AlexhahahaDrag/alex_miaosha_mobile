@@ -317,7 +317,7 @@ async function openCardPicker() {
 	if (cardColumns.value.length === 1) {
 		const { code, data, message } = await getPrepaidCardInfoList({});
 		if (code === '200') {
-			const options = (data || []).map((card: any) => ({
+			const options = (data || []).map((card: Params) => ({
 				text: card.cardName || `卡片 ${card.id}`,
 				value: card.id,
 			}));
@@ -329,7 +329,7 @@ async function openCardPicker() {
 	cardPickerVisible.value = true;
 }
 
-function onCardConfirm(payload: any) {
+function onCardConfirm(payload: Params) {
 	const op = payload?.selectedOptions?.[0] || payload;
 	if (op) {
 		selectedCardId.value = op.value ?? '';
@@ -354,7 +354,7 @@ function resetFilters() {
 function applyFilters() {
 	// 应用筛选条件到查询参数
 	if (selectedCardId.value) {
-		filterParams.cardId = selectedCardId.value as any;
+		filterParams.cardId = selectedCardId.value as Params;
 	} else {
 		delete filterParams.cardId;
 	}
@@ -410,10 +410,11 @@ async function fetchTransactionData(isLoadMore = false) {
 			showFailToast(message || '查询失败，请联系管理员');
 		}
 	} catch (error: unknown) {
-		console.log('错误信息：', error);
+		// console.log('错误信息：', error);
 		setTotal(0);
 		hasMore.value = false;
 		finished.value = true;
+		// eslint-disable-next-line no-console
 		console.error('获取交易记录失败:', error);
 	} finally {
 		loading.value = false;
@@ -441,7 +442,8 @@ async function onRefresh() {
 	try {
 		await fetchTransactionData(false);
 	} catch (error: unknown) {
-		console.log('错误信息：', error);
+		// console.log('错误信息：', error);
+		// eslint-disable-next-line no-console
 		console.error('刷新失败:', error);
 		showFailToast('刷新失败，请稍后重试');
 	} finally {
@@ -462,7 +464,8 @@ async function onLoad() {
 	try {
 		await fetchTransactionData(true);
 	} catch (error: unknown) {
-		console.log('错误信息：', error);
+		// console.log('错误信息：', error);
+		// eslint-disable-next-line no-console
 		console.error('加载更多失败:', error);
 		showFailToast('加载失败，请稍后重试');
 		pagination.current = Math.max(1, (pagination.current || 1) - 1); // 回退页码

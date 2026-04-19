@@ -39,3 +39,7 @@ export const statusOptions = [
 	{ text: '已核销', value: 'USED' },
 	{ text: '已取消', value: 'UNUSED' },
 ];
+
+export interface CpnUserCouponInfoData {
+	[key: string]: unknown;
+}

@@ -52,7 +52,7 @@ const style = computed(() => ({
 
 const emit = defineEmits(['legend-change']);
 
-let chart: any = null;
+let chart: Params = null;
 const initEcharts = () => {
 	disposeChart();
 	if (!chart) {

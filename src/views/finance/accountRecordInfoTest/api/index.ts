@@ -1,4 +1,6 @@
-﻿import { getData, postData, putData, deleteData, baseService } from '@/views/common/api/index';
+﻿import type { AccountRecordInfoTestData } from '../config';
+import { getData, postData, putData, deleteData, baseService } from '@/views/common/api/index';
+import type { CommonPageResult, ResponseBody } from '@/types/api';
 
 const baseAccountRecordInfoTest = '/account-record-info-test';
 
@@ -11,7 +13,7 @@ export function getAccountRecordInfoTestPage(
 	params: number | null | undefined,
 	pageNum: number | null | undefined,
 	pageSize: number | null | undefined,
-): Promise<any> {
+): Promise<ResponseBody<CommonPageResult<AccountRecordInfoTestData>>> {
 	const url = `${baseService.finance + baseAccountRecordInfoTest + AccountRecordInfoTestUrl.page}`;
 	return postData(url, params, {
 		pageNum: pageNum ?? 1,
@@ -19,28 +21,34 @@ export function getAccountRecordInfoTestPage(
 	});
 }
 
-export function getAccountRecordInfoTestDetail(id: number): Promise<any> {
+export function getAccountRecordInfoTestDetail(
+	id: number,
+): Promise<ResponseBody<AccountRecordInfoTestData>> {
 	return getData(
 		`${baseService.finance + baseAccountRecordInfoTest + AccountRecordInfoTestUrl.url}?id=${id}`,
 	);
 }
 
-export function deleteAccountRecordInfoTest(ids: string): Promise<any> {
+export function deleteAccountRecordInfoTest(ids: string): Promise<ResponseBody<boolean>> {
 	return deleteData(
 		`${baseService.finance + baseAccountRecordInfoTest + AccountRecordInfoTestUrl.url}?ids=${ids}`,
 	);
 }
 
 export function addAccountRecordInfoTest(
-	params: any
-): Promise<any> {
-	return postData(baseService.finance + baseAccountRecordInfoTest + AccountRecordInfoTestUrl.url,
-			params,);
+	params: AccountRecordInfoTestData,
+): Promise<ResponseBody<AccountRecordInfoTestData>> {
+	return postData(
+		baseService.finance + baseAccountRecordInfoTest + AccountRecordInfoTestUrl.url,
+		params,
+	);
 }
 
 export function updateAccountRecordInfoTest(
-	params: any
-): Promise<any> {
-	return putData(baseService.finance + baseAccountRecordInfoTest + AccountRecordInfoTestUrl.url,
-			params,);
+	params: AccountRecordInfoTestData,
+): Promise<ResponseBody<AccountRecordInfoTestData>> {
+	return putData(
+		baseService.finance + baseAccountRecordInfoTest + AccountRecordInfoTestUrl.url,
+		params,
+	);
 }

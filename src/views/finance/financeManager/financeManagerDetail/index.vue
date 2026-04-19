@@ -416,7 +416,7 @@ const init = async () => {
 		getUserManagerList({}),
 		getDictList('pay_way,income_expense_type,is_valid'),
 	]);
-	console.log('cosssssssssssssssssssssssssssssssssss', detailRes, userRes, dictRes);
+	// console.log('cosssssssssssssssssssssssssssssssssss', detailRes, userRes, dictRes);
 	if (id) {
 		if (detailRes.code == '200') {
 			formInfo.value = detailRes?.data || {};

@@ -108,8 +108,8 @@
 import { showSuccessToast, showFailToast, showConfirmDialog } from 'vant';
 import { type Dayjs } from 'dayjs';
 import type { PersonalGiftData } from './config';
-import { usePagination } from '@/composables/usePagination';
 import { getPersonalGiftPage, deletePersonalGift } from './api/personalGiftTs';
+import { usePagination } from '@/composables/usePagination';
 import type { PageInfo } from '@/views/common/config';
 import { useNavBar } from '@/composables/useNavBar';
 import { getRoutePathByName } from '@/utils/router';

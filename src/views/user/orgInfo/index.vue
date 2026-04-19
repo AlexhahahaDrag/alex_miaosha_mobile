@@ -98,13 +98,13 @@ import type { PageInfo } from '@/views/common/config/index';
 
 const router = useRouter();
 const route = useRoute();
-const info = ref<any>({
+const info = ref<Params>({
 	title: route?.meta?.title || '财务管理11',
 	rightButton: '新增',
 	leftPath: '/',
 });
 const loading = ref<boolean>(false);
-const dataSource = ref<any[]>([]);
+const dataSource = ref<Params[]>([]);
 const searchInfo = ref<SearchInfo>({});
 
 const finished = ref<boolean>(false); //加载是否已经没有更多数据
@@ -126,7 +126,7 @@ const onCancel = () => {
 async function query(param: SearchInfo, cur: PageInfo) {
 	loading.value = true;
 	getOrgInfoPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
-		.then((res: any) => {
+		.then((res: Params) => {
 			if (res?.code == '200') {
 				dataSource.value = [...dataSource.value, ...res.data.records];
 				setTotal(res.data.total);
@@ -148,7 +148,7 @@ const addOrgInfo = () => {
 	router.push({ path: '/user/orgInfo/orgInfoDetail' });
 };
 
-const userMap: Record<string | number, any> = {};
+const userMap: Record<string | number, Params> = {};
 function getUserInfoList() {
 	getUserManagerList({}).then((res) => {
 		if (res.code == '200') {
@@ -175,12 +175,12 @@ const onRefresh = () => {
 	query(searchInfo.value, pagination);
 };
 
-const beforeClose = (e: any) => {
-	console.log(e);
+const beforeClose = (_e: Params): void => {
+	// console.log(e);
 };
 
 const delOrgInfo = (id: number) => {
-	deleteOrgInfo(`${id}`).then((res: any) => {
+	deleteOrgInfo(`${id}`).then((res: Params) => {
 		if (res?.code == '200') {
 			refresh();
 			showSuccessToast((res && res.message) || '删除成功！');

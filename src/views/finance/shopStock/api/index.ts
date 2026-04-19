@@ -1,4 +1,6 @@
+import type { ShopStockData } from '../config';
 import { getData, postData, putData, deleteData, baseService } from '@/views/common/api/index';
+import type { CommonPageResult, ResponseBody } from '@/types/api';
 
 const baseShopStock = '/shop-stock';
 
@@ -9,10 +11,10 @@ const ShopStockUrl = {
 };
 
 export function getShopStockPage(
-	params: any,
+	params: ShopStockData,
 	pageNum: number | null | undefined,
 	pageSize: number | null | undefined,
-): Promise<any> {
+): Promise<ResponseBody<CommonPageResult<ShopStockData>>> {
 	const url = `${baseService.finance + baseShopStock + ShopStockUrl.page}`;
 	return postData(url, params, {
 		pageNum: pageNum ?? 1,
@@ -20,26 +22,22 @@ export function getShopStockPage(
 	});
 }
 
-export function getShopStockDetail(id: number): Promise<any> {
-	return getData(`${baseService.finance + baseShopStock + ShopStockUrl.url}?id=${id}`);
+export function getShopStockDetail(id: number): Promise<ResponseBody<ShopStockData>> {
+	return getData(`${baseService.finance + baseShopStock + ShopStockUrl.url}`, { id });
 }
 
-export function deleteShopStock(ids: string): Promise<any> {
-	return deleteData(`${baseService.finance + baseShopStock + ShopStockUrl.url}?ids=${ids}`);
+export function deleteShopStock(ids: string): Promise<ResponseBody<boolean>> {
+	return deleteData(`${baseService.finance + baseShopStock + ShopStockUrl.url}`, { ids });
 }
 
-export function addShopStock(
-	params: any
-): Promise<any> {
+export function addShopStock(params: ShopStockData): Promise<ResponseBody<ShopStockData>> {
 	return postData(baseService.finance + baseShopStock + ShopStockUrl.url, params);
 }
 
-export function updateShopStock(
-	params: any
-): Promise<any> {
+export function updateShopStock(params: ShopStockData): Promise<ResponseBody<ShopStockData>> {
 	return putData(baseService.finance + baseShopStock + ShopStockUrl.url, params);
 }
 
-export function getShopList(ids: string): Promise<any> {
+export function getShopList(ids: string): Promise<ResponseBody<ShopStockData>> {
 	return getData(`${baseService.finance + baseShopStock + ShopStockUrl.getShopList}?ids=${ids}`);
 }

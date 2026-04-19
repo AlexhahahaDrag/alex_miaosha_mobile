@@ -91,13 +91,13 @@ import type { PageInfo } from '@/views/common/config/index';
 
 const router = useRouter();
 const route = useRoute();
-const info = ref<any>({
+const info = ref<Params>({
 	title: route?.meta?.title || '财务管理11',
 	rightButton: '新增',
 	leftPath: '/',
 });
 const loading = ref<boolean>(false);
-const dataSource = ref<any[]>([]);
+const dataSource = ref<Params[]>([]);
 const searchInfo = ref<SearchInfo>({});
 
 const finished = ref<boolean>(false); //加载是否已经没有更多数据
@@ -118,7 +118,7 @@ const onCancel = () => {
 const query = (param: SearchInfo, cur: PageInfo): void => {
 	loading.value = true;
 	getShopStockBatchPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
-		.then((res: any) => {
+		.then((res: Params) => {
 			if (res?.code == '200') {
 				dataSource.value = [...dataSource.value, ...res.data.records];
 				pagination.value.current = res.data.current + 1;
@@ -143,10 +143,10 @@ const addShopStockBatch = (): void => {
 
 const userMap = {};
 const getUserInfoList = (): void => {
-	getUserManagerList({}).then((res: any) => {
+	getUserManagerList({}).then((res: Params) => {
 		if (res?.code == '200') {
 			if (res?.data) {
-				res.data.forEach((user: { id: string | number; nickName: any }) => {
+				res.data.forEach((user: { id: string | number; nickName: Params }) => {
 					userMap[user.id] = user.nickName;
 				});
 			}
@@ -166,12 +166,12 @@ const onRefresh = (): void => {
 	query(searchInfo.value, pagination.value);
 };
 
-const beforeClose = (e: any): void => {
-	console.log(e);
+const beforeClose = (_e: Params): void => {
+	// console.log(e);
 };
 
 const delShopStockBatch = (id: number): void => {
-	deleteShopStockBatch(`${id}`).then((res: any) => {
+	deleteShopStockBatch(`${id}`).then((res: Params) => {
 		if (res?.code == '200') {
 			refresh();
 			showSuccessToast(res?.message || '删除成功！');

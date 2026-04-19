@@ -91,22 +91,22 @@
 </template>
 <script lang="ts" setup>
 import { showSuccessToast, showFailToast } from 'vant';
+import type { RoleUserInfoData } from './roleUserInfoTs';
 import { usePagination } from '@/composables/usePagination';
-import type { SearchInfo } from './roleUserInfoTs';
 import { getRoleUserInfoPage, deleteRoleUserInfo } from '@/views/user/roleUserInfo/api/index';
 import { getUserManagerList } from '@/views/user/userManager/api/index';
 import type { PageInfo } from '@/views/common/config/index';
 
 const router = useRouter();
 const route = useRoute();
-const info = ref<any>({
+const info = ref<Params>({
 	title: route?.meta?.title || '财务管理11',
 	rightButton: '新增',
 	leftPath: '/',
 });
 const loading = ref<boolean>(false);
-const dataSource = ref<any[]>([]);
-const searchInfo = ref<SearchInfo>({});
+const dataSource = ref<RoleUserInfoData[]>([]);
+const searchInfo = ref<RoleUserInfoData>({});
 
 const finished = ref<boolean>(false); //加载是否已经没有更多数据
 const isRefresh = ref<boolean>(false); //是否下拉刷新
@@ -124,10 +124,10 @@ const { pagination, resetPagination, setTotal, nextPage } = usePagination();
 //   getFinancePage(searchInfo.value, pagination.value);
 // };
 
-async function query(param: SearchInfo, cur: PageInfo) {
+async function query(param: RoleUserInfoData, cur: PageInfo) {
 	loading.value = true;
 	getRoleUserInfoPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
-		.then((res: any) => {
+		.then((res: Params) => {
 			if (res?.code == '200') {
 				dataSource.value = [...dataSource.value, ...res.data.records];
 				setTotal(res.data.total);
@@ -151,10 +151,10 @@ const addRoleUserInfo = () => {
 
 const userMap = {};
 function getUserInfoList() {
-	getUserManagerList({}).then((res: any) => {
+	getUserManagerList({}).then((res: Params) => {
 		if (res?.code == '200') {
 			if (res?.data) {
-				res.data.forEach((user: { id: string | number; nickName: any }) => {
+				res.data.forEach((user: { id: string | number; nickName: Params }) => {
 					userMap[user.id] = user.nickName;
 				});
 			}
@@ -174,12 +174,12 @@ const onRefresh = () => {
 	query(searchInfo.value, pagination);
 };
 
-const beforeClose = (e: any) => {
-	console.log(e);
+const beforeClose = (_e: Params): void => {
+	// console.log(e);
 };
 
 const delRoleUserInfo = (id: number) => {
-	deleteRoleUserInfo(`${id}`).then((res: any) => {
+	deleteRoleUserInfo(`${id}`).then((res: Params) => {
 		if (res?.code == '200') {
 			refresh();
 			showSuccessToast(res?.message || '删除成功！');

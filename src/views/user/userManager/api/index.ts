@@ -1,4 +1,5 @@
 ﻿import type { CommonPageResult, ResponseBody } from '../../../types/api';
+import type { UserManagerData } from '../config';
 import { getData, postData, putData, deleteData, baseService } from '@/views/common/api/index';
 
 export interface UserManagerData {

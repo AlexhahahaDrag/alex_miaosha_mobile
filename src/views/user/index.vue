@@ -103,7 +103,7 @@ useNavBar({ title: '我的', noShowLeft: true });
 
 const userStore = useUserStore();
 const loading = computed(() => !userStore.getUserInfo);
-const userInfo = computed<any>(() => userStore.getUserInfo || {});
+const userInfo = computed<Params>(() => userStore.getUserInfo || {});
 
 const displayName = computed(() => userInfo.value?.nickName || userInfo.value?.username || '未登录');
 const avatarUrl = computed(

@@ -40,27 +40,27 @@ const props = defineProps<Props>();
 
 const dayConfig = ref<barItem>({});
 
-const monthData = ref<any>([]);
+const monthData = ref<Params>([]);
 
 const monthConfig = ref<barItem>({});
 
-const dayData = ref<any>([]);
+const dayData = ref<Params>([]);
 
 function getDayExpenseInfo(dateStr: string) {
-	getDayShopFinanceInfo(dateStr).then((res: { code: string; data: any[]; message: any }) => {
+	getDayShopFinanceInfo(dateStr).then((res: { code: string; data: Params[]; message: Params }) => {
 		if (res.code == '200') {
 			if (res.data) {
-				const series = [] as any;
-				const costSeries = [] as any;
-				const numSeries = [] as any;
-				const xAxis = [] as any;
+				const series = [] as Params;
+				const costSeries = [] as Params;
+				const numSeries = [] as Params;
+				const xAxis = [] as Params;
 				res.data.forEach((item) => {
 					series.push(item.saleAmount);
 					xAxis.push(item.infoDate.substring(8, 10));
 					numSeries.push(item.saleNum);
 					costSeries.push(item.saleAmount - item.saleCost);
 				});
-				const seriesAll = [] as any[];
+				const seriesAll = [] as Params[];
 				seriesAll[0] = series;
 				seriesAll[1] = numSeries;
 				seriesAll[2] = costSeries;
@@ -79,10 +79,10 @@ function getDayExpenseInfo(dateStr: string) {
 						axisPointer: {
 							type: 'shadow',
 						},
-						formatter(param: any) {
+						formatter(param: Params) {
 							let tip = '';
 							tip += `<p style="margin: 0;text-align: left">${param[0].axisValue}日</p>`;
-							param.forEach((element: { axisValue: any; marker: any; value: any; seriesName: any }) => {
+							param.forEach((element: { axisValue: Params; marker: Params; value: Params; seriesName: Params }) => {
 								tip += `<p style="margin: 0;text-align: left">${element.marker}${
 									element.seriesName
 								}: ${element.value ? element.value : 0.0}${
@@ -105,20 +105,20 @@ function getDayExpenseInfo(dateStr: string) {
 }
 
 function getMonthExpenseInfo(dateStr: string) {
-	getMonthShopFinanceInfo(dateStr).then((res: { code: string; data: any[]; message: any }) => {
+	getMonthShopFinanceInfo(dateStr).then((res: { code: string; data: Params[]; message: Params }) => {
 		if (res.code == '200') {
 			if (res.data) {
-				const series = [] as any;
-				const numSeries = [] as any;
-				const xAxis = [] as any;
-				const costSeries = [] as any;
+				const series = [] as Params;
+				const numSeries = [] as Params;
+				const xAxis = [] as Params;
+				const costSeries = [] as Params;
 				res.data.forEach((item) => {
 					series.push(item.saleAmount);
 					xAxis.push(item.infoDate);
 					numSeries.push(item.saleNum);
 					costSeries.push(item.saleAmount - item.saleCost);
 				});
-				const seriesAll = [] as any[];
+				const seriesAll = [] as Params[];
 				seriesAll[2] = costSeries;
 				seriesAll[0] = series;
 				seriesAll[1] = numSeries;
@@ -137,10 +137,10 @@ function getMonthExpenseInfo(dateStr: string) {
 						axisPointer: {
 							type: 'shadow',
 						},
-						formatter(param: any) {
+						formatter(param: Params) {
 							let tip = '';
 							tip += `<p style="margin: 0;text-align: left">${param[0].axisValue}月</p>`;
-							param.forEach((element: { axisValue: any; marker: any; value: any; seriesName: any }) => {
+							param.forEach((element: { axisValue: Params; marker: Params; value: Params; seriesName: Params }) => {
 								tip += `<p style="margin: 0;text-align: left">${element.marker}${
 									element.seriesName
 								}: ${element.value ? element.value : 0.0}${

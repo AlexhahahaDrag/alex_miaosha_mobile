@@ -108,21 +108,21 @@ import { getDictList } from '@/views/finance/dict/api/index';
 
 const route = useRoute();
 const router = useRouter();
-const info = ref<any>({
+const info = ref<Params>({
 	title: route?.meta?.title || '商店财务表',
 	leftPath: '/finance/shopFinance',
 });
 
-const formInfo = ref<any>({});
+const formInfo = ref<Params>({});
 
 const saleDateName = ref<string>('');
-const saleDateInfo = ref<any>({
+const saleDateInfo = ref<Params>({
 	label: 'saleDate',
 	labelName: '销售日期',
 	rule: rulesRef.saleDate,
 	selectValue: dayjs(),
 	showFlag: false,
-	formatter: (type: string, option: any) => {
+	formatter: (type: string, option: Params) => {
 		if (type === 'year') {
 			option.text += '年';
 		}
@@ -226,7 +226,7 @@ const choose = (type: string) => {
 	popInfo.value.showFlag = true;
 };
 
-const selectInfo = (type: string, value: any, name: string) => {
+const selectInfo = (type: string, value: Params, name: string) => {
 	popInfo.value.showFlag = false;
 	switch (type) {
 		case 'payWay':
@@ -253,7 +253,7 @@ const onSubmit = () => {
 	if (formInfo.value.id) {
 		method = 'put';
 	}
-	(method === 'put' ? updateShopFinance : addShopFinance)( formInfo.value).then((res: any) => {
+	(method === 'put' ? updateShopFinance : addShopFinance)(formInfo.value).then((res: Params) => {
 		if (res?.code == '200') {
 			showSuccessToast(res?.message || '保存成功!');
 			router.push({ path: '/finance/shopFinance' });
@@ -263,7 +263,7 @@ const onSubmit = () => {
 	});
 };
 
-function getDictInfoList(res: any) {
+function getDictInfoList(res: Params) {
 	if (res?.code == '200') {
 		payWayInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'shop_pay_way');
 		incomeAndExpensesInfo.value.list = res.data.filter(
@@ -284,10 +284,10 @@ function getDictInfoList(res: any) {
 }
 
 function init() {
-	const id: any = route?.query?.id;
+	const id: Params = route?.query?.id;
 	if (id) {
 		Promise.all([getShopFinanceDetail(id || '-1'), getDictList('shop_pay_way,income_expense_type,is_valid')])
-			.then((res: any) => {
+			.then((res: Params) => {
 				if (res[0].code == '200') {
 					formInfo.value = res[0].data;
 					formInfo.value.saleDate = dayjs(formInfo.value.saleDate);
@@ -297,12 +297,12 @@ function init() {
 				}
 				getDictInfoList(res[1]);
 			})
-			.catch((_error: any) => {
-				console.log('error:', _error);
+			.catch((_error: Params) => {
+				// console.log('error:', _error);
 				showFailToast('系统问题，请联系管理员！');
 			});
 	} else {
-		getDictList('shop_pay_way,income_expense_type,is_valid').then((res: any) => {
+		getDictList('shop_pay_way,income_expense_type,is_valid').then((res: Params) => {
 			getDictInfoList(res);
 		});
 		formInfo.value = {

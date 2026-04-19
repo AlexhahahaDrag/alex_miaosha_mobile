@@ -68,19 +68,20 @@ import { showFailToast, showSuccessToast } from 'vant';
 import type { Info } from '@/views/common/pop/selectPop.vue';
 import { getListName } from '@/views/common/config';
 import {
-	addAccountRecordInfo, updateAccountRecordInfo,
+	addAccountRecordInfo,
+	updateAccountRecordInfo,
 	getAccountRecordInfoDetail,
 } from '@/views/finance/accountRecordInfo/api/index';
 import { getDictList } from '@/views/finance/dict/api/index';
 
 const route = useRoute();
 const router = useRouter();
-const info = ref<any>({
+const info = ref<Params>({
 	title: route?.meta?.title || '',
 	leftPath: '/selfFinance/accountRecordInfo',
 });
 
-const formInfo = ref<any>({});
+const formInfo = ref<Params>({});
 
 const label = reactive({
 	name: '名称',
@@ -141,7 +142,7 @@ const choose = (type: string) => {
 	popInfo.value.showFlag = true;
 };
 
-const selectInfo = (type: string, value: any, name: string) => {
+const selectInfo = (type: string, value: Params, name: string) => {
 	popInfo.value.showFlag = false;
 	switch (type) {
 		case 'account':
@@ -156,13 +157,13 @@ const cancelInfo = () => {
 };
 
 const avliDateName = ref<string>('');
-const avliDateInfo = ref<any>({
+const avliDateInfo = ref<Params>({
 	label: 'avliDate',
 	labelName: 'field.comment',
 	rule: rulesRef.avliDate,
 	selectValue: dayjs(),
 	showFlag: false,
-	formatter: (type: string, option: any) => {
+	formatter: (type: string, option: Params) => {
 		if (type === 'year') {
 			option.text += '年';
 		}
@@ -217,7 +218,7 @@ const onSubmit = async () => {
 	if (formInfo.value.id) {
 		method = 'put';
 	}
-	const { code, message } = await (method === 'put' ? updateAccountRecordInfo : addAccountRecordInfo)( formInfo.value);
+	const { code, message } = await (method === 'put' ? updateAccountRecordInfo : addAccountRecordInfo)(formInfo.value);
 	if (code == '200') {
 		showSuccessToast(message || '保存成功!');
 		router.push({ path: '/selfFinance/accountRecordInfo' });
@@ -226,7 +227,7 @@ const onSubmit = async () => {
 	}
 };
 
-function getDictInfoList(res: any) {
+function getDictInfoList(res: Params) {
 	if (res.code == '200') {
 		accountInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'account_type');
 		accountName.value = getListName(accountInfo.value.list || [], formInfo.value.account, 'typeCode', 'typeName');
@@ -236,10 +237,10 @@ function getDictInfoList(res: any) {
 }
 
 function init() {
-	const id: any = route?.query?.id;
+	const id: Params = route?.query?.id;
 	if (id) {
 		Promise.all([getAccountRecordInfoDetail(id || '-1'), getDictList('account_type')])
-			.then((res: any) => {
+			.then((res: Params) => {
 				if (res[0].code == '200') {
 					formInfo.value = res[0].data;
 					initInfoDate(formInfo.value.avliDate, 'avliDate');
@@ -253,7 +254,7 @@ function init() {
 				showFailToast('系统问题，请联系管理员！');
 			});
 	} else {
-		getDictList('account_type').then((res: any) => {
+		getDictList('account_type').then((res: Params) => {
 			getDictInfoList(res);
 		});
 		formInfo.value = {

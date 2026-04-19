@@ -18,18 +18,22 @@ export function getFilePage(
 	params: number | null | undefined,
 	pageNum: number | null | undefined,
 	pageSize: number | null | undefined,
-): Promise<any> {
+): Promise<Params> {
 	const url = `${baseService.file + baseFileManager + fileUrl.page}?pageNum=${
 		pageNum ?? 1
 	}&pageSize=${pageSize ?? 10}`;
 	return postData(url, params);
 }
 
-export function getFileDetail(id: number | string): Promise<any> {
+export function getFileDetail(id: number | string): Promise<Params> {
 	return getData(`${baseService.file + baseFileManager + fileUrl.url}?id=${id}`);
 }
 
-export function addOrEditFileManager(method: string, type: string, params: any): Promise<any> {
+export function addOrEditFileManager(
+	method: string,
+	type: string,
+	params: Params,
+): Promise<Params> {
 	if ('put' == method) {
 		return putData(baseService.file + baseFileManager + fileUrl.url, params);
 	} else {
@@ -37,6 +41,6 @@ export function addOrEditFileManager(method: string, type: string, params: any):
 	}
 }
 
-export function deleteDictManager(ids: string): Promise<any> {
+export function deleteDictManager(ids: string): Promise<Params> {
 	return deleteData(`${baseService.file + baseFileManager + fileUrl.url}?ids=${ids}`);
 }

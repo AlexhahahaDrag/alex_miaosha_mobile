@@ -102,7 +102,7 @@ const router = useRouter();
 
 const userInfo = useUserStore()?.getUserInfo;
 
-const formData = reactive<any>({});
+const formData = reactive<Params>({});
 
 // 使用新的NavBar系统
 useNavBar({
@@ -113,12 +113,12 @@ useNavBar({
 
 // 表单数据对象
 
-const chooseDateInfo = ref<any>({
+const chooseDateInfo = ref<Params>({
 	label: 'infoDate',
 	labelName: '消费时间',
 	selectValue: dayjs(),
 	showFlag: false,
-	formatter: (type: string, option: any) => {
+	formatter: (type: string, option: Params) => {
 		if (type === 'year') {
 			option.text += '年';
 		}
@@ -271,7 +271,8 @@ const getPrepaidCardInfoDetailInfo = async () => {
 			showToast(messageInfo?.description || '获取信息失败，请联系管理员！');
 		}
 	} catch (error: unknown) {
-		console.log('错误信息：', error);
+		// console.log('错误信息：', error);
+		// eslint-disable-next-line no-console
 		console.error('获取预付卡信息失败:', error);
 		showToast('获取信息失败，请稍后重试');
 	}

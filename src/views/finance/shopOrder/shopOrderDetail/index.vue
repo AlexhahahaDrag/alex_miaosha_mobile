@@ -76,12 +76,12 @@ import type { Info } from '@/views/common/pop/selectPop.vue';
 import { getDictList } from '@/views/finance/dict/api/index';
 
 const route = useRoute();
-const info = ref<any>({
+const info = ref<Params>({
 	title: route?.meta?.title || '商店订单表',
 	leftPath: '/finance/shopOrder',
 });
 
-const formInfo = ref<any>({});
+const formInfo = ref<Params>({});
 
 const popInfo = ref<Info>({ showFlag: false });
 
@@ -106,7 +106,7 @@ const choose = (type: string): void => {
 	popInfo.value.showFlag = true;
 };
 
-const getDictInfoList = (res: any): void => {
+const getDictInfoList = (res: Params): void => {
 	if (res?.code == '200') {
 		isValidInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'is_valid');
 		isValidName.value = getListName(isValidInfo.value.list || [], formInfo.value.isValid, 'typeCode', 'typeName');
@@ -116,12 +116,12 @@ const getDictInfoList = (res: any): void => {
 };
 
 const saleDateName = ref<string>('');
-const saleDateInfo = ref<any>({
+const saleDateInfo = ref<Params>({
 	label: 'saleDate',
 	labelName: '销售日期',
 	selectValue: dayjs(),
 	showFlag: false,
-	formatter: (type: string, option: any) => {
+	formatter: (type: string, option: Params) => {
 		if (type === 'year') {
 			option.text += '年';
 		}
@@ -158,10 +158,10 @@ const initInfoDate = (infoDate: Dayjs, type: string): void => {
 };
 
 const init = (): void => {
-	const id: any = route?.query?.id;
+	const id: Params = route?.query?.id;
 	if (id) {
 		Promise.all([getShopOrderDetail(id || '-1'), getDictList('is_valid')])
-			.then((res: any) => {
+			.then((res: Params) => {
 				if (res[0].code == '200') {
 					formInfo.value = res[0].data;
 					formInfo.value.saleDate = dayjs(formInfo.value.saleDate);
@@ -175,7 +175,7 @@ const init = (): void => {
 				showFailToast('系统问题，请联系管理员！');
 			});
 	} else {
-		getDictList('is_valid').then((res: any) => {
+		getDictList('is_valid').then((res: Params) => {
 			getDictInfoList(res);
 		});
 		formInfo.value = {

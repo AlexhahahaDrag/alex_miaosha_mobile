@@ -39,9 +39,9 @@ const props = defineProps<Props>();
 const stockList = ref<Info[]>([]);
 
 const getAllStockInfo = () => {
-	getAllStock().then((res: { code: string; data: ShopFinanceChainYear; message: any }) => {
+	getAllStock().then((res: { code: string; data: ShopFinanceChainYear; message: Params }) => {
 		if (res.code == '200') {
-			console.log('res:', res);
+			// console.log('res:', res);
 			const arr: Info[] = [];
 			arr.push({
 				title: '库存金额',
@@ -74,9 +74,9 @@ const getAllStockInfo = () => {
 const crashList = ref<Info[]>([]);
 
 const getCashAmountInfo = () => {
-	getCashAmount().then((res: any) => {
+	getCashAmount().then((res: Params) => {
 		if (res.code == '200') {
-			console.log('res:', res);
+			// console.log('res:', res);
 			const arr: Info[] = [];
 			arr.push({
 				title: '流动资金',

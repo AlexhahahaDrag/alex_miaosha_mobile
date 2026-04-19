@@ -1,4 +1,6 @@
+import type { ShopFinanceData } from '../config';
 import { getData, postData, putData, deleteData, baseService } from '@/views/common/api/index';
+import type { CommonPageResult, ResponseBody } from '@/types/api';
 
 const baseShopFinance = '/shop-finance';
 
@@ -8,10 +10,10 @@ const ShopFinanceUrl = {
 };
 
 export function getShopFinancePage(
-	params: any,
+	params: ShopFinanceData,
 	pageNum: number | null | undefined,
 	pageSize: number | null | undefined,
-): Promise<any> {
+): Promise<ResponseBody<CommonPageResult<ShopFinanceData>>> {
 	const url = `${baseService.finance + baseShopFinance + ShopFinanceUrl.page}`;
 	return postData(url, params, {
 		pageNum: pageNum ?? 1,
@@ -19,22 +21,18 @@ export function getShopFinancePage(
 	});
 }
 
-export function getShopFinanceDetail(id: number): Promise<any> {
-	return getData(`${baseService.finance + baseShopFinance + ShopFinanceUrl.url}?id=${id}`);
+export function getShopFinanceDetail(id: number): Promise<ResponseBody<ShopFinanceData>> {
+	return getData(`${baseService.finance + baseShopFinance + ShopFinanceUrl.url}`, { id });
 }
 
-export function deleteShopFinance(ids: string): Promise<any> {
-	return deleteData(`${baseService.finance + baseShopFinance + ShopFinanceUrl.url}?ids=${ids}`);
+export function deleteShopFinance(ids: string): Promise<ResponseBody<boolean>> {
+	return deleteData(`${baseService.finance + baseShopFinance + ShopFinanceUrl.url}`, { ids });
 }
 
-export function addShopFinance(
-	params: any
-): Promise<any> {
+export function addShopFinance(params: ShopFinanceData): Promise<ResponseBody<ShopFinanceData>> {
 	return postData(baseService.finance + baseShopFinance + ShopFinanceUrl.url, params);
 }
 
-export function updateShopFinance(
-	params: any
-): Promise<any> {
+export function updateShopFinance(params: ShopFinanceData): Promise<ResponseBody<ShopFinanceData>> {
 	return putData(baseService.finance + baseShopFinance + ShopFinanceUrl.url, params);
 }

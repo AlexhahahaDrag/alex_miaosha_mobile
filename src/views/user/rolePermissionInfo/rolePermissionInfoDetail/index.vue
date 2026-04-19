@@ -63,7 +63,8 @@ import { showFailToast, showSuccessToast } from 'vant';
 import { label, rulesRef } from './rolePermissionInfoDetailTs';
 import { getListName } from '@/views/common/config';
 import {
-	addRolePermissionInfo, updateRolePermissionInfo,
+	addRolePermissionInfo,
+	updateRolePermissionInfo,
 	getRolePermissionInfoDetail,
 } from '@/views/user/rolePermissionInfo/api/index';
 import type { Info } from '@/views/common/pop/selectPop.vue';
@@ -71,12 +72,12 @@ import { getDictList } from '@/views/finance/dict/api/index';
 
 const route = useRoute();
 const router = useRouter();
-const info = ref<any>({
+const info = ref<Params>({
 	title: route?.meta?.title || '角色权限信息表',
 	leftPath: '/user/rolePermissionInfo',
 });
 
-const formInfo = ref<any>({});
+const formInfo = ref<Params>({});
 
 const popInfo = ref<Info>({ showFlag: false });
 
@@ -102,7 +103,7 @@ const choose = (type: string) => {
 	popInfo.value.showFlag = true;
 };
 
-const selectInfo = (type: string, value: any, name: string) => {
+const selectInfo = (type: string, value: Params, name: string) => {
 	popInfo.value.showFlag = false;
 	switch (type) {
 		case 'status':
@@ -116,7 +117,7 @@ const cancelInfo = () => {
 	popInfo.value.showFlag = false;
 };
 
-function getDictInfoList(res: any) {
+function getDictInfoList(res: Params) {
 	if (res?.code == '200') {
 		statusInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'is_valid');
 		statusName.value = getListName(statusInfo.value.list || [], formInfo.value.status, 'typeCode', 'typeName');
@@ -130,7 +131,7 @@ const onSubmit = () => {
 	if (formInfo.value.id) {
 		method = 'put';
 	}
-	(method === 'put' ? updateRolePermissionInfo : addRolePermissionInfo)( formInfo.value).then((res: any) => {
+	(method === 'put' ? updateRolePermissionInfo : addRolePermissionInfo)(formInfo.value).then((res: Params) => {
 		if (res?.code == '200') {
 			showSuccessToast(res?.message || '保存成功!');
 			router.push({ path: '/user/rolePermissionInfo' });
@@ -141,10 +142,10 @@ const onSubmit = () => {
 };
 
 function init() {
-	const id: any = route?.query?.id;
+	const id: Params = route?.query?.id;
 	if (id) {
 		Promise.all([getRolePermissionInfoDetail(id || '-1'), getDictList('is_valid')])
-			.then((res: any) => {
+			.then((res: Params) => {
 				if (res[0].code == '200') {
 					formInfo.value = res[0].data;
 				} else {
@@ -156,7 +157,7 @@ function init() {
 				showFailToast('系统问题，请联系管理员！');
 			});
 	} else {
-		getDictList('is_valid').then((res: any) => {
+		getDictList('is_valid').then((res: Params) => {
 			getDictInfoList(res);
 		});
 		formInfo.value = {};

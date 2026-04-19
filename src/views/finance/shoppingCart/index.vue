@@ -103,12 +103,12 @@
 import { showFailToast, showSuccessToast } from 'vant';
 import commonUtils from '@/utils/common/index';
 import type { ShopCartInfo } from '@/views/finance/shoppingCart/shoppingCartTs';
-import { getShopCartList, addShopCart, updateShopCart, deleteShopCart } from '@/views/finance/shopCart/api/index';
+import { getShopCartList, updateShopCart, deleteShopCart } from '@/views/finance/shopCart/api/index';
 
 const route = useRoute();
 const router = useRouter();
 
-const info = ref<any>({
+const info = ref<Params>({
 	title: route?.meta?.title || '购物车',
 });
 
@@ -126,7 +126,7 @@ const getSumAmount = (): void => {
 		return;
 	}
 	sumAmount.value = 0;
-	shopCartList.value.forEach((item: any) => {
+	shopCartList.value.forEach((item: Params) => {
 		if (item?.checked) {
 			sumAmount.value = commonUtils.plus(sumAmount.value, commonUtils.multiply(item.saleAmount, item.saleNum));
 		}
@@ -135,7 +135,7 @@ const getSumAmount = (): void => {
 
 const changeCount = (item: ShopCartInfo): void => {
 	// 保存购物车信息
-	updateShopCart( {
+	updateShopCart({
 		id: item.id,
 		saleNum: item.saleNum,
 	});
@@ -145,7 +145,7 @@ const changeCount = (item: ShopCartInfo): void => {
 
 const getShopCartListInfo = async () => {
 	await getShopCartList()
-		.then((res: any) => {
+		.then((res: Params) => {
 			if (res?.code == '200') {
 				if (res?.data) {
 					shopCartList.value = res.data;
@@ -154,7 +154,7 @@ const getShopCartListInfo = async () => {
 				}
 			}
 		})
-		.catch((err: any) => {
+		.catch((err: Params) => {
 			showFailToast(err?.message || '删除失败，请联系管理员！');
 		});
 };
@@ -177,7 +177,7 @@ const delShopCartInfo = (id: number | null): void => {
 		return;
 	}
 	deleteShopCart(`${id}`)
-		.then((res: any) => {
+		.then((res: Params) => {
 			if (res?.code == '200') {
 				showSuccessToast('删除成功！');
 				init();
@@ -185,7 +185,7 @@ const delShopCartInfo = (id: number | null): void => {
 				showFailToast(res?.message || '删除失败，请联系管理员！');
 			}
 		})
-		.catch((err: any) => {
+		.catch((err: Params) => {
 			showFailToast(err?.message || '删除失败，请联系管理员！');
 		});
 };

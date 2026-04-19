@@ -62,18 +62,22 @@
 import { showFailToast, showSuccessToast } from 'vant';
 import { label, rulesRef } from './shopStockBatchDetailTs';
 import { getListName } from '@/views/common/config';
-import { addShopStockBatch, updateShopStockBatch, getShopStockBatchDetail } from '@/views/finance/shopStockBatch/api/index';
+import {
+	addShopStockBatch,
+	updateShopStockBatch,
+	getShopStockBatchDetail,
+} from '@/views/finance/shopStockBatch/api/index';
 import type { Info } from '@/views/common/pop/selectPop.vue';
 import { getDictList } from '@/views/finance/dict/api/index';
 
 const route = useRoute();
 const router = useRouter();
-const info = ref<any>({
+const info = ref<Params>({
 	title: route?.meta?.title || '商店库存批次表',
 	leftPath: '/finance/shopStockBatch',
 });
 
-const formInfo = ref<any>({});
+const formInfo = ref<Params>({});
 
 const popInfo = ref<Info>({ showFlag: false });
 
@@ -99,7 +103,7 @@ const choose = (type: string): void => {
 	popInfo.value.showFlag = true;
 };
 
-const selectInfo = (type: string, value: any, name: string): void => {
+const selectInfo = (type: string, value: Params, name: string): void => {
 	popInfo.value.showFlag = false;
 	switch (type) {
 		case 'isValid':
@@ -113,7 +117,7 @@ const cancelInfo = () => {
 	popInfo.value.showFlag = false;
 };
 
-const getDictInfoList = (res: any): void => {
+const getDictInfoList = (res: Params): void => {
 	if (res?.code == '200') {
 		isValidInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'is_valid');
 		isValidName.value = getListName(isValidInfo.value.list || [], formInfo.value.isValid, 'typeCode', 'typeName');
@@ -127,7 +131,7 @@ const onSubmit = (): void => {
 	if (formInfo.value.id) {
 		method = 'put';
 	}
-	(method === 'put' ? updateShopStockBatch : addShopStockBatch)( formInfo.value).then((res: any) => {
+	(method === 'put' ? updateShopStockBatch : addShopStockBatch)(formInfo.value).then((res: Params) => {
 		if (res?.code == '200') {
 			showSuccessToast(res?.message || '保存成功!');
 			router.push({ path: '/finance/shopStockBatch' });
@@ -138,10 +142,10 @@ const onSubmit = (): void => {
 };
 
 const init = (): void => {
-	const id: any = route?.query?.id;
+	const id: Params = route?.query?.id;
 	if (id) {
 		Promise.all([getShopStockBatchDetail(id || '-1'), getDictList('is_valid')])
-			.then((res: any) => {
+			.then((res: Params) => {
 				if (res[0].code == '200') {
 					formInfo.value = res[0].data;
 				} else {
@@ -153,7 +157,7 @@ const init = (): void => {
 				showFailToast('系统问题，请联系管理员！');
 			});
 	} else {
-		getDictList('is_valid').then((res: any) => {
+		getDictList('is_valid').then((res: Params) => {
 			getDictInfoList(res);
 		});
 		formInfo.value = {};

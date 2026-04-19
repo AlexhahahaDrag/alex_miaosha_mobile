@@ -42,11 +42,11 @@ const props = defineProps<Props>();
 const pieShopData = ref<object[]>([]);
 
 const getAllAmountInfo = () => {
-	getAllAmount().then((res: { code: string; data: any[]; message: any }) => {
+	getAllAmount().then((res: { code: string; data: Params[]; message: Params }) => {
 		if (res.code == '200') {
 			if (res.data) {
 				const shop: ItemInfo[] = [];
-				res.data.forEach((item: { typeName: any; amount: any }) => {
+				res.data.forEach((item: { typeName: Params; amount: Params }) => {
 					shop.push({ name: item.typeName, value: item.amount });
 				});
 				pieShopData.value = shop;
@@ -63,11 +63,11 @@ const getAllAmountInfo = () => {
 const piePayWayData = ref<object[]>([]);
 
 // const getPayWayInfoInfo = (dateStr: string) => {
-//   getPayWayInfo(dateStr).then((res: { code: string; data: any[]; message: any }) => {
+//   getPayWayInfo(dateStr).then((res: { code: string; data: Params[]; message: Params }) => {
 //     if (res.code == '200') {
 //       if (res.data) {
 //         let shop: ItemInfo[] = [];
-//         res.data.forEach((item: { payWayName: any; saleAmount: any }) => {
+//         res.data.forEach((item: { payWayName: Params; saleAmount: Params }) => {
 //           shop.push({ name: item.payWayName, value: item.saleAmount });
 //         });
 //         piePayWayData.value = shop;

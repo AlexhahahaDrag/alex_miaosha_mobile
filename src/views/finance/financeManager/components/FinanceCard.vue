@@ -56,8 +56,8 @@
 
 <script lang="ts" setup>
 import { computed, type PropType } from 'vue';
-import { formatDate, dataTimeFormat } from '@/utils/dayjs';
 import { fromSourceTransferList, type FinanceManagerData, type FromSourceTransferItem } from '../config/index';
+import { formatDate, dataTimeFormat } from '@/utils/dayjs';
 
 // [Variables]
 const props = defineProps({

@@ -1,3 +1,4 @@
+import type { PlatformGoodsData } from '../config';
 import { getData, deleteData, baseService } from '@/views/common/api/index';
 
 const baseGoods = '/api/v1';
@@ -6,7 +7,7 @@ const platformGoodsUrl = {
 	list: '/goods/getGoodsList',
 };
 
-export function getPlatformList(params: any): Promise<any> {
+export function getPlatformList(params: PlatformGoodsData): Promise<ResponseBody<boolean>> {
 	return getData(baseService.mission + baseGoods + platformGoodsUrl.list, params);
 }
 

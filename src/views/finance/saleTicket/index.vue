@@ -97,7 +97,7 @@ import { getDictList } from '@/views/finance/dict/api/index';
 const route = useRoute();
 const router = useRouter();
 
-const info = ref<any>({
+const info = ref<Params>({
 	title: route?.meta?.title || '订单提交',
 });
 
@@ -139,7 +139,7 @@ const cancelInfo = () => {
 	popInfo.value.showFlag = false;
 };
 
-const selectInfo = (type: string, value: any, name: string) => {
+const selectInfo = (type: string, value: Params, name: string) => {
 	popInfo.value.showFlag = false;
 	switch (type) {
 		case 'payWay':
@@ -152,7 +152,7 @@ const submitOrderInfo = () => {
 	submitLoading.value = true;
 	// todo添加结果类型
 	submitOrder(saleOrderInfo.value)
-		.then((res: any) => {
+		.then((res: Params) => {
 			if (res?.code == '200') {
 				router.push({ name: 'shopProduct' });
 			} else {
@@ -173,7 +173,7 @@ const getSumAmount = (): void => {
 		return;
 	}
 	sumAmount.value = 0;
-	saleOrderInfo.value.shopOrderDetailVoList.forEach((item: any) => {
+	saleOrderInfo.value.shopOrderDetailVoList.forEach((item: Params) => {
 		sumAmount.value = commonUtils.plus(sumAmount.value, commonUtils.multiply(item.saleAmount, item.saleNum));
 	});
 	saleOrderInfo.value.saleAmount = sumAmount.value;
@@ -185,7 +185,7 @@ const changeSumAmount = () => {
 };
 
 const getShopListInfo = async (ids: string) => {
-	await getShopList(ids).then((res: any) => {
+	await getShopList(ids).then((res: Params) => {
 		if (res?.code == '200') {
 			if (res?.data?.length) {
 				saleOrderInfo.value.shopOrderDetailVoList = res.data.map((item: ShopStockInfo) => ({
@@ -205,7 +205,7 @@ const getShopListInfo = async (ids: string) => {
 };
 
 const getShopCartListInfo = async (ids: string) => {
-	await getShopCartList(ids).then((res: any) => {
+	await getShopCartList(ids).then((res: Params) => {
 		if (res?.code == '200') {
 			if (res?.data?.length) {
 				saleOrderInfo.value.shopOrderDetailVoList = res.data.map((item: ShopCartInfo) => ({
@@ -225,7 +225,7 @@ const getShopCartListInfo = async (ids: string) => {
 	});
 };
 
-const getDictInfoList = (res: any) => {
+const getDictInfoList = (res: Params) => {
 	if (res?.code == '200') {
 		payWayInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'shop_pay_way');
 		payWayName.value = CommonUtils.getListName(
@@ -240,8 +240,8 @@ const getDictInfoList = (res: any) => {
 };
 
 onMounted(async () => {
-	const params: any = route.query;
-	getDictList('shop_pay_way').then((res: any) => {
+	const params: Params = route.query;
+	getDictList('shop_pay_way').then((res: Params) => {
 		if (res?.code == '200') {
 			getDictInfoList(res);
 		}

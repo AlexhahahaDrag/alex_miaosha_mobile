@@ -93,21 +93,21 @@
 </template>
 <script lang="ts" setup>
 import { showSuccessToast, showFailToast } from 'vant';
-import { usePagination } from '@/composables/usePagination';
 import type { SearchInfo } from './pmsAttrTs';
+import { usePagination } from '@/composables/usePagination';
 import { getPmsAttrPage, deletePmsAttr } from '@/views/product/pmsAttr/api/index';
 import { getUserManagerList } from '@/views/user/userManager/api/index';
 import type { PageInfo } from '@/views/common/config/index';
 
 const router = useRouter();
 const route = useRoute();
-const info = ref<any>({
+const info = ref<Params>({
 	title: route?.meta?.title || '财务管理11',
 	rightButton: '新增',
 	leftPath: '/',
 });
 const loading = ref<boolean>(false);
-const dataSource = ref<any[]>([]);
+const dataSource = ref<Params[]>([]);
 const searchInfo = ref<SearchInfo>({});
 
 const finished = ref<boolean>(false); //加载是否已经没有更多数据
@@ -129,7 +129,7 @@ const { pagination, resetPagination, setTotal, nextPage } = usePagination();
 async function query(param: SearchInfo, cur: PageInfo) {
 	loading.value = true;
 	getPmsAttrPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
-		.then((res: any) => {
+		.then((res: Params) => {
 			if (res?.code == '200') {
 				dataSource.value = [...dataSource.value, ...res.data.records];
 				setTotal(res.data.total);
@@ -156,7 +156,7 @@ function getUserInfoList() {
 	getUserManagerList({}).then((res) => {
 		if (res.code == '200') {
 			if (res?.data) {
-				res.data.forEach((user: { id: string | number; nickName: any }) => {
+				res.data.forEach((user: { id: string | number; nickName: Params }) => {
 					userMap[user.id] = user.nickName;
 				});
 			}
@@ -176,12 +176,12 @@ const onRefresh = () => {
 	query(searchInfo.value, pagination);
 };
 
-const beforeClose = (e: any) => {
-	console.log(e);
+const beforeClose = (_e: Params): void => {
+	// console.log(e);
 };
 
 const delPmsAttr = (id: number) => {
-	deletePmsAttr(`${id}`).then((res: any) => {
+	deletePmsAttr(`${id}`).then((res: Params) => {
 		if (res?.code == '200') {
 			refresh();
 			showSuccessToast((res && res.message) || '删除成功！');

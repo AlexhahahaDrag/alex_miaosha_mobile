@@ -77,19 +77,23 @@
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
 import { label, rulesRef } from './shopStockAttrsDetailTs';
-import { addShopStockAttrs, updateShopStockAttrs, getShopStockAttrsDetail } from '@/views/finance/shopStockAttrs/api/index';
+import {
+	addShopStockAttrs,
+	updateShopStockAttrs,
+	getShopStockAttrsDetail,
+} from '@/views/finance/shopStockAttrs/api/index';
 import type { Info } from '@/views/common/pop/selectPop.vue';
 import { getListName } from '@/views/common/config';
 import { getDictList } from '@/views/finance/dict/api/index';
 
 const route = useRoute();
 const router = useRouter();
-const info = ref<any>({
+const info = ref<Params>({
 	title: route?.meta?.title || '商店库存属性表',
 	leftPath: '/finance/shopStockAttrs',
 });
 
-const formInfo = ref<any>({});
+const formInfo = ref<Params>({});
 
 const popInfo = ref<Info>({ showFlag: false });
 
@@ -115,7 +119,7 @@ const choose = (type: string): void => {
 	popInfo.value.showFlag = true;
 };
 
-const selectInfo = (type: string, value: any, name: string): void => {
+const selectInfo = (type: string, value: Params, name: string): void => {
 	popInfo.value.showFlag = false;
 	switch (type) {
 		case 'isValid':
@@ -129,7 +133,7 @@ const cancelInfo = () => {
 	popInfo.value.showFlag = false;
 };
 
-const getDictInfoList = (res: any): void => {
+const getDictInfoList = (res: Params): void => {
 	if (res?.code == '200') {
 		isValidInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'is_valid');
 		isValidName.value = getListName(isValidInfo.value.list || [], formInfo.value.isValid, 'typeCode', 'typeName');
@@ -143,7 +147,7 @@ const onSubmit = (): void => {
 	if (formInfo.value.id) {
 		method = 'put';
 	}
-	(method === 'put' ? updateShopStockAttrs : addShopStockAttrs)( formInfo.value).then((res: any) => {
+	(method === 'put' ? updateShopStockAttrs : addShopStockAttrs)(formInfo.value).then((res: Params) => {
 		if (res?.code == '200') {
 			showSuccessToast(res?.message || '保存成功!');
 			router.push({ path: '/finance/shopStockAttrs' });
@@ -154,10 +158,10 @@ const onSubmit = (): void => {
 };
 
 const init = (): void => {
-	const id: any = route?.query?.id;
+	const id: Params = route?.query?.id;
 	if (id) {
 		Promise.all([getShopStockAttrsDetail(id || '-1'), getDictList('is_valid')])
-			.then((res: any) => {
+			.then((res: Params) => {
 				if (res[0].code == '200') {
 					formInfo.value = res[0].data;
 				} else {
@@ -169,7 +173,7 @@ const init = (): void => {
 				showFailToast('系统问题，请联系管理员！');
 			});
 	} else {
-		getDictList('is_valid').then((res: any) => {
+		getDictList('is_valid').then((res: Params) => {
 			getDictInfoList(res);
 		});
 		formInfo.value = {};

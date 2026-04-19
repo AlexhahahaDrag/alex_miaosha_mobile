@@ -1,4 +1,6 @@
-﻿import { getData, postData, putData, deleteData, baseService } from '@/views/common/api/index';
+﻿import type { PmsCategoryData } from '../config';
+import { getData, postData, putData, deleteData, baseService } from '@/views/common/api/index';
+import type { CommonPageResult, ResponseBody } from '@/types/api';
 
 const basePmsCategory = '/pms-category';
 
@@ -8,10 +10,10 @@ const PmsCategoryUrl = {
 };
 
 export function getPmsCategoryPage(
-	params: any,
+	params: PmsCategoryData,
 	pageNum: number | null | undefined,
 	pageSize: number | null | undefined,
-): Promise<any> {
+): Promise<ResponseBody<CommonPageResult<PmsCategoryData>>> {
 	const url = `${baseService.product + basePmsCategory + PmsCategoryUrl.page}`;
 	return postData(url, params, {
 		pageNum: pageNum ?? 1,
@@ -19,22 +21,18 @@ export function getPmsCategoryPage(
 	});
 }
 
-export function getPmsCategoryDetail(id: number): Promise<any> {
-	return getData(`${baseService.product + basePmsCategory + PmsCategoryUrl.url}?id=${id}`);
+export function getPmsCategoryDetail(id: number): Promise<ResponseBody<PmsCategoryData>> {
+	return getData(`${baseService.product + basePmsCategory + PmsCategoryUrl.url}`, { id });
 }
 
-export function deletePmsCategory(ids: string): Promise<any> {
-	return deleteData(`${baseService.product + basePmsCategory + PmsCategoryUrl.url}?ids=${ids}`);
+export function deletePmsCategory(ids: string): Promise<ResponseBody<boolean>> {
+	return deleteData(`${baseService.product + basePmsCategory + PmsCategoryUrl.url}`, { ids });
 }
 
-export function addPmsCategory(
-	params: any
-): Promise<any> {
+export function addPmsCategory(params: PmsCategoryData): Promise<ResponseBody<PmsCategoryData>> {
 	return postData(baseService.product + basePmsCategory + PmsCategoryUrl.url, params);
 }
 
-export function updatePmsCategory(
-	params: any
-): Promise<any> {
+export function updatePmsCategory(params: PmsCategoryData): Promise<ResponseBody<PmsCategoryData>> {
 	return putData(baseService.product + basePmsCategory + PmsCategoryUrl.url, params);
 }

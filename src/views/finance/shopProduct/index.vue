@@ -101,7 +101,7 @@ import { pagination } from './shopProductTs';
 import type { PageInfo } from '@/views/common/config/index';
 import { getShopStockPage } from '@/views/finance/shopStock/api/index';
 import { getUserManagerList } from '@/views/user/userManager/api/index';
-import { addShopCart, updateShopCart } from '@/views/finance/shopCart/api/index';
+import { addShopCart } from '@/views/finance/shopCart/api/index';
 import commonUtils from '@/utils/common/index';
 import { useUserStore } from '@/store/modules/user/user';
 import type { ResponseBody } from '@/types/api';
@@ -122,13 +122,13 @@ const useTabBar = reactive([
 const router = useRouter();
 const route = useRoute();
 const userInfo = useUserStore()?.getUserInfo;
-const info = ref<any>({
+const info = ref<Params>({
 	title: route?.meta?.title || '商品详情',
 	rightButton: '详情',
 	leftPath: '/',
 });
 const loading = ref<boolean>(false);
-const dataSource = ref<any[]>([]);
+const dataSource = ref<Params[]>([]);
 const searchInfo = ref<SearchInfo>({ isShopping: true });
 
 const finished = ref<boolean>(false); //加载是否已经没有更多数据
@@ -149,7 +149,7 @@ const onCancel = () => {
 function query(param: SearchInfo, cur: PageInfo) {
 	loading.value = true;
 	getShopStockPage(param, cur?.current || 1, cur?.pageSize || 10)
-		.then((res: any) => {
+		.then((res: Params) => {
 			if (res?.code == '200') {
 				dataSource.value = [...dataSource.value, ...res.data.records];
 				pagination.value.current = res.data.current + 1;
@@ -170,10 +170,10 @@ function query(param: SearchInfo, cur: PageInfo) {
 
 const userMap = {};
 function getUserInfoList() {
-	getUserManagerList({}).then((res: any) => {
+	getUserManagerList({}).then((res: Params) => {
 		if (res?.code == '200') {
 			if (res?.data) {
-				res.data.forEach((user: { id: string | number; nickName: any }) => {
+				res.data.forEach((user: { id: string | number; nickName: string }) => {
 					userMap[user.id] = user.nickName;
 				});
 			}
@@ -208,8 +208,8 @@ const shoppingCart = (item: ShopStockInfo) => {
 		isValid: '1',
 		saleNum: 1,
 	};
-	addShopCart( info)
-		.then((res: any) => {
+	addShopCart(info)
+		.then((res: Params) => {
 			if (res?.code === '200') {
 			} else {
 				showFailToast(res?.message || '加入购物车失败，请联系管理员!');

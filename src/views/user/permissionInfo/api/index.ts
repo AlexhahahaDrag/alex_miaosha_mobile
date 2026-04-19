@@ -1,4 +1,6 @@
-﻿import { getData, postData, putData, deleteData, baseService } from '@/views/common/api/index';
+﻿import type { PermissionInfoData } from '../config';
+import { getData, postData, putData, deleteData, baseService } from '@/views/common/api/index';
+import type { CommonPageResult, ResponseBody } from '@/types/api';
 
 const basePermissionInfo = '/permission-info';
 
@@ -11,7 +13,7 @@ export function getPermissionInfoPage(
 	params: number | null | undefined,
 	pageNum: number | null | undefined,
 	pageSize: number | null | undefined,
-): Promise<any> {
+): Promise<ResponseBody<CommonPageResult<PermissionInfoData>>> {
 	const url = `${baseService.user + basePermissionInfo + PermissionInfoUrl.page}`;
 	return postData(url, params, {
 		pageNum: pageNum ?? 1,
@@ -19,22 +21,22 @@ export function getPermissionInfoPage(
 	});
 }
 
-export function getPermissionInfoDetail(id: number): Promise<any> {
-	return getData(`${baseService.user + basePermissionInfo + PermissionInfoUrl.url}?id=${id}`);
+export function getPermissionInfoDetail(id: number): Promise<ResponseBody<PermissionInfoData>> {
+	return getData(`${baseService.user + basePermissionInfo + PermissionInfoUrl.url}`, { id });
 }
 
-export function deletePermissionInfo(ids: string): Promise<any> {
-	return deleteData(`${baseService.user + basePermissionInfo + PermissionInfoUrl.url}?ids=${ids}`);
+export function deletePermissionInfo(ids: string): Promise<ResponseBody<boolean>> {
+	return deleteData(`${baseService.user + basePermissionInfo + PermissionInfoUrl.url}`, { ids });
 }
 
 export function addPermissionInfo(
-	params: any
-): Promise<any> {
+	params: PermissionInfoData,
+): Promise<ResponseBody<PermissionInfoData>> {
 	return postData(baseService.user + basePermissionInfo + PermissionInfoUrl.url, params);
 }
 
 export function updatePermissionInfo(
-	params: any
-): Promise<any> {
+	params: PermissionInfoData,
+): Promise<ResponseBody<PermissionInfoData>> {
 	return putData(baseService.user + basePermissionInfo + PermissionInfoUrl.url, params);
 }

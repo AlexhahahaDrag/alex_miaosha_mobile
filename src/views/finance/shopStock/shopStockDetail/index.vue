@@ -138,7 +138,7 @@ import { getDictList } from '@/views/finance/dict/api/index';
 
 const route = useRoute();
 const router = useRouter();
-const info = ref<any>({
+const info = ref<Params>({
 	title: route?.meta?.title || '商店库存表',
 	leftPath: '/finance/shopStock',
 });
@@ -215,7 +215,7 @@ const choose = (type: string) => {
 	popInfo.value.showFlag = true;
 };
 
-const selectInfo = (type: string, value: any, name: string) => {
+const selectInfo = (type: string, value: Params, name: string) => {
 	popInfo.value.showFlag = false;
 	switch (type) {
 		case 'isValid':
@@ -241,7 +241,7 @@ const cancelInfo = () => {
 	popInfo.value.showFlag = false;
 };
 
-function getDictInfoList(res: any) {
+function getDictInfoList(res: Params) {
 	if (res?.code == '200') {
 		isValidInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'is_valid');
 		isValidName.value = getListName(isValidInfo.value.list || [], formInfo.value.isValid, 'typeCode', 'typeName');
@@ -260,13 +260,13 @@ function getDictInfoList(res: any) {
 }
 
 const saleDateName = ref<string>('');
-const saleDateInfo = ref<any>({
+const saleDateInfo = ref<Params>({
 	label: 'saleDate',
 	labelName: '进货日期',
 	rule: rulesRef.saleDate,
 	selectValue: dayjs(),
 	showFlag: false,
-	formatter: (type: string, option: any) => {
+	formatter: (type: string, option: Params) => {
 		if (type === 'year') {
 			option.text += '年';
 		}
@@ -312,7 +312,7 @@ const onSubmit = () => {
 	if (formInfo.value.id) {
 		method = 'put';
 	}
-	(method === 'put' ? updateShopStock : addShopStock)( formInfo.value).then((res: any) => {
+	(method === 'put' ? updateShopStock : addShopStock)(formInfo.value).then((res: Params) => {
 		if (res?.code == '200') {
 			showSuccessToast(res?.message || '保存成功!');
 			router.push({ path: '/finance/shopStock' });
@@ -323,11 +323,11 @@ const onSubmit = () => {
 };
 
 function init() {
-	const id: any = route?.query?.id;
-	const type: any = route?.query?.type;
+	const id: Params = route?.query?.id;
+	const type: Params = route?.query?.type;
 	if (id) {
 		Promise.all([getShopStockDetail(id || '-1'), getDictList('is_valid,shop_category,stock_place')])
-			.then((res: any) => {
+			.then((res: Params) => {
 				if (res[0].code == '200') {
 					formInfo.value = res[0].data;
 					formInfo.value.saleDate = dayjs(formInfo.value.saleDate);
@@ -345,7 +345,7 @@ function init() {
 				showFailToast('系统问题，请联系管理员！');
 			});
 	} else {
-		getDictList('is_valid,shop_category,stock_place').then((res: any) => {
+		getDictList('is_valid,shop_category,stock_place').then((res: Params) => {
 			getDictInfoList(res);
 		});
 		formInfo.value = {

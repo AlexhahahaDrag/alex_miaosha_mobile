@@ -91,19 +91,19 @@ import { addPmsAttr, updatePmsAttr, getPmsAttrDetail } from '@/views/product/pms
 
 const route = useRoute();
 const router = useRouter();
-const info = ref<any>({
+const info = ref<Params>({
 	title: route?.meta?.title || '商品属性',
 	leftPath: '/product/pmsAttr',
 });
 
-const formInfo = ref<any>({});
+const formInfo = ref<Params>({});
 
 const onSubmit = () => {
 	let method = 'post';
 	if (formInfo.value.id) {
 		method = 'put';
 	}
-	(method === 'put' ? updatePmsAttr : addPmsAttr)( formInfo.value).then((res: any) => {
+	(method === 'put' ? updatePmsAttr : addPmsAttr)(formInfo.value).then((res: Params) => {
 		if (res?.code == '200') {
 			showSuccessToast(res?.message || '保存成功!');
 			router.push({ path: '/product/pmsAttr' });
@@ -114,10 +114,10 @@ const onSubmit = () => {
 };
 
 function init() {
-	const id: any = route?.query?.id;
+	const id: Params = route?.query?.id;
 	if (id) {
 		Promise.all([getPmsAttrDetail(id || '-1')])
-			.then((res: any) => {
+			.then((res: Params) => {
 				if (res[0].code == '200') {
 					formInfo.value = res[0].data;
 				} else {

@@ -1,13 +1,7 @@
-export interface SearchInfo {
+export interface RoleUserInfoData {
+	id?: number;
 	roleId?: string;
 	userId?: string;
 	summary?: string;
 	status?: string;
-}
-
-export interface DataItem {
-	roleId: string;
-	userId: string;
-	summary: string;
-	status: string;
 }
