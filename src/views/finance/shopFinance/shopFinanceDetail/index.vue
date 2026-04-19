@@ -104,9 +104,9 @@ import { label, rulesRef } from '@/views/finance/shopFinance/config';
 import type { ShopFinanceData } from '@/views/finance/shopFinance/config';
 import type { DictInfo } from '@/views/common/config';
 import { getListName } from '@/views/common/config';
-import { addShopFinance, updateShopFinance, getShopFinanceDetail } from '@/views/finance/shopFinance/api/index';
+import { addShopFinance, updateShopFinance, getShopFinanceDetail } from '@/views/finance/shopFinance/api';
 import type { Info } from '@/views/common/pop/selectPop.vue';
-import { getDictList } from '@/views/finance/dict/api/index';
+import { getDictList } from '@/views/finance/dict/api';
 import type { ResponseBody } from '@/types/api';
 
 const route = useRoute();

@@ -95,14 +95,11 @@
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { showFailToast } from 'vant';
-import ShopOrderCard from './components/ShopOrderCard.vue';
 import type { ShopOrderData } from './config';
 import { usePagination } from '@/composables/usePagination';
-import CommonPullRefresh from '@/views/components/CommonPullRefresh.vue';
-import CommonList from '@/views/components/CommonList.vue';
-import { getShopOrderPage } from '@/views/finance/shopOrder/api/index';
+import { getShopOrderPage } from '@/views/finance/shopOrder/api';
 import { useNavBar } from '@/composables/useNavBar';
-import type { PageInfo } from '@/views/common/config/index';
+import type { PageInfo } from '@/views/common/config';
 
 const router = useRouter();
 const route = useRoute();

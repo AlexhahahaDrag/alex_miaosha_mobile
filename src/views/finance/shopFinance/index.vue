@@ -107,14 +107,11 @@ import { useRouter, useRoute } from 'vue-router';
 import { showSuccessToast, showFailToast } from 'vant';
 import dayjs from 'dayjs';
 import type { ShopFinanceData } from './config';
-import ShopFinanceCard from './components/ShopFinanceCard.vue';
 import { usePagination } from '@/composables/usePagination';
-import CommonPullRefresh from '@/views/components/CommonPullRefresh.vue';
-import CommonList from '@/views/components/CommonList.vue';
 import { formatHeaderDate } from '@/utils/dayjs';
-import { getShopFinancePage, deleteShopFinance } from '@/views/finance/shopFinance/api/index';
+import { getShopFinancePage, deleteShopFinance } from '@/views/finance/shopFinance/api';
 import { useNavBar } from '@/composables/useNavBar';
-import type { PageInfo } from '@/views/common/config/index';
+import type { PageInfo } from '@/views/common/config';
 
 const router = useRouter();
 const route = useRoute();

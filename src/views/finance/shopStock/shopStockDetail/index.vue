@@ -132,9 +132,9 @@ import { showFailToast, showSuccessToast } from 'vant';
 import type { ShopStockData } from '../config';
 import { label, rulesRef } from './shopStockDetailTs';
 import { getListName } from '@/views/common/config';
-import { addShopStock, updateShopStock, getShopStockDetail } from '@/views/finance/shopStock/api/index';
+import { addShopStock, updateShopStock, getShopStockDetail } from '@/views/finance/shopStock/api';
 import type { Info } from '@/views/common/pop/selectPop.vue';
-import { getDictList } from '@/views/finance/dict/api/index';
+import { getDictList } from '@/views/finance/dict/api';
 
 const route = useRoute();
 const router = useRouter();

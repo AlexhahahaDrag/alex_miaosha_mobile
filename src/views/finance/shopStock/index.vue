@@ -88,11 +88,9 @@ import { showSuccessToast, showFailToast } from 'vant';
 import ShopStockCard from './components/ShopStockCard.vue';
 import type { ShopStockData } from './config';
 import { usePagination } from '@/composables/usePagination';
-import CommonPullRefresh from '@/views/components/CommonPullRefresh.vue';
-import CommonList from '@/views/components/CommonList.vue';
-import { getShopStockPage, deleteShopStock } from '@/views/finance/shopStock/api/index';
+import { getShopStockPage, deleteShopStock } from '@/views/finance/shopStock/api';
 import { useNavBar } from '@/composables/useNavBar';
-import type { PageInfo } from '@/views/common/config/index';
+import type { PageInfo } from '@/views/common/config';
 
 const router = useRouter();
 const route = useRoute();

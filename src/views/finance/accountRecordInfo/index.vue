@@ -46,7 +46,7 @@
 						}"
 					>
 						<template #label>
-							<div style="margin-top: 0px; display: flex">
+							<div style="margin-top: 0; display: flex">
 								<div
 									class="icon"
 									style="background-color: #ffcc00"
@@ -98,11 +98,11 @@
 <script lang="ts" setup>
 import { showSuccessToast, showFailToast } from 'vant';
 import type { Params } from '@/types/global';
-import type { PageInfo } from '@/views/common/config/index';
+import type { PageInfo } from '@/views/common/config';
 import type { AccountRecordInfoData } from '@/views/finance/accountRecordInfo/config';
 import { usePagination } from '@/composables/usePagination';
-import { deleteAccountRecordInfo, getAccountRecordInfoPage } from '@/views/finance/accountRecordInfo/api/index';
-import { getUserManagerList } from '@/views/user/userManager/api/index';
+import { deleteAccountRecordInfo, getAccountRecordInfoPage } from '@/views/finance/accountRecordInfo/api';
+import { getUserManagerList } from '@/views/user/userManager/api';
 
 const router = useRouter();
 const route = useRoute();
