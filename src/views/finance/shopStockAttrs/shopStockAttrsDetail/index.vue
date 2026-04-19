@@ -77,10 +77,10 @@
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
 import { label, rulesRef } from './shopStockAttrsDetailTs';
-import { addOrEditShopStockAttrs, getShopStockAttrsDetail } from '@/api/finance/shopStockAttrs/shopStockAttrsTs';
+import { addShopStockAttrs, updateShopStockAttrs, getShopStockAttrsDetail } from '@/views/finance/shopStockAttrs/api/index';
 import type { Info } from '@/views/common/pop/selectPop.vue';
 import { getListName } from '@/views/common/config';
-import { getDictList } from '@/api/finance/dict/dictManager';
+import { getDictList } from '@/views/finance/dict/api/index';
 
 const route = useRoute();
 const router = useRouter();
@@ -143,7 +143,7 @@ const onSubmit = (): void => {
 	if (formInfo.value.id) {
 		method = 'put';
 	}
-	addOrEditShopStockAttrs(method, formInfo.value).then((res: any) => {
+	(method === 'put' ? updateShopStockAttrs : addShopStockAttrs)( formInfo.value).then((res: any) => {
 		if (res?.code == '200') {
 			showSuccessToast(res?.message || '保存成功!');
 			router.push({ path: '/finance/shopStockAttrs' });

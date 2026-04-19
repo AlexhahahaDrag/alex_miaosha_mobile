@@ -1,0 +1,40 @@
+﻿import { getData, postData, putData, deleteData, baseService } from '@/views/common/api/index';
+
+const basePmsBrand = '/pms-brand';
+
+const PmsBrandUrl = {
+	page: '/page',
+	url: '',
+};
+
+export function getPmsBrandPage(
+	params: any,
+	pageNum: number | null | undefined,
+	pageSize: number | null | undefined,
+): Promise<any> {
+	const url = `${baseService.product + basePmsBrand + PmsBrandUrl.page}`;
+	return postData(url, params, {
+		pageNum: pageNum ?? 1,
+		pageSize: pageSize ?? 10,
+	});
+}
+
+export function getPmsBrandDetail(id: number): Promise<any> {
+	return getData(`${baseService.product + basePmsBrand + PmsBrandUrl.url}?id=${id}`);
+}
+
+export function deletePmsBrand(ids: string): Promise<any> {
+	return deleteData(`${baseService.product + basePmsBrand + PmsBrandUrl.url}?ids=${ids}`);
+}
+
+export function addPmsBrand(
+	params: any
+): Promise<any> {
+	return postData(baseService.product + basePmsBrand + PmsBrandUrl.url, params);
+}
+
+export function updatePmsBrand(
+	params: any
+): Promise<any> {
+	return putData(baseService.product + basePmsBrand + PmsBrandUrl.url, params);
+}

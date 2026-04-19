@@ -1,0 +1,40 @@
+﻿import { getData, postData, putData, deleteData, baseService } from '@/views/common/api/index';
+
+const basePmsAttr = '/pms-attr';
+
+const PmsAttrUrl = {
+	page: '/page',
+	url: '',
+};
+
+export function getPmsAttrPage(
+	params: any,
+	pageNum: number | null | undefined,
+	pageSize: number | null | undefined,
+): Promise<any> {
+	const url = `${baseService.product + basePmsAttr + PmsAttrUrl.page}`;
+	return postData(url, params, {
+		pageNum: pageNum ?? 1,
+		pageSize: pageSize ?? 10,
+	});
+}
+
+export function getPmsAttrDetail(id: number): Promise<any> {
+	return getData(`${baseService.product + basePmsAttr + PmsAttrUrl.url}?id=${id}`);
+}
+
+export function deletePmsAttr(ids: string): Promise<any> {
+	return deleteData(`${baseService.product + basePmsAttr + PmsAttrUrl.url}?ids=${ids}`);
+}
+
+export function addPmsAttr(
+	params: any
+): Promise<any> {
+	return postData(baseService.product + basePmsAttr + PmsAttrUrl.url, params);
+}
+
+export function updatePmsAttr(
+	params: any
+): Promise<any> {
+	return putData(baseService.product + basePmsAttr + PmsAttrUrl.url, params);
+}

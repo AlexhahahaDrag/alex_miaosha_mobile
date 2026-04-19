@@ -1,5 +1,5 @@
 ﻿import type { FinanceDetail } from '../financeAnalysisDetail/common';
-import { getData, baseService } from '@/api/common';
+import { getData, baseService } from '@/views/common/api/index';
 import type { ResponseBody } from '@/types/api';
 
 const baseFinanceAnalysis = '/finance-analysis';

@@ -195,7 +195,7 @@ import {
 	getConsumeCardRecordPage,
 	type TransactionRecord,
 	type TransactionQueryParams,
-} from '@/api/finance/consumeCardRecord/index';
+} from '@/views/finance/consumeCardRecord/api/index';
 import filterIcon from '@/assets/icons/shop/filter.svg';
 
 const route = useRoute();

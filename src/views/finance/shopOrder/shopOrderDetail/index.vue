@@ -71,9 +71,9 @@ import dayjs from 'dayjs';
 import { showFailToast } from 'vant';
 import { label } from './shopOrderDetailTs';
 import { getListName } from '@/views/common/config';
-import { getShopOrderDetail } from '@/api/finance/shopOrder/shopOrderTs';
+import { getShopOrderDetail } from '@/views/finance/shopOrder/api/index';
 import type { Info } from '@/views/common/pop/selectPop.vue';
-import { getDictList } from '@/api/finance/dict/dictManager';
+import { getDictList } from '@/views/finance/dict/api/index';
 
 const route = useRoute();
 const info = ref<any>({

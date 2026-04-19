@@ -85,14 +85,14 @@
 import { showFailToast } from 'vant';
 import dayjs from 'dayjs';
 import commonUtils from '@/utils/common/index';
-import { getShopList } from '@/api/finance/shopStock/shopStockTs';
-import { submitOrder } from '@/api/finance/shopOrder/shopOrderTs';
+import { getShopList } from '@/views/finance/shopStock/api/index';
+import { submitOrder } from '@/views/finance/shopOrder/api/index';
 import type { ShopStockInfo } from '@/views/finance/shopStock/shopStockTs';
 import type { SaleOrderInfo } from '@/views/finance/saleTicket/saleTicketTs';
-import { getShopCartList } from '@/api/finance/shopCart/shopCartTs';
+import { getShopCartList } from '@/views/finance/shopCart/api/index';
 import type { ShopCartInfo } from '@/views/finance/shoppingCart/shoppingCartTs';
 import type { Info } from '@/views/common/pop/selectPop.vue';
-import { getDictList } from '@/api/finance/dict/dictManager';
+import { getDictList } from '@/views/finance/dict/api/index';
 
 const route = useRoute();
 const router = useRouter();

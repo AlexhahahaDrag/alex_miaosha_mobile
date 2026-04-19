@@ -90,7 +90,7 @@ import type { SearchInfo, ShopStockInfo } from './shopStockTs';
 import { usePagination } from '@/composables/usePagination';
 import CommonPullRefresh from '@/views/components/CommonPullRefresh.vue';
 import CommonList from '@/views/components/CommonList.vue';
-import { getShopStockPage, deleteShopStock } from '@/api/finance/shopStock/shopStockTs';
+import { getShopStockPage, deleteShopStock } from '@/views/finance/shopStock/api/index';
 import { useNavBar } from '@/composables/useNavBar';
 import type { PageInfo } from '@/views/common/config/index';
 

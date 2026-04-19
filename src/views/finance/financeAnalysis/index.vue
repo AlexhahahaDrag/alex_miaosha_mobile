@@ -65,10 +65,10 @@ import { showFailToast } from 'vant';
 import type { Info } from '@/views/common/pop/selectPop.vue';
 import { getListName } from '@/views/common/config';
 import { useUserStore } from '@/store/modules/user/user';
-import { getUserManagerList } from '@/api/user/userManager';
+import { getUserManagerList } from '@/views/user/userManager/api/index';
 import { datePickerFormatter } from '@/utils/dayjs';
 import type { DatePickerInfo } from '@/utils/common';
-import type { UserManagerData } from '@/api/user/userManager';
+import type { UserManagerData } from '@/views/user/userManager/api/index';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
 

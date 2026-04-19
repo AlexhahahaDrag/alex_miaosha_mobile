@@ -70,9 +70,9 @@
 import { showFailToast, showSuccessToast } from 'vant';
 import { label, rulesRef } from './permissionInfoDetailTs';
 import { getListName } from '@/views/common/config';
-import { addOrEditPermissionInfo, getPermissionInfoDetail } from '@/api/user/permissionInfo/permissionInfoTs';
+import { addPermissionInfo, updatePermissionInfo, getPermissionInfoDetail } from '@/views/user/permissionInfo/api/index';
 import type { Info } from '@/views/common/pop/selectPop.vue';
-import { getDictList } from '@/api/finance/dict/dictManager';
+import { getDictList } from '@/views/finance/dict/api/index';
 
 const route = useRoute();
 const router = useRouter();
@@ -135,7 +135,7 @@ const onSubmit = () => {
 	if (formInfo.value.id) {
 		method = 'put';
 	}
-	addOrEditPermissionInfo(method, formInfo.value).then((res: any) => {
+	(method === 'put' ? updatePermissionInfo : addPermissionInfo)( formInfo.value).then((res: any) => {
 		if (res?.code == '200') {
 			showSuccessToast(res?.message || '保存成功!');
 			router.push({ path: '/user/permissionInfo' });

@@ -1,5 +1,5 @@
 ﻿import type { CpnCouponInfoData } from '../config/index';
-import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
+import { getData, postData, putData, deleteData, baseService } from '@/views/common/api/index';
 import type { ResponseBody, CommonPageResult } from '@/types/api';
 
 const baseCpnCouponInfo = '/cpn-coupon-info';

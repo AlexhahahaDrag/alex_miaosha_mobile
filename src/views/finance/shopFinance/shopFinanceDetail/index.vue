@@ -102,9 +102,9 @@ import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
 import { label, rulesRef } from './shopFinanceDetailTs';
 import { getListName } from '@/views/common/config';
-import { addOrEditShopFinance, getShopFinanceDetail } from '@/api/finance/shopFinance/shopFinanceTs';
+import { addShopFinance, updateShopFinance, getShopFinanceDetail } from '@/views/finance/shopFinance/api/index';
 import type { Info } from '@/views/common/pop/selectPop.vue';
-import { getDictList } from '@/api/finance/dict/dictManager';
+import { getDictList } from '@/views/finance/dict/api/index';
 
 const route = useRoute();
 const router = useRouter();
@@ -253,7 +253,7 @@ const onSubmit = () => {
 	if (formInfo.value.id) {
 		method = 'put';
 	}
-	addOrEditShopFinance(method, formInfo.value).then((res: any) => {
+	(method === 'put' ? updateShopFinance : addShopFinance)( formInfo.value).then((res: any) => {
 		if (res?.code == '200') {
 			showSuccessToast(res?.message || '保存成功!');
 			router.push({ path: '/finance/shopFinance' });

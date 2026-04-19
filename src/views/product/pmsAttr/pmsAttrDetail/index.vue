@@ -87,7 +87,7 @@
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
 import { label, rulesRef } from './pmsAttrDetailTs';
-import { addOrEditPmsAttr, getPmsAttrDetail } from '@/api/product/pmsAttr/pmsAttrTs';
+import { addPmsAttr, updatePmsAttr, getPmsAttrDetail } from '@/views/product/pmsAttr/api/index';
 
 const route = useRoute();
 const router = useRouter();
@@ -103,7 +103,7 @@ const onSubmit = () => {
 	if (formInfo.value.id) {
 		method = 'put';
 	}
-	addOrEditPmsAttr(method, formInfo.value).then((res: any) => {
+	(method === 'put' ? updatePmsAttr : addPmsAttr)( formInfo.value).then((res: any) => {
 		if (res?.code == '200') {
 			showSuccessToast(res?.message || '保存成功!');
 			router.push({ path: '/product/pmsAttr' });

@@ -99,9 +99,9 @@ import { showFailToast } from 'vant';
 import type { SearchInfo, ShopStockInfo } from './shopProductTs';
 import { pagination } from './shopProductTs';
 import type { PageInfo } from '@/views/common/config/index';
-import { getShopStockPage } from '@/api/finance/shopStock/shopStockTs';
-import { getUserManagerList } from '@/api/user/userManager';
-import { addOrEditShopCart } from '@/api/finance/shopCart/shopCartTs';
+import { getShopStockPage } from '@/views/finance/shopStock/api/index';
+import { getUserManagerList } from '@/views/user/userManager/api/index';
+import { addShopCart, updateShopCart } from '@/views/finance/shopCart/api/index';
 import commonUtils from '@/utils/common/index';
 import { useUserStore } from '@/store/modules/user/user';
 import type { ResponseBody } from '@/types/api';
@@ -208,7 +208,7 @@ const shoppingCart = (item: ShopStockInfo) => {
 		isValid: '1',
 		saleNum: 1,
 	};
-	addOrEditShopCart('post', info)
+	addShopCart( info)
 		.then((res: any) => {
 			if (res?.code === '200') {
 			} else {

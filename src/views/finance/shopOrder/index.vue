@@ -100,7 +100,7 @@ import type { SearchInfo, DataItem } from './shopOrderTs';
 import { usePagination } from '@/composables/usePagination';
 import CommonPullRefresh from '@/views/components/CommonPullRefresh.vue';
 import CommonList from '@/views/components/CommonList.vue';
-import { getShopOrderPage } from '@/api/finance/shopOrder/shopOrderTs';
+import { getShopOrderPage } from '@/views/finance/shopOrder/api/index';
 import { useNavBar } from '@/composables/useNavBar';
 import type { PageInfo } from '@/views/common/config/index';
 

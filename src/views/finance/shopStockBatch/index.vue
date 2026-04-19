@@ -85,8 +85,8 @@
 import { showSuccessToast, showFailToast } from 'vant';
 import type { SearchInfo } from './shopStockBatchTs';
 import { pagination } from './shopStockBatchTs';
-import { getShopStockBatchPage, deleteShopStockBatch } from '@/api/finance/shopStockBatch/shopStockBatchTs';
-import { getUserManagerList } from '@/api/user/userManager';
+import { getShopStockBatchPage, deleteShopStockBatch } from '@/views/finance/shopStockBatch/api/index';
+import { getUserManagerList } from '@/views/user/userManager/api/index';
 import type { PageInfo } from '@/views/common/config/index';
 
 const router = useRouter();

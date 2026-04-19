@@ -112,7 +112,7 @@ import { usePagination } from '@/composables/usePagination';
 import CommonPullRefresh from '@/views/components/CommonPullRefresh.vue';
 import CommonList from '@/views/components/CommonList.vue';
 import { formatHeaderDate } from '@/utils/dayjs';
-import { getShopFinancePage, deleteShopFinance } from '@/api/finance/shopFinance/shopFinanceTs';
+import { getShopFinancePage, deleteShopFinance } from '@/views/finance/shopFinance/api/index';
 import { useNavBar } from '@/composables/useNavBar';
 import type { PageInfo } from '@/views/common/config/index';
 

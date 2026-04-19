@@ -95,8 +95,8 @@
 import { showSuccessToast, showFailToast } from 'vant';
 import { usePagination } from '@/composables/usePagination';
 import type { SearchInfo } from './pmsAttrTs';
-import { getPmsAttrPage, deletePmsAttr } from '@/api/product/pmsAttr/pmsAttrTs';
-import { getUserManagerList } from '@/api/user/userManager';
+import { getPmsAttrPage, deletePmsAttr } from '@/views/product/pmsAttr/api/index';
+import { getUserManagerList } from '@/views/user/userManager/api/index';
 import type { PageInfo } from '@/views/common/config/index';
 
 const router = useRouter();

@@ -31,7 +31,7 @@
 <script lang="ts" setup>
 import { showNotify } from 'vant';
 import type { ItemInfo } from './common';
-import { getShopNameInfo, getPayWayInfo } from '@/api/finance/shopFinanceAnalysis';
+import { getShopNameInfo, getPayWayInfo } from '@/views/finance/shopFinanceAnalysis/api/index';
 
 interface Props {
 	activeTab: number | string;

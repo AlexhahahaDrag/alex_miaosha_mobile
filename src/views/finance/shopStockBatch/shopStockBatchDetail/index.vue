@@ -62,9 +62,9 @@
 import { showFailToast, showSuccessToast } from 'vant';
 import { label, rulesRef } from './shopStockBatchDetailTs';
 import { getListName } from '@/views/common/config';
-import { addOrEditShopStockBatch, getShopStockBatchDetail } from '@/api/finance/shopStockBatch/shopStockBatchTs';
+import { addShopStockBatch, updateShopStockBatch, getShopStockBatchDetail } from '@/views/finance/shopStockBatch/api/index';
 import type { Info } from '@/views/common/pop/selectPop.vue';
-import { getDictList } from '@/api/finance/dict/dictManager';
+import { getDictList } from '@/views/finance/dict/api/index';
 
 const route = useRoute();
 const router = useRouter();
@@ -127,7 +127,7 @@ const onSubmit = (): void => {
 	if (formInfo.value.id) {
 		method = 'put';
 	}
-	addOrEditShopStockBatch(method, formInfo.value).then((res: any) => {
+	(method === 'put' ? updateShopStockBatch : addShopStockBatch)( formInfo.value).then((res: any) => {
 		if (res?.code == '200') {
 			showSuccessToast(res?.message || '保存成功!');
 			router.push({ path: '/finance/shopStockBatch' });

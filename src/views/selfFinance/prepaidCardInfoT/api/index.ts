@@ -1,4 +1,4 @@
-﻿import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
+﻿import { getData, postData, putData, deleteData, baseService } from '@/views/common/api/index';
 
 const basePrepaidCardInfo = '/prepaid-card-info-t';
 const basePrepaidConsumeRecord = '/prepaid-consume-record-t';

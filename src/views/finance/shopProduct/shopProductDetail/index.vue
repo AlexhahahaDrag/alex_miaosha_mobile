@@ -85,8 +85,8 @@ import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast } from 'vant';
 import { label } from './shopProductDetailTs';
 import { getListName } from '@/views/common/config';
-import { getShopStockDetail } from '@/api/finance/shopStock/shopStockTs';
-import { getDictList } from '@/api/finance/dict/dictManager';
+import { getShopStockDetail } from '@/views/finance/shopStock/api/index';
+import { getDictList } from '@/views/finance/dict/api/index';
 
 const route = useRoute();
 const info = ref<any>({

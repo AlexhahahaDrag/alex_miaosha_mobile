@@ -130,7 +130,7 @@ import CommonList from '@/views/components/CommonList.vue';
 import { getRoutePathByName } from '@/utils/router';
 import { formatHeaderDate } from '@/utils/dayjs';
 import { getFinanceMangerPage, deleteFinanceManager } from '@/views/finance/financeManager/api';
-import { getDictList } from '@/api/finance/dict/dictManager';
+import { getDictList } from '@/views/finance/dict/api/index';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
 import type { PageInfo } from '@/views/common/config';

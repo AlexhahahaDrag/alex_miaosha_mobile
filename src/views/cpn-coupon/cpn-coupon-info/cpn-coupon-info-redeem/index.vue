@@ -175,7 +175,7 @@ import { showFailToast, showSuccessToast } from 'vant';
 import dayjs from 'dayjs';
 import { getCpnCouponInfoDetail } from '@/views/cpn-coupon/cpn-coupon-info/api';
 import { redeemCpnUserCouponInfo } from '@/views/cpn-coupon/cpn-user-coupon-info/api';
-import { getUserManagerList } from '@/api/user/userManager';
+import { getUserManagerList } from '@/views/user/userManager/api/index';
 import type { Info } from '@/views/common/pop/selectPop.vue';
 import { getRoutePathByName } from '@/utils/router';
 import { datePickerFormatter } from '@/utils/dayjs';

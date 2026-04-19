@@ -103,7 +103,7 @@
 import { showFailToast, showSuccessToast } from 'vant';
 import commonUtils from '@/utils/common/index';
 import type { ShopCartInfo } from '@/views/finance/shoppingCart/shoppingCartTs';
-import { getShopCartList, addOrEditShopCart, deleteShopCart } from '@/api/finance/shopCart/shopCartTs';
+import { getShopCartList, addShopCart, updateShopCart, deleteShopCart } from '@/views/finance/shopCart/api/index';
 
 const route = useRoute();
 const router = useRouter();
@@ -135,7 +135,7 @@ const getSumAmount = (): void => {
 
 const changeCount = (item: ShopCartInfo): void => {
 	// 保存购物车信息
-	addOrEditShopCart('put', {
+	updateShopCart( {
 		id: item.id,
 		saleNum: item.saleNum,
 	});

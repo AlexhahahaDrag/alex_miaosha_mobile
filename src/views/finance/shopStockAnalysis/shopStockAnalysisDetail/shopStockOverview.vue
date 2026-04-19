@@ -24,7 +24,7 @@
 <script lang="ts" setup>
 import { showNotify } from 'vant';
 import type { ShopFinanceChainYear } from './common';
-import { getAllStock, getCashAmount } from '@/api/finance/shopStockAnalysis';
+import { getAllStock, getCashAmount } from '@/views/finance/shopStockAnalysis/api/index';
 import commonUtils from '@/utils/common/index';
 import type { Info } from '@/views/common/boardData/config';
 

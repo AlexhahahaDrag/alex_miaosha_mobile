@@ -79,10 +79,10 @@
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-import { addOrEditOrgInfo, getOrgInfoDetail } from '@/api/user/orgInfo/orgInfoTs';
+import { addOrgInfo, updateOrgInfo, getOrgInfoDetail } from '@/views/user/orgInfo/api/index';
 import type { Info } from '@/views/common/pop/selectPop.vue';
 import { getListName } from '@/views/common/config';
-import { getDictList } from '@/api/finance/dict/dictManager';
+import { getDictList } from '@/views/finance/dict/api/index';
 
 const route = useRoute();
 const router = useRouter();
@@ -187,7 +187,7 @@ const onSubmit = () => {
 	if (formInfo.value.id) {
 		method = 'put';
 	}
-	addOrEditOrgInfo(method, formInfo.value).then((res: any) => {
+	(method === 'put' ? updateOrgInfo : addOrgInfo)( formInfo.value).then((res: any) => {
 		if (res?.code == '200') {
 			showSuccessToast(res?.message || '保存成功!');
 			router.push({ path: '/user/orgInfo' });

@@ -2,8 +2,8 @@ import { defineStore } from 'pinia';
 import { showFailToast } from 'vant';
 import { getAuthInfo } from './typing';
 import type { MenuInfo, UserState } from './typing';
-import { loginApi } from '@/api/user/login';
-import type { LoginParams } from '@/api/user/login';
+import { loginApi } from '@/views/login/api/index';
+import type { LoginParams } from '@/views/login/api/index';
 import { piniaPersistConfig } from '@/config/piniaPersist';
 import { refreshRouter } from '@/router';
 

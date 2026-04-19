@@ -96,8 +96,8 @@ import type { SearchInfo } from './permissionInfoTs';
 import {
 	getPermissionInfoPage,
 	deletePermissionInfo,
-} from '@/api/user/permissionInfo/permissionInfoTs';
-import { getUserManagerList } from '@/api/user/userManager';
+} from '@/views/user/permissionInfo/api/index';
+import { getUserManagerList } from '@/views/user/userManager/api/index';
 import type { PageInfo } from '@/views/common/config/index';
 
 const router = useRouter();

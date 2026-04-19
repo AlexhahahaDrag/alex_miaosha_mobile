@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import type { ToastOptions } from 'vant';
 import { showToast } from 'vant';
-import { logoutApi } from '@/api/user/login';
+import { logoutApi } from '@/views/login/api/index';
 
 interface Props {
 	visible: boolean;

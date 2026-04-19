@@ -46,7 +46,7 @@
 </template>
 <script setup lang="ts">
 import type { LoginForm } from './login';
-import type { LoginParams } from '@/api/user/login';
+import type { LoginParams } from '@/views/login/api/index';
 import { useUserStore } from '@/store/modules/user/user';
 import { useNavBar } from '@/composables/useNavBar';
 

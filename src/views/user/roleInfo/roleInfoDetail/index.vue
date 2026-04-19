@@ -62,9 +62,9 @@
 import { showFailToast, showSuccessToast } from 'vant';
 import { label, rulesRef } from './roleInfoDetailTs';
 import { getListName } from '@/views/common/config';
-import { addOrEditRoleInfo, getRoleInfoDetail } from '@/api/user/roleInfo/roleInfoTs';
+import { addRoleInfo, updateRoleInfo, getRoleInfoDetail } from '@/views/user/roleInfo/api/index';
 import type { Info } from '@/views/common/pop/selectPop.vue';
-import { getDictList } from '@/api/finance/dict/dictManager';
+import { getDictList } from '@/views/finance/dict/api/index';
 
 const route = useRoute();
 const router = useRouter();
@@ -127,7 +127,7 @@ const onSubmit = () => {
 	if (formInfo.value.id) {
 		method = 'put';
 	}
-	addOrEditRoleInfo(method, formInfo.value).then((res: any) => {
+	(method === 'put' ? updateRoleInfo : addRoleInfo)( formInfo.value).then((res: any) => {
 		if (res?.code == '200') {
 			showSuccessToast(res?.message || '保存成功!');
 			router.push({ path: '/user/roleInfo' });

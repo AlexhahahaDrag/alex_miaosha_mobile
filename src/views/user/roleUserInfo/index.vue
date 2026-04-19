@@ -93,8 +93,8 @@
 import { showSuccessToast, showFailToast } from 'vant';
 import { usePagination } from '@/composables/usePagination';
 import type { SearchInfo } from './roleUserInfoTs';
-import { getRoleUserInfoPage, deleteRoleUserInfo } from '@/api/user/roleUserInfo/roleUserInfoTs';
-import { getUserManagerList } from '@/api/user/userManager';
+import { getRoleUserInfoPage, deleteRoleUserInfo } from '@/views/user/roleUserInfo/api/index';
+import { getUserManagerList } from '@/views/user/userManager/api/index';
 import type { PageInfo } from '@/views/common/config/index';
 
 const router = useRouter();

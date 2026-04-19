@@ -25,7 +25,7 @@
 import { showNotify } from 'vant';
 import dayjs from 'dayjs';
 import type { ShopFinanceChainYear } from './common';
-import { getChainAndYear, getBenefit } from '@/api/finance/shopFinanceAnalysis';
+import { getChainAndYear, getBenefit } from '@/views/finance/shopFinanceAnalysis/api/index';
 import commonUtils from '@/utils/common/index';
 import type { Info } from '@/views/common/boardData/config';
 

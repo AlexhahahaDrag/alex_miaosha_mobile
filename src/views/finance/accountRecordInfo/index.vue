@@ -97,10 +97,10 @@
 </template>
 <script lang="ts" setup>
 import { showSuccessToast, showFailToast } from 'vant';
+
 import { usePagination } from '@/composables/usePagination';
-import type { SearchInfo } from './accountRecordInfoTs';
-import { deleteAccountRecordInfo, getAccountRecordInfoPage } from '@/api/finance/accountRecordInfo/accountRecordInfoTs';
-import { getUserManagerList } from '@/api/user/userManager';
+import { deleteAccountRecordInfo, getAccountRecordInfoPage } from '@/views/finance/accountRecordInfo/api/index';
+import { getUserManagerList } from '@/views/user/userManager/api/index';
 import type { PageInfo } from '@/views/common/config/index';
 
 const router = useRouter();

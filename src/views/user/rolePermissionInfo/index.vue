@@ -96,8 +96,8 @@ import { usePagination } from '@/composables/usePagination';
 import {
 	getRolePermissionInfoPage,
 	deleteRolePermissionInfo,
-} from '@/api/user/rolePermissionInfo/rolePermissionInfoTs';
-import { getUserManagerList } from '@/api/user/userManager';
+} from '@/views/user/rolePermissionInfo/api/index';
+import { getUserManagerList } from '@/views/user/userManager/api/index';
 import type { PageInfo } from '@/views/common/config/index';
 
 const router = useRouter();

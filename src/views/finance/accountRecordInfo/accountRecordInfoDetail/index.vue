@@ -68,10 +68,10 @@ import { showFailToast, showSuccessToast } from 'vant';
 import type { Info } from '@/views/common/pop/selectPop.vue';
 import { getListName } from '@/views/common/config';
 import {
-	addOrEditAccountRecordInfo,
+	addAccountRecordInfo, updateAccountRecordInfo,
 	getAccountRecordInfoDetail,
-} from '@/api/finance/accountRecordInfo/accountRecordInfoTs';
-import { getDictList } from '@/api/finance/dict/dictManager';
+} from '@/views/finance/accountRecordInfo/api/index';
+import { getDictList } from '@/views/finance/dict/api/index';
 
 const route = useRoute();
 const router = useRouter();
@@ -217,7 +217,7 @@ const onSubmit = async () => {
 	if (formInfo.value.id) {
 		method = 'put';
 	}
-	const { code, message } = await addOrEditAccountRecordInfo(method, formInfo.value);
+	const { code, message } = await (method === 'put' ? updateAccountRecordInfo : addAccountRecordInfo)( formInfo.value);
 	if (code == '200') {
 		showSuccessToast(message || '保存成功!');
 		router.push({ path: '/selfFinance/accountRecordInfo' });
