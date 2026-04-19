@@ -34,7 +34,7 @@
 			:loading="loading"
 			:refreshing="isRefresh"
 			:finished="finished"
-			:isEmpty="!dataSource?.length"
+			:is-empty="!dataSource?.length"
 			empty-text="没有找到相关的账单记录"
 			empty-image="search"
 			@load="onLoadMore"
@@ -122,11 +122,11 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { showSuccessToast, showFailToast } from 'vant';
 import dayjs from 'dayjs';
-import { usePagination } from '@/composables/usePagination';
 import { fromSourceTransferList, type FinanceManagerData } from './config';
+import FinanceCard from './components/FinanceCard.vue';
+import { usePagination } from '@/composables/usePagination';
 import CommonPullRefresh from '@/views/components/CommonPullRefresh.vue';
 import CommonList from '@/views/components/CommonList.vue';
-import FinanceCard from './components/FinanceCard.vue';
 import { getRoutePathByName } from '@/utils/router';
 import { formatHeaderDate } from '@/utils/dayjs';
 import { getFinanceMangerPage, deleteFinanceManager } from '@/views/finance/financeManager/api';
