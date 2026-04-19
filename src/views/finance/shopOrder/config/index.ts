@@ -1,3 +1,13 @@
+import type { Dayjs } from 'dayjs';
+
 export interface ShopOrderData {
-	[key: string]: unknown;
+	id?: number;
+	saleOrderCode?: string;
+	saleOrderName?: string;
+	saleAmount?: number;
+	isValid?: string;
+	saleDate?: Dayjs | string;
+	description?: string;
+	payWay?: string;
+	saleCount?: number;
 }

@@ -66,6 +66,7 @@ export interface ModelInfo {
 export interface DictInfo {
 	typeCode?: string | number | undefined;
 	typeName?: string | undefined;
+	belongTo?: string | undefined;
 }
 
 export const getListName = <T>(list: T[], value: unknown, code: string, name: string): string => {

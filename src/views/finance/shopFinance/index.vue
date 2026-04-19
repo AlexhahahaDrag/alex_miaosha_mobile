@@ -106,7 +106,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { showSuccessToast, showFailToast } from 'vant';
 import dayjs from 'dayjs';
-import type { SearchInfo, DataItem } from './shopFinanceTs';
+import type { ShopFinanceData } from './config';
 import ShopFinanceCard from './components/ShopFinanceCard.vue';
 import { usePagination } from '@/composables/usePagination';
 import CommonPullRefresh from '@/views/components/CommonPullRefresh.vue';
@@ -132,15 +132,15 @@ useNavBar({
 
 // 响应式数据
 const loading = ref<boolean>(true);
-const dataSource = ref<DataItem[]>([]);
-const searchInfo = ref<SearchInfo>({});
+const dataSource = ref<ShopFinanceData[]>([]);
+const searchInfo = ref<ShopFinanceData>({});
 const finished = ref<boolean>(false);
 const isRefresh = ref<boolean>(false);
 const { pagination, resetPagination, setTotal, nextPage } = usePagination();
 
 // 分组逻辑
 const groupedDataSource = computed(() => {
-	const groups: { date: string; items: DataItem[] }[] = [];
+	const groups: { date: string; items: ShopFinanceData[] }[] = [];
 	dataSource.value.forEach((item) => {
 		if (!item.saleDate) return;
 		const dateStr = dayjs(item.saleDate).format('YYYY-MM-DD');
@@ -170,7 +170,7 @@ const onClearAllFilters = () => {
 };
 
 // 交互辅助
-const handleCardClick = (item: DataItem) => {
+const handleCardClick = (item: ShopFinanceData) => {
 	router.push({
 		path: '/finance/shopFinance/shopFinanceDetail',
 		query: { id: item.id },
@@ -178,7 +178,7 @@ const handleCardClick = (item: DataItem) => {
 };
 
 // 获取财务数据
-const getFinancePage = async (param: SearchInfo, cur: PageInfo) => {
+const getFinancePage = async (param: ShopFinanceData, cur: PageInfo) => {
 	if (!isRefresh.value) {
 		loading.value = true;
 	}

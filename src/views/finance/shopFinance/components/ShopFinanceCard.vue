@@ -55,11 +55,11 @@
 
 <script lang="ts" setup>
 import { computed, type PropType } from 'vue';
-import { fromSourceTransferList, type DataItem } from '../shopFinanceTs';
+import { fromSourceTransferList, type ShopFinanceData } from '../config';
 
 const props = defineProps({
 	item: {
-		type: Object as PropType<DataItem>,
+		type: Object as PropType<ShopFinanceData>,
 		required: true,
 	},
 });

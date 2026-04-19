@@ -100,11 +100,14 @@
 <script setup lang="ts">
 import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
-import { label, rulesRef } from './shopFinanceDetailTs';
+import { label, rulesRef } from '@/views/finance/shopFinance/config';
+import type { ShopFinanceData } from '@/views/finance/shopFinance/config';
+import type { DictInfo } from '@/views/common/config';
 import { getListName } from '@/views/common/config';
 import { addShopFinance, updateShopFinance, getShopFinanceDetail } from '@/views/finance/shopFinance/api/index';
 import type { Info } from '@/views/common/pop/selectPop.vue';
 import { getDictList } from '@/views/finance/dict/api/index';
+import type { ResponseBody } from '@/types/api';
 
 const route = useRoute();
 const router = useRouter();
@@ -113,7 +116,7 @@ const info = ref<Params>({
 	leftPath: '/finance/shopFinance',
 });
 
-const formInfo = ref<Params>({});
+const formInfo = ref<ShopFinanceData>({});
 
 const saleDateName = ref<string>('');
 const saleDateInfo = ref<Params>({
@@ -248,28 +251,27 @@ const cancelInfo = () => {
 	popInfo.value.showFlag = false;
 };
 
-const onSubmit = () => {
-	let method = 'post';
+const onSubmit = async () => {
+	let api = addShopFinance;
 	if (formInfo.value.id) {
-		method = 'put';
+		api = updateShopFinance;
 	}
-	(method === 'put' ? updateShopFinance : addShopFinance)(formInfo.value).then((res: Params) => {
-		if (res?.code == '200') {
-			showSuccessToast(res?.message || '保存成功!');
-			router.push({ path: '/finance/shopFinance' });
-		} else {
-			showFailToast(res?.message || '保存失败，请联系管理员!');
-		}
-	});
+	const { code, message } = await api(formInfo.value);
+	if (code == '200') {
+		showSuccessToast(message || '保存成功!');
+		router.push({ path: '/finance/shopFinance' });
+	} else {
+		showFailToast(message || '保存失败，请联系管理员!');
+	}
 };
 
-function getDictInfoList(res: Params) {
+const getDictInfoList = (res: ResponseBody<DictInfo[]>) => {
 	if (res?.code == '200') {
-		payWayInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'shop_pay_way');
-		incomeAndExpensesInfo.value.list = res.data.filter(
+		payWayInfo.value.list = (res.data || []).filter((item: { belongTo: string }) => item.belongTo == 'shop_pay_way');
+		incomeAndExpensesInfo.value.list = (res.data || []).filter(
 			(item: { belongTo: string }) => item.belongTo == 'income_expense_type',
 		);
-		isValidInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'is_valid');
+		isValidInfo.value.list = (res.data || []).filter((item: { belongTo: string }) => item.belongTo == 'is_valid');
 		payWayName.value = getListName(payWayInfo.value.list || [], formInfo.value.payWay, 'typeCode', 'typeName');
 		incomeAndExpensesName.value = getListName(
 			incomeAndExpensesInfo.value.list || [],
@@ -281,40 +283,45 @@ function getDictInfoList(res: Params) {
 	} else {
 		showFailToast(res?.message || '查询失败，请联系管理员!');
 	}
-}
+};
 
-function init() {
-	const id: Params = route?.query?.id;
-	if (id) {
-		Promise.all([getShopFinanceDetail(id || '-1'), getDictList('shop_pay_way,income_expense_type,is_valid')])
-			.then((res: Params) => {
-				if (res[0].code == '200') {
-					formInfo.value = res[0].data;
-					formInfo.value.saleDate = dayjs(formInfo.value.saleDate);
-					initSaleDate(formInfo.value.saleDate, 'saleDate');
-				} else {
-					showFailToast(res?.message || '查询详情失败，请联系管理员!');
-				}
-				getDictInfoList(res[1]);
-			})
-			.catch((_error: Params) => {
-				// console.log('error:', _error);
-				showFailToast('系统问题，请联系管理员！');
-			});
-	} else {
-		getDictList('shop_pay_way,income_expense_type,is_valid').then((res: Params) => {
-			getDictInfoList(res);
-		});
-		formInfo.value = {
-			saleDate: dayjs(),
-			isValid: '1',
-			incomeAndExpenses: 'income',
-			payWay: 'wx',
-			saleNum: 1,
-		};
-		initSaleDate(formInfo.value.saleDate, 'saleDate');
+const init = async () => {
+	const id = route.query.id as string;
+
+	try {
+		const [detailRes, dictRes] = await Promise.all([
+			id ? getShopFinanceDetail(Number(id)) : null,
+			getDictList('shop_pay_way,income_expense_type,is_valid'),
+		]);
+
+		getDictInfoList(dictRes);
+
+		if (id && detailRes) {
+			if (detailRes.code === '200' && detailRes.data) {
+				formInfo.value = detailRes.data;
+				formInfo.value.saleDate = dayjs(formInfo.value.saleDate);
+			} else {
+				showFailToast(detailRes.message || '查询详情失败，请联系管理员!');
+			}
+		} else if (!id) {
+			formInfo.value = {
+				saleDate: dayjs(),
+				isValid: '1',
+				incomeAndExpenses: 'income',
+				payWay: 'wx',
+				saleNum: 1,
+			};
+		}
+
+		if (formInfo.value.saleDate) {
+			initSaleDate(formInfo.value.saleDate, 'saleDate');
+		}
+	} catch (error) {
+		// eslint-disable-next-line no-console
+		console.error('init error:', error);
+		showFailToast('系统问题，请联系管理员！');
 	}
-}
+};
 
 init();
 </script>

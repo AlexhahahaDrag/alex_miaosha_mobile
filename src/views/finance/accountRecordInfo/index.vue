@@ -74,7 +74,7 @@
 					<template #right>
 						<van-button
 							class="right_info"
-							@click="delAccountRecordInfo(item.id)"
+							@click="delAccountRecordInfo(item.id ?? 0)"
 							square
 							type="danger"
 							text="删除"
@@ -97,10 +97,12 @@
 </template>
 <script lang="ts" setup>
 import { showSuccessToast, showFailToast } from 'vant';
+import type { Params } from '@/types/global';
+import type { PageInfo } from '@/views/common/config/index';
+import type { AccountRecordInfoData } from '@/views/finance/accountRecordInfo/config';
 import { usePagination } from '@/composables/usePagination';
 import { deleteAccountRecordInfo, getAccountRecordInfoPage } from '@/views/finance/accountRecordInfo/api/index';
 import { getUserManagerList } from '@/views/user/userManager/api/index';
-import type { PageInfo } from '@/views/common/config/index';
 
 const router = useRouter();
 const route = useRoute();
@@ -110,8 +112,8 @@ const info = ref<Params>({
 	leftPath: '/',
 });
 const loading = ref<boolean>(false);
-const dataSource = ref<Params[]>([]);
-const searchInfo = ref<SearchInfo>({});
+const dataSource = ref<AccountRecordInfoData[]>([]);
+const searchInfo = ref<AccountRecordInfoData>({});
 
 const finished = ref<boolean>(false); //加载是否已经没有更多数据
 const isRefresh = ref<boolean>(false); //是否下拉刷新
@@ -126,26 +128,27 @@ const { pagination, resetPagination, setTotal, nextPage } = usePagination();
 //   searchInfo.value.typeCode = '';
 // };
 
-async function query(param: SearchInfo, cur: PageInfo) {
+const query = async (param: AccountRecordInfoData, cur: PageInfo) => {
 	loading.value = true;
-	getAccountRecordInfoPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
-		.then((res: Params) => {
-			if (res?.code == '200') {
-				dataSource.value = [...dataSource.value, ...res.data.records];
-				setTotal(res.data.total);
-				nextPage();
-				if ((pagination.total || 0) <= dataSource.value.length) {
-					finished.value = true;
-				}
-			} else {
-				showFailToast((res && res.message) || '查询列表失败！');
-			}
-		})
-		.finally(() => {
-			isRefresh.value = false;
-			loading.value = false;
-		});
-}
+	const { code, message, data } = await getAccountRecordInfoPage(
+		param,
+		cur?.current ? cur.current : 1,
+		cur?.pageSize || 10,
+	).finally(() => {
+		isRefresh.value = false;
+		loading.value = false;
+	});
+	if (code == '200') {
+		dataSource.value = [...dataSource.value, ...(data?.records || [])];
+		setTotal(data?.total || 0);
+		nextPage();
+		if ((pagination.total || 0) <= dataSource.value.length) {
+			finished.value = true;
+		}
+	} else {
+		showFailToast(message || '查询列表失败！');
+	}
+};
 
 const addAccountRecordInfo = () => {
 	router.push({
@@ -154,19 +157,18 @@ const addAccountRecordInfo = () => {
 };
 
 const userMap = {};
-function getUserInfoList() {
-	getUserManagerList({}).then((res) => {
-		if (res.code == '200') {
-			if (res?.data) {
-				res.data.forEach((user: { id: string | number; nickName: Params }) => {
-					userMap[user.id] = user.nickName;
-				});
-			}
-		} else {
-			showFailToast((res && res.message) || '查询列表失败！');
+const getUserInfoList = async () => {
+	const { code, message, data } = await getUserManagerList({});
+	if (code == '200') {
+		if (data) {
+			(data || []).forEach((user: { id: string | number; nickName: string }) => {
+				userMap[user.id] = user.nickName;
+			});
 		}
-	});
-}
+	} else {
+		showFailToast(message || '查询列表失败！');
+	}
+};
 
 const refresh = () => {
 	resetPagination();
@@ -182,15 +184,14 @@ const beforeClose = (_e: Params): void => {
 	// console.log(e);
 };
 
-const delAccountRecordInfo = (id: number) => {
-	deleteAccountRecordInfo(`${id}`).then((res: Params) => {
-		if (res?.code == '200') {
-			refresh();
-			showSuccessToast((res && res.message) || '删除成功！');
-		} else {
-			showFailToast((res && res.message) || '删除失败，请联系管理员！');
-		}
-	});
+const delAccountRecordInfo = async (id: number) => {
+	const { code, message } = await deleteAccountRecordInfo(`${id}`);
+	if (code == '200') {
+		refresh();
+		showSuccessToast(message || '删除成功！');
+	} else {
+		showFailToast(message || '删除失败，请联系管理员！');
+	}
 };
 
 function init() {

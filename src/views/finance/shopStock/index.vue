@@ -86,7 +86,7 @@ import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { showSuccessToast, showFailToast } from 'vant';
 import ShopStockCard from './components/ShopStockCard.vue';
-import type { SearchInfo, ShopStockInfo } from './shopStockTs';
+import type { ShopStockData } from './config';
 import { usePagination } from '@/composables/usePagination';
 import CommonPullRefresh from '@/views/components/CommonPullRefresh.vue';
 import CommonList from '@/views/components/CommonList.vue';
@@ -110,8 +110,8 @@ useNavBar({
 
 // 响应式数据
 const loading = ref<boolean>(true);
-const dataSource = ref<ShopStockInfo[]>([]);
-const searchInfo = ref<SearchInfo>({});
+const dataSource = ref<ShopStockData[]>([]);
+const searchInfo = ref<ShopStockData>({});
 const finished = ref<boolean>(false);
 const isRefresh = ref<boolean>(false);
 const { pagination, resetPagination, setTotal, nextPage } = usePagination();
@@ -139,7 +139,7 @@ const addShopStock = (id: number | null, type: string) => {
 };
 
 // 交互辅助
-const handleCardClick = (item: ShopStockInfo) => {
+const handleCardClick = (item: ShopStockData) => {
 	addShopStock(item.id || null, 'update');
 };
 
@@ -148,7 +148,7 @@ const handleCopy = (id: number) => {
 };
 
 // 获取库存数据
-const getStockPage = async (param: SearchInfo, cur: PageInfo) => {
+const getStockPage = async (param: ShopStockData, cur: PageInfo) => {
 	if (!isRefresh.value) {
 		loading.value = true;
 	}

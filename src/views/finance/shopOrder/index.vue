@@ -96,7 +96,7 @@ import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { showFailToast } from 'vant';
 import ShopOrderCard from './components/ShopOrderCard.vue';
-import type { SearchInfo, DataItem } from './shopOrderTs';
+import type { ShopOrderData } from './config';
 import { usePagination } from '@/composables/usePagination';
 import CommonPullRefresh from '@/views/components/CommonPullRefresh.vue';
 import CommonList from '@/views/components/CommonList.vue';
@@ -120,8 +120,8 @@ useNavBar({
 
 // 响应式数据
 const loading = ref<boolean>(true);
-const dataSource = ref<DataItem[]>([]);
-const searchInfo = ref<SearchInfo>({});
+const dataSource = ref<ShopOrderData[]>([]);
+const searchInfo = ref<ShopOrderData>({});
 const finished = ref<boolean>(false);
 const isRefresh = ref<boolean>(false);
 const { pagination, resetPagination, setTotal, nextPage } = usePagination();
@@ -146,7 +146,7 @@ const addShopOrder = () => {
 };
 
 // 交互辅助
-const handleCardClick = (item: DataItem) => {
+const handleCardClick = (item: ShopOrderData) => {
 	router.push({
 		path: '/finance/shopOrder/shopOrderDetail',
 		query: { id: item.id },
@@ -154,7 +154,7 @@ const handleCardClick = (item: DataItem) => {
 };
 
 // 获取订单数据
-const getOrderPage = async (param: SearchInfo, cur: PageInfo) => {
+const getOrderPage = async (param: ShopOrderData, cur: PageInfo) => {
 	if (!isRefresh.value) {
 		loading.value = true;
 	}

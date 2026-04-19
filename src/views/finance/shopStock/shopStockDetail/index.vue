@@ -129,7 +129,7 @@
 <script setup lang="ts">
 import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
-import type { ShopStockInfo } from '../shopStockTs';
+import type { ShopStockData } from '../config';
 import { label, rulesRef } from './shopStockDetailTs';
 import { getListName } from '@/views/common/config';
 import { addShopStock, updateShopStock, getShopStockDetail } from '@/views/finance/shopStock/api/index';
@@ -143,7 +143,7 @@ const info = ref<Params>({
 	leftPath: '/finance/shopStock',
 });
 
-const formInfo = ref<ShopStockInfo>({});
+const formInfo = ref<ShopStockData>({});
 
 const popInfo = ref<Info>({ showFlag: false });
 
