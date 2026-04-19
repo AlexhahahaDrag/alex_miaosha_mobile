@@ -1,8 +1,8 @@
 <template>
-	<NavBar
+	<navBar
 		:info="info"
-		@click-right="addOrgInfo"
-	></NavBar>
+		@click-right="addShopStockBatch"
+	></navBar>
 	<common-pull-refresh
 		:style="{ height: 'calc(100% - 44px)' }"
 		v-model="isRefresh"
@@ -11,11 +11,12 @@
 	>
 		<form action="/">
 			<van-search
-				v-model="searchInfo.orgName"
+				v-model="searchInfo.title"
 				show-action
-				placeholder="请输入机构名称"
+				placeholder="请输入搜索关键词"
 				@search="onSearch"
 				@cancel="onCancel"
+				@change="onSearch"
 				action-text="清空"
 			/>
 		</form>
@@ -28,7 +29,7 @@
 		<van-empty
 			v-if="dataSource.length == 0"
 			description="暂无数据"
-		></van-empty>
+		/>
 		<van-list
 			v-else
 			v-model:loading="loading"
@@ -43,31 +44,23 @@
 					:key="index"
 				>
 					<van-cell
-						:title-class="item.status == '1' ? 'validClass' : 'notValidClass'"
-						:title="item.orgName"
+						:title="item.batchCode"
 						:key="index"
 						is-link
 						:to="{
-							path: '/user/orgInfo/orgInfoDetail',
+							path: '/finance/shopStockBatch/shopStockBatchDetail',
 							query: { id: item.id },
 						}"
 					>
-						<template #label>
-							<div class="iconClass">
-								<div class="icon">
-									{{ item.parentOrgName }}
-								</div>
-							</div>
-						</template>
 						<template #right-icon>
 							<div class="text-right">
 								<div style="display: flex">
 									<div class="van-ellipsis">
-										{{ item.orgCode }}
+										{{ item.batchName }}
 									</div>
 								</div>
 								<div :class="true ? 'rightDiv' : 'rightRedDiv'">
-									{{ item.status == '1' ? '有效' : '无效' }}
+									{{ item.description }}
 								</div>
 							</div>
 						</template>
@@ -75,7 +68,7 @@
 					<template #right>
 						<van-button
 							class="right_info"
-							@click="delOrgInfo(item.id)"
+							@click="delShopStockBatch(item.id)"
 							square
 							type="danger"
 							text="删除"
@@ -86,13 +79,13 @@
 			</van-cell-group>
 		</van-list>
 	</common-pull-refresh>
-	<van-back-top></van-back-top>
+	<van-back-top />
 </template>
 <script lang="ts" setup>
 import { showSuccessToast, showFailToast } from 'vant';
-import type { SearchInfo } from './orgInfoTs';
-import { usePagination } from '@/composables/usePagination';
-import { getOrgInfoPage, deleteOrgInfo } from '@/api/user/orgInfo/orgInfoTs';
+import type { SearchInfo } from './shopStockBatchTs';
+import { pagination } from './shopStockBatchTs';
+import { getShopStockBatchPage, deleteShopStockBatch } from '@/api/finance/shopStockBatch/shopStockBatchTs';
 import { getUserManagerList } from '@/api/user/userManager';
 import type { PageInfo } from '@/views/common/config/index';
 
@@ -109,94 +102,92 @@ const searchInfo = ref<SearchInfo>({});
 
 const finished = ref<boolean>(false); //加载是否已经没有更多数据
 const isRefresh = ref<boolean>(false); //是否下拉刷新
-const { pagination, resetPagination, setTotal, nextPage } = usePagination();
 
 const onSearch = () => {
-	resetPagination();
+	pagination.value.current = 1;
 	dataSource.value = [];
 	onRefresh();
 };
 const onCancel = () => {
-	searchInfo.value.orgName = '';
-	resetPagination();
+	searchInfo.value.title = '';
+	pagination.value.current = 0;
 	dataSource.value = [];
-	query(searchInfo.value, pagination);
+	query(searchInfo.value, pagination.value);
 };
 
-async function query(param: SearchInfo, cur: PageInfo) {
+const query = (param: SearchInfo, cur: PageInfo): void => {
 	loading.value = true;
-	getOrgInfoPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
+	getShopStockBatchPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
 		.then((res: any) => {
 			if (res?.code == '200') {
 				dataSource.value = [...dataSource.value, ...res.data.records];
-				setTotal(res.data.total);
-				nextPage();
-				if ((pagination.total || 0) <= dataSource.value.length) {
+				pagination.value.current = res.data.current + 1;
+				pagination.value.pageSize = res.data.size;
+				pagination.value.total = res.data.total;
+				if ((pagination.value.total || 0) < (pagination.value.current || 1) * (pagination.value.pageSize || 10)) {
 					finished.value = true;
 				}
 			} else {
-				showFailToast((res && res.message) || '查询列表失败！');
+				showFailToast(res?.message || '查询列表失败！');
 			}
 		})
 		.finally(() => {
 			isRefresh.value = false;
 			loading.value = false;
 		});
-}
-
-const addOrgInfo = () => {
-	router.push({ path: '/user/orgInfo/orgInfoDetail' });
 };
 
-const userMap: Record<string | number, any> = {};
-function getUserInfoList() {
-	getUserManagerList({}).then((res) => {
-		if (res.code == '200') {
+const addShopStockBatch = (): void => {
+	router.push({ path: '/finance/shopStockBatch/shopStockBatchDetail' });
+};
+
+const userMap = {};
+const getUserInfoList = (): void => {
+	getUserManagerList({}).then((res: any) => {
+		if (res?.code == '200') {
 			if (res?.data) {
-				res.data.forEach((user) => {
-					if (user.id !== undefined) {
-						userMap[user.id] = user.nickName;
-					}
+				res.data.forEach((user: { id: string | number; nickName: any }) => {
+					userMap[user.id] = user.nickName;
 				});
 			}
 		} else {
-			showFailToast((res && res.message) || '查询列表失败！');
+			showFailToast(res?.message || '查询列表失败！');
 		}
 	});
-}
+};
 
-const refresh = () => {
-	resetPagination();
+const refresh = (): void => {
+	pagination.value.current = 0;
 	dataSource.value = [];
-	query(searchInfo.value, pagination);
+	query(searchInfo.value, pagination.value);
 };
 
-const onRefresh = () => {
-	query(searchInfo.value, pagination);
+const onRefresh = (): void => {
+	query(searchInfo.value, pagination.value);
 };
 
-const beforeClose = (e: any) => {
+const beforeClose = (e: any): void => {
 	console.log(e);
 };
 
-const delOrgInfo = (id: number) => {
-	deleteOrgInfo(`${id}`).then((res: any) => {
+const delShopStockBatch = (id: number): void => {
+	deleteShopStockBatch(`${id}`).then((res: any) => {
 		if (res?.code == '200') {
 			refresh();
-			showSuccessToast((res && res.message) || '删除成功！');
+			showSuccessToast(res?.message || '删除成功！');
 		} else {
-			showFailToast((res && res.message) || '删除失败，请联系管理员！');
+			showFailToast(res?.message || '删除失败，请联系管理员！');
 		}
 	});
 };
 
-function init() {
+const init = (): void => {
 	dataSource.value = [];
-	resetPagination();
-	query(searchInfo.value, pagination);
+	pagination.value.current = 0;
+	query(searchInfo.value, pagination.value);
 	//获取用户信息
 	getUserInfoList();
-}
+};
 
 init();
 </script>
@@ -232,13 +223,5 @@ init();
 	padding: 0 16px;
 	margin-top: 0px;
 	margin-bottom: 0px;
-}
-
-.validClass {
-	font-weight: bolder;
-}
-
-.notValidClass {
-	color: gray;
 }
 </style>

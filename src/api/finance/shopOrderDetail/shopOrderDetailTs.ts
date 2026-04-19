@@ -1,0 +1,38 @@
+import { getData, postData, putData, deleteData, baseService } from '@/api/common/index';
+
+const baseShopOrderDetail = '/shop-order-detail';
+
+const ShopOrderDetailUrl = {
+	page: '/page',
+	url: '',
+};
+
+export function getShopOrderDetailPage(
+	params: any,
+	pageNum: number | null | undefined,
+	pageSize: number | null | undefined,
+): Promise<any> {
+	const url = `${baseService.finance + baseShopOrderDetail + ShopOrderDetailUrl.page}`;
+	return postData(url, params, {
+		pageNum: pageNum ?? 1,
+		pageSize: pageSize ?? 10,
+	});
+}
+
+export function getShopOrderDetailDetail(id: number): Promise<any> {
+	return getData(`${baseService.finance + baseShopOrderDetail + ShopOrderDetailUrl.url}?id=${id}`);
+}
+
+export function deleteShopOrderDetail(ids: string): Promise<any> {
+	return deleteData(
+		`${baseService.finance + baseShopOrderDetail + ShopOrderDetailUrl.url}?ids=${ids}`,
+	);
+}
+
+export function addOrEditShopOrderDetail(method: string, params: any): Promise<any> {
+	if ('put' == method) {
+		return putData(baseService.finance + baseShopOrderDetail + ShopOrderDetailUrl.url, params);
+	} else {
+		return postData(baseService.finance + baseShopOrderDetail + ShopOrderDetailUrl.url, params);
+	}
+}
