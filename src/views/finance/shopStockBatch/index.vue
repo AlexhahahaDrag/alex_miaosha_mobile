@@ -1,227 +1,336 @@
 <template>
-	<navBar
-		:info="info"
-		@click-right="addShopStockBatch"
-	></navBar>
-	<common-pull-refresh
-		:style="{ height: 'calc(100% - 44px)' }"
-		v-model="isRefresh"
-		@refresh="refresh"
-		ref="pullRefresh"
-	>
-		<form action="/">
-			<van-search
-				v-model="searchInfo.title"
-				show-action
-				placeholder="请输入搜索关键词"
-				@search="onSearch"
-				@cancel="onCancel"
-				@change="onSearch"
-				action-text="清空"
-			/>
-		</form>
-		<van-divider
-			:style="{
-				color: '#1989fa',
-				borderColor: 'grey',
-			}"
-		></van-divider>
-		<van-empty
-			v-if="dataSource.length == 0"
-			description="暂无数据"
-		/>
-		<van-list
-			v-else
-			v-model:loading="loading"
-			:finished="finished"
-			finished-text="没有更多了"
-			@load="onRefresh"
+	<div class="shop-stock-batch-container">
+		<!-- Search Header -->
+		<div class="search-header">
+			<form action="/">
+				<van-search
+					v-model="searchInfo.title"
+					placeholder="搜索批次名称或编码..."
+					shape="round"
+					background="transparent"
+					@search="onSearch"
+					@clear="onClear"
+					class="custom-search"
+				/>
+			</form>
+		</div>
+
+		<!-- List Content -->
+		<common-pull-refresh
+			class="list-refresh"
+			v-model="isRefresh"
+			@refresh="onRefreshData"
+			ref="pullRefresh"
 		>
-			<van-cell-group>
-				<van-swipe-cell
-					v-for="(item, index) in dataSource"
-					:before-close="beforeClose"
-					:key="index"
+			<van-list
+				v-model:loading="loading"
+				:finished="finished"
+				finished-text="没有更多了"
+				@load="onLoadMore"
+				class="batch-list"
+			>
+				<!-- Empty State -->
+				<template v-if="!dataSource.length && !loading">
+					<van-empty
+						image="search"
+						description="暂无相关批次记录"
+					/>
+				</template>
+
+				<!-- Batch Cards -->
+				<div
+					v-for="item in dataSource"
+					:key="item.id ?? 0"
+					class="batch-card-wrapper"
 				>
-					<van-cell
-						:title="item.batchCode"
-						:key="index"
-						is-link
-						:to="{
-							path: '/finance/shopStockBatch/shopStockBatchDetail',
-							query: { id: item.id },
-						}"
-					>
-						<template #right-icon>
-							<div class="text-right">
-								<div style="display: flex">
-									<div class="van-ellipsis">
-										{{ item.batchName }}
-									</div>
+					<van-swipe-cell>
+						<div
+							class="batch-card"
+							@click="handleCardClick(item)"
+						>
+							<div class="card-header">
+								<div class="batch-code">
+									<van-icon
+										name="label-o"
+										class="header-icon"
+									/>
+									<span>{{ item.batchCode }}</span>
 								</div>
-								<div :class="true ? 'rightDiv' : 'rightRedDiv'">
-									{{ item.description }}
+								<van-tag
+									v-if="item.isValid === '1'"
+									type="success"
+									plain
+								>
+									生效中
+								</van-tag>
+								<van-tag
+									v-else
+									type="warning"
+									plain
+								>
+									已失效
+								</van-tag>
+							</div>
+							<div class="card-body">
+								<div class="batch-name">{{ item.batchName }}</div>
+								<div class="batch-desc van-multi-ellipsis--l2">
+									{{ item.description || '暂无描述信息' }}
 								</div>
 							</div>
+						</div>
+						<template #right>
+							<van-button
+								square
+								type="danger"
+								text="删除"
+								class="delete-btn"
+								@click="onDelete(item.id ?? '')"
+							/>
 						</template>
-					</van-cell>
-					<template #right>
-						<van-button
-							class="right_info"
-							@click="delShopStockBatch(item.id)"
-							square
-							type="danger"
-							text="删除"
-						/>
-					</template>
-					<van-divider class="dividerClass"></van-divider>
-				</van-swipe-cell>
-			</van-cell-group>
-		</van-list>
-	</common-pull-refresh>
-	<van-back-top />
+					</van-swipe-cell>
+				</div>
+			</van-list>
+		</common-pull-refresh>
+
+		<van-back-top />
+	</div>
 </template>
+
 <script lang="ts" setup>
-import { showSuccessToast, showFailToast } from 'vant';
-import type { SearchInfo } from './shopStockBatchTs';
-import { pagination } from './shopStockBatchTs';
-import { getShopStockBatchPage, deleteShopStockBatch } from '@/views/finance/shopStockBatch/api/index';
-import { getUserManagerList } from '@/views/user/userManager/api/index';
-import type { PageInfo } from '@/views/common/config/index';
+import { showSuccessToast, showFailToast, showConfirmDialog } from 'vant';
+import type { ShopStockBatchData } from './config';
+import { getShopStockBatchPage, deleteShopStockBatch } from '@/views/finance/shopStockBatch/api';
+import { getUserManagerList } from '@/views/user/userManager/api';
+import { useNavBar } from '@/composables/useNavBar';
+import { usePagination } from '@/composables/usePagination';
+import type { PageInfo } from '@/views/common/config';
 
 const router = useRouter();
 const route = useRoute();
-const info = ref<Params>({
-	title: route?.meta?.title || '财务管理11',
-	rightButton: '新增',
-	leftPath: '/',
-});
-const loading = ref<boolean>(false);
-const dataSource = ref<Params[]>([]);
-const searchInfo = ref<SearchInfo>({});
 
-const finished = ref<boolean>(false); //加载是否已经没有更多数据
-const isRefresh = ref<boolean>(false); //是否下拉刷新
+// --- useHooks ---
+useNavBar({
+	title: (route?.meta?.title as string) || '批次管理',
+	rightIcon: 'plus',
+	leftPath: '/',
+	visible: true,
+	onRightClick: () => {
+		navigator.vibrate?.(50);
+		router.push({ path: '/finance/shopStockBatch/shopStockBatchDetail' });
+	},
+});
+
+const { pagination, resetPagination, setTotal, nextPage } = usePagination();
+
+// --- Variables ---
+const loading = ref<boolean>(false);
+const dataSource = ref<ShopStockBatchData[]>([]);
+const searchInfo = ref<ShopStockBatchData>({});
+const finished = ref<boolean>(false);
+const isRefresh = ref<boolean>(false);
+const userMap = ref<Record<string, string>>({});
+
+// --- Methods ---
+const fetchBatchList = async (param: ShopStockBatchData, cur: PageInfo) => {
+	if (!isRefresh.value) {
+		loading.value = true;
+	}
+	try {
+		const { code, data, message } = await getShopStockBatchPage(param, cur?.current || 1, cur?.pageSize || 10);
+		if (code == '200') {
+			const records = data?.records || [];
+			dataSource.value = cur.current === 1 ? records : [...dataSource.value, ...records];
+			setTotal(data?.total || 0);
+			finished.value = dataSource.value.length >= (data?.total || 0);
+		} else {
+			showFailToast(message || '查询列表失败！');
+			finished.value = true;
+		}
+	} catch {
+		showFailToast('网络异常，请重试');
+		finished.value = true;
+	} finally {
+		loading.value = false;
+		isRefresh.value = false;
+	}
+};
+
+const getUserInfoList = async () => {
+	try {
+		const { code, data } = await getUserManagerList({});
+		if (code == '200' && data) {
+			data.forEach((user: { id: string | number; nickName: string }) => {
+				userMap.value[user.id] = user.nickName;
+			});
+		}
+	} catch {
+		// eslint-disable-next-line no-console
+		console.error('Failed to load user list');
+	}
+};
 
 const onSearch = () => {
-	pagination.value.current = 1;
+	resetPagination();
 	dataSource.value = [];
-	onRefresh();
+	fetchBatchList(searchInfo.value, pagination);
 };
-const onCancel = () => {
+
+const onClear = () => {
 	searchInfo.value.title = '';
-	pagination.value.current = 0;
-	dataSource.value = [];
-	query(searchInfo.value, pagination.value);
+	onSearch();
 };
 
-const query = (param: SearchInfo, cur: PageInfo): void => {
-	loading.value = true;
-	getShopStockBatchPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
-		.then((res: Params) => {
-			if (res?.code == '200') {
-				dataSource.value = [...dataSource.value, ...res.data.records];
-				pagination.value.current = res.data.current + 1;
-				pagination.value.pageSize = res.data.size;
-				pagination.value.total = res.data.total;
-				if ((pagination.value.total || 0) < (pagination.value.current || 1) * (pagination.value.pageSize || 10)) {
-					finished.value = true;
-				}
-			} else {
-				showFailToast(res?.message || '查询列表失败！');
-			}
-		})
-		.finally(() => {
-			isRefresh.value = false;
-			loading.value = false;
+const onRefreshData = () => {
+	resetPagination();
+	fetchBatchList(searchInfo.value, pagination);
+};
+
+const onLoadMore = () => {
+	if (loading.value || finished.value) return;
+	nextPage();
+	fetchBatchList(searchInfo.value, pagination);
+};
+
+const handleCardClick = (item: ShopStockBatchData) => {
+	router.push({
+		path: '/finance/shopStockBatch/shopStockBatchDetail',
+		query: { id: item.id },
+	});
+};
+
+const onDelete = async (id: string) => {
+	navigator.vibrate?.(50);
+	try {
+		await showConfirmDialog({
+			title: '确认删除',
+			message: '确定要删除这条批次记录吗？',
+			confirmButtonColor: '#ee0a24',
 		});
-};
 
-const addShopStockBatch = (): void => {
-	router.push({ path: '/finance/shopStockBatch/shopStockBatchDetail' });
-};
-
-const userMap = {};
-const getUserInfoList = (): void => {
-	getUserManagerList({}).then((res: Params) => {
-		if (res?.code == '200') {
-			if (res?.data) {
-				res.data.forEach((user: { id: string | number; nickName: Params }) => {
-					userMap[user.id] = user.nickName;
-				});
-			}
+		const { code, message } = await deleteShopStockBatch(id);
+		if (code == '200') {
+			showSuccessToast(message || '删除成功！');
+			onRefreshData();
 		} else {
-			showFailToast(res?.message || '查询列表失败！');
+			showFailToast(message || '删除失败，请联系管理员！');
 		}
-	});
+	} catch {
+		// 取消删除
+	}
 };
 
-const refresh = (): void => {
-	pagination.value.current = 0;
-	dataSource.value = [];
-	query(searchInfo.value, pagination.value);
-};
-
-const onRefresh = (): void => {
-	query(searchInfo.value, pagination.value);
-};
-
-const beforeClose = (_e: Params): void => {
-	// console.log(e);
-};
-
-const delShopStockBatch = (id: number): void => {
-	deleteShopStockBatch(`${id}`).then((res: Params) => {
-		if (res?.code == '200') {
-			refresh();
-			showSuccessToast(res?.message || '删除成功！');
-		} else {
-			showFailToast(res?.message || '删除失败，请联系管理员！');
-		}
-	});
-};
-
-const init = (): void => {
-	dataSource.value = [];
-	pagination.value.current = 0;
-	query(searchInfo.value, pagination.value);
-	//获取用户信息
+// --- Init ---
+onMounted(() => {
 	getUserInfoList();
-};
-
-init();
+	onRefreshData();
+});
 </script>
 
 <style lang="less" scoped>
-.right_info {
+.shop-stock-batch-container {
 	height: 100%;
-}
-
-.rightDiv {
-	margin-top: 10px;
-	text-align: right;
-}
-
-.rightRedDiv {
-	margin-top: 10px;
-	text-align: right;
-	color: red;
-}
-
-.iconClass {
-	margin-top: 10px;
 	display: flex;
-}
-.van-ellipsis {
-	width: 130px;
-	text-align: right;
+	flex-direction: column;
+	background-color: #f7f9fc;
 }
 
-.dividerClass {
-	color: #1989fa;
-	border-color: grey;
-	padding: 0 16px;
-	margin-top: 0px;
-	margin-bottom: 0px;
+.search-header {
+	padding: 8px 4px;
+	background-color: #fff;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+	z-index: 10;
+
+	.custom-search {
+		padding: 0 12px;
+	}
+}
+
+.list-refresh {
+	flex: 1;
+	overflow-y: auto;
+}
+
+.batch-list {
+	padding: 12px 16px;
+}
+
+.batch-card-wrapper {
+	margin-bottom: 12px;
+	border-radius: 16px;
+	overflow: hidden;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.batch-card {
+	background: #fff;
+	padding: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	transition: background-color 0.2s;
+
+	&:active {
+		background-color: #f8fafc;
+	}
+
+	.card-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+
+		.batch-code {
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			font-size: 13px;
+			color: #64748b;
+			font-weight: 500;
+
+			.header-icon {
+				font-size: 14px;
+				color: #3b82f6;
+			}
+		}
+	}
+
+	.card-body {
+		.batch-name {
+			font-size: 16px;
+			font-weight: 700;
+			color: #323233;
+			margin-bottom: 6px;
+		}
+
+		.batch-desc {
+			font-size: 13px;
+			color: #94a3b8;
+			line-height: 1.5;
+		}
+	}
+
+	.card-footer {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding-top: 12px;
+		border-top: 1px solid #f1f5f9;
+
+		.footer-info {
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			font-size: 12px;
+			color: #94a3b8;
+		}
+
+		.arrow-icon {
+			font-size: 14px;
+			color: #cbd5e1;
+		}
+	}
+}
+
+.delete-btn {
+	height: 100%;
 }
 </style>

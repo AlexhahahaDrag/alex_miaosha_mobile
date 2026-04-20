@@ -207,8 +207,8 @@
 <script setup lang="ts">
 import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
-import { getListName } from '@/views/common/config';
-import { rulesRef, type FinanceManagerData, type DictFieldConfig } from '@/views/finance/financeManager/config';
+import { getListName, type DictFieldConfig } from '@/views/common/config';
+import { rulesRef, type FinanceManagerData } from '@/views/finance/financeManager/config';
 import { getDictList } from '@/views/finance/dict/api/index';
 import { getUserManagerList } from '@/views/user/userManager/api/index';
 import { useUserStore } from '@/store/modules/user/user';
@@ -226,21 +226,22 @@ const route = useRoute();
 const router = useRouter();
 const userInfo = useUserStore()?.getUserInfo;
 
-// 获取左侧路径
-const getLeftPath = computed(() => {
-	return getRoutePathByName(router, 'financeManager');
-});
-
 // 使用新的NavBar系统
 useNavBar({
 	title: (route?.meta?.title as string) || '财务明细',
-	leftPath: getLeftPath.value,
+	leftPath: getRoutePathByName(router, 'financeManager'),
 	visible: true,
 });
 
 // TabBar配置
 useTabBar({
 	visible: false,
+});
+
+// --- Variables ---
+// 获取左侧路径
+const getLeftPath = computed(() => {
+	return getRoutePathByName(router, 'financeManager');
 });
 
 const formInfo = ref<FinanceManagerData>({});
@@ -250,7 +251,7 @@ const loading = ref<boolean>(false);
 const popInfo = ref<Info>({ showFlag: false });
 
 // 统一字典信息配置
-const dictFieldConfig: DictFieldConfig[] = [
+const dictFieldConfig: DictFieldConfig<FinanceManagerData>[] = [
 	{
 		key: 'fromSource',
 		labelName: '支付方式',
@@ -364,6 +365,7 @@ const cancelDateInfo = () => {
 
 // 提交表单
 const onSubmit = async () => {
+	navigator.vibrate?.(50);
 	loading.value = true;
 	try {
 		let api = addFinanceManger;

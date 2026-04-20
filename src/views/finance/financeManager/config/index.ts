@@ -1,21 +1,5 @@
 import type { Dayjs } from 'dayjs';
 
-export interface FieldRule {
-	required?: boolean;
-	message?: string;
-	validator?: (val: unknown) => boolean | Promise<boolean>;
-	pattern?: RegExp;
-	trigger?: string;
-}
-
-export interface DictFieldConfig {
-	key: string;
-	labelName: string;
-	rule?: FieldRule[];
-	belongTo?: string;
-	formKey: keyof FinanceManagerData;
-}
-
 export interface FromSourceTransferItem {
 	value: string;
 	label: string;

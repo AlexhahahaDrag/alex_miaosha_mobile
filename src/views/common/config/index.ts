@@ -1,5 +1,21 @@
 import { Dayjs } from 'dayjs';
 
+export interface FieldRule {
+	required?: boolean;
+	message?: string;
+	validator?: (val: unknown) => boolean | Promise<boolean>;
+	pattern?: RegExp;
+	trigger?: string;
+}
+
+export interface DictFieldConfig<T = Record<string, unknown>> {
+	key: string;
+	labelName: string;
+	rule?: FieldRule[];
+	belongTo?: string;
+	formKey: keyof T;
+}
+
 // 格式化时间显示
 export const formatTime = (timeStr: string | Dayjs | undefined): string => {
 	if (!timeStr) return '';

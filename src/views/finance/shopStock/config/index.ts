@@ -18,4 +18,7 @@ export interface ShopStockData {
 	style?: string;
 	stockBatch?: string;
 	title?: string;
+	pictureUrl?: string;
+	description?: string;
+	details?: string;
 }
