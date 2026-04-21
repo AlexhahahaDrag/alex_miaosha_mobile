@@ -5,7 +5,7 @@ import type { ConfigEnv, UserConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import Components from 'unplugin-vue-components/vite';
 import { VantResolver } from 'unplugin-vue-components/resolvers';
-import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
+import { createSvgIconsPlugin } from 'vite-plugin-svg-icons-ng';
 import AutoImport from 'unplugin-auto-import/vite';
 import { visualizer } from 'rollup-plugin-visualizer';
 import viteCompression from 'vite-plugin-compression';
@@ -173,7 +173,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
 							}
 							// 其余较大的运行时库单独打包
 							const packageName = normalizedId.split('node_modules/')[1].split('/')[0];
-							const largePackages = ['pinia', 'vue-router', 'particles.vue3'];
+							const largePackages = ['pinia', 'vue-router', '@tsparticles'];
 							if (largePackages.some((pkg) => packageName.includes(pkg))) {
 								return packageName;
 							}
