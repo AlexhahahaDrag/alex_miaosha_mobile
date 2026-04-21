@@ -114,7 +114,6 @@
 		</common-pull-refresh>
 
 		<van-back-top />
-		<Tabbar :data="tabBarItems" />
 	</div>
 </template>
 
@@ -133,20 +132,6 @@ import type { PageInfo } from '@/views/common/config';
 const router = useRouter();
 const route = useRoute();
 const userStore = useUserStore();
-
-// --- Constants ---
-const tabBarItems = reactive([
-	{
-		title: '商品',
-		to: '/finance/shopProduct',
-		icon: 'shop-o',
-	},
-	{
-		title: '购物车',
-		to: '/finance/shoppingCart',
-		icon: 'shopping-cart-o',
-	},
-]);
 
 // --- useHooks ---
 useNavBar({

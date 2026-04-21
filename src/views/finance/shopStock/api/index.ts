@@ -38,6 +38,6 @@ export function updateShopStock(params: ShopStockData): Promise<ResponseBody<Sho
 	return putData(baseService.finance + baseShopStock + ShopStockUrl.url, params);
 }
 
-export function getShopList(ids: string): Promise<ResponseBody<ShopStockData>> {
+export function getShopList(ids: string): Promise<ResponseBody<ShopStockData[]>> {
 	return getData(`${baseService.finance + baseShopStock + ShopStockUrl.getShopList}?ids=${ids}`);
 }

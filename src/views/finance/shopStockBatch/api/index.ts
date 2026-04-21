@@ -7,6 +7,7 @@ const baseShopStockBatch = '/shop-stock-batch';
 const ShopStockBatchUrl = {
 	page: '/page',
 	url: '',
+	getList: '/getList',
 };
 
 export function getShopStockBatchPage(
@@ -14,21 +15,18 @@ export function getShopStockBatchPage(
 	pageNum: number | null | undefined,
 	pageSize: number | null | undefined,
 ): Promise<ResponseBody<CommonPageResult<ShopStockBatchData>>> {
-	const url = `${baseService.finance + baseShopStockBatch + ShopStockBatchUrl.page}`;
-	return postData(url, params, {
+	return postData(baseService.finance + baseShopStockBatch + ShopStockBatchUrl.page, params, {
 		pageNum: pageNum ?? 1,
 		pageSize: pageSize ?? 10,
 	});
 }
 
 export function getShopStockBatchDetail(id: number): Promise<ResponseBody<ShopStockBatchData>> {
-	return getData(`${baseService.finance + baseShopStockBatch + ShopStockBatchUrl.url}`, { id });
+	return getData(baseService.finance + baseShopStockBatch + ShopStockBatchUrl.url, { id });
 }
 
 export function deleteShopStockBatch(ids: string): Promise<ResponseBody<boolean>> {
-	return deleteData(
-		`${baseService.finance + baseShopStockBatch + ShopStockBatchUrl.url}?ids=${ids}`,
-	);
+	return deleteData(baseService.finance + baseShopStockBatch + ShopStockBatchUrl.url, { ids });
 }
 
 export function addShopStockBatch(
@@ -41,4 +39,10 @@ export function updateShopStockBatch(
 	params: ShopStockBatchData,
 ): Promise<ResponseBody<ShopStockBatchData>> {
 	return putData(baseService.finance + baseShopStockBatch + ShopStockBatchUrl.url, params);
+}
+
+export function getShopStockBatchList(
+	params: ShopStockBatchData,
+): Promise<ResponseBody<ShopStockBatchData[]>> {
+	return postData(baseService.finance + baseShopStockBatch + ShopStockBatchUrl.getList, params);
 }

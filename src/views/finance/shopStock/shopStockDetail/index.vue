@@ -31,7 +31,7 @@
 					/>
 				</div>
 				<div class="field-item">
-					<div class="field-label required">商品编码</div>
+					<div class="field-label">商品编码</div>
 					<van-field
 						v-model="formInfo.shopCode"
 						name="shopCode"
@@ -255,21 +255,24 @@
 <script setup lang="ts">
 import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
-import { type ShopStockData } from '../config';
-import { label, rulesRef } from './shopStockDetailTs';
+import { type ShopStockData, label, rulesRef } from '../config';
+import type { ShopStockBatchData } from '../../shopStockBatch/config';
 import { getListName, type DictFieldConfig } from '@/views/common/config';
 import { addShopStock, updateShopStock, getShopStockDetail } from '@/views/finance/shopStock/api';
 import type { Info } from '@/views/common/pop/selectPop.vue';
 import { getDictList } from '@/views/finance/dict/api';
+import { getShopStockBatchList } from '@/views/finance/shopStockBatch/api';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
 import { getRoutePathByName } from '@/utils/router';
+import { useShopStockStore } from '@/store/modules/finance/shopStock';
 import { datePickerFormatter } from '@/utils/dayjs';
 import type { DatePickerInfo } from '@/utils/common';
 import type { DictInfo } from '@/views/finance/dict/api';
 
 const route = useRoute();
 const router = useRouter();
+const shopStockStore = useShopStockStore();
 
 // 使用NavBar系统
 useNavBar({
@@ -333,12 +336,20 @@ const dictInfoMap = dictFieldConfig.reduce(
 				text: 'typeName',
 				value: 'typeCode',
 			},
-			selectValue: formInfo.value[config.formKey],
+			selectValue: formInfo.value[config.formKey] as string | number | null,
 		});
 		return acc;
 	},
 	{} as Record<string, Ref<Info>>,
 );
+
+// 针对进货批次进行特殊配置，使用自定义字段名
+if (dictInfoMap.stockBatch) {
+	dictInfoMap.stockBatch.value.customFieldName = {
+		text: 'batchName',
+		value: 'batchCode',
+	};
+}
 
 // 创建名称 ref 映射
 const nameRefMap = {
@@ -404,6 +415,9 @@ const onSubmit = async () => {
 		const api = formInfo.value.id ? updateShopStock : addShopStock;
 		const { code, message } = await api(formInfo.value);
 		if (code == '200') {
+			if (formInfo.value.stockBatch) {
+				shopStockStore.setLastStockBatch(formInfo.value.stockBatch);
+			}
 			showSuccessToast(message || '保存成功!');
 			router.push({ path: getRoutePathByName(router, 'shopStock') });
 		} else {
@@ -441,9 +455,10 @@ const init = async () => {
 	const type = route.query.type as string;
 
 	try {
-		const [detailRes, dictRes] = await Promise.all([
+		const [detailRes, dictRes, batchRes] = await Promise.all([
 			id ? getShopStockDetail(id) : Promise.resolve({ code: '200', data: {} }),
-			getDictList('is_valid,shop_category,stock_place,stock_batch'),
+			getDictList('is_valid,shop_category,stock_place'),
+			getShopStockBatchList({ isValid: '1' }),
 		]);
 
 		if (id) {
@@ -458,14 +473,32 @@ const init = async () => {
 				showFailToast((detailRes as { message?: string })?.message || '查询详情失败，请联系管理员!');
 			}
 		} else {
+			const batches = batchRes?.data || [];
+			const lastBatch = shopStockStore.lastStockBatch;
+			const defaultBatch =
+				lastBatch && batches.some((b: ShopStockBatchData) => b.batchCode === lastBatch) ? lastBatch : batches[0]?.batchCode;
+
 			formInfo.value = {
 				saleDate: dayjs(),
 				isValid: '1',
 				purchasePlace: 'sz',
+				stockBatch: defaultBatch,
 			};
 		}
 
 		getDictInfoList(dictRes?.data || []);
+
+		// 初始化批次列表数据
+		if (dictInfoMap.stockBatch) {
+			dictInfoMap.stockBatch.value.list = batchRes?.data || [];
+			nameRefMap.stockBatch.value = getListName(
+				dictInfoMap.stockBatch.value.list || [],
+				formInfo.value.stockBatch || '',
+				'batchCode',
+				'batchName',
+			);
+		}
+
 		initInfoDate((formInfo.value.saleDate as Dayjs) || dayjs());
 	} catch (error) {
 		// eslint-disable-next-line no-console

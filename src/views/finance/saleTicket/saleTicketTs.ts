@@ -1,4 +1,5 @@
 import type { Dayjs } from 'dayjs';
+import type { ShopStockData } from '../shopStock/config';
 
 export interface SaleOrderInfo {
 	id?: number;
@@ -9,7 +10,7 @@ export interface SaleOrderInfo {
 	payWay?: string;
 	saleDate?: Dayjs;
 	description?: string;
-	shopOrderDetailVoList?: SaleOrderDetailInfo[];
+	shopOrderDetailVoList?: ShopStockData[];
 }
 
 export interface SaleOrderDetailInfo {

@@ -38,7 +38,7 @@ export function updateShopCart(params: ShopCartData): Promise<ResponseBody<ShopC
 	return putData(baseService.finance + baseShopCart + ShopCartUrl.url, params);
 }
 
-export function getShopCartList(ids?: string): Promise<ResponseBody<ShopCartData>> {
+export function getShopCartList(ids?: string): Promise<ResponseBody<ShopCartData[]>> {
 	const url = baseService.finance + baseShopCart + ShopCartUrl.list + (ids ? `?ids=${ids}` : '');
 	return postData(url, {});
 }

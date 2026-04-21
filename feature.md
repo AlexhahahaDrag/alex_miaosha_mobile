@@ -70,7 +70,20 @@
   - **状态字段**：`giftType`: `1`-节日红包, `2`-积分兑换等
   - **关联表/API**：`src/api/finance/`
 
+## 3. 门店进销存管理 (Shop Inventory Management)
+**该模块主要负责门店货物的入库、库存盘点以及进货批次的生命周期管理。**
 
+- **门店库存记录 (`shopStock`)**：
+  - **业务逻辑**：记录每一笔货物的入库信息，包括商品编码、成本、售价、数量及所属批次。
+  - **代码路径**：`src/views/finance/shopStock/`
+  - **状态字段**：`isValid`: `1`-有效, `0`-失效
+  - **关联表/API**：`src/views/finance/shopStock/api/`
+
+- **进货批次管理 (`shopStockBatch`)**：
+  - **业务逻辑**：定义货物的进货批次，支持在库存入库时选择动态生成的批次列表，确保货物流转的可追溯性。
+  - **代码路径**：`src/views/finance/shopStockBatch/`
+  - **状态字段**：`isValid`: `1`-有效, `0`-失效
+  - **关联表/API**：`src/views/finance/shopStockBatch/api/` (包含 `getShopStockBatchList` 获取动态批次列表)
 
 ## 4. 商品与产品体系 (Goods & Cart)
 **统一的平台标准库，为 C端交易与后台进销存提供规范的 SPU 模型。**

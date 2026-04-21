@@ -266,7 +266,7 @@ const dictInfoMap = dictFieldConfig.reduce(
 				text: 'typeName',
 				value: 'typeCode',
 			},
-			selectValue: formInfo.value[config.formKey],
+			selectValue: formInfo.value[config.formKey] as string | number | null,
 		});
 		return acc;
 	},
