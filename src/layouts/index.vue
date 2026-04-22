@@ -31,8 +31,6 @@ import { useTabBarStore } from '@/store/modules/tabbar';
 
 const navBarStore = useNavBarStore();
 const tabBarStore = useTabBarStore();
-console.log('tabBarStore.getTabBarInfo ooooooooooooooooooo:', tabBarStore.getTabBarInfo);
-console.log('tabBarStore.getNavBarInfo ooooooooooooooooooo:', navBarStore.getNavBarInfo);
 const handleRightClick = () => {
 	const handler = navBarStore.getRightClickHandler;
 	if (handler) {

@@ -25,7 +25,7 @@
 			<van-list
 				v-model:loading="loading"
 				:finished="finished"
-				finished-text="没有更多了"
+				:finished-text="dataSource.length > 0 ? '没有更多了' : ''"
 				@load="onLoadMore"
 				class="batch-list"
 			>

@@ -1,4 +1,5 @@
-import type { ShopFinanceAnalysisData } from '../config';
+import type { ShopFinanceAnalysisData, ShopFinanceAnalysisParams } from '../config';
+import type { ShopFinanceChainYear } from '../shopFinanceAnalysisDetail/common';
 import type { ResponseBody } from '@/types/api';
 import { getData, baseService } from '@/views/common/api/index';
 
@@ -47,12 +48,16 @@ export function getPayWayInfo(searchDate?: string): Promise<ResponseBody<ShopFin
 	return getData(url);
 }
 
-export function getChainAndYear(params?: Params): Promise<ResponseBody<ShopFinanceAnalysisData>> {
+export function getChainAndYear(
+	params?: ShopFinanceAnalysisParams,
+): Promise<ResponseBody<ShopFinanceChainYear>> {
 	const url = baseService.finance + baseFinanceAnalysis + financeAnalysisUrl.getChainAndYear;
-	return getData(url, { params });
+	return getData(url, params);
 }
 
-export function getBenefit(params?: Params): Promise<ResponseBody<ShopFinanceAnalysisData>> {
+export function getBenefit(
+	params?: ShopFinanceAnalysisParams,
+): Promise<ResponseBody<ShopFinanceChainYear>> {
 	const url = baseService.finance + baseFinanceAnalysis + financeAnalysisUrl.getBenefitInfo;
 	return getData(url, params);
 }

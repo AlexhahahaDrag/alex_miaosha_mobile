@@ -91,7 +91,7 @@
 					提交保存
 				</van-button>
 			</div>
-			<selectPop
+			<SelectPop
 				:info="popInfo"
 				@select-info="selectInfo"
 				@cancel-info="cancelInfo"

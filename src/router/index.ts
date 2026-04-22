@@ -111,24 +111,28 @@ const router = createRouter({
 	routes,
 });
 
-let dynamicRouter = [] as any[];
+let dynamicRouter = [] as RouteRecordRaw[];
+let isAdded = false;
 
-router.beforeEach((to, _from, next) => {
+router.beforeEach((to, _from) => {
 	const userStore = useUserStore();
 	if (to.path == '/login') {
-		next();
-	} else if (userStore.getToken) {
-		if (!userStore.getRouteStatus || routes.length <= 5) {
+		isAdded = false;
+		return true;
+	}
+
+	if (userStore.getToken) {
+		if (!userStore.getRouteStatus || !isAdded) {
 			dynamicRouter = [];
 			addRouter();
-			next({ ...to, replace: true });
-		} else {
-			next();
+			isAdded = true;
+			if (routes.length > 5) {
+				return { ...to, replace: true };
+			}
 		}
-	} else {
-		next({ name: 'login' });
+		return true;
 	}
-	console.log('router:', router.options.routes);
+	return { name: 'login' };
 });
 
 const addRouter = () => {
@@ -136,30 +140,40 @@ const addRouter = () => {
 	if (userStore.getMenuInfo?.length) {
 		const roleInfo = userStore.getRoleInfo;
 		if (roleInfo?.roleCode !== 'super_super' && !roleInfo?.permissionList?.length) {
+			userStore.changeRouteStatus(true);
 			return;
 		}
 		userStore.getMenuInfo.forEach((item: MenuInfo) => {
 			if (judgePermission(roleInfo?.permissionList, item?.permissionCode, roleInfo.roleCode)) {
 				const newRouter = getChildren(item, roleInfo?.permissionList, roleInfo.roleCode);
-				if (!router.hasRoute(newRouter.name)) {
+				if (newRouter.name && !router.hasRoute(newRouter.name)) {
 					router.addRoute(newRouter);
 					dynamicRouter.push(newRouter);
 					routes.push(newRouter);
 				}
 			}
 		});
-		userStore.changeRouteStatus(true);
 	}
+	userStore.changeRouteStatus(true);
 };
 
-const getChildren = (item: MenuInfo, permissionList: any[], roleCode: string): any => {
+interface PermissionItem {
+	permissionCode: string;
+	[key: string]: any;
+}
+
+const getChildren = (
+	item: MenuInfo,
+	permissionList: PermissionItem[] | undefined,
+	roleCode: string,
+): MenuDataItem => {
 	const component =
 		item.component == null
 			? modules[pageInfo[404]]
 			: 'Layout' === item.component
 				? Layout
 				: modules[item.component];
-	const routeInfo: RouteRecordRaw = {
+	const routeInfo: MenuDataItem = {
 		path: item.path,
 		component,
 		redirect: item.redirect,
@@ -174,10 +188,10 @@ const getChildren = (item: MenuInfo, permissionList: any[], roleCode: string): a
 		children: [],
 	};
 	if (item?.children?.length) {
-		item.children.forEach((childItem: any) => {
+		item.children.forEach((childItem: MenuInfo) => {
 			if (judgePermission(permissionList, childItem?.permissionCode, roleCode)) {
 				const cur = getChildren(childItem, permissionList, roleCode);
-				if (!router.hasRoute(routeInfo?.name || '')) {
+				if (routeInfo.name && !router.hasRoute(routeInfo.name)) {
 					routeInfo.children?.push(cur);
 				}
 			}
@@ -188,7 +202,11 @@ const getChildren = (item: MenuInfo, permissionList: any[], roleCode: string): a
 
 router.afterEach(() => {});
 
-const judgePermission = (permissionList: any[], permissionCode: string, roleCode: string) => {
+const judgePermission = (
+	permissionList: PermissionItem[] | undefined,
+	permissionCode: string,
+	roleCode: string,
+) => {
 	if (roleCode === 'super_super') {
 		return true;
 	}
@@ -205,10 +223,12 @@ const judgePermission = (permissionList: any[], permissionCode: string, roleCode
 
 export const refreshRouter = () => {
 	dynamicRouter.forEach((route) => {
-		router.removeRoute(route.name);
-		const index = routes.findIndex((item) => item.name === route.name);
-		if (index > -1) {
-			routes.splice(index);
+		if (route.name) {
+			router.removeRoute(route.name);
+			const index = routes.findIndex((item) => item.name === route.name);
+			if (index > -1) {
+				routes.splice(index, 1);
+			}
 		}
 	});
 	dynamicRouter = []; // 清空引用
