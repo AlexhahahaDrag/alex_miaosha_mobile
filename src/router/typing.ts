@@ -19,7 +19,7 @@ export interface MenuRouteMeta {
 
 export type MenuDataItem = {
 	path: string;
-	name?: string;
+	name?: string | symbol;
 	children?: MenuDataItem[];
 	meta?: MenuRouteMeta & RouteMeta;
 	redirect?: RouteRecordRedirectOption;
