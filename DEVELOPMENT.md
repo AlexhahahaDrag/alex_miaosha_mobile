@@ -112,7 +112,8 @@
 7. **Watchers**：`watch` 监听。
 8. **Emits**：`defineEmits` 必须作为 Script 区块的最后一行。
 
-详细规范内容查阅：[.gemini/skills/vue-coding-standards.md](file:///d:/project/alex_miaosha_mobile/.gemini/skills/vue-coding-standards.md)
+- 详细规范内容查阅：[.gemini/skills/vue-coding-standards.md](file:///d:/project/alex_miaosha_mobile/.gemini/skills/vue-coding-standards.md)
+- UI/UX 设计增强：[.gemini/skills/ui-ux-pro-max/SKILL.md](file:///d:/project/alex_miaosha_mobile/.gemini/skills/ui-ux-pro-max/SKILL.md) (集成 UI/UX Pro Max 设计智能)
 
 ---
 

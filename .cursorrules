@@ -66,3 +66,13 @@
 
 > [!IMPORTANT]
 > **凡涉及全局交互体系、基础设施、或 `src/views/components` 的结构性更改，Antigravity 必须自觉检查并更新本 `.cursorrules` 信息（或同步更新 `DEVELOPMENT.md`）。**
+
+---
+
+## 6. UI/UX 设计智能 (UI/UX Pro Max)
+在进行任何 UI/UX 相关工作（设计、构建、重构、优化）时，必须启用 `ui-ux-pro-max` 技能：
+- **技能路径**: `.gemini/skills/ui-ux-pro-max/SKILL.md`
+- **核心流程**:
+  1. **生成设计系统**: 使用 `python .gemini/skills/ui-ux-pro-max/scripts/search.py "关键词" --design-system` 获取方案。
+  2. **遵循规范**: 严格执行 `SKILL.md` 中的“Pre-Delivery Checklist”，特别是**严禁使用 Emoji 作为图标**，必须使用 SVG。
+  3. **视觉标准**: 优先参考 `.gemini/skills/ui-ux-pro-max/data/` 中的行业匹配建议。

@@ -1,11 +1,6 @@
-﻿import type { CommonPageResult, ResponseBody } from '../../../types/api';
 import type { UserManagerData } from '../config';
+import type { CommonPageResult, ResponseBody } from '@/types/api';
 import { getData, postData, putData, deleteData, baseService } from '@/views/common/api/index';
-
-export interface UserManagerData {
-	id?: number;
-	nickName?: string;
-}
 
 const baseUserManager = '/user';
 

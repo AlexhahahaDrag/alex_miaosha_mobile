@@ -1,90 +1,118 @@
 <template>
-	<div class="user-page">
-		<div class="user-header">
-			<van-skeleton
-				:loading="loading"
-				avatar
-				:row="1"
-				avatar-size="64"
-			>
-				<div class="user-profile">
-					<van-image
-						round
-						width="64"
-						height="64"
-						fit="cover"
-						:src="avatarUrl"
-					/>
-					<div class="user-meta">
-						<div class="user-name">{{ displayName }}</div>
-						<div
-							class="user-desc"
-							v-if="orgName || roleName"
-						>
-							{{ roleName }}<span v-if="roleName && orgName"> · </span>{{ orgName }}
+	<div class="user-page-container">
+		<!-- Hero Profile Section -->
+		<div class="profile-hero">
+			<div class="hero-content">
+				<van-skeleton
+					:loading="loading"
+					avatar
+					avatar-size="72"
+					:row="1"
+					class="hero-skeleton"
+				>
+					<div class="profile-main">
+						<div class="avatar-wrapper">
+							<van-image
+								round
+								width="72"
+								height="72"
+								fit="cover"
+								:src="avatarUrl || ''"
+								class="profile-avatar"
+							/>
+							<div class="role-badge">{{ roleName }}</div>
+						</div>
+						<div class="profile-info">
+							<div class="display-name">{{ displayName }}</div>
+							<div
+								class="org-tag"
+								v-if="orgName"
+							>
+								<svg-icon
+									name="orgManager"
+									class="tag-icon"
+								/>
+								{{ orgName }}
+							</div>
 						</div>
 					</div>
-				</div>
-			</van-skeleton>
+				</van-skeleton>
+			</div>
 		</div>
 
-		<van-cell-group
-			inset
-			title="账户"
-		>
-			<van-cell
-				icon="points"
-				title="个人信息"
-				is-link
-				to="/myself/info"
-			/>
-			<van-cell
-				icon="gold-coin-o"
-				title="账号与安全"
-				is-link
-				@click="goSecurity"
-			/>
-		</van-cell-group>
+		<!-- Action Cards -->
+		<div class="action-sections">
+			<div class="card-group">
+				<div class="group-title">账户设置</div>
+				<van-cell
+					title="个人信息"
+					is-link
+					to="/myself/info"
+					@click="handleInteraction"
+				>
+					<template #icon>
+						<div class="cell-icon-box blue">
+							<svg-icon name="user-circle" />
+						</div>
+					</template>
+				</van-cell>
+				<van-cell
+					title="账号与安全"
+					is-link
+					@click="goSecurity"
+				>
+					<template #icon>
+						<div class="cell-icon-box green">
+							<svg-icon name="shield-check" />
+						</div>
+					</template>
+				</van-cell>
+			</div>
 
-		<van-cell-group
-			inset
-			title="个性化"
-			class="mt16"
-		>
-			<van-cell
-				icon="gift-o"
-				title="主题设置"
-				is-link
-				@click="openTheme"
-			/>
-		</van-cell-group>
+			<div class="card-group mt-4">
+				<div class="group-title">个性化</div>
+				<van-cell
+					title="主题设置"
+					is-link
+					@click="openTheme"
+				>
+					<template #icon>
+						<div class="cell-icon-box amber">
+							<svg-icon name="palette" />
+						</div>
+					</template>
+				</van-cell>
+			</div>
 
-		<van-cell-group
-			inset
-			title="信息"
-			class="mt16"
-		>
-			<van-cell
-				title="组织"
-				:value="orgName || '-'"
-			/>
-			<van-cell
-				title="角色"
-				:value="roleName || '-'"
-			/>
-		</van-cell-group>
+			<div class="card-group mt-4">
+				<div class="group-title">系统信息</div>
+				<van-cell
+					title="当前角色"
+					:value="roleName || '-'"
+				/>
+				<van-cell
+					title="所属组织"
+					:value="orgName || '-'"
+				/>
+			</div>
 
-		<van-cell-group
-			inset
-			class="mt16"
-		>
-			<van-cell
-				icon="warning-o"
-				title="退出登录"
-				is-link
-				@click="showLogout"
-			/>
-		</van-cell-group>
+			<div class="logout-box mt-6">
+				<van-button
+					block
+					round
+					class="logout-btn"
+					@click="showLogout"
+				>
+					<template #icon>
+						<svg-icon
+							name="log-out"
+							class="logout-icon"
+						/>
+					</template>
+					退出当前账号
+				</van-button>
+			</div>
+		</div>
 	</div>
 	<logout
 		:visible="showLogoutFlag"
@@ -95,15 +123,27 @@
 <script lang="ts" setup>
 import { showToast } from 'vant';
 import logout from './logout/index.vue';
+import type { UserManagerData } from './userManager/config';
 import { useUserStore } from '@/store/modules/user/user';
 import { useNavBar } from '@/composables/useNavBar';
+import { useTabBar } from '@/composables/useTabBar';
 
 // NavBar 设置
 useNavBar({ title: '我的', noShowLeft: true });
 
+useTabBar({
+	visible: true,
+	data: [
+		{ name: 'dashboard', title: '首页', icon: 'homepage' },
+		{ name: 'message', title: '消息', icon: 'message' },
+		{ name: 'myself', title: '我的', icon: 'user' },
+	],
+	active: 2,
+});
+
 const userStore = useUserStore();
 const loading = computed(() => !userStore.getUserInfo);
-const userInfo = computed<Params>(() => userStore.getUserInfo || {});
+const userInfo = computed<UserManagerData>(() => userStore.getUserInfo || {});
 
 const displayName = computed(() => userInfo.value?.nickName || userInfo.value?.username || '未登录');
 const avatarUrl = computed(
@@ -123,43 +163,166 @@ const logoutInfo = (v: boolean) => {
 	showLogoutFlag.value = v;
 };
 
-const goSecurity = () => showToast('功能即将上线');
-const openTheme = () => showToast('功能即将上线');
+const goSecurity = () => {
+	handleInteraction();
+	showToast('功能即将上线');
+};
+const openTheme = () => {
+	handleInteraction();
+	showToast('功能即将上线');
+};
+
+const handleInteraction = () => {
+	if (navigator.vibrate) {
+		navigator.vibrate(50);
+	}
+};
 </script>
 
-<style lang="less">
-.user-page {
-	padding: 12px 12px 24px;
+<style lang="less" scoped>
+.user-page-container {
+	background-color: #f8fafc;
+	padding-bottom: 50px;
 }
 
-.user-header {
-	background: linear-gradient(135deg, #f2f3f5 0%, #ffffff 100%);
-	border-radius: 12px;
-	padding: 16px;
+.profile-hero {
+	background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+	padding: 40px 20px 60px;
+	border-radius: 0 0 32px 32px;
 }
 
-.user-profile {
+.profile-main {
 	display: flex;
 	align-items: center;
 }
 
-.user-meta {
-	margin-left: 12px;
+.avatar-wrapper {
+	position: relative;
 }
 
-.user-name {
-	font-size: 16px;
-	font-weight: 600;
-	color: #323233;
+.profile-avatar {
+	border: 3px solid rgba(255, 255, 255, 0.3);
+	box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
-.user-desc {
-	margin-top: 4px;
+.role-badge {
+	position: absolute;
+	bottom: -4px;
+	left: 50%;
+	transform: translateX(-50%);
+	background: #f59e0b;
+	color: white;
+	font-size: 10px;
+	padding: 2px 8px;
+	border-radius: 10px;
+	white-space: nowrap;
+	font-weight: 700;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.profile-info {
+	margin-left: 20px;
+}
+
+.display-name {
+	font-size: 24px;
+	font-weight: 800;
+	color: #ffffff;
+	margin-bottom: 6px;
+}
+
+.org-tag {
+	display: inline-flex;
+	align-items: center;
+	background: rgba(255, 255, 255, 0.15);
+	color: rgba(255, 255, 255, 0.9);
+	padding: 4px 10px;
+	border-radius: 6px;
 	font-size: 12px;
-	color: #969799;
+	backdrop-filter: blur(4px);
 }
 
-.mt16 {
+.tag-icon {
+	width: 14px;
+	height: 14px;
+	margin-right: 4px;
+}
+
+.action-sections {
+	margin-top: -30px;
+	padding: 0 16px;
+}
+
+.card-group {
+	background: #ffffff;
+	border-radius: 20px;
+	padding: 12px 4px;
+	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.group-title {
+	font-size: 13px;
+	font-weight: 700;
+	color: #64748b;
+	margin: 0 16px 12px;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.cell-icon-box {
+	width: 32px;
+	height: 32px;
+	border-radius: 8px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-right: 12px;
+	svg {
+		width: 18px;
+		height: 18px;
+	}
+	&.blue {
+		background: #eff6ff;
+		color: #1e40af;
+	}
+	&.green {
+		background: #f0fdf4;
+		color: #16a34a;
+	}
+	&.amber {
+		background: #fffbeb;
+		color: #d97706;
+	}
+}
+
+.logout-box {
+	padding: 0 16px;
+}
+
+.logout-btn {
+	height: 50px;
+	background: #ffffff;
+	border: 1px solid #fee2e2;
+	color: #ef4444;
+	font-weight: 700;
+	font-size: 15px;
+	box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.05);
+	&:active {
+		transform: scale(0.98);
+		background: #fef2f2;
+	}
+}
+
+.logout-icon {
+	width: 18px;
+	height: 18px;
+	margin-right: 6px;
+}
+
+.mt-4 {
 	margin-top: 16px;
+}
+.mt-6 {
+	margin-top: 24px;
 }
 </style>

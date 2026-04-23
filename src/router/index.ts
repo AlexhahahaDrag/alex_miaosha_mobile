@@ -69,7 +69,7 @@ export const routes: MenuDataItem[] = [
 		redirect: '/myself/about',
 		name: 'myself',
 		meta: {
-			title: '个人',
+			title: '我的',
 			icon: 'myself',
 			hideInMenu: false,
 			showInHome: false,
@@ -79,7 +79,7 @@ export const routes: MenuDataItem[] = [
 				path: '/myself/about',
 				name: 'about',
 				component: modules[pageInfo.about],
-				meta: { title: '个人', icon: 'about', hideInMenu: false },
+				meta: { title: '我的', icon: 'about', hideInMenu: false },
 			},
 			{
 				path: '/myself/info',
