@@ -1,0 +1,68 @@
+# Alex Miaosha Mobile - AI 指令与开发规范 (.cursorrules)
+
+本文件定义了在该项目中与 AI (Antigravity/Cursor) 协作时必须遵守的所有底层规范与最佳实践。
+
+---
+
+## 1. 全局 UI 架构与视觉标准
+项目中所有的 UI 改造与新组件开发需遵循以下基准：
+
+- **组件视觉形态 (Visual Hierarchy)**：
+  - 推崇“去线留白”。顶部搜索与下拉导航尽量去除底部边界阴影。
+  - 核心内容实施**卡片化布局**，圆角基准统一提高为 `16px`。
+  - 列表容器需保持适当侧边距（推荐 `padding: 0 16px`）。
+- **交互体验 (Interaction & Haptics)**：
+  - **触觉反馈 (Haptic)**：在关键业务按钮（提交、删除、列表卡片点击跳转）中，需通过 `navigator.vibrate?.(50)` 注入触力动效震动。
+  - **原生手势兼容**：卡片通过 `active` 状态缩放 (`&:active { transform: scale(0.98); }`) 拟合原生级按压动效。
+- **加载与感知 (Performance)**：
+  - 加载占位符首推骨架屏（Skeleton Screen，如 `<van-skeleton>`）而非 Loading 文本。
+  - 空状态应统一使用插画友好提示补充。
+
+---
+
+## 2. 公共基础组件与 Hooks 使用规范
+
+### 📌 核心公共组件 (src/views/components/)
+- **`CommonPullRefresh.vue`**: 对 `van-pull-refresh` 的轻量封装，仅负责手势拦截。
+- **`CommonList.vue`**: 负责列表状态（加载中、已结束、空状态）的统一显示，集成骨架屏。
+- **组合示例**:
+  ```vue
+  <CommonPullRefresh v-model="isRefresh" @refresh="onRefresh">
+      <CommonList v-model="loading" :loading="loading" :refreshing="isRefresh" :finished="finished" :isEmpty="dataSource.length === 0" @load="onLoadMore">
+          <div v-for="item in dataSource">...</div>
+      </CommonList>
+  </CommonPullRefresh>
+  ```
+
+### 📌 核心 Hooks (src/composables/)
+- **`usePagination.ts`**: 标准化分页管理。
+- **使用原则**: 禁止在业务组件内独立定义 `ref({ current: 1, ... })`，统一使用 `usePagination`。
+  ```ts
+  const { pagination, resetPagination, setTotal, nextPage } = usePagination();
+  ```
+
+---
+
+## 3. Vue SFC 代码规范与结构约束
+
+### 📌 标签块布局顺序
+1. `<template>`
+2. `<script setup lang="ts">`
+3. `<style lang="less" scoped>`
+
+### 📌 Script 内部声明顺序
+1. **Imports**：依赖导入。
+2. **Constants / Types / API**：静态定义。
+3. **useHooks**：路由、Store、Composables 实例化。
+4. **Variables**：`ref`, `reactive`, `computed`, `defineProps` 等。
+5. **Methods**：业务逻辑函数（`init`/`fetchData` 置于该区底部）。
+6. **Lifecycle**：`onMounted` 等生命周期。
+7. **Watchers**：`watch` 监听。
+8. **Emits**：`defineEmits` 必须作为 Script 区块的最后一行。
+
+---
+
+## 5. 「开发/架构层面」双向同步协议
+
+> [!IMPORTANT]
+> **凡涉及全局交互体系、基础设施、或 `src/views/components` 的结构性更改，Antigravity 必须自觉检查并更新本 `.cursorrules` 信息（或同步更新 `DEVELOPMENT.md`）。**

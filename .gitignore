@@ -37,3 +37,5 @@ components.d.ts
 .skills-lock.json
 *.tsbuildinfo
 .gemini/
+.agent/
+package-lock.json

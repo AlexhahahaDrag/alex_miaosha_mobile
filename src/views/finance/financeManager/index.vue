@@ -130,7 +130,7 @@ import { getFinanceMangerPage, deleteFinanceManager } from '@/views/finance/fina
 import { getDictList } from '@/views/finance/dict/api';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
-import type { PageInfo } from '@/views/common/config';
+import type { DictInfo, PageInfo } from '@/views/common/config';
 import type { ResponseBody } from '@/types/api';
 
 const router = useRouter();
@@ -145,9 +145,9 @@ const sourceOptions = computed(() => {
 	return [{ text: '支付方式 (全部)', value: '' }, ...options];
 });
 
-const categoryList = ref<Params[]>([]);
+const categoryList = ref<DictInfo[]>([]);
 const categoryOptions = computed(() => {
-	const options = categoryList.value.map((item) => ({
+	const options = categoryList.value.map((item: DictInfo) => ({
 		text: item.typeName,
 		value: item.typeCode,
 	}));

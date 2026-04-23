@@ -21,15 +21,16 @@
 		"prepare": "husky"
 	},
 	"dependencies": {
+		"@tsparticles/slim": "^3.7.1",
+		"@tsparticles/vue3": "^3.0.1",
 		"axios": "^1.15.0",
 		"crypto-js": "^4.2.0",
 		"dayjs": "^1.11.20",
 		"default-passive-events": "^2.0.0",
 		"echarts": "^6.0.0",
 		"lodash": "4.18.0",
+		"lucide-vue-next": "^1.0.0",
 		"mathjs": "^15.2.0",
-		"@tsparticles/vue3": "^3.0.1",
-		"@tsparticles/slim": "^3.7.1",
 		"pinia": "^3.0.4",
 		"pinia-plugin-persistedstate": "^4.7.1",
 		"vant": "^4.9.24",

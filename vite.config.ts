@@ -64,15 +64,8 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
 				dts: true, // 生成类型定义文件，默认生成在根目录的 components.d.ts
 			}),
 			createSvgIconsPlugin({
-				iconDirs: [
-					pathResolve('src/assets/icons'), // 根目录（1个）
-					pathResolve('src/assets/icons/common'), // 2个
-					pathResolve('src/assets/icons/finance'), // 14个
-					pathResolve('src/assets/icons/menu'), // 20个
-					pathResolve('src/assets/icons/shop'), // 11个（之前遗漏）
-					pathResolve('src/assets/icons/soft'), // 8个
-				],
-				symbolId: 'icon-[dir]-[name]',
+				iconDirs: [pathResolve('src/assets/icons')],
+				symbolId: 'icon-[name]',
 				inject: 'body-last',
 				customDomId: '__svg__icons__dom__',
 			}),
