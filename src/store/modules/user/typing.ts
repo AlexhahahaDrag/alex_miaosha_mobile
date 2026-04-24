@@ -10,13 +10,34 @@ export interface UserState {
 	lastUpdateTime: number;
 	menuInfo: MenuInfo[] | null;
 	hasMenu: boolean;
-	orgInfo: any;
-	roleInfo: any;
+	orgInfo: OrgInfo | null;
+	roleInfo: RolePermissionInfo | null;
 }
 
 export interface RoleInfo {
 	roleName: string;
 	value: string;
+}
+
+export interface RolePermissionInfo {
+	roleCode?: string;
+	roleName?: string;
+	permissionList?: MenuInfo[];
+	[key: string]: unknown;
+}
+
+export interface OrgInfo {
+	id?: number;
+	orgCode?: string;
+	orgName?: string;
+	orgAlias?: string;
+	orgShortName?: string;
+	parentId?: number;
+	parentName?: string;
+	parentOrgName?: string;
+	status?: string | number;
+	summary?: string;
+	[key: string]: unknown;
 }
 
 export interface GetUserInfoModel {

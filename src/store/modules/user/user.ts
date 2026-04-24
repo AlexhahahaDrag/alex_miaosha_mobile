@@ -92,7 +92,6 @@ export const useUserStore = defineStore('app-user', {
 
 				showFailToast(data?.message || '登录失败！');
 			} catch (error: unknown) {
-				console.log('错误信息：', error);
 				return Promise.reject(error);
 			}
 		},

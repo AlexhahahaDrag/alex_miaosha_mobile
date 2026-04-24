@@ -1,4 +1,4 @@
-import { Dayjs } from 'dayjs';
+import dayjs, { type Dayjs } from 'dayjs';
 
 export interface FieldRule {
 	required?: boolean;
@@ -20,7 +20,12 @@ export interface DictFieldConfig<T = Record<string, unknown>> {
 export const formatTime = (timeStr: string | Dayjs | undefined): string => {
 	if (!timeStr) return '';
 
-	const date = timeStr instanceof Dayjs ? timeStr.toDate() : new Date(timeStr);
+	const date = dayjs.isDayjs(timeStr) ? timeStr.toDate() : new Date(timeStr);
+
+	if (Number.isNaN(date.getTime())) {
+		return '';
+	}
+
 	const now = new Date();
 	const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 	const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
@@ -33,11 +38,13 @@ export const formatTime = (timeStr: string | Dayjs | undefined): string => {
 
 	if (recordDate.getTime() === today.getTime()) {
 		return `今天 ${timeFormat}`;
-	} else if (recordDate.getTime() === yesterday.getTime()) {
-		return `昨天 ${timeFormat}`;
-	} else {
-		return `${date.getMonth() + 1}月${date.getDate()}日 ${timeFormat}`;
 	}
+
+	if (recordDate.getTime() === yesterday.getTime()) {
+		return `昨天 ${timeFormat}`;
+	}
+
+	return `${date.getMonth() + 1}月${date.getDate()}日 ${timeFormat}`;
 };
 
 // 格式化金额显示
@@ -46,15 +53,15 @@ export const formatAmount = (amount: number, type: string): string => {
 
 	const formattedAmount = Math.abs(amount).toFixed(2);
 
-	// 根据交易类型决定正负号
 	if (type === 'CONSUME' || type === 'DEBIT' || type === '消费') {
 		return `-￥${formattedAmount}`;
-	} else if (type === 'RECHARGE' || type === 'CREDIT' || type === '充值') {
-		return `+￥${formattedAmount}`;
-	} else {
-		// 默认根据金额正负判断
-		return amount >= 0 ? `+￥${formattedAmount}` : `-￥${formattedAmount}`;
 	}
+
+	if (type === 'RECHARGE' || type === 'CREDIT' || type === '充值') {
+		return `+￥${formattedAmount}`;
+	}
+
+	return amount >= 0 ? `+￥${formattedAmount}` : `-￥${formattedAmount}`;
 };
 
 export interface Pagination {
@@ -85,14 +92,20 @@ export interface DictInfo {
 	belongTo?: string | undefined;
 }
 
-export const getListName = <T>(list: T[], value: unknown, code: string, name: string): string => {
+export const getListName = <T extends Record<string, unknown>>(
+	list: T[],
+	value: unknown,
+	code: keyof T,
+	name: keyof T,
+): string => {
 	if (!list?.length) {
 		return '';
 	}
+
 	let listName = '';
 	list.forEach((item) => {
 		if (item[code] == value) {
-			listName = item[name];
+			listName = String(item[name] ?? '');
 		}
 	});
 	return listName;

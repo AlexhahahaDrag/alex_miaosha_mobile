@@ -1,22 +1,16 @@
+import dayjs, { type Dayjs } from 'dayjs';
 import zhCn from 'dayjs/locale/zh-cn';
-import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
-import dayjs from 'dayjs';
-import type { Dayjs } from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.locale(zhCn);
-
-// 设置默认时区为中国
 dayjs.tz.setDefault('Asia/Shanghai');
 
 const defaultDateFormat = 'YYYY-MM-DD';
-
 const defaultTimeFormat = 'YYYY-MM-DD HH:mm:ss';
-
 const dataTimeFormat = 'YYYY-MM-DD HH:mm';
-
 const dateFormatYYYYMM = 'YYYY-MM';
 
 dayjs.prototype.toISOString = function () {
@@ -24,38 +18,32 @@ dayjs.prototype.toISOString = function () {
 };
 
 /**
- * 格式化时间
- * @param date 时间
- * @returns 格式化后的时间
+ * 格式化为 dayjs 对象
  */
-const formatDayjs = (date: string | Dayjs | undefined | null): Dayjs | string | undefined => {
+const formatDayjs = (date: string | Dayjs | undefined | null): Dayjs | undefined => {
 	if (!date) {
 		return undefined;
 	}
+
 	return dayjs(date);
 };
 
 /**
  * 格式化日期
- * @param date 日期
- * @param dateFormat
- * @returns 格式化后的日期
  */
 const formatDate = (
 	date: string | Dayjs | undefined | null,
 	dateFormat: string = defaultDateFormat,
-) => {
+): string => {
 	if (!date) {
 		return '';
 	}
+
 	return dayjs(date).format(dateFormat);
 };
 
 /**
  * 格式化时间
- * @param date 时间
- * @param dateFormat 时间格式
- * @returns 格式化后的时间
  */
 const formatTime = (
 	date: string | Dayjs | undefined | null,
@@ -64,14 +52,12 @@ const formatTime = (
 	if (!date) {
 		return '';
 	}
+
 	return dayjs(date).format(dateFormat);
 };
 
 /**
- * 日期选择器格式化函数，支持年月日和年月日时分秒格式
- * @param type - 日期类型（year, month, day, hour, minute, second）
- * @param option - 选项对象，包含 text 属性
- * @returns 格式化后的选项对象
+ * 日期选择器格式化函数
  */
 const datePickerFormatter = (type: string, option: { text: string }): { text: string } => {
 	const suffixMap: Record<string, string> = {
@@ -82,14 +68,18 @@ const datePickerFormatter = (type: string, option: { text: string }): { text: st
 		minute: '分',
 		second: '秒',
 	};
+
 	if (suffixMap[type]) {
 		option.text += suffixMap[type];
 	}
+
 	return option;
 };
 
-// 获取格式化时间信息（相对时间显示）
-const getFormatTimeInfo = (time?: string | dayjs.Dayjs): string => {
+/**
+ * 获取相对时间信息
+ */
+const getFormatTimeInfo = (time?: string | Dayjs): string => {
 	if (!time) return '--';
 
 	const now = dayjs();
@@ -97,37 +87,35 @@ const getFormatTimeInfo = (time?: string | dayjs.Dayjs): string => {
 	const diffMinutes = now.diff(targetTime, 'minute');
 	const diffHours = now.diff(targetTime, 'hour');
 
-	// 3分钟内
 	if (diffMinutes < 3) {
 		return '刚刚';
 	}
-	// 1小时内
+
 	if (diffMinutes < 60) {
 		return `${diffMinutes}分钟前`;
 	}
-	// 1天内
+
 	if (diffHours < 24) {
 		return `${diffHours}小时前`;
 	}
-	// 超过1天，显示具体时间
-	return targetTime.format('YYYY-MM-DD HH:mm');
+
+	return targetTime.format(defaultTimeFormat);
 };
 
 /**
- * 格式化列表头部日期（支持 今天/昨天/MM-DD）
- * @param date 日期字符串
- * @returns 格式化后的日期显示文本
+ * 格式化列表头部日期
  */
-const formatHeaderDate = (date: string | dayjs.Dayjs): string => {
+const formatHeaderDate = (date: string | Dayjs): string => {
 	const now = dayjs().startOf('day');
 	const target = dayjs(date);
+
 	if (target.isSame(now, 'day')) return '今天 (Today)';
 	if (target.isSame(now.subtract(1, 'day'), 'day')) return '昨天 (Yesterday)';
 	if (target.isSame(now, 'year')) return target.format('MM月DD日');
+
 	return target.format('YYYY年MM月DD日');
 };
 
-// 导出所有工具函数和常量
 export {
 	defaultDateFormat,
 	defaultTimeFormat,

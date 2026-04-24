@@ -1,7 +1,8 @@
-import type { Params } from '@/types/global';
 import request, { requestFile } from '@/utils/request/request';
 
 const apiPrefix = import.meta.env.VITE_APP_API_PREFIX;
+
+type QueryParams = Record<string, unknown>;
 
 function formatUrl(url: string) {
 	// 将 /api/am-{service}/{path} 转换为 /api/am-{service}/{apiPrefix}/{path}
@@ -12,27 +13,27 @@ function formatUrl(url: string) {
 export function postData<T = unknown>(
 	url: string,
 	params: unknown,
-	queryParams?: Record<string, unknown>,
+	queryParams?: QueryParams,
 ): Promise<T> {
-	return request.post<Params, T>(formatUrl(url), params, {
+	return request.post<T, T, unknown>(formatUrl(url), params, {
 		params: queryParams,
 	});
 }
 
 export function putData<T = unknown>(url: string, params: unknown): Promise<T> {
-	return request.put<Params, T>(formatUrl(url), params);
+	return request.put<T, T, unknown>(formatUrl(url), params);
 }
 
-export function getData<T = unknown>(url: string, params?: Record<string, unknown>): Promise<T> {
-	return request.get<Params, T>(formatUrl(url), { params });
+export function getData<T = unknown>(url: string, params?: QueryParams): Promise<T> {
+	return request.get<T, T>(formatUrl(url), { params });
 }
 
-export function deleteData<T = unknown>(url: string, params?: Record<string, unknown>): Promise<T> {
-	return request.delete<Params, T>(formatUrl(url), { params });
+export function deleteData<T = unknown>(url: string, params?: QueryParams): Promise<T> {
+	return request.delete<T, T>(formatUrl(url), { params });
 }
 
 export function postFileData<T = unknown>(url: string, params: unknown): Promise<T> {
-	return requestFile.post<Params, T>(formatUrl(url), params);
+	return requestFile.post<T, T, unknown>(formatUrl(url), params);
 }
 
 export const baseService = {

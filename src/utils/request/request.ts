@@ -13,7 +13,6 @@ const requestFile = axios.create({
 });
 
 request.defaults.headers.post['Content-Type'] = 'application/json';
-requestFile.defaults.headers.post['Content-Type'] = 'multipart/form-data';
 
 const redirectToLogin = () => {
 	if (router.currentRoute.value.name !== 'login') {
@@ -21,8 +20,8 @@ const redirectToLogin = () => {
 	}
 };
 
-const errorHandler = (error: AxiosError): Promise<any> => {
-	let response = null;
+const errorHandler = (error: AxiosError): Promise<unknown> => {
+	let response: unknown = null;
 
 	if (error.response) {
 		const { status } = error.response;
@@ -63,7 +62,6 @@ const requestHandlerFile = (
 
 	if (token) {
 		config.headers.Authorization = token;
-		config.headers['Content-Type'] = 'multipart/form-data';
 	} else {
 		redirectToLogin();
 	}
@@ -71,13 +69,13 @@ const requestHandlerFile = (
 	return config;
 };
 
-const responseHandler = (response: AxiosResponse<any>) => {
+const responseHandler = (response: AxiosResponse<unknown>) => {
 	const { data } = response;
 	const resData = decrypt(data);
 
 	if (resData.code == 403) {
 		redirectToLogin();
-		return;
+		return Promise.reject(resData);
 	}
 
 	return resData;

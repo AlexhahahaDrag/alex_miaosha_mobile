@@ -90,21 +90,29 @@
 </template>
 <script lang="ts" setup>
 import { showSuccessToast, showFailToast } from 'vant';
+import type { OrgInfoData } from './config';
 import type { SearchInfo } from './orgInfoTs';
 import { usePagination } from '@/composables/usePagination';
-import { getOrgInfoPage, deleteOrgInfo } from '@/views/user/orgInfo/api/index';
-import { getUserManagerList } from '@/views/user/userManager/api/index';
-import type { PageInfo } from '@/views/common/config/index';
+import { getOrgInfoPage, deleteOrgInfo } from '@/views/user/orgInfo/api';
+import { getUserManagerList } from '@/views/user/userManager/api';
+import type { PageInfo } from '@/views/common/config';
+import type { CommonPageResult, ResponseBody } from '@/types/api';
+
+interface NavBarInfo {
+	title?: string;
+	rightButton?: string;
+	leftPath?: string;
+}
 
 const router = useRouter();
 const route = useRoute();
-const info = ref<Params>({
+const info = ref<NavBarInfo>({
 	title: route?.meta?.title || '财务管理11',
 	rightButton: '新增',
 	leftPath: '/',
 });
 const loading = ref<boolean>(false);
-const dataSource = ref<Params[]>([]);
+const dataSource = ref<OrgInfoData[]>([]);
 const searchInfo = ref<SearchInfo>({});
 
 const finished = ref<boolean>(false); //加载是否已经没有更多数据
@@ -126,7 +134,7 @@ const onCancel = () => {
 async function query(param: SearchInfo, cur: PageInfo) {
 	loading.value = true;
 	getOrgInfoPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
-		.then((res: Params) => {
+		.then((res: ResponseBody<CommonPageResult<OrgInfoData>>) => {
 			if (res?.code == '200') {
 				dataSource.value = [...dataSource.value, ...res.data.records];
 				setTotal(res.data.total);
@@ -148,7 +156,7 @@ const addOrgInfo = () => {
 	router.push({ path: '/user/orgInfo/orgInfoDetail' });
 };
 
-const userMap: Record<string | number, Params> = {};
+const userMap: Record<string | number, string> = {};
 function getUserInfoList() {
 	getUserManagerList({}).then((res) => {
 		if (res.code == '200') {
@@ -175,12 +183,12 @@ const onRefresh = () => {
 	query(searchInfo.value, pagination);
 };
 
-const beforeClose = (_e: Params): void => {
+const beforeClose = (_e: unknown): void => {
 	// console.log(e);
 };
 
 const delOrgInfo = (id: number) => {
-	deleteOrgInfo(`${id}`).then((res: Params) => {
+	deleteOrgInfo(`${id}`).then((res: ResponseBody<boolean>) => {
 		if (res?.code == '200') {
 			refresh();
 			showSuccessToast((res && res.message) || '删除成功！');

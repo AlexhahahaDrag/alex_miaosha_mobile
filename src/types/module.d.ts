@@ -1,4 +1,6 @@
+import type { DefineComponent } from 'vue';
+
 declare module '*.vue' {
-    const Component: DefineComponent<object, object, any>;
-    export default Component;
-  }
+	const Component: DefineComponent<object, object, unknown>;
+	export default Component;
+}

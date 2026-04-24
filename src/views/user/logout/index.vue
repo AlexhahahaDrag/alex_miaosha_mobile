@@ -14,6 +14,7 @@
 <script setup lang="ts">
 import type { ToastOptions } from 'vant';
 import { showToast } from 'vant';
+import { useCartStore } from '@/store/modules/shopping/cart';
 import { logoutApi } from '@/views/login/api';
 import { useUserStore } from '@/store/modules/user/user';
 
@@ -22,11 +23,13 @@ interface Props {
 }
 
 const router = useRouter();
+const cartStore = useCartStore();
 const userStore = useUserStore();
 const logout = async () => {
 	try {
 		await logoutApi();
 	} finally {
+		cartStore.clearShoppingCart();
 		userStore.resetState();
 		void router.push('/login');
 	}

@@ -79,19 +79,27 @@
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
+import type { OrgInfoData } from '../config';
 import { addOrgInfo, updateOrgInfo, getOrgInfoDetail } from '@/views/user/orgInfo/api/index';
 import type { Info } from '@/views/common/pop/selectPop.vue';
 import { getListName } from '@/views/common/config';
 import { getDictList } from '@/views/finance/dict/api/index';
+import type { DictInfo } from '@/views/finance/dict/api/index';
+import type { ResponseBody } from '@/types/api';
+
+interface NavBarInfo {
+	title?: string;
+	leftPath?: string;
+}
 
 const route = useRoute();
 const router = useRouter();
-const info = ref<Params>({
+const info = ref<NavBarInfo>({
 	title: route?.meta?.title || '机构表',
 	leftPath: '/user/orgInfo',
 });
 
-const formInfo = ref<Params>({});
+const formInfo = ref<OrgInfoData>({});
 
 const label = reactive({
 	orgCode: '机构编码',
@@ -159,7 +167,7 @@ const choose = (type: string) => {
 	popInfo.value.showFlag = true;
 };
 
-const selectInfo = (type: string, value: Params, name: string) => {
+const selectInfo = (type: string, value: string | number, name: string) => {
 	popInfo.value.showFlag = false;
 	switch (type) {
 		case 'status':
@@ -173,7 +181,7 @@ const cancelInfo = () => {
 	popInfo.value.showFlag = false;
 };
 
-function getDictInfoList(res: Params) {
+function getDictInfoList(res: ResponseBody<DictInfo[]>) {
 	if (res.code == '200') {
 		statusInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'is_valid');
 		statusName.value = getListName(statusInfo.value.list || [], formInfo.value.status, 'typeCode', 'typeName');
@@ -187,7 +195,7 @@ const onSubmit = () => {
 	if (formInfo.value.id) {
 		method = 'put';
 	}
-	(method === 'put' ? updateOrgInfo : addOrgInfo)(formInfo.value).then((res: Params) => {
+	(method === 'put' ? updateOrgInfo : addOrgInfo)(formInfo.value).then((res: ResponseBody<OrgInfoData>) => {
 		if (res?.code == '200') {
 			showSuccessToast(res?.message || '保存成功!');
 			router.push({ path: '/user/orgInfo' });
@@ -198,22 +206,23 @@ const onSubmit = () => {
 };
 
 function init() {
-	const id: Params = route?.query?.id;
+	const id = route?.query?.id;
 	if (id) {
 		Promise.all([getOrgInfoDetail(id || '-1'), getDictList('is_valid')])
-			.then((res: Params) => {
-				if (res[0].code == '200') {
-					formInfo.value = res[0].data;
+			.then(([detailRes, dictRes]) => {
+				const res = detailRes;
+				if (detailRes.code == '200' && detailRes.data) {
+					formInfo.value = detailRes.data;
 				} else {
 					showFailToast(res?.message || '查询详情失败，请联系管理员!');
 				}
-				getDictInfoList(res[1]);
+				getDictInfoList(dictRes);
 			})
 			.catch(() => {
 				showFailToast('系统问题，请联系管理员！');
 			});
 	} else {
-		getDictList('is_valid').then((res: Params) => {
+		getDictList('is_valid').then((res: ResponseBody<DictInfo[]>) => {
 			getDictInfoList(res);
 		});
 		formInfo.value = {

@@ -25,12 +25,11 @@ export interface CpnUserCouponInfoData {
 	operateTime?: Dayjs | string;
 	paymentStatus?: number;
 	remarks?: string;
-	// 取消核销相关
 	cancelTime?: Dayjs | string;
 	cancelRemarks?: string;
 	cancelOperatorName?: string;
-	// 操作记录列表
 	operationRecords?: OperationRecord[];
+	[key: string]: unknown;
 }
 
 // 状态筛选选项
@@ -39,7 +38,3 @@ export const statusOptions = [
 	{ text: '已核销', value: 'USED' },
 	{ text: '已取消', value: 'UNUSED' },
 ];
-
-export interface CpnUserCouponInfoData {
-	[key: string]: unknown;
-}

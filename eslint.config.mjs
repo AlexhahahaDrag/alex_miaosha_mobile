@@ -20,6 +20,7 @@ export default [
 			'**/build/**',
 			'**/.eslintrc.*',
 			'**/eslint.config.js',
+			'**/eslint.config.mjs',
 			'**/eslint.config.ts',
 			'**/postcss.config.js',
 			'**/components.d.ts',

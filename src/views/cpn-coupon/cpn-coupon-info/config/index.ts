@@ -13,10 +13,9 @@ export interface CpnCouponInfoData {
 	remainingQuantity?: number;
 	consumedQuantity?: number;
 	paymentStatus?: number;
-	// 为了列表的环形图展示
 	currentRate?: number;
-	// 筛选状态：true=可用优惠券，false=全部优惠券
 	onlyValidAndNotFullyRedeemed?: boolean;
+	[key: string]: unknown;
 }
 
 export const rulesRef = reactive({
@@ -45,7 +44,3 @@ export const rulesRef = reactive({
 		},
 	],
 });
-
-export interface CpnCouponInfoData {
-	[key: string]: unknown;
-}
