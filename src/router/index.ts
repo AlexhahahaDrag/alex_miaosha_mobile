@@ -14,13 +14,24 @@ const modules = import.meta.glob([
 const pageInfo = {
 	dashboard: '/src/views/home/index.vue',
 	message: '/src/views/message/index.vue',
-	test: '/src/views/finance/test/index.vue',
-	testInfo: '/src/views/test/index.vue',
-	consumptionCard: '/src/views/test/index.vue',
 	about: '/src/views/user/index.vue',
 	myself: '/src/views/user/userManager/index.vue',
 	login: '/src/views/login/index.vue',
 	'404': '/src/views/common/error/404.vue',
+};
+
+const fallbackView = modules[pageInfo['404']];
+
+const resolveViewComponent = (componentPath?: string | null) => {
+	if (!componentPath) {
+		return fallbackView;
+	}
+
+	if (componentPath === 'Layout') {
+		return Layout;
+	}
+
+	return modules[componentPath] ?? fallbackView;
 };
 
 export const routes: MenuDataItem[] = [
@@ -38,7 +49,7 @@ export const routes: MenuDataItem[] = [
 			{
 				name: 'dashboard',
 				path: '/dashboard',
-				component: modules[pageInfo.dashboard],
+				component: resolveViewComponent(pageInfo.dashboard),
 				meta: { title: '首页', icon: 'dashboard' },
 			},
 		],
@@ -58,7 +69,7 @@ export const routes: MenuDataItem[] = [
 			{
 				path: '/message/messageManager',
 				name: 'messageManager',
-				component: modules[pageInfo.test],
+				component: resolveViewComponent(pageInfo.message),
 				meta: { title: '消息管理', icon: 'message', hideInMenu: false },
 			},
 		],
@@ -78,20 +89,20 @@ export const routes: MenuDataItem[] = [
 			{
 				path: '/myself/about',
 				name: 'about',
-				component: modules[pageInfo.about],
+				component: resolveViewComponent(pageInfo.about),
 				meta: { title: '我的', icon: 'about', hideInMenu: false },
 			},
 			{
 				path: '/myself/info',
 				name: 'myselfInfo',
-				component: modules[pageInfo.myself],
+				component: resolveViewComponent(pageInfo.myself),
 				meta: { title: '个人信息', icon: 'userManager', hideInMenu: false },
 			},
 		],
 	},
 	{
 		path: '/login',
-		component: modules[pageInfo.login],
+		component: resolveViewComponent(pageInfo.login),
 		name: 'login',
 		meta: {
 			title: '登录',
@@ -102,7 +113,7 @@ export const routes: MenuDataItem[] = [
 	},
 	{
 		path: '/:catchAll(.*)',
-		component: modules[pageInfo[404]],
+		component: fallbackView,
 	},
 ];
 
@@ -167,15 +178,9 @@ const getChildren = (
 	permissionList: PermissionItem[] | undefined,
 	roleCode: string,
 ): MenuDataItem => {
-	const component =
-		item.component == null
-			? modules[pageInfo[404]]
-			: 'Layout' === item.component
-				? Layout
-				: modules[item.component];
 	const routeInfo: MenuDataItem = {
 		path: item.path,
-		component,
+		component: resolveViewComponent(item.component),
 		redirect: item.redirect,
 		name: item.name,
 		meta: {
@@ -191,7 +196,7 @@ const getChildren = (
 		item.children.forEach((childItem: MenuInfo) => {
 			if (judgePermission(permissionList, childItem?.permissionCode, roleCode)) {
 				const cur = getChildren(childItem, permissionList, roleCode);
-				if (routeInfo.name && !router.hasRoute(routeInfo.name)) {
+				if (cur.name && !router.hasRoute(cur.name)) {
 					routeInfo.children?.push(cur);
 				}
 			}
@@ -231,7 +236,7 @@ export const refreshRouter = () => {
 			}
 		}
 	});
-	dynamicRouter = []; // 清空引用
+	dynamicRouter = [];
 };
 
 export default router;

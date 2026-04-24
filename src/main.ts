@@ -10,10 +10,17 @@ import { setupStore } from '@/store';
 import '@/assets/styles/variables.css';
 
 const app = createApp(App);
+
+setupStore(app);
+
 app.use(Particles, {
 	init: async (engine) => {
 		await loadSlim(engine);
 	},
 });
-app.use(router).mount('#app');
-setupStore(app);
+
+app.use(router);
+
+void router.isReady().then(() => {
+	app.mount('#app');
+});

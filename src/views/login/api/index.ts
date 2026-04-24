@@ -1,5 +1,7 @@
+import type { LoginResultData } from '../config';
 import request from '@/utils/request/request';
-import { baseService } from '@/views/common/api/index';
+import type { ResponseBody } from '@/types/api';
+import { baseService } from '@/views/common/api';
 
 // 将请求数据转换为form-data格式
 // 这里不用qs，用FormData也可以，不赘述
@@ -17,7 +19,7 @@ export interface LoginParams {
 	type?: string;
 }
 
-function transParams(data) {
+function transParams(data: LoginParams): URLSearchParams {
 	const params = new URLSearchParams();
 	for (const item in data) {
 		params.append(item, data[`${item}`]);
@@ -25,10 +27,10 @@ function transParams(data) {
 	return params;
 }
 
-export function loginApi(params: LoginParams): Promise<Params> {
+export function loginApi(params: LoginParams): Promise<ResponseBody<LoginResultData>> {
 	return request.post(baseService.user + baseUrl + Api.login, transParams(params));
 }
 
-export function logoutApi(): Promise<Params> {
+export function logoutApi(): Promise<ResponseBody<boolean>> {
 	return request.post(baseService.user + baseUrl + Api.logout);
 }
