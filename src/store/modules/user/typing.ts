@@ -21,15 +21,10 @@ export interface RoleInfo {
 
 export interface GetUserInfoModel {
 	roles: RoleInfo[];
-	// 用户id
 	userId: string | number;
-	// 用户名
 	username: string;
-	// 昵称
 	nickName: string;
-	// 头像
 	avatar?: string;
-	// 介绍
 	desc?: string;
 }
 
@@ -48,12 +43,4 @@ export interface MenuInfo {
 	status: string;
 	children: MenuInfo[];
 	permissionCode: string;
-}
-
-export function getAuthInfo(type: string) {
-	const infoStr = localStorage.getItem(type);
-	if (infoStr) {
-		return JSON.parse(infoStr);
-	}
-	return null;
 }

@@ -14,16 +14,22 @@
 <script setup lang="ts">
 import type { ToastOptions } from 'vant';
 import { showToast } from 'vant';
-import { logoutApi } from '@/views/login/api/index';
+import { logoutApi } from '@/views/login/api';
+import { useUserStore } from '@/store/modules/user/user';
 
 interface Props {
 	visible: boolean;
 }
 
 const router = useRouter();
+const userStore = useUserStore();
 const logout = async () => {
-	await logoutApi();
-	router.push('/login');
+	try {
+		await logoutApi();
+	} finally {
+		userStore.resetState();
+		void router.push('/login');
+	}
 };
 const emit = defineEmits(['select']);
 const props = defineProps<Props>();

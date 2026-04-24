@@ -1,79 +1,74 @@
 import { defineStore } from 'pinia';
 import { showFailToast } from 'vant';
-import { getAuthInfo } from './typing';
 import type { MenuInfo, UserState } from './typing';
-import { loginApi } from '@/views/login/api/index';
-import type { LoginParams } from '@/views/login/api/index';
+import { loginApi } from '@/views/login/api';
+import type { LoginParams } from '@/views/login/api';
 import { piniaPersistConfig } from '@/config/piniaPersist';
 import { refreshRouter } from '@/router';
 
+const createDefaultState = (): UserState => ({
+	userInfo: null,
+	token: '',
+	roleList: [],
+	sessionTimeout: false,
+	lastUpdateTime: 0,
+	menuInfo: null,
+	hasMenu: false,
+	orgInfo: null,
+	roleInfo: null,
+});
+
 export const useUserStore = defineStore('app-user', {
-	state: (): UserState => ({
-		userInfo: null,
-		token: undefined,
-		roleList: [],
-		sessionTimeout: false,
-		lastUpdateTime: 0,
-		menuInfo: null,
-		hasMenu: false,
-		orgInfo: null,
-		roleInfo: null,
-	}),
+	state: (): UserState => createDefaultState(),
 
 	getters: {
-		getUserInfo(): any {
-			return this.userInfo;
-			// return this.userInfo || getAuthCache<UserInfo>(USER_INFO_KEY) || {};
+		getUserInfo(state): UserState['userInfo'] {
+			return state.userInfo;
 		},
-		getToken(): string {
-			const localStorage = window.localStorage;
-			return this.token || localStorage.getItem('token') || '';
+		getToken(state): string {
+			return state.token || '';
 		},
-		getMenuInfo(): MenuInfo[] | null {
-			return this.menuInfo || getAuthInfo('menuInfo');
+		getMenuInfo(state): MenuInfo[] | null {
+			return state.menuInfo;
 		},
-		getSessionTimeout(): boolean {
-			return !!this.sessionTimeout;
+		getSessionTimeout(state): boolean {
+			return !!state.sessionTimeout;
 		},
-		getLastUpdateTime(): number {
-			return this.lastUpdateTime;
+		getLastUpdateTime(state): number {
+			return state.lastUpdateTime;
 		},
-		getRouteStatus(): boolean {
-			return this.hasMenu || localStorage.getItem('hasRoute') === 'true';
+		getRouteStatus(state): boolean {
+			return state.hasMenu;
 		},
-		getRoleInfo(): any {
-			return this.roleInfo || getAuthInfo('roleInfo');
+		getRoleInfo(state): UserState['roleInfo'] {
+			return state.roleInfo;
 		},
-		getOrgInfo(): any {
-			return this.orgInfo || getAuthInfo('orgInfo');
+		getOrgInfo(state): UserState['orgInfo'] {
+			return state.orgInfo;
 		},
 	},
 	actions: {
 		setToken(info: string | undefined) {
-			this.token = info ? info : '';
-			localStorage.setItem('token', this.token);
+			this.token = info || '';
 		},
-		//设置用户信息
-		setUserInfo(admin: any) {
+		setUserInfo(admin: UserState['userInfo']) {
 			this.userInfo = admin;
-			localStorage.setItem('userInfo', JSON.stringify(this.userInfo));
 		},
-		setMenuInfo(info: MenuInfo[]) {
-			this.menuInfo = info ? info : null;
-			localStorage.setItem('menuInfo', JSON.stringify(this.menuInfo));
+		setMenuInfo(info: MenuInfo[] | null | undefined) {
+			this.menuInfo = info || null;
 		},
 		changeRouteStatus(state: boolean) {
 			this.hasMenu = state;
-			localStorage.setItem('hasRoute', state.toString() || 'false');
 		},
-		//设置用户信息
-		setRoleInfo(roleInfo: any) {
+		setRoleInfo(roleInfo: UserState['roleInfo']) {
 			this.roleInfo = roleInfo;
-			localStorage.setItem('roleInfo', JSON.stringify(this.roleInfo));
 		},
-		setOrgInfo(orgInfo: any) {
+		setOrgInfo(orgInfo: UserState['orgInfo']) {
 			this.orgInfo = orgInfo;
-			localStorage.setItem('orgInfo', JSON.stringify(this.orgInfo));
+		},
+		resetState() {
+			Object.assign(this, createDefaultState());
+			refreshRouter();
 		},
 		async login(
 			params: LoginParams & {
@@ -83,7 +78,7 @@ export const useUserStore = defineStore('app-user', {
 			try {
 				const { ...loginParams } = params;
 				const data = await loginApi(loginParams);
-				if (data?.code == '200') {
+				if (data?.code == '200' && data.data) {
 					const { token, admin } = data.data;
 					this.setUserInfo(admin);
 					this.setToken(token);
@@ -93,9 +88,9 @@ export const useUserStore = defineStore('app-user', {
 					this.changeRouteStatus(false);
 					refreshRouter();
 					return admin;
-				} else {
-					showFailToast(data?.message || '登录失败！');
 				}
+
+				showFailToast(data?.message || '登录失败！');
 			} catch (error: unknown) {
 				console.log('错误信息：', error);
 				return Promise.reject(error);
