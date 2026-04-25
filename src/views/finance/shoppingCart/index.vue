@@ -103,7 +103,7 @@
 import { showFailToast, showSuccessToast } from 'vant';
 import commonUtils from '@/utils/common/index';
 import type { ShopCartInfo } from '@/views/finance/shoppingCart/shoppingCartTs';
-import { getShopCartList, updateShopCart, deleteShopCart } from '@/views/finance/shopCart/api/index';
+import { getShopCartList, updateShopCart, deleteShopCart } from '@/views/finance/shopCart/api';
 
 const route = useRoute();
 const router = useRouter();

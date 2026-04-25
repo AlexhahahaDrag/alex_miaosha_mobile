@@ -29,7 +29,7 @@
 <script lang="ts" setup>
 import { showNotify } from 'vant';
 import type { barItem } from './common';
-import { getDayShopFinanceInfo, getMonthShopFinanceInfo } from '@/views/finance/shopFinanceAnalysis/api/index';
+import { getDayShopFinanceInfo, getMonthShopFinanceInfo } from '@/views/finance/shopFinanceAnalysis/api';
 
 interface Props {
 	activeTab: number | string;

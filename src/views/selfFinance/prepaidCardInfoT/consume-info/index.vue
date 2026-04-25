@@ -93,7 +93,7 @@
 <script setup lang="ts">
 import { showToast, showSuccessToast, showFailToast } from 'vant';
 import dayjs, { type Dayjs } from 'dayjs';
-import { getPrepaidCardInfoDetail, prepaidCardConsumeAndRecharge } from '../api/index';
+import { getPrepaidCardInfoDetail, prepaidCardConsumeAndRecharge } from '../api';
 import { useNavBar } from '@/composables/useNavBar';
 import { useUserStore } from '@/store/modules/user/user';
 

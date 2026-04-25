@@ -67,8 +67,8 @@ import type { Info } from '@/views/common/pop/selectPop.vue';
 import { getRoutePathByName } from '@/utils/router';
 import { datePickerFormatter } from '@/utils/dayjs';
 import type { DatePickerInfo } from '@/utils/common';
-import type { DictInfo } from '@/views/finance/dict/api/index';
-import { getDictList } from '@/views/finance/dict/api/index';
+import type { DictInfo } from '@/views/finance/dict/api';
+import { getDictList } from '@/views/finance/dict/api';
 import { useNavBar } from '@/composables/useNavBar';
 
 const route = useRoute();

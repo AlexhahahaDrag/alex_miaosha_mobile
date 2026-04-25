@@ -24,7 +24,7 @@
 <script lang="ts" setup>
 import { showNotify } from 'vant';
 import dayjs from 'dayjs';
-import { getChainAndYear, getBenefit } from '@/views/finance/shopFinanceAnalysis/api/index';
+import { getChainAndYear, getBenefit } from '@/views/finance/shopFinanceAnalysis/api';
 import commonUtils from '@/utils/common/index';
 import type { Info } from '@/views/common/boardData/config';
 

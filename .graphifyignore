@@ -1,0 +1,21 @@
+# Build and dependency outputs
+node_modules/
+dist/
+
+# Generated type declarations from Vite plugins
+components.d.ts
+src/auto-imports.d.ts
+
+# Assistant config files should not be indexed into the knowledge graph
+AGENTS.md
+.codex/
+.agents/
+.gemini/
+.agent/
+
+# Generated graph internals
+graphify-out/cache/
+graphify-out/manifest.json
+graphify-out/cost.json
+graphify-out/
+src/graphify-out/

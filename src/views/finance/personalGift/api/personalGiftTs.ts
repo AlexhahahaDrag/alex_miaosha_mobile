@@ -1,6 +1,6 @@
 ﻿import type { PersonalGiftData } from '../config';
 import type { ResponseBody, CommonPageResult } from '@/types/api';
-import { getData, postData, putData, deleteData, baseService } from '@/views/common/api/index';
+import { getData, postData, putData, deleteData, baseService } from '@/views/common/api';
 
 const basePersonalGift = '/personal-gift';
 

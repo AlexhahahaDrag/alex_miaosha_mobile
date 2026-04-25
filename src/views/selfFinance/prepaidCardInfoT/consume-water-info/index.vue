@@ -188,14 +188,14 @@
 <script setup lang="ts">
 import { showFailToast } from 'vant';
 import { typeIconMap } from '../config/index';
-import { getPrepaidCardInfoList } from '../api/index';
+import { getPrepaidCardInfoList } from '../api';
 import { useNavBar } from '@/composables/useNavBar';
 import { usePagination } from '@/composables/usePagination';
 import {
 	getConsumeCardRecordPage,
 	type TransactionRecord,
 	type TransactionQueryParams,
-} from '@/views/finance/consumeCardRecord/api/index';
+} from '@/views/finance/consumeCardRecord/api';
 import filterIcon from '@/assets/icons/shop/filter.svg';
 
 const route = useRoute();

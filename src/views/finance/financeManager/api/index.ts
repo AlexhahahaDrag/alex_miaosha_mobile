@@ -1,5 +1,5 @@
 ﻿import type { FinanceManagerData } from '../config';
-import { getData, postData, putData, deleteData, baseService } from '@/views/common/api/index';
+import { getData, postData, putData, deleteData, baseService } from '@/views/common/api';
 import type { ResponseBody, CommonPageResult } from '@/types/api';
 
 const baseFinanceManager = '/finance-info';

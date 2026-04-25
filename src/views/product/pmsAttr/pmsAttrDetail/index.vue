@@ -87,7 +87,7 @@
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
 import { label, rulesRef } from './pmsAttrDetailTs';
-import { addPmsAttr, updatePmsAttr, getPmsAttrDetail } from '@/views/product/pmsAttr/api/index';
+import { addPmsAttr, updatePmsAttr, getPmsAttrDetail } from '@/views/product/pmsAttr/api';
 
 const route = useRoute();
 const router = useRouter();

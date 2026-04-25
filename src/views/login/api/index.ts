@@ -28,7 +28,9 @@ function transParams(data: LoginParams): URLSearchParams {
 }
 
 export function loginApi(params: LoginParams): Promise<ResponseBody<LoginResultData>> {
-	return request.post(baseService.user + baseUrl + Api.login, transParams(params));
+	return request.post(baseService.user + baseUrl + Api.login, transParams(params), {
+		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+	});
 }
 
 export function logoutApi(): Promise<ResponseBody<boolean>> {

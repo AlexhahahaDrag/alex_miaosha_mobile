@@ -1,5 +1,5 @@
 import type { ShopCartData } from '../config';
-import { getData, postData, putData, deleteData, baseService } from '@/views/common/api/index';
+import { getData, postData, putData, deleteData, baseService } from '@/views/common/api';
 import type { CommonPageResult, ResponseBody } from '@/types/api';
 
 const baseShopCart = '/shop-cart';

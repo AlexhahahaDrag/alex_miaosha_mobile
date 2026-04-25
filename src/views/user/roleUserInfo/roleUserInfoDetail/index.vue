@@ -62,9 +62,9 @@
 import { showFailToast, showSuccessToast } from 'vant';
 import { label, rulesRef } from './roleUserInfoDetailTs';
 import { getListName } from '@/views/common/config';
-import { addRoleUserInfo, updateRoleUserInfo, getRoleUserInfoDetail } from '@/views/user/roleUserInfo/api/index';
+import { addRoleUserInfo, updateRoleUserInfo, getRoleUserInfoDetail } from '@/views/user/roleUserInfo/api';
 import type { Info } from '@/views/common/pop/selectPop.vue';
-import { getDictList } from '@/views/finance/dict/api/index';
+import { getDictList } from '@/views/finance/dict/api';
 
 const route = useRoute();
 const router = useRouter();

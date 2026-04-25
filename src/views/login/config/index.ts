@@ -11,3 +11,8 @@ export interface LoginResultData {
 	admin: LoginAdminData;
 	token: string;
 }
+
+export interface LoginForm {
+	username: string;
+	password: string;
+}

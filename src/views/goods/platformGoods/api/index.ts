@@ -1,5 +1,5 @@
 import type { PlatformGoodsData } from '../config';
-import { getData, deleteData, baseService } from '@/views/common/api/index';
+import { getData, deleteData, baseService } from '@/views/common/api';
 
 const baseGoods = '/api/v1';
 

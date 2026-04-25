@@ -80,11 +80,11 @@
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
 import type { OrgInfoData } from '../config';
-import { addOrgInfo, updateOrgInfo, getOrgInfoDetail } from '@/views/user/orgInfo/api/index';
+import { addOrgInfo, updateOrgInfo, getOrgInfoDetail } from '@/views/user/orgInfo/api';
 import type { Info } from '@/views/common/pop/selectPop.vue';
 import { getListName } from '@/views/common/config';
-import { getDictList } from '@/views/finance/dict/api/index';
-import type { DictInfo } from '@/views/finance/dict/api/index';
+import { getDictList } from '@/views/finance/dict/api';
+import type { DictInfo } from '@/views/finance/dict/api';
 import type { ResponseBody } from '@/types/api';
 
 interface NavBarInfo {

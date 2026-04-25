@@ -37,6 +37,7 @@ export default [
 			'**/.eslintignore',
 			'**/.prettierignore',
 			'**/stats.html',
+			'**/scripts/**',
 		],
 	},
 	// 为 vite.config.ts 单独配置

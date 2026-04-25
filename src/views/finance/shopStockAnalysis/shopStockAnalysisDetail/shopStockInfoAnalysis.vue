@@ -29,7 +29,7 @@
 <script lang="ts" setup>
 import { showNotify } from 'vant';
 import type { ItemInfo } from './common';
-import { getAllAmount } from '@/views/finance/shopStockAnalysis/api/index';
+import { getAllAmount } from '@/views/finance/shopStockAnalysis/api';
 
 interface Props {
 	activeTab: number | string;

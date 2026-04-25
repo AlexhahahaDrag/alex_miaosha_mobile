@@ -77,14 +77,10 @@
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
 import { label, rulesRef } from './shopStockAttrsDetailTs';
-import {
-	addShopStockAttrs,
-	updateShopStockAttrs,
-	getShopStockAttrsDetail,
-} from '@/views/finance/shopStockAttrs/api/index';
+import { addShopStockAttrs, updateShopStockAttrs, getShopStockAttrsDetail } from '@/views/finance/shopStockAttrs/api';
 import type { Info } from '@/views/common/pop/selectPop.vue';
 import { getListName } from '@/views/common/config';
-import { getDictList } from '@/views/finance/dict/api/index';
+import { getDictList } from '@/views/finance/dict/api';
 
 const route = useRoute();
 const router = useRouter();

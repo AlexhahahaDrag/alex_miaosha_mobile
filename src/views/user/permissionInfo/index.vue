@@ -93,8 +93,8 @@
 import { showSuccessToast, showFailToast } from 'vant';
 import type { SearchInfo } from './permissionInfoTs';
 import { usePagination } from '@/composables/usePagination';
-import { getPermissionInfoPage, deletePermissionInfo } from '@/views/user/permissionInfo/api/index';
-import { getUserManagerList } from '@/views/user/userManager/api/index';
+import { getPermissionInfoPage, deletePermissionInfo } from '@/views/user/permissionInfo/api';
+import { getUserManagerList } from '@/views/user/userManager/api';
 import type { PageInfo } from '@/views/common/config/index';
 
 const router = useRouter();

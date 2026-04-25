@@ -1,5 +1,5 @@
 import type { ShopStockAnalysisData } from '../config';
-import { getData, baseService } from '@/views/common/api/index';
+import { getData, baseService } from '@/views/common/api';
 
 const baseFinanceAnalysis = '/shop-stock-analysis';
 

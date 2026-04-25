@@ -1,14 +1,12 @@
 <template>
 	<div class="login-container">
-		<!-- 动态粒子背景底座 -->
-		<Particles
+		<vue-particles
 			id="tsparticles"
 			class="login-particles"
 			:options="particlesOptions"
 		/>
 
 		<div class="login-content">
-			<!-- 品牌视觉区 -->
 			<header class="login-header">
 				<div class="logo-box">
 					<div class="logo-inner">
@@ -22,7 +20,6 @@
 				<p class="brand-subtitle">企业级通用管理终端</p>
 			</header>
 
-			<!-- 登录核心卡片 (Extreme Compact Glass) -->
 			<main class="login-card">
 				<div class="card-inner">
 					<div class="card-glow"></div>
@@ -82,32 +79,25 @@
 				</div>
 			</main>
 
-			<!-- 底部版权 (移入 content 以便整体缩放) -->
 			<footer class="login-footer">
 				<div class="footer-links">
 					<span>隐私政策</span>
 					<span class="dot">·</span>
 					<span>安全协议</span>
 				</div>
-				<p class="copyright">© 2026 Alex 系统架构。保留所有权利。</p>
+				<p class="copyright">2026 Alex 系统架构。保留所有权利。</p>
 			</footer>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-/**
- * 1. Imports
- */
 import { showFailToast, showSuccessToast } from 'vant';
-import type { LoginForm } from './login';
-import type { LoginParams } from '@/views/login/api/index';
+import type { LoginForm } from '@/views/login/config';
+import type { LoginParams } from '@/views/login/api';
 import { useUserStore } from '@/store/modules/user/user';
 import { useNavBar } from '@/composables/useNavBar';
 
-/**
- * 2. Constants / Types / API
- */
 const particlesOptions = {
 	background: { color: { value: 'transparent' } },
 	fpsLimit: 120,
@@ -147,23 +137,14 @@ const particlesOptions = {
 	detectRetina: true,
 };
 
-/**
- * 3. useHooks
- */
 const router = useRouter();
 const userStore = useUserStore();
 useNavBar({ visible: false });
 
-/**
- * 4. Variables
- */
 const loginForm = ref<LoginForm>({ username: '', password: '' });
 const submitLoading = ref<boolean>(false);
 const showPassword = ref<boolean>(false);
 
-/**
- * 5. Methods
- */
 const onSubmit = async () => {
 	if (submitLoading.value) return;
 
@@ -194,15 +175,24 @@ const onSubmit = async () => {
 </script>
 
 <style lang="less" scoped>
+:global(html),
+:global(body),
+:global(#app) {
+	height: 100%;
+	margin: 0;
+}
+
 .login-container {
 	position: relative;
-	min-height: 100vh;
+	height: 100vh;
+	height: 100dvh;
 	width: 100%;
+	box-sizing: border-box;
 	background: radial-gradient(circle at center, #f0f7ff 0%, #f8fafc 100%);
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	overflow-x: hidden; /* 仅锁定水平溢出 */
+	overflow: hidden;
 
 	.login-particles {
 		position: absolute;
@@ -216,18 +206,20 @@ const onSubmit = async () => {
 	z-index: 10;
 	width: 100%;
 	max-width: 400px;
-	min-height: 100vh;
-	padding: 20px 40px;
+	height: 100%;
+	min-height: 0;
+	box-sizing: border-box;
+	padding: max(16px, env(safe-area-inset-top)) clamp(24px, 8vw, 40px) max(14px, env(safe-area-inset-bottom));
 	display: flex;
 	flex-direction: column;
-	justify-content: center; /* 改为居中，配合 padding 调整重心 */
+	justify-content: center;
 	align-items: center;
+	overflow: hidden;
 }
 
 .login-header {
 	text-align: center;
-	margin-top: auto;
-	margin-bottom: 32px;
+	margin-bottom: clamp(18px, 4vh, 32px);
 	flex-shrink: 0;
 
 	.logo-box {
@@ -253,7 +245,7 @@ const onSubmit = async () => {
 		font-weight: 800;
 		color: #1e293b;
 		margin-bottom: 2px;
-		letter-spacing: -0.5px;
+		letter-spacing: 0;
 	}
 
 	.brand-subtitle {
@@ -267,6 +259,7 @@ const onSubmit = async () => {
 
 .login-card {
 	width: 100%;
+	flex-shrink: 0;
 	position: relative;
 	background: rgba(255, 255, 255, 0.7);
 	backdrop-filter: blur(24px);
@@ -361,8 +354,7 @@ const onSubmit = async () => {
 
 .login-footer {
 	text-align: center;
-	margin-top: auto; /* 推到底部 */
-	padding-top: 20px;
+	margin-top: clamp(14px, 4vh, 24px);
 	flex-shrink: 0;
 
 	.footer-links {
@@ -381,6 +373,80 @@ const onSubmit = async () => {
 	.copyright {
 		font-size: 9px;
 		color: #cbd5e1;
+	}
+}
+
+@media (max-height: 620px) {
+	.login-content {
+		padding-top: 12px;
+		padding-bottom: 10px;
+	}
+
+	.login-header {
+		margin-bottom: 14px;
+
+		.logo-box {
+			width: 42px;
+			height: 42px;
+			margin-bottom: 6px;
+		}
+
+		.brand-title {
+			font-size: 18px;
+		}
+
+		.brand-subtitle {
+			font-size: 10px;
+		}
+	}
+
+	.login-card {
+		border-radius: 22px;
+
+		.card-inner {
+			padding: 14px 18px;
+		}
+	}
+
+	.form-fields {
+		gap: 10px;
+	}
+
+	.field-group {
+		.glass-field {
+			padding: 8px 12px;
+		}
+	}
+
+	.form-action {
+		margin-top: 14px;
+
+		.login-btn {
+			height: 44px;
+		}
+	}
+
+	.form-links {
+		margin-top: 10px;
+	}
+
+	.login-footer {
+		margin-top: 12px;
+	}
+}
+
+@media (max-height: 540px) {
+	.login-footer {
+		display: none;
+	}
+
+	.login-header {
+		margin-bottom: 10px;
+
+		.logo-box {
+			width: 36px;
+			height: 36px;
+		}
 	}
 }
 </style>

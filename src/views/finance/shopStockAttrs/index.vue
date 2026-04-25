@@ -93,8 +93,8 @@
 import { showSuccessToast, showFailToast } from 'vant';
 import type { SearchInfo } from './shopStockAttrsTs';
 import { pagination } from './shopStockAttrsTs';
-import { getShopStockAttrsPage, deleteShopStockAttrs } from '@/views/finance/shopStockAttrs/api/index';
-import { getUserManagerList } from '@/views/user/userManager/api/index';
+import { getShopStockAttrsPage, deleteShopStockAttrs } from '@/views/finance/shopStockAttrs/api';
+import { getUserManagerList } from '@/views/user/userManager/api';
 import type { PageInfo } from '@/views/common/config/index';
 
 const router = useRouter();

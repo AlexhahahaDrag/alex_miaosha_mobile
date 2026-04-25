@@ -1,5 +1,5 @@
 import type { SeckillData } from '../config';
-import { getData, deleteData } from '@/views/common/api/index';
+import { getData, deleteData } from '@/views/common/api';
 
 export function getSeckillList(params: SeckillData): Promise<ResponseBody<boolean>> {
 	return getData('/api/blog/getList', params);

@@ -186,7 +186,7 @@
 
 <script setup lang="ts">
 import { showToast, showLoadingToast, showFailToast, closeToast } from 'vant';
-import { getPrepaidCardInfoList, getPrepaidConsumeRecordPage } from './api/index';
+import { getPrepaidCardInfoList, getPrepaidConsumeRecordPage } from './api';
 import { type CardItem, type TransactionItem, getCardColor, typeIconMap } from './config/index';
 import { formatTime, formatAmount } from '@/views/common/config';
 import { useNavBar } from '@/composables/useNavBar';

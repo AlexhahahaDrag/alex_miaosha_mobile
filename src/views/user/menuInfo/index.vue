@@ -95,8 +95,8 @@
 import { showSuccessToast, showFailToast } from 'vant';
 import type { SearchInfo } from './menuInfoTs';
 import { usePagination } from '@/composables/usePagination';
-import { getMenuInfoPage, deleteMenuInfo } from '@/views/user/menuInfo/api/index';
-import { getUserManagerList } from '@/views/user/userManager/api/index';
+import { getMenuInfoPage, deleteMenuInfo } from '@/views/user/menuInfo/api';
+import { getUserManagerList } from '@/views/user/userManager/api';
 import type { PageInfo } from '@/views/common/config/index';
 
 const router = useRouter();

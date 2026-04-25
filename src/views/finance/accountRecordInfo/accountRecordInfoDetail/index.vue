@@ -71,8 +71,8 @@ import {
 	addAccountRecordInfo,
 	updateAccountRecordInfo,
 	getAccountRecordInfoDetail,
-} from '@/views/finance/accountRecordInfo/api/index';
-import { getDictList } from '@/views/finance/dict/api/index';
+} from '@/views/finance/accountRecordInfo/api';
+import { getDictList } from '@/views/finance/dict/api';
 
 const route = useRoute();
 const router = useRouter();

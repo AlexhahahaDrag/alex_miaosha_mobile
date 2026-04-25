@@ -66,9 +66,9 @@ import {
 	addRolePermissionInfo,
 	updateRolePermissionInfo,
 	getRolePermissionInfoDetail,
-} from '@/views/user/rolePermissionInfo/api/index';
+} from '@/views/user/rolePermissionInfo/api';
 import type { Info } from '@/views/common/pop/selectPop.vue';
-import { getDictList } from '@/views/finance/dict/api/index';
+import { getDictList } from '@/views/finance/dict/api';
 
 const route = useRoute();
 const router = useRouter();
