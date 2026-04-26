@@ -31,10 +31,7 @@
 			>
 				<!-- Empty State -->
 				<template v-if="!dataSource.length && !loading">
-					<van-empty
-						image="search"
-						description="暂无相关商品"
-					/>
+					<van-empty description="暂无相关商品" />
 				</template>
 
 				<!-- Product Cards -->

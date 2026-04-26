@@ -1921,7 +1921,7 @@
       "id": "views_finance_financemanager_index_vue",
       "community": 3,
       "norm_label": "index.vue",
-      "degree": 16
+      "degree": 17
     },
     {
       "label": "fetchCategories()",
@@ -5372,7 +5372,7 @@
       "source_location": "AutoImport",
       "community": 152,
       "norm_label": "ref",
-      "degree": 11,
+      "degree": 12,
       "synthetic_auto_import": true
     },
     {
@@ -15314,6 +15314,18 @@
       "_tgt": "autoimport_api_useroute",
       "source": "autoimport_api_useroute",
       "target": "views_finance_financemanager_financemanagerdetail_index_vue",
+      "confidence_score": 1
+    },
+    {
+      "relation": "uses_auto_import_api",
+      "confidence": "EXTRACTED",
+      "source_file": "src\\views\\finance\\financeManager\\index.vue",
+      "source_location": "script",
+      "weight": 1,
+      "_src": "views_finance_financemanager_index_vue",
+      "_tgt": "autoimport_api_ref",
+      "source": "autoimport_api_ref",
+      "target": "views_finance_financemanager_index_vue",
       "confidence_score": 1
     },
     {

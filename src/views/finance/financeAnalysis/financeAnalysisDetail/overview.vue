@@ -277,7 +277,11 @@ const goToFinanceManager = (item: FinanceDetail) => {
 	// 映射 typeName 到 fromSource 代码
 	// 如果 item.typeCode 已经是 yhk, wx 等，则可以直接使用
 	// 根据用户提示，这里使用 typeCode 或者是手动映射
-	router.push({ name: 'financeManager', query: { fromSource: item.typeCode } });
+	const query: Record<string, string | number> = { fromSource: item.typeCode || '' };
+	if (props.belongTo && props.belongTo !== '0') {
+		query.belongTo = props.belongTo;
+	}
+	router.push({ name: 'financeManager', query });
 };
 
 watch(

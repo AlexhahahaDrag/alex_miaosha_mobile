@@ -24,7 +24,6 @@
 			:finished="finished"
 			:is-empty="!dataSource?.length"
 			empty-text="暂无订单数据"
-			empty-image="search"
 			@load="onLoadMore"
 		>
 			<template #skeleton>
@@ -59,10 +58,7 @@
 
 			<template #empty>
 				<div class="empty-state-container">
-					<van-empty
-						image="search"
-						description="暂无订单数据"
-					>
+					<van-empty description="暂无订单数据">
 						<van-button
 							v-if="searchInfo.saleOrderCode"
 							round

@@ -21,6 +21,8 @@ export interface FinanceManagerData {
 	incomeAndExpenses?: string;
 	incomeAndExpensesName?: string;
 	infoDate?: string | Dayjs | null;
+	infoDateStart?: string;
+	infoDateEnd?: string;
 	description?: string;
 }
 

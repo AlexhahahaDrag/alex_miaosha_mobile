@@ -24,7 +24,6 @@
 			:finished="finished"
 			:is-empty="!dataSource?.length"
 			empty-text="没有找到相关的账单记录"
-			empty-image="search"
 			@load="onLoadMore"
 		>
 			<template #skeleton>
@@ -58,10 +57,7 @@
 
 			<template #empty>
 				<div class="empty-state-container">
-					<van-empty
-						image="search"
-						description="没有找到相关的账单记录"
-					>
+					<van-empty description="没有找到相关的账单记录">
 						<van-button
 							v-if="searchInfo.shopName"
 							round

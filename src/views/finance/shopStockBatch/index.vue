@@ -31,10 +31,7 @@
 			>
 				<!-- Empty State -->
 				<template v-if="!dataSource.length && !loading">
-					<van-empty
-						image="search"
-						description="暂无相关批次记录"
-					/>
+					<van-empty description="暂无相关批次记录" />
 				</template>
 
 				<!-- Batch Cards -->
