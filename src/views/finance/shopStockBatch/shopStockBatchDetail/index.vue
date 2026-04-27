@@ -75,10 +75,75 @@
 						autosize
 						:maxlength="200"
 						show-word-limit
+						class="custom-field"
+					/>
+				</van-cell-group>
+			</div>
+
+			<!-- Financial Info Section -->
+			<div class="form-section-card">
+				<div class="section-title">
+					<span class="title-line"></span>
+					财务信息
+				</div>
+				<van-cell-group
+					:border="false"
+					class="custom-cell-group"
+				>
+					<!-- Cost -->
+					<van-field
+						v-model="formInfo.cost"
+						name="cost"
+						:label="label.cost"
+						:placeholder="'请输入' + label.cost"
+						type="number"
+						class="custom-field"
+					>
+						<template #button>
+							<span class="field-prefix">¥</span>
+						</template>
+					</van-field>
+
+					<!-- Travel Expense -->
+					<van-field
+						v-model="formInfo.travelExpense"
+						name="travelExpense"
+						:label="label.travelExpense"
+						:placeholder="'请输入' + label.travelExpense"
+						type="number"
+						class="custom-field"
+					>
+						<template #button>
+							<span class="field-prefix">¥</span>
+						</template>
+					</van-field>
+
+					<!-- Purchase Date -->
+					<van-field
+						v-model="formInfo.purchaseDate"
+						name="purchaseDate"
+						:label="label.purchaseDate"
+						:placeholder="'请选择' + label.purchaseDate"
+						@click="showDatePicker = true"
+						readonly
+						is-link
 						class="custom-field last-field"
 					/>
 				</van-cell-group>
 			</div>
+
+			<!-- Date Picker Popup -->
+			<van-popup
+				v-model:show="showDatePicker"
+				position="bottom"
+			>
+				<van-date-picker
+					v-model="selectedDate"
+					title="选择进货日期"
+					@confirm="onDateConfirm"
+					@cancel="showDatePicker = false"
+				/>
+			</van-popup>
 
 			<div class="submit-wrapper">
 				<van-button
@@ -125,6 +190,8 @@ useNavBar({
 const formInfo = ref<ShopStockBatchData>({});
 const popInfo = ref<Info>({ showFlag: false });
 const isValidName = ref<string>('');
+const showDatePicker = ref<boolean>(false);
+const selectedDate = ref<string[]>([]);
 
 const isValidInfo = ref<Info>({
 	label: 'isValid',
@@ -160,6 +227,11 @@ const selectInfo = (type: string, value: string, name: string) => {
 
 const cancelInfo = () => {
 	popInfo.value.showFlag = false;
+};
+
+const onDateConfirm = ({ selectedValues }: { selectedValues: string[] }) => {
+	formInfo.value.purchaseDate = selectedValues.join('-');
+	showDatePicker.value = false;
 };
 
 const getDictInfoList = (data: DictInfo[]) => {
@@ -300,6 +372,12 @@ init();
 		left: 4px;
 		right: 4px;
 		border-bottom: 1px solid #f1f5f9;
+	}
+
+	.field-prefix {
+		color: #64748b;
+		font-weight: 500;
+		margin-right: 4px;
 	}
 }
 

@@ -5,6 +5,9 @@ export interface ShopStockBatchData {
 	isValid?: string;
 	description?: string;
 	title?: string;
+	cost?: number;
+	travelExpense?: number;
+	purchaseDate?: string;
 }
 
 export const label = reactive({
@@ -12,6 +15,9 @@ export const label = reactive({
 	batchName: '批次名称',
 	isValid: '状态',
 	description: '描述',
+	cost: '成本',
+	travelExpense: '差旅费',
+	purchaseDate: '进货日期',
 });
 
 export const rulesRef = reactive({

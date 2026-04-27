@@ -74,6 +74,23 @@
 									{{ item.description || '暂无描述信息' }}
 								</div>
 							</div>
+							<div class="card-footer">
+								<div class="footer-info">
+									<van-icon name="balance-o" />
+									<span>成本: ¥{{ item.cost?.toFixed(2) || '0.00' }}</span>
+								</div>
+								<div class="footer-info">
+									<van-icon name="guide-o" />
+									<span>差旅: ¥{{ item.travelExpense?.toFixed(2) || '0.00' }}</span>
+								</div>
+								<div
+									class="footer-info"
+									v-if="item.purchaseDate"
+								>
+									<van-icon name="calendar-o" />
+									<span>{{ item.purchaseDate }}</span>
+								</div>
+							</div>
 						</div>
 						<template #right>
 							<van-button
