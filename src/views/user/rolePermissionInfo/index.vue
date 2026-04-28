@@ -178,7 +178,7 @@ const beforeClose = (_e: Params): void => {
 	// console.log(e);
 };
 
-const delRolePermissionInfo = (id: number) => {
+const delRolePermissionInfo = (id: string) => {
 	deleteRolePermissionInfo(`${id}`).then((res: Params) => {
 		if (res?.code == '200') {
 			refresh();

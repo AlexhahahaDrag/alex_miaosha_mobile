@@ -189,7 +189,7 @@ const isFilterActive = (value: string): boolean => {
 };
 
 // 查看详情
-const onViewDetail = (id?: number) => {
+const onViewDetail = (id?: string) => {
 	if (!id) return;
 	const path = getRoutePathByName(router, 'cpnUserCouponInfoDetail');
 	router.push({

@@ -20,7 +20,7 @@ export interface barItem {
 }
 
 export interface FinanceDetail {
-	id?: number;
+	id?: string;
 	name?: string;
 	typeCode?: string;
 	amount?: number;

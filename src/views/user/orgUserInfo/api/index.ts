@@ -21,7 +21,7 @@ export function getOrgUserInfoPage(
 	});
 }
 
-export function getOrgUserInfoDetail(id: number): Promise<ResponseBody<OrgUserInfoData>> {
+export function getOrgUserInfoDetail(id: string): Promise<ResponseBody<OrgUserInfoData>> {
 	return getData(`${baseService.user + baseOrgUserInfo + OrgUserInfoUrl.url}`, { id });
 }
 

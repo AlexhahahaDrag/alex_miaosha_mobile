@@ -27,12 +27,12 @@ export interface RolePermissionInfo {
 }
 
 export interface OrgInfo {
-	id?: number;
+	id?: string;
 	orgCode?: string;
 	orgName?: string;
 	orgAlias?: string;
 	orgShortName?: string;
-	parentId?: number;
+	parentId?: string;
 	parentName?: string;
 	parentOrgName?: string;
 	status?: string | number;
@@ -42,7 +42,7 @@ export interface OrgInfo {
 
 export interface GetUserInfoModel {
 	roles: RoleInfo[];
-	userId: string | number;
+	userId: string;
 	username: string;
 	nickName: string;
 	avatar?: string;

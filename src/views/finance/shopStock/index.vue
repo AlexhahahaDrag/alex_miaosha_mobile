@@ -125,7 +125,7 @@ const onClearAllFilters = () => {
 	onRefreshData();
 };
 
-const addShopStock = (id: number | null, type: string) => {
+const addShopStock = (id: string | null, type: string) => {
 	router.push({
 		path: '/finance/shopStock/shopStockDetail',
 		query: { id, type },
@@ -137,7 +137,7 @@ const handleCardClick = (item: ShopStockData) => {
 	addShopStock(item.id || null, 'update');
 };
 
-const handleCopy = (id: number) => {
+const handleCopy = (id: string) => {
 	addShopStock(id, 'copy');
 };
 

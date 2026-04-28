@@ -2,7 +2,7 @@ import type { Dayjs } from 'dayjs';
 import type { ShopStockData } from '../shopStock/config';
 
 export interface SaleOrderInfo {
-	id?: number;
+	id?: string;
 	saleOrderCode?: string;
 	saleOrderName?: string;
 	saleAmount?: number;
@@ -14,8 +14,8 @@ export interface SaleOrderInfo {
 }
 
 export interface SaleOrderDetailInfo {
-	id?: number;
-	orderId?: number;
+	id?: string;
+	orderId?: string;
 	shopName?: string;
 	shopCode?: string;
 	oldShopCode?: string;
@@ -24,5 +24,5 @@ export interface SaleOrderDetailInfo {
 	saleDate?: Dayjs | string;
 	payWay?: string;
 	saleNum?: number;
-	shopStockId?: number;
+	shopStockId?: string;
 }

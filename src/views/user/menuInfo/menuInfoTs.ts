@@ -20,7 +20,7 @@ export interface DataItem {
 	redirect: string;
 	icon: string;
 	hideInMenu: string;
-	parentId: number;
+	parentId: string;
 	summary: string;
 	status: string;
 	orderBy: number;

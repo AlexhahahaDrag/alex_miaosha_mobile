@@ -22,7 +22,7 @@ export function getUserManagerPage(
 	});
 }
 
-export function getUserManagerDetail(id: number): Promise<ResponseBody<UserManagerData>> {
+export function getUserManagerDetail(id: string): Promise<ResponseBody<UserManagerData>> {
 	return getData(`${baseService.user + baseUserManager + userMangerUrl.url}`, { id });
 }
 

@@ -190,7 +190,7 @@ const monthChartOptions = computed(() => ({
 }));
 
 // API Calls
-const fetchData = async (userId: number | string | null, dateStr: string) => {
+const fetchData = async (userId: string | null, dateStr: string) => {
 	const [dayRes, monthRes, listRes] = await Promise.all([
 		getDayExpense(userId, dateStr),
 		getMonthExpense(userId, dateStr),

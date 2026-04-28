@@ -21,7 +21,7 @@ export function getShopStockAttrsPage(
 	});
 }
 
-export function getShopStockAttrsDetail(id: number): Promise<ResponseBody<ShopStockAttrsData>> {
+export function getShopStockAttrsDetail(id: string): Promise<ResponseBody<ShopStockAttrsData>> {
 	return getData(`${baseService.finance + baseShopStockAttrs + ShopStockAttrsUrl.url}`, { id });
 }
 

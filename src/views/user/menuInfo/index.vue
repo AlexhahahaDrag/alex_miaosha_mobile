@@ -180,7 +180,7 @@ const beforeClose = (_e: Params): void => {
 	// console.log(e);
 };
 
-const delMenuInfo = (id: number) => {
+const delMenuInfo = (id: string) => {
 	deleteMenuInfo(`${id}`).then((res: Params) => {
 		if (res?.code == '200') {
 			refresh();

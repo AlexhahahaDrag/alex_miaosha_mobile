@@ -1,7 +1,7 @@
 import type { Dayjs } from 'dayjs';
 
 export interface AccountRecordInfoData {
-	id?: number;
+	id?: string;
 	name?: string;
 	accountName?: string;
 	fromSource?: string;

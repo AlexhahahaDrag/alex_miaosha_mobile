@@ -18,9 +18,7 @@ const PrepaidConsumeRecordUrl = {
 };
 
 // 消费卡信息表相关接口
-export function getPrepaidCardInfoDetail(
-	id: number | string,
-): Promise<ResponseBody<PrepaidCardInfoTData>> {
+export function getPrepaidCardInfoDetail(id: string): Promise<ResponseBody<PrepaidCardInfoTData>> {
 	const url = baseService.finance + basePrepaidCardInfo + PrepaidCardInfoUrl.detail;
 	return getData(url, { id });
 }
@@ -72,7 +70,7 @@ export function prepaidCardConsumeAndRecharge(
 
 // 消费卡交易记录表相关接口
 export function getPrepaidConsumeRecordDetail(
-	id: number,
+	id: string,
 ): Promise<ResponseBody<PrepaidCardInfoTData>> {
 	const url = baseService.finance + basePrepaidConsumeRecord + PrepaidConsumeRecordUrl.detail;
 	return getData(url, { id });

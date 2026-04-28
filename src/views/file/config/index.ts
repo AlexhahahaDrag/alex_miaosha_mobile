@@ -1,5 +1,5 @@
 export interface FileInfoData {
-	id?: number | string;
+	id?: string;
 	name?: string;
 	type?: string;
 	url?: string;

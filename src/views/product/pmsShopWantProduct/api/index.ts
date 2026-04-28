@@ -22,7 +22,7 @@ export function getPmsShopWantProductPage(
 }
 
 export function getPmsShopWantProductDetail(
-	id: number,
+	id: string,
 ): Promise<ResponseBody<PmsShopWantProductData>> {
 	return getData(
 		`${baseService.product + basePmsShopWantProduct + PmsShopWantProductUrl.url}?id=${id}`,

@@ -1,8 +1,8 @@
 export interface ShopCartInfo {
-	id?: number;
-	shopId?: number;
-	userId?: number;
-	customerId?: number;
+	id?: string;
+	shopId?: string;
+	userId?: string;
+	customerId?: string;
 	isValid?: string;
 	saleNum?: number;
 	stockNum?: number;

@@ -246,7 +246,7 @@ interface BalanceResponse {
 	momTrend?: string;
 }
 
-const getBalanceInfo = async (userId: number | string | null, dateStr: string) => {
+const getBalanceInfo = async (userId: string | null, dateStr: string) => {
 	const { code, data, message } = await getBalance(userId, dateStr);
 	if (code == '200') {
 		if (Array.isArray(data)) {

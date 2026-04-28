@@ -35,7 +35,7 @@ export function getNewestPmsShopProductPage(
 	});
 }
 
-export function getPmsShopProductDetail(id: number): Promise<ResponseBody<PmsShopProductData>> {
+export function getPmsShopProductDetail(id: string): Promise<ResponseBody<PmsShopProductData>> {
 	return getData(`${baseService.product + basePmsShopProduct + PmsShopProductUrl.url}`, { id });
 }
 

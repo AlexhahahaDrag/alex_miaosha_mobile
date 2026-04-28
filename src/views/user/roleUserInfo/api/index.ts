@@ -21,7 +21,7 @@ export function getRoleUserInfoPage(
 	});
 }
 
-export function getRoleUserInfoDetail(id: number): Promise<ResponseBody<RoleUserInfoData>> {
+export function getRoleUserInfoDetail(id: string): Promise<ResponseBody<RoleUserInfoData>> {
 	return getData(`${baseService.user + baseRoleUserInfo + RoleUserInfoUrl.url}`, { id });
 }
 

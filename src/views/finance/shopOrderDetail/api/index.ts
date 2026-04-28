@@ -21,7 +21,7 @@ export function getShopOrderDetailPage(
 	});
 }
 
-export function getShopOrderDetailDetail(id: number): Promise<ResponseBody<ShopOrderDetailData>> {
+export function getShopOrderDetailDetail(id: string): Promise<ResponseBody<ShopOrderDetailData>> {
 	return getData(`${baseService.finance + baseShopOrderDetail + ShopOrderDetailUrl.url}`, { id });
 }
 

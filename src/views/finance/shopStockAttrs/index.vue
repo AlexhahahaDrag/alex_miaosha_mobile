@@ -178,7 +178,7 @@ const beforeClose = (_e: Params): void => {
 	// console.log(e);
 };
 
-const delShopStockAttrs = (id: number): void => {
+const delShopStockAttrs = (id: string): void => {
 	deleteShopStockAttrs(`${id}`).then((res: Params) => {
 		if (res?.code == '200') {
 			refresh();

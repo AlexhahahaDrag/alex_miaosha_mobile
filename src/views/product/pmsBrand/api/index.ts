@@ -21,7 +21,7 @@ export function getPmsBrandPage(
 	});
 }
 
-export function getPmsBrandDetail(id: number): Promise<ResponseBody<PmsBrandData>> {
+export function getPmsBrandDetail(id: string): Promise<ResponseBody<PmsBrandData>> {
 	return getData(`${baseService.product + basePmsBrand + PmsBrandUrl.url}`, { id });
 }
 

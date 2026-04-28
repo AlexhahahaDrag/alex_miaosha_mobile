@@ -1,7 +1,7 @@
 import type { Dayjs } from 'dayjs';
 
 export interface ShopStockData {
-	id?: number | null;
+	id?: string | null;
 	shopName?: string;
 	oldShopCode?: string;
 	shopCode?: string;

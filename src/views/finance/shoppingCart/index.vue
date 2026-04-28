@@ -172,7 +172,7 @@ const changeCheck = (): void => {
 	getSumAmount();
 };
 
-const delShopCartInfo = (id: number | null): void => {
+const delShopCartInfo = (id: string | null): void => {
 	if (!id) {
 		return;
 	}

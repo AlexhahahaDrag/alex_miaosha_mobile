@@ -22,7 +22,7 @@ export function getRolePermissionInfoPage(
 }
 
 export function getRolePermissionInfoDetail(
-	id: number,
+	id: string,
 ): Promise<ResponseBody<RolePermissionInfoData>> {
 	return getData(
 		`${baseService.user + baseRolePermissionInfo + RolePermissionInfoUrl.url}?id=${id}`,

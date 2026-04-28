@@ -21,7 +21,7 @@ export function getPmsAttrPage(
 	});
 }
 
-export function getPmsAttrDetail(id: number): Promise<ResponseBody<PmsAttrData>> {
+export function getPmsAttrDetail(id: string): Promise<ResponseBody<PmsAttrData>> {
 	return getData(`${baseService.product + basePmsAttr + PmsAttrUrl.url}`, { id });
 }
 

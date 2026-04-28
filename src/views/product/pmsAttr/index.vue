@@ -180,7 +180,7 @@ const beforeClose = (_e: Params): void => {
 	// console.log(e);
 };
 
-const delPmsAttr = (id: number) => {
+const delPmsAttr = (id: string) => {
 	deletePmsAttr(`${id}`).then((res: Params) => {
 		if (res?.code == '200') {
 			refresh();

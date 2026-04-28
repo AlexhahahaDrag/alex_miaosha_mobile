@@ -21,7 +21,7 @@ export function getPmsCategoryPage(
 	});
 }
 
-export function getPmsCategoryDetail(id: number): Promise<ResponseBody<PmsCategoryData>> {
+export function getPmsCategoryDetail(id: string): Promise<ResponseBody<PmsCategoryData>> {
 	return getData(`${baseService.product + basePmsCategory + PmsCategoryUrl.url}`, { id });
 }
 

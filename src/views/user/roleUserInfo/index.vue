@@ -178,7 +178,7 @@ const beforeClose = (_e: Params): void => {
 	// console.log(e);
 };
 
-const delRoleUserInfo = (id: number) => {
+const delRoleUserInfo = (id: string) => {
 	deleteRoleUserInfo(`${id}`).then((res: Params) => {
 		if (res?.code == '200') {
 			refresh();

@@ -21,7 +21,7 @@ export function getPermissionInfoPage(
 	});
 }
 
-export function getPermissionInfoDetail(id: number): Promise<ResponseBody<PermissionInfoData>> {
+export function getPermissionInfoDetail(id: string): Promise<ResponseBody<PermissionInfoData>> {
 	return getData(`${baseService.user + basePermissionInfo + PermissionInfoUrl.url}`, { id });
 }
 

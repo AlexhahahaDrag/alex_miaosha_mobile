@@ -81,7 +81,7 @@ export interface PageInfo {
 export interface ModelInfo {
 	title?: string;
 	width?: string;
-	id?: number | undefined;
+	id?: string;
 	confirmLoading?: boolean;
 }
 

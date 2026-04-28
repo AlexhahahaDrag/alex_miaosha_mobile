@@ -178,7 +178,7 @@ const beforeClose = (_e: Params): void => {
 	// console.log(e);
 };
 
-const delOrgUserInfo = (id: number) => {
+const delOrgUserInfo = (id: string) => {
 	deleteOrgUserInfo(`${id}`).then((res: Params) => {
 		if (res?.code == '200') {
 			refresh();

@@ -5,6 +5,6 @@ export function getSeckillList(params: SeckillData): Promise<ResponseBody<boolea
 	return getData('/api/blog/getList', params);
 }
 
-export function deleteBlogById(id: number) {
+export function deleteBlogById(id: string) {
 	return deleteData(`/api/blog/delete?id=${id}`);
 }

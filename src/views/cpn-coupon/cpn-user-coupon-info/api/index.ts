@@ -44,9 +44,9 @@ export const redeemCpnUserCouponInfo = async (params: {
 
 // 取消核销（按数量核销）
 export const cancelRedeemCpnUserCouponInfo = async (params: {
-	userId?: number;
-	couponId?: number;
-	userCouponId?: number;
+	userId?: string;
+	couponId?: string;
+	userCouponId?: string;
 	redemptionQuantity?: number;
 	remarks?: string;
 }): Promise<ResponseBody<boolean>> => {

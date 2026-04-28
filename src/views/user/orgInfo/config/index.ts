@@ -1,13 +1,12 @@
 export interface OrgInfoData {
-	id?: number;
+	id?: string;
 	orgCode?: string;
 	orgName?: string;
 	orgAlias?: string;
 	orgShortName?: string;
-	parentId?: number;
+	parentId?: string;
 	parentName?: string;
 	parentOrgName?: string;
 	summary?: string;
 	status?: string | number;
-	[key: string]: unknown;
 }

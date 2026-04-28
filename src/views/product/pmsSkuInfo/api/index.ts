@@ -21,7 +21,7 @@ export function getPmsSkuInfoPage(
 	});
 }
 
-export function getPmsSkuInfoDetail(id: number): Promise<ResponseBody<PmsSkuInfoData>> {
+export function getPmsSkuInfoDetail(id: string): Promise<ResponseBody<PmsSkuInfoData>> {
 	return getData(`${baseService.product + basePmsSkuInfo + PmsSkuInfoUrl.url}`, { id });
 }
 

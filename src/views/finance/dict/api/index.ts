@@ -10,7 +10,7 @@ const dictUrl = {
 };
 
 export interface DictInfo {
-	id?: number;
+	id?: string;
 	name?: string;
 	typeCode?: string;
 	typeName?: string;
@@ -33,7 +33,7 @@ export function getDictList(belongTo: string): Promise<ResponseBody<DictInfo[]>>
 	return getData(`${baseService.finance + baseDictManager + dictUrl.listByBelong}`, { belongTo });
 }
 
-export function getDictManagerDetail(id: number): Promise<ResponseBody<DictInfo>> {
+export function getDictManagerDetail(id: string): Promise<ResponseBody<DictInfo>> {
 	return getData(`${baseService.finance + baseDictManager + dictUrl.url}`, { id });
 }
 

@@ -187,7 +187,7 @@ const beforeClose = (_e: unknown): void => {
 	// console.log(e);
 };
 
-const delOrgInfo = (id: number) => {
+const delOrgInfo = (id: string) => {
 	deleteOrgInfo(`${id}`).then((res: ResponseBody<boolean>) => {
 		if (res?.code == '200') {
 			refresh();

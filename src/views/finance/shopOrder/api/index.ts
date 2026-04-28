@@ -22,7 +22,7 @@ export function getShopOrderPage(
 	});
 }
 
-export function getShopOrderDetail(id: number): Promise<ResponseBody<ShopOrderData>> {
+export function getShopOrderDetail(id: string): Promise<ResponseBody<ShopOrderData>> {
 	return getData(`${baseService.finance + baseShopOrder + ShopOrderUrl.url}`, { id });
 }
 

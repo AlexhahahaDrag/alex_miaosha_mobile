@@ -13,7 +13,7 @@ export const label = reactive({
 });
 
 export interface ShopStockInfo {
-	id?: number;
+	id?: string;
 	shopName?: string;
 	shopCode?: string;
 	costAmount?: number;

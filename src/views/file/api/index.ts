@@ -27,7 +27,7 @@ export function getFilePage(
 	return postData(url, params);
 }
 
-export function getFileDetail(id: number | string): Promise<ResponseBody<FileInfoData>> {
+export function getFileDetail(id: string): Promise<ResponseBody<FileInfoData>> {
 	return getData(`${baseService.file + baseFileManager + fileUrl.url}?id=${id}`);
 }
 

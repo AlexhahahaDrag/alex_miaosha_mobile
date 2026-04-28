@@ -21,7 +21,7 @@ export function getShopStockBatchPage(
 	});
 }
 
-export function getShopStockBatchDetail(id: number): Promise<ResponseBody<ShopStockBatchData>> {
+export function getShopStockBatchDetail(id: string): Promise<ResponseBody<ShopStockBatchData>> {
 	return getData(baseService.finance + baseShopStockBatch + ShopStockBatchUrl.url, { id });
 }
 

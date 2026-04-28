@@ -22,7 +22,7 @@ export function getShopCartPage(
 	});
 }
 
-export function getShopCartDetail(id: number): Promise<ResponseBody<ShopCartData>> {
+export function getShopCartDetail(id: string): Promise<ResponseBody<ShopCartData>> {
 	return getData(`${baseService.finance + baseShopCart + ShopCartUrl.url}`, { id });
 }
 

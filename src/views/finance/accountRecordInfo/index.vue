@@ -184,7 +184,7 @@ const beforeClose = (_e: Params): void => {
 	// console.log(e);
 };
 
-const delAccountRecordInfo = async (id: number) => {
+const delAccountRecordInfo = async (id: string) => {
 	const { code, message } = await deleteAccountRecordInfo(`${id}`);
 	if (code == '200') {
 		refresh();

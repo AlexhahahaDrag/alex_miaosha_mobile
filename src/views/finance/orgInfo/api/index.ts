@@ -21,7 +21,7 @@ export function getOrgInfoPage(
 	});
 }
 
-export function getOrgInfoDetail(id: number): Promise<ResponseBody<OrgInfoData>> {
+export function getOrgInfoDetail(id: string): Promise<ResponseBody<OrgInfoData>> {
 	return getData(`${baseService.finance + baseOrgInfo + OrgInfoUrl.url}`, { id });
 }
 

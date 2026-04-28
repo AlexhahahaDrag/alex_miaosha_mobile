@@ -2,7 +2,7 @@ import type { Dayjs } from 'dayjs';
 
 // 操作记录项
 export interface OperationRecord {
-	id?: number;
+	id?: string;
 	action?: string;
 	actionName?: string;
 	operateTime?: Dayjs | string;
@@ -11,10 +11,10 @@ export interface OperationRecord {
 }
 
 export interface CpnUserCouponInfoData {
-	id?: number;
-	userId?: number;
+	id?: string;
+	userId?: string;
 	userName?: string;
-	couponId?: number;
+	couponId?: string;
 	couponName?: string;
 	couponImage?: string;
 	unitValue?: number;

@@ -22,7 +22,7 @@ export function getAccountRecordInfoTestPage(
 }
 
 export function getAccountRecordInfoTestDetail(
-	id: number,
+	id: string,
 ): Promise<ResponseBody<AccountRecordInfoTestData>> {
 	return getData(
 		`${baseService.finance + baseAccountRecordInfoTest + AccountRecordInfoTestUrl.url}?id=${id}`,

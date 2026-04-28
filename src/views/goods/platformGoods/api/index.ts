@@ -11,6 +11,6 @@ export function getPlatformList(params: PlatformGoodsData): Promise<ResponseBody
 	return getData(baseService.mission + baseGoods + platformGoodsUrl.list, params);
 }
 
-export function deleteBlogById(id: number) {
+export function deleteBlogById(id: string) {
 	return deleteData(`/api/blog/delete?id=${id}`);
 }

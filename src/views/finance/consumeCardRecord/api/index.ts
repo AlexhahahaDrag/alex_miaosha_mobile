@@ -9,10 +9,10 @@ const ConsumeCardRecordUrl = {
 };
 // 消费卡交易记录类型 - 基于API文档 PrepaidConsumeRecordTVo
 export interface TransactionRecord {
-	id: number;
+	id: string;
 	amount: number; // 金额
 	balanceAfter: number; // 余额
-	cardId: number; // 卡片ID
+	cardId: string; // 卡片ID
 	cardName: string; // 卡片名称
 	consumeTime: string; // 消费时间
 	createTime: string; // 创建时间
@@ -58,7 +58,7 @@ export function getConsumeCardRecordPage(
  * 获取交易记录详情
  * @param id 记录ID
  */
-export function getConsumeCardRecordDetail(id: number): Promise<TransactionRecord> {
+export function getConsumeCardRecordDetail(id: string): Promise<TransactionRecord> {
 	return getData(
 		`${baseService.finance + baseConsumeCardRecord + ConsumeCardRecordUrl.url}?id=${id}`,
 	);

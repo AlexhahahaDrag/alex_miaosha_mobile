@@ -5,7 +5,7 @@ export interface SearchInfo {
 	valueSelect?: string;
 	attrType?: number;
 	enable?: number;
-	catelogId?: number;
+	catelogId?: string;
 	showDesc?: number;
 }
 
@@ -16,6 +16,6 @@ export interface DataItem {
 	valueSelect: string;
 	attrType: number;
 	enable: number;
-	catelogId: number;
+	catelogId: string;
 	showDesc: number;
 }
