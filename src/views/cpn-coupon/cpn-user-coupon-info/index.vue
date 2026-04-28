@@ -35,7 +35,8 @@
 				/>
 				<van-list
 					v-else
-					v-model:loading="loading"
+					:loading="loading"
+					@update:loading="onLoadingChange"
 					:finished="finished"
 					:immediate-check="false"
 					finished-text="没有更多了"
@@ -256,6 +257,10 @@ const onRefreshData = () => {
 // 加载更多
 const onLoadMore = () => {
 	getCpnUserCouponPageData(searchInfo.value, pagination);
+};
+
+const onLoadingChange = (value: boolean) => {
+	loading.value = value;
 };
 
 // 取消核销

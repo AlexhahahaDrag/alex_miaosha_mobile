@@ -72,22 +72,14 @@ export function deleteConsumeCardRecord(ids: string): Promise<ResponseBody<boole
 		`${baseService.finance + baseConsumeCardRecord + ConsumeCardRecordUrl.url}?ids=${ids}`,
 	);
 }
-/**
- * 新增交易记录
- * @param method 方法类型
- * @param params 参数
- */
+// 新增交易记录
 export function addConsumeCardRecord(
 	params: TransactionRecord,
 ): Promise<ResponseBody<ConsumeCardRecordData>> {
 	return postData(baseService.finance + baseConsumeCardRecord + ConsumeCardRecordUrl.url, params);
 }
 
-/**
- * 更新交易记录
- * @param method 方法类型
- * @param params 参数
- */
+// 更新交易记录
 export function updateConsumeCardRecord(
 	params: TransactionRecord,
 ): Promise<ResponseBody<ConsumeCardRecordData>> {

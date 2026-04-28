@@ -32,7 +32,8 @@
 		></van-empty>
 		<van-list
 			v-else
-			v-model:loading="loading"
+			:loading="loading"
+			@update:loading="onLoadingChange"
 			:finished="finished"
 			finished-text="没有更多了"
 			@load="onRefresh"
@@ -69,7 +70,7 @@
 										{{ item.permissionName }}
 									</div>
 								</div>
-								<div :class="true ? 'rightDiv' : 'rightRedDiv'"> item.status+item.options+; </div>
+								<div class="rightDiv"> item.status+item.options+; </div>
 							</div>
 						</template>
 					</van-cell>
@@ -95,7 +96,7 @@ import type { SearchInfo } from './permissionInfoTs';
 import { usePagination } from '@/composables/usePagination';
 import { getPermissionInfoPage, deletePermissionInfo } from '@/views/user/permissionInfo/api';
 import { getUserManagerList } from '@/views/user/userManager/api';
-import type { PageInfo } from '@/views/common/config/index';
+import type { PageInfo } from '@/views/common/config';
 
 const router = useRouter();
 const route = useRoute();
@@ -174,6 +175,10 @@ const onRefresh = () => {
 	query(searchInfo.value, pagination);
 };
 
+const onLoadingChange = (value: boolean) => {
+	loading.value = value;
+};
+
 const beforeClose = (_e: Params): void => {
 	// console.log(e);
 };
@@ -229,7 +234,7 @@ init();
 	color: #1989fa;
 	border-color: grey;
 	padding: 0 16px;
-	margin-top: 0px;
-	margin-bottom: 0px;
+	margin-top: 0;
+	margin-bottom: 0;
 }
 </style>
