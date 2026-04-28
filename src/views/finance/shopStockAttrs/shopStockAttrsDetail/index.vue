@@ -76,9 +76,11 @@
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-import { label, rulesRef } from './shopStockAttrsDetailTs';
+import { label, rulesRef } from '@/views/finance/shopStockAttrs/config';
+import type { ShopStockAttrsData } from '@/views/finance/shopStockAttrs/config';
 import { addShopStockAttrs, updateShopStockAttrs, getShopStockAttrsDetail } from '@/views/finance/shopStockAttrs/api';
 import type { Info } from '@/views/common/pop/selectPop.vue';
+import type { DictInfo } from '@/views/common/config';
 import { getListName } from '@/views/common/config';
 import { getDictList } from '@/views/finance/dict/api';
 
@@ -89,7 +91,7 @@ const info = ref<Params>({
 	leftPath: '/finance/shopStockAttrs',
 });
 
-const formInfo = ref<Params>({});
+const formInfo = ref<ShopStockAttrsData>({});
 
 const popInfo = ref<Info>({ showFlag: false });
 
@@ -129,28 +131,25 @@ const cancelInfo = () => {
 	popInfo.value.showFlag = false;
 };
 
-const getDictInfoList = (res: Params): void => {
-	if (res?.code == '200') {
-		isValidInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'is_valid');
-		isValidName.value = getListName(isValidInfo.value.list || [], formInfo.value.isValid, 'typeCode', 'typeName');
-	} else {
-		showFailToast(res?.message || '查询失败，请联系管理员!');
-	}
+const getDictInfoList = (data: DictInfo[]): void => {
+	isValidInfo.value.list = data.filter((item: { belongTo: string }) => item.belongTo == 'is_valid');
+	isValidName.value = getListName(isValidInfo.value.list || [], formInfo.value.isValid, 'typeCode', 'typeName');
 };
 
-const onSubmit = (): void => {
-	let method = 'post';
-	if (formInfo.value.id) {
-		method = 'put';
-	}
-	(method === 'put' ? updateShopStockAttrs : addShopStockAttrs)(formInfo.value).then((res: Params) => {
-		if (res?.code == '200') {
-			showSuccessToast(res?.message || '保存成功!');
+const onSubmit = async (): Promise<void> => {
+	const api = formInfo.value.id ? updateShopStockAttrs : addShopStockAttrs;
+
+	try {
+		const { code, message } = await api(formInfo.value);
+		if (code === '200') {
+			showSuccessToast(message || '保存成功!');
 			router.push({ path: '/finance/shopStockAttrs' });
 		} else {
-			showFailToast(res?.message || '保存失败，请联系管理员!');
+			showFailToast(message || '保存失败，请联系管理员!');
 		}
-	});
+	} catch {
+		showFailToast('网络请求异常');
+	}
 };
 
 const init = (): void => {
@@ -163,7 +162,7 @@ const init = (): void => {
 				} else {
 					showFailToast(res?.message || '查询详情失败，请联系管理员!');
 				}
-				getDictInfoList(res[1]);
+				getDictInfoList(res[1]?.data || []);
 			})
 			.catch(() => {
 				showFailToast('系统问题，请联系管理员！');

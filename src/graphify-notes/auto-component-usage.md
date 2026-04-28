@@ -19,7 +19,7 @@ Why it exists:
 ## CommonPullRefresh
 - component: `src/views/components/CommonPullRefresh.vue`
 - template tag: `<common-pull-refresh>`
-- referenced by 21 file(s)
+- referenced by 20 file(s)
 - consumer: `src/views/cpn-coupon/cpn-coupon-info/index.vue`
 - consumer: `src/views/cpn-coupon/cpn-user-coupon-info/index.vue`
 - consumer: `src/views/finance/accountRecordInfo/index.vue`
@@ -29,7 +29,6 @@ Why it exists:
 - consumer: `src/views/finance/shopOrder/index.vue`
 - consumer: `src/views/finance/shopProduct/index.vue`
 - consumer: `src/views/finance/shopStock/index.vue`
-- consumer: `src/views/finance/shopStockAttrs/index.vue`
 - consumer: `src/views/finance/shopStockBatch/index.vue`
 - consumer: `src/views/message/index.vue`
 - consumer: `src/views/product/pmsAttr/index.vue`

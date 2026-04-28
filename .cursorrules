@@ -25,27 +25,29 @@
 ### 📌 核心公共组件 (src/views/components/)
 - **`CommonPullRefresh.vue`**: 对 `van-pull-refresh` 的轻量封装，仅负责手势拦截。
 - **`CommonList.vue`**: 负责列表状态（加载中、已结束、空状态）的统一显示，集成骨架屏。
-- **组合示例**:
-  ```vue
-  <CommonPullRefresh v-model="isRefresh" @refresh="onRefresh">
-      <CommonList v-model="loading" :loading="loading" :refreshing="isRefresh" :finished="finished" :isEmpty="dataSource.length === 0" @load="onLoadMore">
-          <div v-for="item in dataSource">...</div>
-      </CommonList>
-  </CommonPullRefresh>
-  ```
 
 ### 📌 核心 Hooks (src/composables/)
-- **`usePagination.ts`**: 标准化分页管理。
-- **使用原则**: 禁止在业务组件内独立定义 `ref({ current: 1, ... })`，统一使用 `usePagination`。
-  ```ts
-  const { pagination, resetPagination, setTotal, nextPage } = usePagination();
-  ```
+- **`usePagination.ts`**: 标准化分页管理。禁止在业务组件内独立定义 `ref({ current: 1, ... })`，统一使用 `usePagination`。
+
+### 📌 自动导入说明 (Auto-Imports)
+- 项目使用 `unplugin-auto-import` 和 `unplugin-vue-components`。
+- **Vue APIs**: `ref`, `computed`, `watch`, `onMounted` 等无需显式 import。
+- **UI Components**: Vant 组件 (`van-xxx`) 及 `src/views/components/` 下的组件可直接在 template 中使用，无需显式 import。
 
 ---
 
-## 3. Vue SFC 代码规范与结构约束
+## 3. 开发规范与代码约束
 
-### 📌 标签块布局顺序
+### 📌 交付质量要求
+- **ESLint 校验**: 任何代码修改后，必须运行 `npm run lint` 确保无报错。
+- **基础测试**: 修改关键逻辑后需运行 `npm run test` 或在本地环境下进行功能验证，严禁提交无法运行的代码。
+
+### 📌 现代 API 标准
+- **严禁使用 `url.parse()`**: 必须使用 `new URL()` API 替换。
+- **类型安全**: 必须使用 TypeScript，优先定义 Interface 而非 type。
+- **API 调用**: 优先使用 `postData`, `getData`, `putData`, `deleteData` 等封装好的核心抽象。
+
+### 📌 Vue SFC 结构顺序
 1. `<template>`
 2. `<script setup lang="ts">`
 3. `<style lang="less" scoped>`
@@ -62,17 +64,20 @@
 
 ---
 
-## 5. 「开发/架构层面」双向同步协议
+## 4. 知识图谱维护 (Graphify)
+项目使用 `graphify` 进行架构分析与关系追踪。
+- **修改后同步**: 凡修改 `src` 目录下的代码文件，完成后必须运行 `npm run graphify:update` 以保持图谱同步。
+- **查询参考**: 在推断跨模块依赖或进行重构分析时，优先查询 `src/graphify-out/GRAPH_REPORT.md`。
 
+---
+
+## 5. 「开发/架构层面」双向同步协议
 > [!IMPORTANT]
 > **凡涉及全局交互体系、基础设施、或 `src/views/components` 的结构性更改，Antigravity 必须自觉检查并更新本 `.cursorrules` 信息（或同步更新 `DEVELOPMENT.md`）。**
 
 ---
 
 ## 6. UI/UX 设计智能 (UI/UX Pro Max)
-在进行任何 UI/UX 相关工作（设计、构建、重构、优化）时，必须启用 `ui-ux-pro-max` 技能：
-- **技能路径**: `.gemini/skills/ui-ux-pro-max/SKILL.md`
-- **核心流程**:
-  1. **生成设计系统**: 使用 `python .gemini/skills/ui-ux-pro-max/scripts/search.py "关键词" --design-system` 获取方案。
-  2. **遵循规范**: 严格执行 `SKILL.md` 中的“Pre-Delivery Checklist”，特别是**严禁使用 Emoji 作为图标**，必须使用 SVG。
-  3. **视觉标准**: 优先参考 `.gemini/skills/ui-ux-pro-max/data/` 中的行业匹配建议。
+在进行任何 UI/UX 相关工作时，必须启用 `ui-ux-pro-max` 技能：
+- **核心流程**: 使用 `python .gemini/skills/ui-ux-pro-max/scripts/search.py "关键词" --design-system` 获取方案。
+- **严禁使用 Emoji**: 必须使用 SVG。

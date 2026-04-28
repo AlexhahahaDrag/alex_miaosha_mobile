@@ -921,7 +921,7 @@
       "id": "views_components_commonpullrefresh_vue",
       "community": 4,
       "norm_label": "commonpullrefresh.vue",
-      "degree": 23
+      "degree": 22
     },
     {
       "label": "onRefresh()",
@@ -3221,7 +3221,7 @@
       "id": "views_finance_shopstockattrs_config_index_ts",
       "community": 103,
       "norm_label": "index.ts",
-      "degree": 0
+      "degree": 1
     },
     {
       "label": "index.vue",
@@ -3241,7 +3241,7 @@
       "id": "views_finance_shopstockattrs_shopstockattrsdetail_shopstockattrsdetailts_ts",
       "community": 104,
       "norm_label": "shopstockattrsdetailts.ts",
-      "degree": 1
+      "degree": 0
     },
     {
       "label": "index.vue",
@@ -3401,7 +3401,7 @@
       "id": "views_home_index_vue",
       "community": 110,
       "norm_label": "index.vue",
-      "degree": 3
+      "degree": 2
     },
     {
       "label": "index.vue",
@@ -5372,7 +5372,7 @@
       "source_location": "AutoImport",
       "community": 152,
       "norm_label": "ref",
-      "degree": 12,
+      "degree": 11,
       "synthetic_auto_import": true
     },
     {
@@ -5416,7 +5416,7 @@
       "source_location": "AutoImport",
       "community": 152,
       "norm_label": "onmounted",
-      "degree": 20,
+      "degree": 21,
       "synthetic_auto_import": true
     },
     {
@@ -14359,19 +14359,6 @@
     {
       "relation": "uses_component_auto",
       "confidence": "EXTRACTED",
-      "source_file": "src\\views\\finance\\shopStockAttrs\\index.vue",
-      "source_location": "template",
-      "weight": 1,
-      "_src": "views_finance_shopstockattrs_index_vue",
-      "_tgt": "views_components_commonpullrefresh_vue",
-      "source": "views_components_commonpullrefresh_vue",
-      "target": "views_finance_shopstockattrs_index_vue",
-      "confidence_score": 1,
-      "component_tag": "common-pull-refresh"
-    },
-    {
-      "relation": "uses_component_auto",
-      "confidence": "EXTRACTED",
       "source_file": "src\\views\\finance\\shopStockBatch\\index.vue",
       "source_location": "template",
       "weight": 1,
@@ -16003,61 +15990,73 @@
     {
       "relation": "uses_auto_import_api",
       "confidence": "EXTRACTED",
-      "source_file": "src\\views\\finance\\shopStockAttrs\\index.vue",
+      "source_file": "src\\views\\finance\\shopStockAttrs\\config\\index.ts",
       "source_location": "script",
       "weight": 1,
-      "_src": "views_finance_shopstockattrs_index_vue",
-      "_tgt": "autoimport_api_userouter",
-      "source": "autoimport_api_userouter",
-      "target": "views_finance_shopstockattrs_index_vue",
-      "confidence_score": 1
-    },
-    {
-      "relation": "uses_auto_import_api",
-      "confidence": "EXTRACTED",
-      "source_file": "src\\views\\finance\\shopStockAttrs\\index.vue",
-      "source_location": "script",
-      "weight": 1,
-      "_src": "views_finance_shopstockattrs_index_vue",
-      "_tgt": "autoimport_api_useroute",
-      "source": "autoimport_api_useroute",
-      "target": "views_finance_shopstockattrs_index_vue",
-      "confidence_score": 1
-    },
-    {
-      "relation": "uses_auto_import_api",
-      "confidence": "EXTRACTED",
-      "source_file": "src\\views\\finance\\shopStockAttrs\\shopStockAttrsDetail\\index.vue",
-      "source_location": "script",
-      "weight": 1,
-      "_src": "views_finance_shopstockattrs_shopstockattrsdetail_index_vue",
-      "_tgt": "autoimport_api_userouter",
-      "source": "autoimport_api_userouter",
-      "target": "views_finance_shopstockattrs_shopstockattrsdetail_index_vue",
-      "confidence_score": 1
-    },
-    {
-      "relation": "uses_auto_import_api",
-      "confidence": "EXTRACTED",
-      "source_file": "src\\views\\finance\\shopStockAttrs\\shopStockAttrsDetail\\index.vue",
-      "source_location": "script",
-      "weight": 1,
-      "_src": "views_finance_shopstockattrs_shopstockattrsdetail_index_vue",
-      "_tgt": "autoimport_api_useroute",
-      "source": "autoimport_api_useroute",
-      "target": "views_finance_shopstockattrs_shopstockattrsdetail_index_vue",
-      "confidence_score": 1
-    },
-    {
-      "relation": "uses_auto_import_api",
-      "confidence": "EXTRACTED",
-      "source_file": "src\\views\\finance\\shopStockAttrs\\shopStockAttrsDetail\\shopStockAttrsDetailTs.ts",
-      "source_location": "script",
-      "weight": 1,
-      "_src": "views_finance_shopstockattrs_shopstockattrsdetail_shopstockattrsdetailts_ts",
+      "_src": "views_finance_shopstockattrs_config_index_ts",
       "_tgt": "autoimport_api_reactive",
       "source": "autoimport_api_reactive",
-      "target": "views_finance_shopstockattrs_shopstockattrsdetail_shopstockattrsdetailts_ts",
+      "target": "views_finance_shopstockattrs_config_index_ts",
+      "confidence_score": 1
+    },
+    {
+      "relation": "uses_auto_import_api",
+      "confidence": "EXTRACTED",
+      "source_file": "src\\views\\finance\\shopStockAttrs\\index.vue",
+      "source_location": "script",
+      "weight": 1,
+      "_src": "views_finance_shopstockattrs_index_vue",
+      "_tgt": "autoimport_api_onmounted",
+      "source": "autoimport_api_onmounted",
+      "target": "views_finance_shopstockattrs_index_vue",
+      "confidence_score": 1
+    },
+    {
+      "relation": "uses_auto_import_api",
+      "confidence": "EXTRACTED",
+      "source_file": "src\\views\\finance\\shopStockAttrs\\index.vue",
+      "source_location": "script",
+      "weight": 1,
+      "_src": "views_finance_shopstockattrs_index_vue",
+      "_tgt": "autoimport_api_userouter",
+      "source": "autoimport_api_userouter",
+      "target": "views_finance_shopstockattrs_index_vue",
+      "confidence_score": 1
+    },
+    {
+      "relation": "uses_auto_import_api",
+      "confidence": "EXTRACTED",
+      "source_file": "src\\views\\finance\\shopStockAttrs\\index.vue",
+      "source_location": "script",
+      "weight": 1,
+      "_src": "views_finance_shopstockattrs_index_vue",
+      "_tgt": "autoimport_api_useroute",
+      "source": "autoimport_api_useroute",
+      "target": "views_finance_shopstockattrs_index_vue",
+      "confidence_score": 1
+    },
+    {
+      "relation": "uses_auto_import_api",
+      "confidence": "EXTRACTED",
+      "source_file": "src\\views\\finance\\shopStockAttrs\\shopStockAttrsDetail\\index.vue",
+      "source_location": "script",
+      "weight": 1,
+      "_src": "views_finance_shopstockattrs_shopstockattrsdetail_index_vue",
+      "_tgt": "autoimport_api_userouter",
+      "source": "autoimport_api_userouter",
+      "target": "views_finance_shopstockattrs_shopstockattrsdetail_index_vue",
+      "confidence_score": 1
+    },
+    {
+      "relation": "uses_auto_import_api",
+      "confidence": "EXTRACTED",
+      "source_file": "src\\views\\finance\\shopStockAttrs\\shopStockAttrsDetail\\index.vue",
+      "source_location": "script",
+      "weight": 1,
+      "_src": "views_finance_shopstockattrs_shopstockattrsdetail_index_vue",
+      "_tgt": "autoimport_api_useroute",
+      "source": "autoimport_api_useroute",
+      "target": "views_finance_shopstockattrs_shopstockattrsdetail_index_vue",
       "confidence_score": 1
     },
     {
@@ -16142,18 +16141,6 @@
       "_tgt": "autoimport_api_userouter",
       "source": "autoimport_api_userouter",
       "target": "views_goods_index_vue",
-      "confidence_score": 1
-    },
-    {
-      "relation": "uses_auto_import_api",
-      "confidence": "EXTRACTED",
-      "source_file": "src\\views\\home\\index.vue",
-      "source_location": "script",
-      "weight": 1,
-      "_src": "views_home_index_vue",
-      "_tgt": "autoimport_api_ref",
-      "source": "autoimport_api_ref",
-      "target": "views_home_index_vue",
       "confidence_score": 1
     },
     {
