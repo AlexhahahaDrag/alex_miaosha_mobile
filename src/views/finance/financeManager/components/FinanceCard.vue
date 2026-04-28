@@ -61,7 +61,11 @@
 <script setup lang="ts">
 import { computed, type PropType } from 'vue';
 import dayjs from 'dayjs';
-import { fromSourceTransferList, type FinanceManagerData, type FromSourceTransferItem } from '../config';
+import {
+	fromSourceTransferList,
+	type FinanceManagerData,
+	type FromSourceTransferItem,
+} from '@/views/finance/financeManager/config';
 
 const props = defineProps({
 	item: {
@@ -98,7 +102,7 @@ const iconToneClass = computed(() =>
 
 const formattedAmount = computed(() => {
 	const amount = Number(props.item.amount || 0);
-	const prefix = props.item.incomeAndExpenses === 'income' ? '+' : '-';
+	const prefix = props.item.incomeAndExpenses === 'income' ? '' : '-';
 	return `${prefix}¥${amount.toFixed(2)}`;
 });
 
@@ -177,7 +181,7 @@ const onDelete = () => {
 	}
 
 	&__title {
-		flex: 1;
+		flex: 0 1 auto;
 		min-width: 0;
 		font-size: 14px;
 		font-weight: 600;

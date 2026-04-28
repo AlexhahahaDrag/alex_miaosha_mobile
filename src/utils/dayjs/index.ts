@@ -109,8 +109,8 @@ const formatHeaderDate = (date: string | Dayjs): string => {
 	const now = dayjs().startOf('day');
 	const target = dayjs(date);
 
-	if (target.isSame(now, 'day')) return '今天 (Today)';
-	if (target.isSame(now.subtract(1, 'day'), 'day')) return '昨天 (Yesterday)';
+	if (target.isSame(now, 'day')) return '今天';
+	if (target.isSame(now.subtract(1, 'day'), 'day')) return '昨天';
 	if (target.isSame(now, 'year')) return target.format('MM月DD日');
 
 	return target.format('YYYY年MM月DD日');

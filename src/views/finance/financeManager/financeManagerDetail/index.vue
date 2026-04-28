@@ -216,15 +216,17 @@ import type { Info } from '@/views/common/pop/selectPop.vue';
 import { datePickerFormatter } from '@/utils/dayjs';
 import type { DatePickerInfo } from '@/utils/common';
 import type { DictInfo } from '@/views/finance/dict/api';
-import type { UserManagerData } from '@/views/user/userManager/api';
+import type { UserManagerData } from '@/views/user/userManager/config';
 import { addFinanceManger, editFinanceManger, getFinanceMangerDetail } from '@/views/finance/financeManager/api';
 import { useNavBar } from '@/composables/useNavBar';
 import { getRoutePathByName } from '@/utils/router';
 import { useTabBar } from '@/composables/useTabBar';
+import { useDashboardStore } from '@/store/modules/dashboard/dashboard';
 
 const route = useRoute();
 const router = useRouter();
 const userInfo = useUserStore()?.getUserInfo;
+const dashboardStore = useDashboardStore();
 
 // 使用新的NavBar系统
 useNavBar({
@@ -354,7 +356,8 @@ const chooseDate = () => {
 };
 
 const selectDateInfo = (date: Dayjs, dateName: string) => {
-	formInfo.value.infoDate = date;
+	const now = dayjs();
+	formInfo.value.infoDate = dayjs(date).hour(now.hour()).minute(now.minute()).second(now.second());
 	nameRefMap.infoDate.value = dateName;
 	chooseDateInfo.value.showFlag = false;
 };
@@ -375,6 +378,7 @@ const onSubmit = async () => {
 		const { code, message } = await api(formInfo.value);
 		if (code == '200') {
 			showSuccessToast(message || '保存成功!');
+			dashboardStore.updateSaveTime('财务信息');
 			router.push({ path: getLeftPath.value });
 		} else {
 			showFailToast(message || '保存失败，请联系管理员!');

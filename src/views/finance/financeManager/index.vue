@@ -224,8 +224,8 @@
 								<span class="date-group__weekday">{{ getWeekdayLabel(group.date) }}</span>
 							</div>
 							<div class="date-group__summary">
-								<span>支出 {{ formatCurrency(group.expense) }}</span>
-								<span>收入 {{ formatCurrency(group.income) }}</span>
+								<span v-if="Number(group.expense) > 0">支出 {{ formatCurrency(group.expense) }}</span>
+								<span v-if="Number(group.income) > 0">收入 {{ formatCurrency(group.income) }}</span>
 							</div>
 						</header>
 
@@ -253,7 +253,10 @@
 			@confirm="onConfirmCustomDate"
 		/>
 
-		<van-back-top target="#finance-manager-list" />
+		<van-back-top
+			target="#finance-manager-list"
+			:bottom="100"
+		/>
 	</div>
 </template>
 
@@ -275,8 +278,9 @@ import type { UserManagerData } from '@/views/user/userManager/config';
 import type { ResponseBody } from '@/types/api';
 import { formatHeaderDate } from '@/utils/dayjs';
 import { getRoutePathByName } from '@/utils/router';
+import { useDashboardStore } from '@/store/modules/dashboard/dashboard';
 
-type TimePreset = 'today' | '7d' | '30d' | 'all' | 'custom';
+type TimePreset = 'today' | '7d' | 'month' | 'all' | 'custom';
 
 interface FilterOption {
 	text: string;
@@ -298,13 +302,14 @@ interface ActiveFilterTag {
 const timeFilterOptions: { label: string; value: TimePreset }[] = [
 	{ label: '今天', value: 'today' },
 	{ label: '近7天', value: '7d' },
-	{ label: '近30天', value: '30d' },
+	{ label: '当月', value: 'month' },
 	{ label: '全部', value: 'all' },
 	{ label: '自定义', value: 'custom' },
 ];
 
 const router = useRouter();
 const route = useRoute();
+const dashboardStore = useDashboardStore();
 
 const categoryList = ref<DictInfo[]>([]);
 const userList = ref<UserManagerData[]>([]);
@@ -319,7 +324,7 @@ const searchInfo = ref<FinanceManagerData>({
 const finished = ref<boolean>(false);
 const isRefresh = ref<boolean>(false);
 const manualFilterPanelOpen = ref<boolean>(false);
-const activeTimePreset = ref<TimePreset>('30d');
+const activeTimePreset = ref<TimePreset>('month');
 const showCustomDatePicker = ref<boolean>(false);
 const customDateRange = ref<[Date, Date] | null>(null);
 
@@ -328,16 +333,16 @@ const { pagination, resetPagination, setTotal, nextPage } = usePagination();
 const sourceFilterOptions = computed<FilterOption[]>(() => [
 	{ text: '全部', value: '' },
 	...fromSourceTransferList.map((item) => ({
-		text: item.name,
-		value: item.value,
+		text: item.name || '',
+		value: String(item.value || ''),
 	})),
 ]);
 
 const categoryFilterOptions = computed<FilterOption[]>(() => [
 	{ text: '全部', value: '' },
 	...categoryList.value.map((item) => ({
-		text: item.typeName,
-		value: item.typeCode,
+		text: item.typeName || '',
+		value: String(item.typeCode || ''),
 	})),
 ]);
 
@@ -526,7 +531,11 @@ const getFinancePage = async (param: FinanceManagerData, cur: PageInfo) => {
 		});
 
 	if (code === '200') {
-		dataSource.value = [...dataSource.value, ...(data?.records || [])];
+		if (cur?.current === 1) {
+			dataSource.value = data?.records || [];
+		} else {
+			dataSource.value = [...dataSource.value, ...(data?.records || [])];
+		}
 		setTotal(data?.total || 0);
 		finished.value = (pagination.total || 0) <= dataSource.value.length;
 		return;
@@ -564,6 +573,7 @@ const onDeleteFinance = async (id?: string) => {
 
 	const { code, message } = await deleteFinanceManager(`${id}`);
 	if (code === '200') {
+		dashboardStore.updateSaveTime('财务信息');
 		onRefreshData();
 		showSuccessToast(message || '删除成功');
 		return;
@@ -634,8 +644,8 @@ const getTimePresetLabel = (value: TimePreset) => {
 			return '今天';
 		case '7d':
 			return '近7天';
-		case '30d':
-			return '近30天';
+		case 'month':
+			return '当月';
 		case 'custom':
 			if (customDateRange.value) {
 				return `${dayjs(customDateRange.value[0]).format('MM/DD')} - ${dayjs(customDateRange.value[1]).format('MM/DD')}`;
@@ -654,8 +664,8 @@ const getTimeBoundary = (): { start: Dayjs; end: Dayjs } | null => {
 			return { start: now.startOf('day'), end: now.endOf('day') };
 		case '7d':
 			return { start: now.subtract(6, 'day').startOf('day'), end: now.endOf('day') };
-		case '30d':
-			return { start: now.subtract(29, 'day').startOf('day'), end: now.endOf('day') };
+		case 'month':
+			return { start: now.startOf('month'), end: now.endOf('day') };
 		case 'custom':
 			if (!customDateRange.value) {
 				return null;

@@ -1,40 +1,42 @@
 <template>
 	<div class="home-container">
-		<!-- KPI Stats Section -->
-		<div
+		<!-- Section 1: 数据概览 -->
+		<section
 			v-if="visibleStats.length > 0"
-			class="stats-grid"
+			class="data-overview"
 		>
-			<div
-				v-for="stat in visibleStats"
-				:key="stat.label"
-				class="stat-card"
-			>
-				<div class="stat-label">{{ stat.label }}</div>
-				<div class="stat-value">{{ stat.value }}</div>
-				<div
-					class="stat-trend"
-					:class="stat.trend > 0 ? 'up' : 'down'"
-				>
-					{{ stat.trend > 0 ? '+' : '' }}{{ stat.trend }}% 较昨日
+			<div class="overview-card">
+				<div class="overview-header">
+					<h2 class="overview-title">最近保存时间</h2>
+				</div>
+				<div class="overview-content">
+					<div
+						v-for="(stat, index) in visibleStats"
+						:key="stat.label"
+						class="stat-item"
+						:class="{ 'has-divider': index > 0 }"
+					>
+						<span class="stat-label">{{ stat.label }}</span>
+						<span
+							class="stat-value"
+							:style="{ color: stat.color || '#191b23' }"
+						>
+							{{ stat.value }}
+						</span>
+					</div>
 				</div>
 			</div>
-		</div>
+		</section>
 
-		<!-- Main Menu Grid -->
-		<div class="menu-section">
-			<div class="section-title">快捷功能</div>
-			<van-grid
-				:column-num="3"
-				:border="false"
-				class="custom-grid"
-			>
-				<van-grid-item
+		<!-- Section 2: 快捷功能 -->
+		<section class="menu-section">
+			<h2 class="section-title">快捷功能</h2>
+			<div class="menu-grid">
+				<div
 					v-for="item in homeList"
 					:key="item?.name || ''"
-					:to="item.path"
-					class="grid-item-card"
-					@click="handleIconClick"
+					class="menu-item-card"
+					@click="handleGridItemClick(item)"
 				>
 					<div
 						class="icon-wrapper"
@@ -48,49 +50,52 @@
 						</svg-icon>
 					</div>
 					<span class="homeFontClass">{{ item?.meta?.title?.toString() || '' }}</span>
-				</van-grid-item>
-			</van-grid>
-		</div>
+				</div>
+			</div>
+		</section>
 	</div>
 </template>
 
 <script setup lang="ts">
-import type { RouteRecordRaw } from 'vue-router';
+import { ref, computed } from 'vue';
+import { useRouter, type RouteRecordRaw } from 'vue-router';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
+import { useDashboardStore } from '@/store/modules/dashboard/dashboard';
 
 const router = useRouter();
 const homeList = ref<RouteRecordRaw[]>([]);
+const dashboardStore = useDashboardStore();
 
 /**
  * 1. 颜色与图标动态映射系统
  * 为不同类别的功能分配和谐的色彩体系
  */
 const iconConfigMap: Record<string, { icon: string; color: string; bgColor: string }> = {
-	用户信息: { icon: 'user', color: '#6366f1', bgColor: '#eef2ff' },
+	用户信息: { icon: 'user', color: '#0058be', bgColor: '#d8e2ff' },
 	机构管理: { icon: 'orgManager', color: '#8b5cf6', bgColor: '#f5f3ff' },
 	菜单管理: { icon: 'palette', color: '#ec4899', bgColor: '#fdf2f8' },
-	权限信息: { icon: 'shield-check', color: '#6366f1', bgColor: '#eef2ff' },
-	角色管理: { icon: 'userManager', color: '#8b5cf6', bgColor: '#f5f3ff' },
-	用户: { icon: 'user', color: '#ec4899', bgColor: '#fdf2f8' },
-	字典信息: { icon: 'dict', color: '#64748b', bgColor: '#f8fafc' },
-	店财务管理: { icon: 'shopFinance', color: '#f59e0b', bgColor: '#fffbeb' },
-	店财务分析: { icon: 'shopFinanceAnalysis', color: '#e11d48', bgColor: '#fff1f2' },
-	店库存分析: { icon: 'financeAnalysis', color: '#f43f5e', bgColor: '#fff1f2' },
+	权限信息: { icon: 'shield-check', color: '#10b981', bgColor: '#ecfdf5' },
+	角色管理: { icon: 'userManager', color: '#f59e0b', bgColor: '#fffbeb' },
+	用户: { icon: 'user', color: '#06b6d4', bgColor: '#ecfeff' },
+	字典信息: { icon: 'dict', color: '#54647a', bgColor: '#d0e1fb' },
+	店财务管理: { icon: 'shopFinance', color: '#0058be', bgColor: '#d8e2ff' },
+	店财务分析: { icon: 'shopFinanceAnalysis', color: '#8b5cf6', bgColor: '#f5f3ff' },
+	店库存分析: { icon: 'financeAnalysis', color: '#ec4899', bgColor: '#fdf2f8' },
 	店铺库存: { icon: 'shopStock', color: '#10b981', bgColor: '#ecfdf5' },
-	店铺商品: { icon: 'shopProduct', color: '#3b82f6', bgColor: '#eff6ff' },
-	销售单管理: { icon: 'orderManager', color: '#2563eb', bgColor: '#eff6ff' },
-	商品库存批次: { icon: 'shopStockBatch', color: '#1e40af', bgColor: '#eff6ff' },
-	财务信息: { icon: 'finance', color: '#d97706', bgColor: '#fffbeb' },
-	猫超管理: { icon: 'order', color: '#4f46e5', bgColor: '#eef2ff' },
-	财务分析: { icon: 'financeAnalysis', color: '#be123c', bgColor: '#fff1f2' },
-	消费卡交易记录: { icon: 'card-transaction', color: '#0ea5e9', bgColor: '#f0f9ff' },
-	消费卡信息: { icon: 'card-info', color: '#06b6d4', bgColor: '#ecfeff' },
-	消费券核销记录表: { icon: 'coupon-check', color: '#8b5cf6', bgColor: '#f5f3ff' },
-	消费券信息表: { icon: 'coupon', color: '#ec4899', bgColor: '#fdf2f8' },
-	用户消费券库存表: { icon: 'coupon', color: '#10b981', bgColor: '#ecfdf5' },
-	商品属性: { icon: 'attribute', color: '#7c3aed', bgColor: '#f5f3ff' },
-	个人随礼信息: { icon: 'gift', color: '#f97316', bgColor: '#fff7ed' },
+	店铺商品: { icon: 'shopProduct', color: '#f59e0b', bgColor: '#fffbeb' },
+	销售单管理: { icon: 'orderManager', color: '#06b6d4', bgColor: '#ecfeff' },
+	商品库存批次: { icon: 'shopStockBatch', color: '#54647a', bgColor: '#d0e1fb' },
+	财务信息: { icon: 'finance', color: '#8b5cf6', bgColor: '#f5f3ff' },
+	猫超管理: { icon: 'order', color: '#ec4899', bgColor: '#fdf2f8' },
+	财务分析: { icon: 'financeAnalysis', color: '#06b6d4', bgColor: '#ecfeff' },
+	消费卡交易记录: { icon: 'card-transaction', color: '#10b981', bgColor: '#ecfdf5' },
+	消费卡信息: { icon: 'card-info', color: '#0058be', bgColor: '#d8e2ff' },
+	消费券核销记录表: { icon: 'coupon-check', color: '#0058be', bgColor: '#d8e2ff' },
+	消费券信息表: { icon: 'coupon', color: '#10b981', bgColor: '#ecfdf5' },
+	用户消费券库存表: { icon: 'coupon', color: '#f59e0b', bgColor: '#fffbeb' },
+	商品属性: { icon: 'attribute', color: '#8b5cf6', bgColor: '#f5f3ff' },
+	个人随礼信息: { icon: 'gift', color: '#54647a', bgColor: '#d0e1fb' },
 };
 
 const getIconConfig = (item: RouteRecordRaw) => {
@@ -104,16 +109,28 @@ const getIconConfig = (item: RouteRecordRaw) => {
 	};
 };
 
-// KPI 数据指标配置 (支持显示/隐藏配置)
-const stats = ref([
-	{ label: '本月营收', value: '¥28,450', trend: 12.5, show: false },
-	{ label: '本月支出', value: '¥12,300', trend: 5.8, show: false },
-	{ label: '本月库存', value: '4,520 件', trend: -1.2, show: false },
-	{ label: '本月销售', value: '892 单', trend: 15.4, show: false },
-]);
+// 模块配置：定义需要追踪保存时间的模块及其颜色
+const TRACKED_MODULES = [
+	{ title: '财务信息', color: '#0058be', key: '财务信息' },
+	{ title: '猫超管理', color: '#8b5cf6', key: '猫超管理' },
+	{ title: '库存记录', color: '#10b981', key: '库存记录' },
+	{ title: '消费卡', color: '#ec4899', key: '消费卡' },
+	{ title: '消费券', color: '#2563eb', key: '消费券' },
+	{ title: '个人随礼', color: '#f59e0b', key: '个人随礼' },
+];
 
-// 过滤仅展示配置为 show: true 的指标
-const visibleStats = computed(() => stats.value.filter((item) => item.show));
+// 动态计算统计数据：从 Pinia Store 中读取各模块最后保存时间
+const visibleStats = computed(() => {
+	return TRACKED_MODULES.map((module) => {
+		const savedTime = dashboardStore.lastSaveTimes[module.key];
+		return {
+			label: `${module.title}最新保存`,
+			value: savedTime || '',
+			color: module.color,
+			show: !!savedTime, // 只有存在保存时间时才显示
+		};
+	}).filter((stat) => stat.show);
+});
 
 // 使用新的NavBar系统
 useNavBar({
@@ -133,10 +150,13 @@ useTabBar({
 	active: 0,
 });
 
-// 交互反馈
-const handleIconClick = () => {
+// 交互反馈及路由跳转
+const handleGridItemClick = (item: RouteRecordRaw) => {
 	if (navigator.vibrate) {
 		navigator.vibrate(50);
+	}
+	if (item.path) {
+		router.push(item.path);
 	}
 };
 
@@ -151,7 +171,6 @@ const getHomeList = (arr: readonly RouteRecordRaw[] | null): RouteRecordRaw[] =>
 // 初始化数据源时进行排序或过滤逻辑
 const init = () => {
 	const rawList = getHomeList(router?.options?.routes || []);
-	// 保持界面整洁，这里可以添加排序逻辑
 	homeList.value = rawList;
 };
 
@@ -160,96 +179,158 @@ init();
 
 <style lang="less" scoped>
 .home-container {
-	background-color: #f8fafc;
+	background-color: #f9f9ff;
 	padding: 16px;
 	box-sizing: border-box;
+	min-height: calc(100vh - 96px);
+	padding-bottom: 80px; /* 为 TabBar 留出合适空间 */
+	overflow-x: hidden;
 }
 
-.stats-grid {
-	display: grid;
-	grid-template-columns: repeat(2, 1fr);
-	gap: 12px;
+.data-overview {
 	margin-bottom: 24px;
 }
 
-.stat-card {
-	background: #ffffff;
+.overview-card {
+	background-color: #ffffff;
+	border-radius: 12px;
+	box-shadow: 0 4px 20px rgba(30, 41, 59, 0.04);
 	padding: 16px;
-	border-radius: 16px;
-	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+	border: 1px solid rgba(194, 198, 214, 0.3);
+}
+
+.overview-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 16px;
+	padding: 0 8px;
+}
+
+.overview-title {
+	font-size: 22px;
+	font-weight: 600;
+	color: #191b23;
+	margin: 0;
+	line-height: 28px;
+	letter-spacing: -0.01em;
+}
+
+.overview-more {
+	font-size: 11px;
+	font-weight: 600;
+	color: #727785;
+	cursor: pointer;
+	transition: color 0.2s;
+	letter-spacing: 0.02em;
+
+	&:hover {
+		color: #0058be;
+	}
+}
+
+.overview-content {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.stat-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 12px 4px;
+
+	&.has-divider {
+		border-top: 1px solid rgba(194, 198, 214, 0.3);
+		border-left: none;
+	}
 }
 
 .stat-label {
-	font-size: 12px;
-	color: #64748b;
-	margin-bottom: 4px;
+	font-size: 14px;
+	font-weight: 500;
+	color: #505f76;
+	line-height: 20px;
 }
 
 .stat-value {
-	font-size: 20px;
-	font-weight: 800;
-	color: #1e293b;
-	margin-bottom: 4px;
-}
-
-.stat-trend {
-	font-size: 11px;
-	&.up {
-		color: #10b981;
-	}
-	&.down {
-		color: #ef4444;
-	}
+	font-size: 15px;
+	font-weight: 600;
+	line-height: 20px;
+	letter-spacing: -0.01em;
 }
 
 .menu-section {
-	background: #ffffff;
-	border-radius: 16px;
-	padding: 16px 8px;
-	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+	margin-bottom: 24px;
 }
 
 .section-title {
-	font-size: 15px;
-	font-weight: 700;
-	color: #1e293b;
-	margin-left: 8px;
-	margin-bottom: 12px;
+	font-size: 22px;
+	font-weight: 600;
+	color: #191b23;
+	margin: 0 0 16px 8px;
+	line-height: 28px;
+	letter-spacing: -0.01em;
 }
 
-.grid-item-card {
-	transition: transform 0.2s;
+.menu-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 16px;
+}
+
+.menu-item-card {
+	background-color: #ffffff;
+	border-radius: 12px;
+	padding: 16px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	box-shadow: 0 4px 12px rgba(30, 41, 59, 0.02);
+	border: 1px solid rgba(194, 198, 214, 0.2);
+	cursor: pointer;
+	transition:
+		background-color 0.2s,
+		transform 0.2s;
+
+	&:hover {
+		background-color: #f2f3fd;
+	}
+
 	&:active {
 		transform: scale(0.95);
 	}
 }
 
 .icon-wrapper {
-	width: 52px;
-	height: 52px;
-	border-radius: 16px;
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	margin-bottom: 10px;
 	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-	box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.04);
 }
 
 .homeSvgClass {
-	height: 28px;
-	width: 28px;
+	height: 24px;
+	width: 24px;
 	transition: transform 0.3s ease;
 }
 
-.grid-item-card:active .homeSvgClass {
+.menu-item-card:active .homeSvgClass {
 	transform: scale(1.1);
 }
 
 .homeFontClass {
-	font-size: 12px;
-	color: #334155;
+	font-size: 11px;
 	font-weight: 600;
-	letter-spacing: -0.2px;
+	color: #191b23;
+	text-align: center;
+	letter-spacing: 0.02em;
+	line-height: 13px;
 }
 </style>

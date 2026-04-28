@@ -181,7 +181,11 @@ const getFinancePage = async (param: ShopFinanceData, cur: PageInfo) => {
 	});
 
 	if (code === '200') {
-		dataSource.value = [...dataSource.value, ...(data?.records || [])];
+		if (cur?.current === 1) {
+			dataSource.value = data?.records || [];
+		} else {
+			dataSource.value = [...dataSource.value, ...(data?.records || [])];
+		}
 		setTotal(data?.total || 0);
 		finished.value = (pagination.total || 0) <= dataSource.value.length;
 	} else {
@@ -210,7 +214,9 @@ const onRefreshData = () => {
 
 // 加载更多
 const onLoadMore = () => {
-	nextPage();
+	if (dataSource.value.length > 0) {
+		nextPage();
+	}
 	getFinancePage(searchInfo.value, pagination);
 };
 
