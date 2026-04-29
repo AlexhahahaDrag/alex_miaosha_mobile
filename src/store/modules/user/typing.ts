@@ -1,16 +1,17 @@
 import type { Nullable } from '@/types/global';
-import type { RoleEnum } from '@/types/role_enum';
 import type { UserInfo } from '@/types/store';
+import type { OrgInfoData } from '@/views/user/orgInfo/config';
+import type { RoleInfoData } from '@/views/user/roleInfo/config';
 
 export interface UserState {
 	userInfo: Nullable<UserInfo>;
 	token?: string;
-	roleList: RoleEnum[];
+	roleList: RoleInfoData[];
 	sessionTimeout?: boolean;
 	lastUpdateTime: number;
 	menuInfo: MenuInfo[] | null;
 	hasMenu: boolean;
-	orgInfo: OrgInfo | null;
+	orgInfo: OrgInfoData | null;
 	roleInfo: RolePermissionInfo | null;
 }
 
@@ -24,29 +25,6 @@ export interface RolePermissionInfo {
 	roleName?: string;
 	permissionList?: MenuInfo[];
 	[key: string]: unknown;
-}
-
-export interface OrgInfo {
-	id?: string;
-	orgCode?: string;
-	orgName?: string;
-	orgAlias?: string;
-	orgShortName?: string;
-	parentId?: string;
-	parentName?: string;
-	parentOrgName?: string;
-	status?: string | number;
-	summary?: string;
-	[key: string]: unknown;
-}
-
-export interface GetUserInfoModel {
-	roles: RoleInfo[];
-	userId: string;
-	username: string;
-	nickName: string;
-	avatar?: string;
-	desc?: string;
 }
 
 export interface MenuInfo {

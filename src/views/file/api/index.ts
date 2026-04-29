@@ -1,4 +1,4 @@
-﻿import type { FileInfoData, FileInfoFormData } from '../config';
+import type { FileInfoData, FileInfoFormData } from '../config';
 import {
 	getData,
 	postData,
@@ -31,16 +31,15 @@ export function getFileDetail(id: string): Promise<ResponseBody<FileInfoData>> {
 	return getData(`${baseService.file + baseFileManager + fileUrl.url}?id=${id}`);
 }
 
-export function addOrEditFileManager(
-	method: string,
+export function addFileManager(
 	type: string,
 	params: FileInfoFormData,
 ): Promise<ResponseBody<boolean>> {
-	if ('put' == method) {
-		return putData(baseService.file + baseFileManager + fileUrl.url, params);
-	} else {
-		return postFileData(`${baseService.file + baseFileManager + fileUrl.url}?type=${type}`, params);
-	}
+	return postFileData(`${baseService.file + baseFileManager + fileUrl.url}?type=${type}`, params);
+}
+
+export function editFileManager(params: FileInfoFormData): Promise<ResponseBody<boolean>> {
+	return putData(baseService.file + baseFileManager + fileUrl.url, params);
 }
 
 export function deleteDictManager(ids: string): Promise<ResponseBody<boolean>> {
