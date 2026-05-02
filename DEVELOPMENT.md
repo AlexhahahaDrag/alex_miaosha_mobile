@@ -115,9 +115,22 @@
 - 详细规范内容查阅：[.gemini/skills/vue-coding-standards.md](file:///d:/project/alex_miaosha_mobile/.gemini/skills/vue-coding-standards.md)
 - UI/UX 设计增强：[.gemini/skills/ui-ux-pro-max/SKILL.md](file:///d:/project/alex_miaosha_mobile/.gemini/skills/ui-ux-pro-max/SKILL.md) (集成 UI/UX Pro Max 设计智能)
 
+## 6. 「架构与自动导入」技术说明
+
+项目深度集成了 `unplugin-auto-import` 与 `unplugin-vue-components`，这对代码分析与依赖追踪有以下影响：
+
+- **隐式依赖 (Implicit Dependencies)**：
+  - Vue 核心 API (`ref`, `computed`, `watch`, `onMounted` 等)、`vue-router` 以及 `pinia` 的常用方法已配置全局自动导入。
+  - **重要原则**：严禁在 Vue SFC 中手动导入上述已配置的全局 API。若发现遗留的手动导入，应在重构时予以清除。
+- **组件自动解析 (Auto-resolved Components)**：
+  - `src/views/components/` 下的公共组件以及 `Vant` 组件库均由插件自动解析。
+  - 在分析 `.vue` 文件时，**不能仅通过 `import` 语句判断依赖**，必须同步检查 `<template>` 中的标签（如 `<CommonList>`, `<van-field>`）。
+- **类型声明文件**：
+  - `components.d.ts` 与 `src/auto-imports.d.ts` 是由构建工具动态生成的，严禁手动修改。
+
 ---
 
-## 5. 「开发/架构层面」双向同步协议
+## 7. 开发/架构层面同步协议 (Sync Protocol)
 
 > [!IMPORTANT]
 > **凡涉及全局交互体系、基础设施、或 `src/views/components` 的结构性更改，Antigravity 必须自觉检查并更新本 `DEVELOPMENT.md` 文件。**

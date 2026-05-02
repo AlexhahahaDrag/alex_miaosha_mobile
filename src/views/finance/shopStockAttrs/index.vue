@@ -111,10 +111,8 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, onMounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { showSuccessToast, showFailToast } from 'vant';
 import { Package as PackageIcon } from 'lucide-vue-next';
+import { showSuccessToast, showFailToast } from 'vant';
 import type { ShopStockAttrsData } from './config';
 import type { UserManagerData } from '@/views/user/userManager/config';
 import { getShopStockAttrsPage, deleteShopStockAttrs } from '@/views/finance/shopStockAttrs/api';

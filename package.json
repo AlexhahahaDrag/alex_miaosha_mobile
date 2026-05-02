@@ -20,7 +20,7 @@
 		"graphify": "python -m graphify",
 		"graphify:prepare": "node scripts/generate-graphify-auto-component-report.mjs",
 		"graphify:augment": "node scripts/augment-graphify-auto-component-edges.mjs",
-		"graphify:update": "npm run graphify:prepare && python -m graphify update src && npm run graphify:augment",
+		"graphify:update": "python -m graphify update src && npm run graphify:augment",
 		"graphify:codex": "python -m graphify codex install",
 		"graphify:antigravity": "python -m graphify antigravity install",
 		"test:hooks": "echo 'Testing Git hooks setup...' && npm run lint:staged",
