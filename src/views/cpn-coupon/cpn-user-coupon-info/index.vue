@@ -250,12 +250,15 @@ const onCancel = () => {
 
 // 下拉刷新
 const onRefreshData = () => {
-	resetData();
+	resetPagination();
 	getCpnUserCouponPageData(searchInfo.value, pagination);
 };
 
 // 加载更多
 const onLoadMore = () => {
+	if (isRefresh.value) {
+		return;
+	}
 	getCpnUserCouponPageData(searchInfo.value, pagination);
 };
 

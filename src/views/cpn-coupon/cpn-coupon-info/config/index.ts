@@ -15,6 +15,9 @@ export interface CpnCouponInfoData {
 	paymentStatus?: number;
 	currentRate?: number;
 	onlyValidAndNotFullyRedeemed?: boolean;
+	createTime?: string | null;
+	createTimeStart?: string;
+	createTimeEnd?: string;
 	[key: string]: unknown;
 }
 

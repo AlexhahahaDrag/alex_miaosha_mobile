@@ -1,39 +1,48 @@
 <template>
 	<div class="redeem-page">
-		<div class="page-title">消费券信息</div>
-		<div class="section-card coupon-display-card">
-			<div class="card-row name-row">
-				<div class="content-left">
-					<div class="row-label">消费券名称</div>
-					<div class="row-value name">{{ couponInfo?.couponName || '未命名消费券' }}</div>
+		<!-- 顶部展示卡片 - 英雄区 -->
+		<div class="section-card coupon-hero-card">
+			<div class="hero-header">
+				<div class="coupon-icon-box">
+					<van-icon name="shop-collect" />
 				</div>
-				<div class="coupon-icon-wrapper">
+				<div class="coupon-name-section">
+					<div class="label">消费券名称</div>
+					<h2 class="name">{{ couponInfo?.couponName || '加载中...' }}</h2>
+				</div>
+				<div class="ticket-watermark">
 					<van-icon name="coupon-o" />
 				</div>
 			</div>
 
-			<div class="card-row value-row">
-				<div class="row-label">面值</div>
-				<div class="row-value price">¥ {{ couponInfo?.unitValue || 0 }}</div>
-			</div>
-
-			<div class="display-divider"></div>
-
-			<div class="card-row stats-row">
-				<div class="stat-item">
-					<div class="row-label highlight">剩余数量</div>
-					<div class="row-value number highlight">
-						{{ (couponInfo?.remainingQuantity ?? 0) - (redeemForm.redemptionQuantity ?? 0) }}
+			<div class="hero-body">
+				<div class="price-section">
+					<div class="label">面值</div>
+					<div class="price-value">
+						<span class="symbol">¥</span>
+						<span class="amount">{{ couponInfo?.unitValue || '0.00' }}</span>
 					</div>
 				</div>
-				<div class="stat-item align-right">
-					<div class="row-label">总数量</div>
-					<div class="row-value number">{{ couponInfo?.totalQuantity ?? 0 }}</div>
+				<div class="validity-tag">
+					有效期至 {{ couponInfo?.endDate ? dayjs(couponInfo.endDate).format('YYYY-MM-DD') : '----' }}
+				</div>
+			</div>
+
+			<div class="hero-divider"></div>
+
+			<div class="hero-footer">
+				<div class="stat-box">
+					<div class="stat-label">剩余数量</div>
+					<div class="stat-value highlight">{{ couponInfo?.remainingQuantity || 0 }}</div>
+				</div>
+				<div class="stat-box">
+					<div class="stat-label">总数量</div>
+					<div class="stat-value">{{ couponInfo?.totalQuantity || 0 }}</div>
 				</div>
 			</div>
 		</div>
 
-		<!-- 核销表单分区 -->
+		<!-- 核销表单 -->
 		<van-form
 			@submit="onSubmit"
 			:rules="rulesRef"
@@ -43,6 +52,8 @@
 				<!-- 核销时间 -->
 				<van-field
 					readonly
+					is-link
+					center
 					class="premium-input-field"
 					@click="chooseDate"
 				>
@@ -51,17 +62,14 @@
 							<div class="icon-circle time-bg">
 								<van-icon name="clock" />
 							</div>
-							<span class="label-main-text">核销时间 <span class="required-box">*</span></span>
+							<span class="label-main-text">核销时间 <span class="required-mark">*</span></span>
 						</div>
 					</template>
 					<template #input>
-						<div class="field-value-text">{{ redeemTime.format('YYYY年MM月DD日') }}</div>
-					</template>
-					<template #right-icon>
-						<van-icon
-							name="calendar-o"
-							class="calendar-icon"
-						/>
+						<div class="field-value-content">
+							<div class="main-value">{{ redeemTime.format('YYYY年MM月DD日') }}</div>
+							<div class="sub-value">{{ redeemTime.format('HH:mm:ss') }}</div>
+						</div>
 					</template>
 				</van-field>
 
@@ -70,6 +78,8 @@
 					v-model="userName"
 					name="userId"
 					readonly
+					is-link
+					center
 					:rules="rulesRef.userId"
 					class="premium-input-field"
 					@click="chooseUser"
@@ -79,7 +89,7 @@
 							<div class="icon-circle user-bg">
 								<van-icon name="user-o" />
 							</div>
-							<span class="label-main-text">核销用户 <span class="required">*</span></span>
+							<span class="label-main-text">核销用户 <span class="required-mark">*</span></span>
 						</div>
 					</template>
 					<template #input>
@@ -88,20 +98,20 @@
 								round
 								width="28"
 								height="28"
-								src="https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg"
+								:src="
+									selectedUser?.avatarUrl || selectedUser?.avatar || 'https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg'
+								"
 								class="avatar-img"
 							/>
-							<span class="name-text">{{ userName || '选择用户' }}</span>
+							<span class="name-text">{{ userName || '选择核销人' }}</span>
 						</div>
-					</template>
-					<template #right-icon>
-						<van-icon name="arrow" />
 					</template>
 				</van-field>
 
 				<!-- 核销数量 -->
 				<van-field
 					name="redemptionQuantity"
+					center
 					:rules="rulesRef.redemptionQuantity"
 					class="premium-input-field no-border"
 				>
@@ -110,7 +120,7 @@
 							<div class="icon-circle quantity-bg">
 								<van-icon name="shopping-cart-o" />
 							</div>
-							<span class="label-main-text">核销数量 <span class="required">*</span></span>
+							<span class="label-main-text">核销数量 <span class="required-mark">*</span></span>
 						</div>
 					</template>
 					<template #input>
@@ -118,55 +128,115 @@
 							<van-stepper
 								v-model="redeemForm.redemptionQuantity"
 								theme="round"
-								button-size="22"
+								button-size="24"
 								disable-input
+								:max="couponInfo?.remainingQuantity || 0"
 							/>
 						</div>
 					</template>
 				</van-field>
+
+				<!-- 预期提示 -->
+				<div class="redeem-notice-bar">
+					<van-icon name="info-o" />
+					<span>核销后剩余数量: {{ expectedRemaining }} / {{ couponInfo?.totalQuantity || 0 }}</span>
+				</div>
 			</div>
 
-			<!-- 备注分区 (可选) -->
-			<div class="section-card remarks-card">
+			<!-- 消费券详情列表 -->
+			<div class="section-card details-section">
+				<div class="section-title">
+					<span class="title-bar"></span>
+					消费券详情
+				</div>
+				<div class="detail-list">
+					<div class="detail-item">
+						<div class="item-left">
+							<van-icon name="qr" />
+							<span>券码</span>
+						</div>
+						<div class="item-right">
+							<span class="code">{{ couponInfo?.id || '----' }}</span>
+							<van-icon
+								name="copy-o"
+								class="copy-btn"
+							/>
+						</div>
+					</div>
+
+					<div class="detail-item">
+						<div class="item-left">
+							<van-icon name="contact-o" />
+							<span>领取用户</span>
+						</div>
+						<div class="item-right">
+							{{ userName || '----' }}
+							<span v-if="selectedUser?.phonenumber">({{ selectedUser.phonenumber }})</span>
+						</div>
+					</div>
+					<div class="detail-item">
+						<div class="item-left">
+							<van-icon name="underway-o" />
+							<span>领取时间</span>
+						</div>
+						<div class="item-right">
+							{{ couponInfo?.createTime ? dayjs(couponInfo.createTime).format('YYYY-MM-DD HH:mm:ss') : '----' }}
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- 备注分区 -->
+			<div class="section-card remarks-section">
+				<div class="section-title-simple">备注 <span class="opt">(可选)</span></div>
 				<van-field
 					v-model="redeemForm.remarks"
 					name="remarks"
-					label="备注"
-					placeholder="请输入备注（可选）"
+					placeholder="请输入备注信息"
 					type="textarea"
 					rows="2"
 					autosize
-					label-width="50px"
+					maxlength="100"
+					show-word-limit
+					class="remarks-input"
 				/>
 			</div>
 
-			<div class="submit-action">
+			<!-- 底部固定动作栏 -->
+			<div class="submit-action-bar">
 				<van-button
 					round
 					block
 					type="primary"
 					native-type="submit"
-					class="premium-btn"
+					class="premium-submit-btn"
 					:loading="submitLoading"
 				>
-					确认核销
+					<template #default>
+						<div class="btn-inner">
+							<van-icon
+								name="expand-o"
+								class="scan-icon"
+							/>
+							<span>确认核销</span>
+						</div>
+					</template>
 				</van-button>
 			</div>
 		</van-form>
 
+		<!-- 弹窗组件 -->
 		<select-pop
 			:info="userInfo"
 			@select-info="selectUser"
 			@cancel-info="cancelUser"
-		>
-		</select-pop>
+		/>
 
 		<date-pop
 			:info="chooseDateInfo"
 			@select-date-info="onDateSelect"
 			@cancel-date-info="onDateCancel"
-		>
-		</date-pop>
+		/>
 	</div>
 </template>
 
@@ -177,6 +247,7 @@ import { getCpnCouponInfoDetail } from '@/views/cpn-coupon/cpn-coupon-info/api';
 import { redeemCpnUserCouponInfo } from '@/views/cpn-coupon/cpn-user-coupon-info/api';
 import { getUserManagerList } from '@/views/user/userManager/api';
 import type { Info } from '@/views/common/pop/selectPop.vue';
+import type { UserManagerData } from '@/views/user/userManager/config';
 import { getRoutePathByName } from '@/utils/router';
 import { datePickerFormatter } from '@/utils/dayjs';
 import type { CpnCouponInfoData } from '@/views/cpn-coupon/cpn-coupon-info/config';
@@ -185,34 +256,19 @@ import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
 import type { DatePickerInfo } from '@/utils/common';
 
+// 3. useHooks
 const route = useRoute();
 const router = useRouter();
-const currentUser = useUserStore()?.getUserInfo;
+const userStore = useUserStore();
+const currentUser = computed(() => userStore?.getUserInfo);
 
-// 获取左侧路径
+// 4. Variables
 const getLeftPath = computed(() => {
 	return getRoutePathByName(router, 'cpnCouponInfo', '/selfFinance/cpnCouponInfo');
 });
 
-// 使用新的NavBar系统
-useNavBar({
-	title: '核销消费券',
-	leftPath: getLeftPath.value,
-	visible: true,
-});
-
-// TabBar配置
-useTabBar({
-	visible: false,
-});
-
-// 消费券信息
 const couponInfo = ref<CpnCouponInfoData | null>(null);
-
-// 核销时间，默认为当前时间
 const redeemTime = ref<dayjs.Dayjs>(dayjs());
-
-// 核销表单数据
 const redeemForm = ref<{
 	userId?: string;
 	couponId?: string;
@@ -223,57 +279,70 @@ const redeemForm = ref<{
 	remarks: '',
 });
 
-// 提交加载状态
 const submitLoading = ref<boolean>(false);
 
-// 表单验证规则
 const rulesRef = reactive({
-	userId: [
-		{
-			required: true,
-			message: '请选择核销用户',
-		},
-	],
+	userId: [{ required: true, message: '请选择核销用户' }],
 	redemptionQuantity: [
-		{
-			required: true,
-			message: '请输入核销数量',
-		},
+		{ required: true, message: '请输入核销数量' },
 		{
 			validator: (value: number) => {
-				if (!value || value <= 0) {
-					return '核销数量必须大于0';
-				}
-				if (couponInfo.value && value > (couponInfo.value.remainingQuantity || 0)) {
-					return '核销数量不能大于剩余数量';
-				}
+				if (!value || value <= 0) return '核销数量必须大于0';
+				if (couponInfo.value && value > (couponInfo.value.remainingQuantity || 0)) return '核销数量不能大于剩余数量';
 				return true;
 			},
 		},
 	],
 });
 
-// 用户选择相关
 const userName = ref<string>('');
 const userInfo = ref<Info>({
 	label: 'userId',
 	labelName: '核销用户',
 	rule: rulesRef.userId,
-	customFieldName: {
-		text: 'nickName',
-		value: 'id',
-	},
+	customFieldName: { text: 'nickName', value: 'id' },
 	selectValue: redeemForm.value.userId,
 	showFlag: false,
 	list: [],
 });
 
-// 选择用户
+const chooseDateInfo = ref<DatePickerInfo<dayjs.Dayjs>>({
+	label: 'redeemTime',
+	labelName: '核销时间',
+	selectValue: redeemTime.value,
+	showFlag: false,
+	formatter: datePickerFormatter,
+});
+
+const expectedRemaining = computed(() => {
+	return (couponInfo.value?.remainingQuantity || 0) - (redeemForm.value.redemptionQuantity || 0);
+});
+
+const selectedUser = computed(() => {
+	return userInfo.value?.list?.find((u: UserManagerData) => u.id === redeemForm.value.userId);
+});
+
+// 5. Methods
+const setupNavBar = () => {
+	useNavBar({
+		title: '核销消费券',
+		leftPath: getLeftPath.value,
+		rightButton: '核销记录',
+		visible: true,
+		onRightClick: () => {
+			showFailToast('核销记录功能开发中...');
+		},
+	});
+};
+
+const setupTabBar = () => {
+	useTabBar({ visible: false });
+};
+
 const chooseUser = () => {
 	userInfo.value.showFlag = true;
 };
 
-// 选择用户信息
 const selectUser = (type: string, value: string, name: string) => {
 	userInfo.value.showFlag = false;
 	if (type === 'userId') {
@@ -282,19 +351,9 @@ const selectUser = (type: string, value: string, name: string) => {
 	}
 };
 
-// 取消选择用户
 const cancelUser = () => {
 	userInfo.value.showFlag = false;
 };
-
-// 日期选择相关
-const chooseDateInfo = ref<DatePickerInfo<dayjs.Dayjs>>({
-	label: 'redeemTime',
-	labelName: '核销时间',
-	selectValue: redeemTime.value,
-	showFlag: false,
-	formatter: datePickerFormatter,
-});
 
 const chooseDate = () => {
 	chooseDateInfo.value.showFlag = true;
@@ -309,16 +368,12 @@ const onDateCancel = () => {
 	chooseDateInfo.value.showFlag = false;
 };
 
-// 提交核销
 const onSubmit = async () => {
 	if (!redeemForm.value.redemptionQuantity || redeemForm.value.redemptionQuantity <= 0) {
 		showFailToast('请输入有效的核销数量');
 		return;
 	}
-	if (couponInfo.value && redeemForm.value.redemptionQuantity > (couponInfo.value.remainingQuantity || 0)) {
-		showFailToast('核销数量不能大于剩余数量');
-		return;
-	}
+	navigator.vibrate?.(50);
 	submitLoading.value = true;
 	try {
 		const { code, message } = await redeemCpnUserCouponInfo({
@@ -331,61 +386,48 @@ const onSubmit = async () => {
 			showSuccessToast(message || '核销成功！');
 			router.push({ path: getLeftPath.value });
 		} else {
-			showFailToast(message || '核销失败，请联系管理员！');
+			showFailToast(message || '核销失败!');
 		}
 	} catch {
-		showFailToast('核销失败，请稍后重试！');
+		showFailToast('核销失败!');
 	} finally {
 		submitLoading.value = false;
 	}
 };
 
-// 初始化用户列表
 const initUserList = async () => {
 	try {
 		const { code, data } = await getUserManagerList({});
-		if (code === '200') {
-			userInfo.value.list = data || [];
-		} else {
-			userInfo.value.list = [];
-		}
+		if (code === '200') userInfo.value.list = data || [];
 	} catch {
-		showFailToast('获取用户列表失败！');
+		showFailToast('获取用户列表失败');
 	}
 };
 
-// 初始化消费券信息
 const initCouponInfo = async () => {
 	const couponId = route?.query?.couponId as string;
 	if (!couponId) {
-		showFailToast('缺少消费券ID');
 		router.push({ path: getLeftPath.value });
 		return;
 	}
 	try {
-		const { code, data, message } = await getCpnCouponInfoDetail(couponId);
+		const { code, data } = await getCpnCouponInfoDetail(couponId);
 		if (code === '200') {
 			couponInfo.value = data || null;
 			redeemForm.value.couponId = couponId;
-			if (couponInfo.value && (!couponInfo.value.remainingQuantity || couponInfo.value.remainingQuantity <= 0)) {
-				showFailToast('该消费券已无剩余数量，无法核销！');
-				router.push({ path: getLeftPath.value });
-			}
-		} else {
-			showFailToast(message || '获取消费券信息失败！');
-			router.push({ path: getLeftPath.value });
 		}
 	} catch {
-		showFailToast('获取消费券信息失败！');
-		router.push({ path: getLeftPath.value });
+		showFailToast('获取消费券信息失败');
 	}
 };
 
-// 初始化
+// 6. Lifecycle
 onMounted(async () => {
-	if (currentUser) {
-		userName.value = currentUser.nickName;
-		redeemForm.value.userId = currentUser.id;
+	setupNavBar();
+	setupTabBar();
+	if (currentUser.value) {
+		userName.value = currentUser.value.nickName || '';
+		redeemForm.value.userId = currentUser.value.userId;
 	}
 	await Promise.all([initCouponInfo(), initUserList()]);
 });
@@ -395,169 +437,175 @@ onMounted(async () => {
 .redeem-page {
 	min-height: 100vh;
 	background-color: #f8fafc;
-	padding: 20px 18px;
+	padding: 16px 16px 100px;
 }
 
 .section-card {
 	background: #fff;
-	border-radius: 28px;
+	border-radius: 16px;
+	padding: 20px;
+	margin-bottom: 16px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+}
+
+// ========== 英雄卡片样式 ==========
+.coupon-hero-card {
+	background: #fff;
 	padding: 24px;
-	margin-bottom: 20px;
-	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
-}
-
-.page-title {
-	font-size: 14px;
-	color: #94a3b8;
-	margin-bottom: 14px;
-	padding-left: 8px;
-	letter-spacing: 0.5px;
-	text-transform: uppercase;
-	font-weight: 600;
-}
-
-.coupon-display-card {
-	padding: 28px 24px;
 	position: relative;
 	overflow: hidden;
 
-	&::before {
-		content: '';
-		position: absolute;
-		top: -40px;
-		right: -40px;
-		width: 160px;
-		height: 160px;
-		background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
-		pointer-events: none;
+	.hero-header {
+		display: flex;
+		align-items: center;
+		margin-bottom: 24px;
+		position: relative;
+		z-index: 1;
+
+		.coupon-icon-box {
+			width: 50px;
+			height: 50px;
+			background: #3b82f6;
+			border-radius: 14px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: #fff;
+			font-size: 26px;
+			margin-right: 14px;
+			box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+		}
+
+		.coupon-name-section {
+			.label {
+				font-size: 13px;
+				color: #94a3b8;
+				margin-bottom: 4px;
+			}
+			.name {
+				font-size: 24px;
+				font-weight: 800;
+				color: #1e293b;
+				margin: 0;
+			}
+		}
+
+		.ticket-watermark {
+			position: absolute;
+			right: -10px;
+			top: -10px;
+			font-size: 80px;
+			color: #f1f5f9;
+			transform: rotate(-15deg);
+			z-index: -1;
+		}
 	}
 
-	.card-row {
+	.hero-body {
 		display: flex;
 		justify-content: space-between;
 		align-items: flex-end;
-		margin-bottom: 30px;
+		margin-bottom: 24px;
 
-		&:last-child {
-			margin-bottom: 0;
-		}
-	}
+		.price-section {
+			.label {
+				font-size: 12px;
+				color: #94a3b8;
+				margin-bottom: 6px;
+			}
+			.price-value {
+				display: flex;
+				align-items: baseline;
+				color: #3b82f6;
 
-	.row-label {
-		font-size: 13px;
-		color: #94a3b8;
-		margin-bottom: 12px;
-		font-weight: 400;
-
-		&.highlight {
-			color: #64748b;
-			font-weight: 500;
-		}
-	}
-
-	.row-value {
-		color: #1e293b;
-		line-height: 1.1;
-
-		&.name {
-			font-size: 30px;
-			font-weight: 800;
-			letter-spacing: -0.5px;
-		}
-
-		&.price {
-			font-size: 38px;
-			font-weight: 800;
-			color: #3b82f6;
-		}
-
-		&.number {
-			font-size: 22px;
-			font-weight: 700;
-
-			&.highlight {
-				color: #2563eb;
-				font-size: 26px;
+				.symbol {
+					font-size: 20px;
+					font-weight: 700;
+					margin-right: 4px;
+				}
+				.amount {
+					font-size: 34px;
+					font-weight: 800;
+					letter-spacing: -1px;
+				}
 			}
 		}
+
+		.validity-tag {
+			background: #eff6ff;
+			color: #3b82f6;
+			padding: 4px 10px;
+			border-radius: 8px;
+			font-size: 12px;
+			font-weight: 600;
+		}
 	}
 
-	.coupon-icon-wrapper {
-		width: 48px;
-		height: 48px;
-		background: #eff6ff;
-		color: #3b82f6;
-		border-radius: 16px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 24px;
-		box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
-	}
-
-	.display-divider {
+	.hero-divider {
 		height: 1px;
 		background: #f1f5f9;
-		margin: 28px 0;
+		margin: 0 -24px 24px;
 	}
 
-	.stats-row {
-		.stat-item {
-			flex: 1;
+	.hero-footer {
+		display: flex;
 
-			&.align-right {
-				text-align: right;
+		.stat-box {
+			flex: 1;
+			text-align: center;
+
+			&:first-child {
+				border-right: 1px solid #f1f5f9;
+			}
+
+			.stat-label {
+				font-size: 12px;
+				color: #94a3b8;
+				margin-bottom: 8px;
+				display: block;
+			}
+			.stat-value {
+				font-size: 22px;
+				font-weight: 700;
+				color: #475569;
+
+				&.highlight {
+					color: #3b82f6;
+				}
 			}
 		}
 	}
 }
 
+// ========== 表单区域样式 ==========
 .form-body-card {
 	padding: 8px 0;
-	overflow: hidden;
 
 	.premium-input-field {
-		padding: 22px 24px;
-		background: transparent;
-		align-items: center;
-
-		&::after {
-			left: 24px;
-			right: 24px;
-			border-bottom: 1px solid #f8fafc;
-		}
-
-		&.no-border::after {
-			display: none;
-		}
+		padding: 16px 20px;
 
 		:deep(.van-field__label) {
 			width: auto;
-			margin-right: 0;
-		}
-
-		:deep(.van-field__value) {
-			display: flex;
-			justify-content: flex-end;
+			margin-right: 16px;
 		}
 
 		.field-label-wrapper {
 			display: flex;
 			align-items: center;
-			gap: 14px;
+			gap: 12px;
 
 			.icon-circle {
-				width: 38px;
-				height: 38px;
-				border-radius: 12px;
+				width: 32px;
+				height: 32px;
+				border-radius: 10px;
 				display: flex;
 				align-items: center;
 				justify-content: center;
-				font-size: 16px;
+				font-size: 15px;
 
 				&.time-bg {
-					background: #f0f9ff;
-					color: #0ea5e9;
+					background: #eff6ff;
+					color: #3b82f6;
 				}
 				&.user-bg {
 					background: #f5f3ff;
@@ -571,77 +619,174 @@ onMounted(async () => {
 
 			.label-main-text {
 				font-size: 14px;
-				color: #94a3b8;
-				font-weight: 400;
+				color: #64748b;
+				font-weight: 500;
 			}
-
-			.required-box {
-				color: #f43f5e;
-				font-size: 14px;
-				margin-left: 2px;
+			.required-mark {
+				color: #ef4444;
 			}
 		}
 
-		.field-value-text {
-			font-size: 15px;
-			color: #1e293b;
-			font-weight: 600;
+		.field-value-content {
 			text-align: right;
+			.main-value {
+				font-size: 15px;
+				font-weight: 700;
+				color: #1e293b;
+			}
+			.sub-value {
+				font-size: 11px;
+				color: #94a3b8;
+			}
 		}
 
 		.user-info-display {
 			display: flex;
 			align-items: center;
 			gap: 10px;
+			justify-content: flex-end;
 
 			.name-text {
 				font-size: 15px;
+				font-weight: 700;
 				color: #1e293b;
-				font-weight: 600;
 			}
 		}
 
-		.calendar-icon,
-		.arrow-icon {
-			color: #cbd5e1;
-			font-size: 18px;
-			margin-left: 4px;
+		.stepper-container {
+			display: flex;
+			align-items: center;
+			justify-content: flex-end;
+		}
+	}
+
+	.redeem-notice-bar {
+		margin: 12px 20px;
+		background: #f0f9ff;
+		color: #3b82f6;
+		padding: 10px 14px;
+		border-radius: 10px;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		font-size: 13px;
+		font-weight: 500;
+	}
+}
+
+// ========== 详情列表样式 ==========
+.details-section {
+	.section-title {
+		display: flex;
+		align-items: center;
+		font-size: 16px;
+		font-weight: 700;
+		color: #1e293b;
+		margin-bottom: 16px;
+
+		.title-bar {
+			width: 4px;
+			height: 16px;
+			background: #3b82f6;
+			border-radius: 2px;
+			margin-right: 8px;
+		}
+	}
+
+	.detail-list {
+		.detail-item {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 12px 0;
+			font-size: 14px;
+
+			&:not(:last-child) {
+				border-bottom: 1px solid #f8fafc;
+			}
+
+			.item-left {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				color: #64748b;
+
+				.van-icon {
+					font-size: 16px;
+				}
+			}
+
+			.item-right {
+				color: #334155;
+				font-weight: 500;
+
+				.code {
+					letter-spacing: 1px;
+				}
+				.copy-btn {
+					margin-left: 6px;
+					color: #3b82f6;
+					cursor: pointer;
+				}
+			}
 		}
 	}
 }
 
-.remarks-card {
-	padding: 12px 24px;
-	border-radius: 20px;
-
-	:deep(.van-field__label) {
-		color: #94a3b8;
-		font-weight: 400;
+// ========== 备注样式 ==========
+.remarks-section {
+	.section-title-simple {
 		font-size: 14px;
+		font-weight: 600;
+		color: #64748b;
+		margin-bottom: 12px;
+
+		.opt {
+			font-weight: 400;
+			color: #cbd5e1;
+		}
 	}
 
-	:deep(.van-field__control) {
-		font-size: 14px;
-		color: #1e293b;
+	.remarks-input {
+		background: #f8fafc;
+		border-radius: 12px;
+		padding: 12px;
 	}
 }
 
-.submit-action {
-	padding: 20px 8px 48px;
+// ========== 底部按钮样式 ==========
+.submit-action-bar {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	padding: 16px 24px 32px;
+	background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, #fff 100%);
+	backdrop-filter: blur(10px);
+	z-index: 100;
 
-	.premium-btn {
-		height: 56px;
+	.premium-submit-btn {
+		height: 54px;
 		background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
 		border: none;
-		border-radius: 18px;
-		font-size: 18px;
+		font-size: 17px;
 		font-weight: 700;
-		box-shadow: 0 12px 28px rgba(37, 99, 235, 0.25);
-		transition: all 0.2s ease;
+		box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+
+		.btn-inner {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 10px;
+
+			.scan-icon {
+				font-size: 20px;
+			}
+		}
 
 		&:active {
-			transform: scale(0.97);
-			box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+			transform: scale(0.98);
+			opacity: 0.9;
 		}
 	}
 }

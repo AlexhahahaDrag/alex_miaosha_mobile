@@ -1,10 +1,11 @@
 import type { Nullable } from '@/types/global';
-import type { UserInfo } from '@/types/store';
 import type { OrgInfoData } from '@/views/user/orgInfo/config';
 import type { RoleInfoData } from '@/views/user/roleInfo/config';
+import type { UserManagerData } from '@/views/user/userManager/config';
 
 export interface UserState {
-	userInfo: Nullable<UserInfo>;
+	id?: string;
+	userInfo: Nullable<UserManagerData>;
 	token?: string;
 	roleList: RoleInfoData[];
 	sessionTimeout?: boolean;

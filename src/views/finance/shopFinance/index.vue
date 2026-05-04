@@ -208,12 +208,15 @@ const onCancel = () => {
 
 // 下拉刷新
 const onRefreshData = () => {
-	resetData();
+	resetPagination();
 	getFinancePage(searchInfo.value, pagination);
 };
 
 // 加载更多
 const onLoadMore = () => {
+	if (isRefresh.value) {
+		return;
+	}
 	if (dataSource.value.length > 0) {
 		nextPage();
 	}

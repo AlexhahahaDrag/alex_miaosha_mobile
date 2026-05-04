@@ -13,7 +13,14 @@
 			:key="index"
 		>
 			<template #icon="props">
+				<van-icon
+					v-if="item.icon && item.icon.startsWith('van-')"
+					:name="item.icon.replace('van-', '')"
+					:color="props.active ? '#1989fa' : '#969799'"
+					class="tab-icon"
+				/>
 				<svg-icon
+					v-else
 					:name="item.icon"
 					:color="props.active ? '#1989fa' : '#969799'"
 					class="tab-icon"
@@ -71,6 +78,7 @@ const tabBarData = computed(() => {
 .tab-icon {
 	width: 24px;
 	height: 24px;
+	font-size: 24px;
 	margin-bottom: 2px;
 }
 

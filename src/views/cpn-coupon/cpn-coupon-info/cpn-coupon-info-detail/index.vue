@@ -2,7 +2,7 @@
 	<div class="coupon-detail-page">
 		<!-- 编辑模式 -->
 		<template v-if="isEditMode">
-			<!-- 优惠券图片区域 -->
+			<!-- 消费券图片区域 -->
 			<div class="coupon-image-section">
 				<img
 					:src="couponImage"
@@ -30,7 +30,7 @@
 						<van-field
 							v-model="formInfo.couponName"
 							name="couponName"
-							placeholder="请输入优惠券名称"
+							placeholder="请输入消费券名称"
 							:rules="rulesRef.couponName"
 							class="custom-input"
 						/>
@@ -91,7 +91,7 @@
 					<div class="activities-title">最近活动</div>
 					<van-cell-group inset>
 						<van-cell
-							title="优惠券已领取"
+							title="消费券已领取"
 							:label="`共 ${formInfo.totalQuantity || 0} 张 已兑换 ${consumedQuantity} 张`"
 							icon="completed"
 							class="activity-item success"
@@ -101,7 +101,7 @@
 							</template>
 						</van-cell>
 						<van-cell
-							title="优惠券已核销"
+							title="消费券已核销"
 							label="全部可核销"
 							icon="stop-circle-o"
 							class="activity-item info"
@@ -157,19 +157,19 @@
 
 		<!-- 展示模式 -->
 		<template v-else>
-			<!-- 优惠券卡片 -->
+			<!-- 消费券卡片 -->
 			<div class="coupon-card-display">
 				<div class="coupon-image">
 					<img
 						:src="couponImage"
 						alt="coupon"
 					/>
-					<div class="coupon-badge">优惠券</div>
+					<div class="coupon-badge">消费券</div>
 				</div>
 
 				<div class="coupon-info-section">
 					<div class="coupon-amount">
-						¥{{ Number(formInfo.unitValue || 0).toFixed(0) }} <span class="coupon-label">优惠券</span>
+						¥{{ Number(formInfo.unitValue || 0).toFixed(0) }} <span class="coupon-label">消费券</span>
 					</div>
 					<div class="coupon-description">{{ formInfo.couponName || '限定兑换咖啡' }}</div>
 					<div class="coupon-validity">
@@ -192,7 +192,7 @@
 				<div class="activities-title">最近活动</div>
 				<van-cell-group>
 					<van-cell
-						title="优惠券已领取"
+						title="消费券已领取"
 						:label="`共 ${formInfo.totalQuantity || 0} 张 已兑换 ${consumedQuantity} 张`"
 						icon="completed"
 						class="activity-item success"
@@ -202,7 +202,7 @@
 						</template>
 					</van-cell>
 					<van-cell
-						title="优惠券已核销"
+						title="消费券已核销"
 						label="全部可核销"
 						icon="stop-circle-o"
 						class="activity-item info"
@@ -253,42 +253,21 @@ import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
 import type { DatePickerInfo } from '@/utils/common';
 
+// 3. useHooks
 const route = useRoute();
 const router = useRouter();
-
-// 判断是否为编辑模式（通过 query 参数 mode=edit）
-const isEditMode = computed(() => route.query.mode === 'edit');
-
-// 获取左侧路径
-const getLeftPath = computed(() => {
-	return getRoutePathByName(router, 'cpnCouponInfo');
-});
-
-// 使用新的NavBar系统
-useNavBar({
-	title: isEditMode.value ? '编辑优惠券信息' : '优惠券详情',
-	leftPath: getLeftPath.value,
-	visible: true,
-	rightButton: isEditMode.value ? '' : '编辑',
-	onRightClick: () => {
-		if (!isEditMode.value) {
-			// 切换到编辑模式
-			router.push({
-				path: route.path,
-				query: { ...route.query, mode: 'edit' },
-			});
-		}
-	},
-});
-
-// TabBar配置
+const { setNavBar } = useNavBar();
 useTabBar({
 	visible: false,
 });
 
+// 4. Variables
 const formInfo = ref<CpnCouponInfoData>({});
-// 提交按钮loading状态
 const loading = ref<boolean>(false);
+const isEditMode = computed(() => route.query.mode === 'edit');
+const getLeftPath = computed(() => {
+	return getRoutePathByName(router, 'cpnCouponInfo');
+});
 
 const chooseDateInfo = ref<DatePickerInfo<Dayjs>>({
 	label: 'endDate',
@@ -298,9 +277,42 @@ const chooseDateInfo = ref<DatePickerInfo<Dayjs>>({
 	formatter: datePickerFormatter,
 });
 
-// 创建名称 ref 映射
 const nameRefMap = {
 	infoDate: ref<string>(''),
+};
+
+const couponImage = ref(
+	'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOnJnYigxODUsMzMsNDApO3N0b3Atb3BhY2l0eToxIiAvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6cmdiKDIyMCw1Myw2OSk7c3RvcC1vcGFjaXR5OjEiIC8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1zaXplPSI0MCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7wnY6I4oC854OfPC90ZXh0Pjwvc3ZnPg==',
+);
+
+const consumedQuantity = computed(() => {
+	return (formInfo.value.totalQuantity || 0) - (formInfo.value.remainingQuantity || 0);
+});
+
+// 5. Methods
+const updateNavBar = () => {
+	setNavBar({
+		title: isEditMode.value ? '编辑消费券信息' : '消费券详情',
+		leftPath: getLeftPath.value,
+		visible: true,
+		rightButton: isEditMode.value ? '取消' : '编辑',
+		onRightClick: () => {
+			if (isEditMode.value) {
+				if (!route.query.id) {
+					router.push(getLeftPath.value);
+					return;
+				}
+				const query = { ...route.query };
+				delete query.mode;
+				router.replace({ path: route.path, query });
+			} else {
+				router.push({
+					path: route.path,
+					query: { ...route.query, mode: 'edit' },
+				});
+			}
+		},
+	});
 };
 
 const initInfoDate = (infoDate: Dayjs) => {
@@ -314,17 +326,6 @@ const chooseDate = () => {
 	chooseDateInfo.value.showFlag = true;
 };
 
-// 优惠券图片
-const couponImage = ref(
-	'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOnJnYigxODUsMzMsNDApO3N0b3Atb3BhY2l0eToxIiAvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6cmdiKDIyMCw1Myw2OSk7c3RvcC1vcGFjaXR5OjEiIC8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1zaXplPSI0MCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7wnY6I4oC854OfPC90ZXh0Pjwvc3ZnPg==',
-);
-
-// 已使用数量
-const consumedQuantity = computed(() => {
-	return (formInfo.value.totalQuantity || 0) - (formInfo.value.remainingQuantity || 0);
-});
-
-// 日期确认
 const selectDateInfo = (date: Dayjs) => {
 	formInfo.value.endDate = date.hour(23).minute(59).second(59);
 	initInfoDate(date);
@@ -335,26 +336,28 @@ const cancelDateInfo = () => {
 	chooseDateInfo.value.showFlag = false;
 };
 
-// 提交表单
 const onSubmit = async () => {
-	let api = addCpnCouponInfo;
-	if (formInfo.value.id) {
-		api = editCpnCouponInfo;
-	}
-	const { code, message } = await api(formInfo.value);
-	if (code == '200') {
-		showSuccessToast(message || '保存成功!');
-		// 保存后切换回列表模式
-		router.push({
-			path: getLeftPath.value,
-		});
-	} else {
-		showFailToast(message || '保存失败，请联系管理员!');
+	navigator.vibrate?.(50);
+	loading.value = true;
+	try {
+		let api = addCpnCouponInfo;
+		if (formInfo.value.id) {
+			api = editCpnCouponInfo;
+		}
+		const { code, message } = await api(formInfo.value);
+		if (code == '200') {
+			showSuccessToast(message || '保存成功!');
+			router.push({ path: getLeftPath.value });
+		} else {
+			showFailToast(message || '保存失败，请联系管理员!');
+		}
+	} finally {
+		loading.value = false;
 	}
 };
 
-// 立即兑换
 const onRedeem = () => {
+	navigator.vibrate?.(50);
 	const path = getRoutePathByName(router, 'cpnCouponInfoRedeem', '/selfFinance/cpnCouponInfo/redeem');
 	router.push({
 		path,
@@ -362,11 +365,10 @@ const onRedeem = () => {
 	});
 };
 
-// 统一数据获取逻辑
 const init = async () => {
 	const id: string = route?.query?.id as string;
 	if (id) {
-		const { code, data, message } = await getCpnCouponInfoDetail(id || '0');
+		const { code, data, message } = await getCpnCouponInfoDetail(id);
 		if (code == '200') {
 			formInfo.value = data || {};
 			if (formInfo.value.endDate) {
@@ -379,7 +381,6 @@ const init = async () => {
 			showFailToast(message || '查询详情失败，请联系管理员!');
 		}
 	} else {
-		// 新增模式，默认为编辑模式
 		formInfo.value = {
 			endDate: dayjs(),
 			paymentStatus: 0,
@@ -388,7 +389,16 @@ const init = async () => {
 	initInfoDate((formInfo.value?.endDate as Dayjs) || dayjs());
 };
 
-init();
+// 6. Lifecycle
+onMounted(() => {
+	updateNavBar();
+	init();
+});
+
+// 7. Watchers
+watch(isEditMode, () => {
+	updateNavBar();
+});
 </script>
 
 <style lang="less" scoped>
@@ -449,19 +459,10 @@ init();
 
 	.form-section-card {
 		background: #fff;
-		border-radius: 12px;
+		border-radius: 16px;
 		padding: 20px;
 		margin-bottom: 16px;
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-
-		.section-title {
-			font-size: 13px;
-			font-weight: 600;
-			color: #3d7fff;
-			margin-bottom: 20px;
-			display: flex;
-			align-items: center;
-		}
 
 		.field-item {
 			display: flex;
@@ -516,7 +517,7 @@ init();
 
 .recent-activities-edit {
 	background: #fff;
-	border-radius: 12px;
+	border-radius: 16px;
 	overflow: hidden;
 	margin-bottom: 80px;
 
@@ -544,6 +545,12 @@ init();
 		border: none;
 		border-radius: 14px;
 		box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+		transition: all 0.2s ease;
+
+		&:active {
+			transform: scale(0.98);
+			opacity: 0.9;
+		}
 
 		.btn-content {
 			display: flex;
@@ -570,6 +577,7 @@ init();
 	border-radius: 16px;
 	overflow: hidden;
 	margin-bottom: 16px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 	animation: card-slide-up 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 
 	@keyframes card-slide-up {
@@ -699,20 +707,9 @@ init();
 	}
 }
 
-.usage-note {
-	background: #fff;
-	border-radius: 12px;
-	padding: 16px;
-	margin-bottom: 16px;
-	font-size: 12px;
-	line-height: 20px;
-	color: #646566;
-	animation: fade-in-up 0.5s ease 0.2s backwards;
-}
-
 .recent-activities {
 	background: #fff;
-	border-radius: 12px;
+	border-radius: 16px;
 	overflow: hidden;
 	margin-bottom: 80px;
 	animation: fade-in-up 0.5s ease 0.3s backwards;

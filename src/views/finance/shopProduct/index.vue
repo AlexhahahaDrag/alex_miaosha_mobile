@@ -188,7 +188,7 @@ const onRefreshData = () => {
 };
 
 const onLoadMore = () => {
-	if (loading.value || finished.value) return;
+	if (isRefresh.value || loading.value || finished.value) return;
 	nextPage();
 	fetchProducts(searchInfo.value, pagination);
 };

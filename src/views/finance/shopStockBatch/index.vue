@@ -118,6 +118,7 @@ import { getUserManagerList } from '@/views/user/userManager/api';
 import { useNavBar } from '@/composables/useNavBar';
 import { usePagination } from '@/composables/usePagination';
 import type { PageInfo } from '@/views/common/config';
+import type { UserManagerData } from '@/views/user/userManager/config';
 
 const router = useRouter();
 const route = useRoute();
@@ -173,8 +174,10 @@ const getUserInfoList = async () => {
 	try {
 		const { code, data } = await getUserManagerList({});
 		if (code == '200' && data) {
-			data.forEach((user: { id: string | number; nickName: string }) => {
-				userMap.value[user.id] = user.nickName;
+			data.forEach((user: UserManagerData) => {
+				if (user.id && user.nickName) {
+					userMap.value[String(user.id)] = user.nickName;
+				}
 			});
 		}
 	} catch {
@@ -200,7 +203,7 @@ const onRefreshData = () => {
 };
 
 const onLoadMore = () => {
-	if (loading.value || finished.value) return;
+	if (isRefresh.value || loading.value || finished.value) return;
 	nextPage();
 	fetchBatchList(searchInfo.value, pagination);
 };

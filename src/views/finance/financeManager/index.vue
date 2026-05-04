@@ -22,9 +22,7 @@
 					icon="filter-o"
 					class="search-shell__filter-btn"
 					@click="onToggleFilterPanel"
-				>
-					筛选
-				</van-button>
+				/>
 			</div>
 
 			<div
@@ -51,113 +49,15 @@
 			</div>
 		</section>
 
-		<section
-			v-show="showFilterPanel"
-			class="filter-card"
-		>
-			<div class="filter-card__section">
-				<div class="filter-card__label">
-					<van-icon
-						name="balance-o"
-						class="filter-card__label-icon"
-					/>
-					支付方式
-				</div>
-				<div class="chip-group">
-					<button
-						v-for="option in sourceFilterOptions"
-						:key="`source-${option.value}`"
-						type="button"
-						:class="['chip', { 'chip--active': searchInfo.fromSource === option.value }]"
-						@click="onSelectSource(option.value)"
-					>
-						{{ option.text }}
-					</button>
-				</div>
-			</div>
-
-			<div class="filter-card__section">
-				<div class="filter-card__label">
-					<van-icon
-						name="apps-o"
-						class="filter-card__label-icon"
-					/>
-					类别
-				</div>
-				<div class="chip-group">
-					<button
-						v-for="option in categoryFilterOptions"
-						:key="`category-${option.value}`"
-						type="button"
-						:class="['chip', { 'chip--active': searchInfo.incomeAndExpenses === option.value }]"
-						@click="onSelectCategory(option.value)"
-					>
-						{{ option.text }}
-					</button>
-				</div>
-			</div>
-
-			<div class="filter-card__section">
-				<div class="filter-card__label">
-					<van-icon
-						name="user-o"
-						class="filter-card__label-icon"
-					/>
-					用户
-				</div>
-				<div class="chip-group">
-					<button
-						v-for="option in userFilterOptions"
-						:key="`user-${option.value}`"
-						type="button"
-						:class="['chip', { 'chip--active': String(searchInfo.belongTo || '') === option.value }]"
-						@click="onSelectUser(option.value)"
-					>
-						{{ option.text }}
-					</button>
-				</div>
-			</div>
-
-			<div class="filter-card__section">
-				<div class="filter-card__label">
-					<van-icon
-						name="underway-o"
-						class="filter-card__label-icon"
-					/>
-					时间
-				</div>
-				<div class="chip-group">
-					<button
-						v-for="option in timeFilterOptions"
-						:key="option.value"
-						type="button"
-						:class="['chip', { 'chip--active': activeTimePreset === option.value }]"
-						@click="onSelectTimePreset(option.value)"
-					>
-						{{ option.label }}
-					</button>
-				</div>
-			</div>
-
-			<div class="filter-card__actions">
-				<van-button
-					plain
-					round
-					class="filter-card__reset"
-					@click="onResetFilters"
-				>
-					重置
-				</van-button>
-				<van-button
-					round
-					type="primary"
-					class="filter-card__submit"
-					@click="onApplyFilters"
-				>
-					完成筛选
-				</van-button>
-			</div>
-		</section>
+		<common-filter-panel
+			:show="showFilterPanel"
+			:sections="filterSections"
+			:model-value="searchInfo"
+			:active-map="{ time: activeTimePreset }"
+			@select="handleFilterSelect"
+			@reset="onResetFilters"
+			@submit="onApplyFilters"
+		/>
 
 		<common-pull-refresh
 			ref="pullRefresh"
@@ -203,12 +103,6 @@
 								<van-skeleton :row="2" />
 							</div>
 						</div>
-					</div>
-				</template>
-
-				<template #empty>
-					<div class="empty-state-container">
-						<van-empty description="暂无数据"> </van-empty>
 					</div>
 				</template>
 
@@ -355,6 +249,30 @@ const userFilterOptions = computed<FilterOption[]>(() => [
 ]);
 
 const showFilterPanel = computed(() => manualFilterPanelOpen.value);
+
+const filterSections = computed(() => [
+	{ label: '支付方式', icon: 'balance-o', key: 'fromSource', options: sourceFilterOptions.value },
+	{ label: '类别', icon: 'apps-o', key: 'incomeAndExpenses', options: categoryFilterOptions.value },
+	{ label: '用户', icon: 'user-o', key: 'belongTo', options: userFilterOptions.value },
+	{ label: '时间', icon: 'underway-o', key: 'time', options: timeFilterOptions },
+]);
+
+const handleFilterSelect = ({ key, value }: { key: string; value: unknown }) => {
+	switch (key) {
+		case 'fromSource':
+			onSelectSource(value as string);
+			break;
+		case 'incomeAndExpenses':
+			onSelectCategory(value as string);
+			break;
+		case 'belongTo':
+			onSelectUser(value as string);
+			break;
+		case 'time':
+			onSelectTimePreset(value as TimePreset);
+			break;
+	}
+};
 
 const activeFilterTags = computed<ActiveFilterTag[]>(() => {
 	const tags: ActiveFilterTag[] = [];
@@ -555,11 +473,14 @@ const onCancel = () => {
 };
 
 const onRefreshData = () => {
-	resetData();
+	resetPagination();
 	getFinancePage(searchInfo.value, pagination);
 };
 
 const onLoadMore = () => {
+	if (isRefresh.value) {
+		return;
+	}
 	if (dataSource.value.length > 0) {
 		nextPage();
 	}
@@ -728,10 +649,11 @@ onMounted(() => {
 	}
 
 	&__filter-btn {
+		width: 38px;
 		height: 38px;
-		padding: 0 14px;
+		padding: 0;
 		border-radius: 12px;
-		font-size: 13px;
+		font-size: 18px; /* 调大一点图标 */
 	}
 }
 
@@ -769,70 +691,6 @@ onMounted(() => {
 	}
 }
 
-.filter-card {
-	margin: 0 14px 10px;
-	padding: 14px;
-	background: #ffffff;
-	border-radius: 18px;
-	box-shadow: 0 8px 24px rgba(15, 56, 120, 0.06);
-
-	&__section + &__section {
-		margin-top: 14px;
-	}
-
-	&__label {
-		display: flex;
-		align-items: center;
-		gap: 6px;
-		margin-bottom: 10px;
-		font-size: 13px;
-		font-weight: 600;
-		color: #25324a;
-	}
-
-	&__label-icon {
-		color: #1677ff;
-		font-size: 15px;
-	}
-
-	&__actions {
-		display: grid;
-		grid-template-columns: 96px 1fr;
-		gap: 10px;
-		margin-top: 16px;
-	}
-
-	&__reset,
-	&__submit {
-		height: 40px;
-		border-radius: 12px;
-	}
-}
-
-.chip-group {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 8px;
-}
-
-.chip {
-	border: 1px solid #e7edf6;
-	background: #f8fafc;
-	border-radius: 10px;
-	padding: 7px 12px;
-	font-size: 12px;
-	line-height: 1;
-	color: #52617a;
-	transition: all 0.2s ease;
-
-	&--active {
-		color: #ffffff;
-		background: linear-gradient(135deg, #3e8cff 0%, #1677ff 100%);
-		border-color: transparent;
-		box-shadow: 0 6px 12px rgba(22, 119, 255, 0.2);
-	}
-}
-
 .refresh-info {
 	flex: 1;
 	min-height: 0;
@@ -840,7 +698,7 @@ onMounted(() => {
 }
 
 .card-list {
-	padding: 0 0 16px;
+	padding: 0 0;
 }
 
 .date-group {

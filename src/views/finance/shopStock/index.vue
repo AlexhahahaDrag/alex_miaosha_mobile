@@ -175,12 +175,15 @@ const onCancel = () => {
 
 // 下拉刷新
 const onRefreshData = () => {
-	resetData();
+	resetPagination();
 	getStockPage(searchInfo.value, pagination);
 };
 
 // 加载更多
 const onLoadMore = () => {
+	if (isRefresh.value) {
+		return;
+	}
 	nextPage();
 	getStockPage(searchInfo.value, pagination);
 };

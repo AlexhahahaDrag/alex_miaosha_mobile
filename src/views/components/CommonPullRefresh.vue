@@ -1,5 +1,6 @@
 <template>
 	<van-pull-refresh
+		class="common-pull-refresh-wrapper"
 		v-model="refreshing"
 		pulling-text="松开以刷新..."
 		loosing-text="释放即可刷新..."
@@ -39,5 +40,16 @@ const onRefresh = () => {
 </script>
 
 <style lang="less" scoped>
-// 基础容器样式
+.common-pull-refresh-wrapper {
+	/* 赋予外层组件独立滚动上下文 */
+	height: 100%;
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
+
+	/* 深度穿透：当内部嵌套 common-list 时，强制剥夺其独立滚动权，由外层接管 */
+	:deep(.list-wrapper) {
+		height: auto !important;
+		overflow-y: visible !important;
+	}
+}
 </style>

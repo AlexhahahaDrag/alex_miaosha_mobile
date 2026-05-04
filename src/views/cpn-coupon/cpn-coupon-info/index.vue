@@ -1,12 +1,82 @@
 <template>
 	<div class="coupon-page">
-		<!-- 搜索栏 -->
-		<van-search
-			v-model="searchInfo.couponName"
-			placeholder="搜索优惠券"
-			@search="onSearch"
-			@clear="onCancel"
+		<!-- 搜索栏与过滤面板 -->
+		<section class="page-search">
+			<div class="search-shell">
+				<form
+					action="/"
+					class="search-shell__form"
+				>
+					<van-search
+						v-model="searchInfo.couponName"
+						placeholder="搜索消费券名称"
+						shape="round"
+						background="transparent"
+						class="search-bar"
+						@search="onSearch"
+						@clear="onCancel"
+					/>
+				</form>
+				<van-button
+					type="primary"
+					plain
+					icon="filter-o"
+					class="search-shell__filter-btn"
+					@click="onToggleFilterPanel"
+				/>
+			</div>
+
+			<div
+				v-if="activeFilterTags.length"
+				class="active-tags"
+			>
+				<van-tag
+					v-for="tag in activeFilterTags"
+					:key="tag.key"
+					plain
+					round
+					type="primary"
+					class="active-tags__item"
+				>
+					{{ tag.label }}
+				</van-tag>
+				<button
+					type="button"
+					class="active-tags__clear"
+					@click="onResetFilters"
+				>
+					清空
+				</button>
+			</div>
+		</section>
+
+		<common-filter-panel
+			:show="showFilterPanel"
+			:sections="filterSections"
+			:model-value="{ status: activeStatus }"
+			:active-map="{ time: activeTimePreset }"
+			@select="handleFilterSelect"
+			@reset="onResetFilters"
+			@submit="onApplyFilters"
 		/>
+
+		<!-- 自定义日期选择弹窗 -->
+		<van-calendar
+			v-model:show="showCustomDatePicker"
+			type="range"
+			@confirm="onConfirmCustomDate"
+			color="#1989fa"
+			:min-date="new Date(2020, 0, 1)"
+			:max-date="new Date()"
+		/>
+
+		<!-- 汇总信息与排序 -->
+		<div class="summary-bar">
+			<div class="total-count">
+				共 <span class="highlight">{{ pagination.total || 0 }}</span> 张消费券
+			</div>
+			<div class="sort-action"> 按有效期 <van-icon name="arrow-down" /> </div>
+		</div>
 
 		<!-- 下拉刷新容器 -->
 		<common-pull-refresh
@@ -14,44 +84,47 @@
 			@refresh="onRefreshData"
 			class="refresh-container"
 		>
-			<div class="content-wrapper">
-				<!-- 下拉筛选菜单 -->
-				<van-dropdown-menu class="filter-dropdown">
-					<van-dropdown-item
-						v-model="searchInfo.onlyValidAndNotFullyRedeemed"
-						:options="filterOptions"
-						@click-option="onFilterChange"
-					/>
-				</van-dropdown-menu>
-
-				<!-- 空状态 -->
-				<van-empty
-					v-if="!dataSource?.length"
-					description="暂无数据"
-				/>
-
-				<!-- 优惠券列表 -->
-				<van-list
-					v-else
-					v-model:loading="loading"
-					:finished="finished"
-					:immediate-check="false"
-					finished-text="没有更多了"
-					@load="onLoadMore"
-					class="coupon-list"
-				>
-					<transition-group name="card-list">
-						<van-swipe-cell
-							v-for="(item, index) in dataSource"
-							:key="item.id"
-							class="card-item"
+			<common-list
+				v-model="loading"
+				:loading="loading"
+				:refreshing="isRefresh"
+				:finished="finished"
+				:is-empty="!dataSource.length"
+				@load="onLoadMore"
+				class="content-wrapper"
+			>
+				<!-- 骨架屏状态 -->
+				<template #skeleton>
+					<div class="skeleton-list">
+						<div
+							v-for="i in 5"
+							:key="i"
+							class="skeleton-card"
 						>
+							<van-skeleton
+								avatar
+								avatar-size="64px"
+								avatar-shape="round"
+								title
+								:row="2"
+							/>
+						</div>
+					</div>
+				</template>
+
+				<!-- 消费券列表 -->
+				<div class="card-list-wrapper">
+					<div
+						v-for="(item, index) in dataSource"
+						:key="item.id"
+						class="card-item"
+					>
+						<van-swipe-cell>
 							<div
 								class="coupon-card"
-								:class="getBorderColorClass(index)"
 								@click="onCardClick(item.id)"
 							>
-								<!-- 左侧图标 -->
+								<!-- 左侧大圆角图标 -->
 								<div class="coupon-icon">
 									<img
 										:src="getCouponImage(index)"
@@ -61,31 +134,31 @@
 
 								<!-- 中间内容 -->
 								<div class="coupon-content">
-									<div class="coupon-name">
-										<span class="text">{{ item.couponName || '未命名消费券' }}</span>
+									<div class="coupon-header">
+										<span class="coupon-name">{{ item.couponName || '未命名消费券' }}</span>
 										<van-tag
 											:type="item.paymentStatus === 1 ? 'success' : 'warning'"
 											plain
 											size="medium"
+											class="status-tag"
 										>
 											{{ item.paymentStatus === 1 ? '已支付' : '未支付' }}
 										</van-tag>
 									</div>
-									<div class="coupon-validity">{{ getValidityText(item) }}</div>
 									<div class="coupon-price">¥ {{ item.unitValue?.toFixed(2) || '0.00' }}</div>
+									<div class="coupon-footer">
+										{{ getValidityText(item) }} <span class="divider">|</span> 剩余 {{ item.remainingQuantity || 0 }} /
+										{{ item.totalQuantity || 0 }}
+									</div>
 								</div>
-								<!-- 右侧进度 -->
-								<div class="coupon-progress">
-									<van-circle
-										v-model:current-rate="item.currentRate"
-										:rate="getProgressRate(item)"
-										:speed="100"
-										:text="getProgressText(item)"
-										:color="getProgressColor(index)"
-										:stroke-width="50"
-										size="50px"
+
+								<!-- 右侧箭头 -->
+								<div class="coupon-arrow">
+									<van-icon
+										name="arrow"
+										color="#c8c9cc"
+										size="18"
 									/>
-									<div class="remaining-text">剩余数量</div>
 								</div>
 							</div>
 							<template #right>
@@ -106,9 +179,9 @@
 								/>
 							</template>
 						</van-swipe-cell>
-					</transition-group>
-				</van-list>
-			</div>
+					</div>
+				</div>
+			</common-list>
 		</common-pull-refresh>
 
 		<!-- 删除确认弹窗 -->
@@ -126,8 +199,8 @@
 						color="#ee0a24"
 					/>
 				</div>
-				<div class="delete-title">确认删除该优惠券吗？</div>
-				<div class="delete-message">删除后将无法恢复此优惠券，请确认是否继续操作。</div>
+				<div class="delete-title">确认删除该消费券吗？</div>
+				<div class="delete-message">删除后将无法恢复此消费券，请确认是否继续操作。</div>
 				<div class="delete-buttons">
 					<van-button
 						class="cancel-btn"
@@ -152,6 +225,7 @@
 	</div>
 </template>
 <script lang="ts" setup>
+import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
 import { debounce } from 'lodash';
 import type { CpnCouponInfoData } from './config';
@@ -162,6 +236,7 @@ import { formatDate } from '@/utils/dayjs';
 import { getCpnCouponInfoPage, deleteCpnCouponInfo } from '@/views/cpn-coupon/cpn-coupon-info/api';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
+import CommonList from '@/views/components/CommonList.vue';
 import type { ResponseBody } from '@/types/api';
 
 const router = useRouter();
@@ -184,8 +259,8 @@ useTabBar({
 	visible: true,
 	data: [
 		{ name: 'dashboard', title: '首页', icon: 'homepage' },
-		{ name: 'cpnCouponInfo', title: '消费券', icon: 'cpnCouponInfo' },
-		{ name: 'cpnUserCouponInfo', title: '核销记录', icon: 'cpnUserCouponInfo' },
+		{ name: 'cpnCouponInfo', title: '消费券', icon: 'van-coupon-o' },
+		{ name: 'cpnUserCouponInfo', title: '核销记录', icon: 'van-orders-o' },
 		{ name: 'myself', title: '个人', icon: 'user' },
 	],
 	active: 1,
@@ -203,25 +278,172 @@ const { pagination, resetPagination, setTotal, nextPage } = usePagination();
 const showDeletePopup = ref<boolean>(false);
 const deleteTargetId = ref<string | undefined>(undefined);
 
-// 下拉筛选选项
-const filterOptions = [
-	{ text: '可用优惠券', value: true },
-	{ text: '全部优惠券', value: false },
+type TimePreset = 'today' | '7d' | 'month' | 'all' | 'custom';
+
+const timeFilterOptions: { label: string; value: TimePreset }[] = [
+	{ label: '今天', value: 'today' },
+	{ label: '近7天', value: '7d' },
+	{ label: '当月', value: 'month' },
+	{ label: '全部', value: 'all' },
+	{ label: '自定义', value: 'custom' },
 ];
 
-// 卡片边框颜色类（循环使用）
-const getBorderColorClass = (index: number) => {
-	const colors = ['border-green', 'border-orange', 'border-blue', 'border-red'];
-	return colors[index % colors.length];
+const statusOptions = [
+	{ text: '全部', value: '' },
+	{ text: '可用', value: 'AVAILABLE' },
+	{ text: '未支付', value: 'UNPAID' },
+];
+
+const manualFilterPanelOpen = ref<boolean>(false);
+const activeStatus = ref<string>('AVAILABLE'); // 默认展示可用
+const activeTimePreset = ref<TimePreset>('all');
+const showCustomDatePicker = ref<boolean>(false);
+const customDateRange = ref<[Date, Date] | null>(null);
+
+const showFilterPanel = computed(() => manualFilterPanelOpen.value);
+
+const filterSections = computed(() => [
+	{ label: '状态', icon: 'info-o', key: 'status', options: statusOptions },
+	{ label: '时间', icon: 'underway-o', key: 'time', options: timeFilterOptions },
+]);
+
+interface ActiveFilterTag {
+	key: string;
+	label: string;
+}
+
+const activeFilterTags = computed<ActiveFilterTag[]>(() => {
+	const tags: ActiveFilterTag[] = [];
+	const keyword = searchInfo.value.couponName?.trim();
+	const statusText = statusOptions.find((o) => o.value === activeStatus.value)?.text;
+
+	if (keyword) {
+		tags.push({ key: 'keyword', label: keyword });
+	}
+
+	if (statusText && activeStatus.value) {
+		tags.push({ key: 'status', label: statusText });
+	}
+
+	if (activeTimePreset.value !== 'all') {
+		tags.push({ key: 'time', label: getTimePresetLabel(activeTimePreset.value) });
+	}
+
+	return tags;
+});
+
+const onToggleFilterPanel = () => {
+	manualFilterPanelOpen.value = !manualFilterPanelOpen.value;
 };
 
-// 获取优惠券图片（使用占位图）
+const handleFilterSelect = ({ key, value }: { key: string; value: unknown }) => {
+	if (key === 'status') {
+		activeStatus.value = value as string;
+	} else if (key === 'time') {
+		onSelectTimePreset(value as TimePreset);
+	}
+};
+
+const onSelectTimePreset = (value: TimePreset) => {
+	if (value === 'custom') {
+		showCustomDatePicker.value = true;
+		return;
+	}
+
+	activeTimePreset.value = value;
+	customDateRange.value = null;
+};
+
+const onConfirmCustomDate = (value: Date[]) => {
+	if (Array.isArray(value) && value.length === 2) {
+		customDateRange.value = [value[0], value[1]];
+		activeTimePreset.value = 'custom';
+	}
+	showCustomDatePicker.value = false;
+};
+
+const getTimePresetLabel = (value: TimePreset) => {
+	switch (value) {
+		case 'today':
+			return '今天';
+		case '7d':
+			return '近7天';
+		case 'month':
+			return '当月';
+		case 'custom':
+			if (customDateRange.value) {
+				return `${dayjs(customDateRange.value[0]).format('MM/DD')} - ${dayjs(customDateRange.value[1]).format('MM/DD')}`;
+			}
+			return '自定义';
+		default:
+			return '全部';
+	}
+};
+
+const getTimeBoundary = (): { start: Dayjs; end: Dayjs } | null => {
+	const now = dayjs();
+
+	switch (activeTimePreset.value) {
+		case 'today':
+			return { start: now.startOf('day'), end: now.endOf('day') };
+		case '7d':
+			return { start: now.subtract(6, 'day').startOf('day'), end: now.endOf('day') };
+		case 'month':
+			return { start: now.startOf('month'), end: now.endOf('day') };
+		case 'custom':
+			if (!customDateRange.value) {
+				return null;
+			}
+			return {
+				start: dayjs(customDateRange.value[0]).startOf('day'),
+				end: dayjs(customDateRange.value[1]).endOf('day'),
+			};
+		default:
+			return null;
+	}
+};
+
+const applyStatusFilter = () => {
+	searchInfo.value.onlyValidAndNotFullyRedeemed = undefined;
+	searchInfo.value.paymentStatus = undefined;
+	if (activeStatus.value === 'AVAILABLE') {
+		searchInfo.value.onlyValidAndNotFullyRedeemed = true;
+	} else if (activeStatus.value === 'UNPAID') {
+		searchInfo.value.paymentStatus = 0;
+	}
+
+	// 处理时间过滤
+	const boundary = getTimeBoundary();
+	if (boundary) {
+		searchInfo.value.createTimeStart = boundary.start.format('YYYY-MM-DD');
+		searchInfo.value.createTimeEnd = boundary.end.format('YYYY-MM-DD');
+	} else {
+		delete searchInfo.value.createTimeStart;
+		delete searchInfo.value.createTimeEnd;
+	}
+};
+
+const onApplyFilters = () => {
+	manualFilterPanelOpen.value = false;
+	applyStatusFilter();
+};
+
+const onResetFilters = () => {
+	searchInfo.value.couponName = '';
+	activeStatus.value = 'AVAILABLE';
+	activeTimePreset.value = 'all';
+	customDateRange.value = null;
+	manualFilterPanelOpen.value = false;
+	applyStatusFilter();
+};
+
+// 获取消费券图片（使用更大的圆角 rx="16"）
 const getCouponImage = (index: number) => {
 	const images = [
-		'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjN2NiMzQyIiByeD0iOCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjI0IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuKYlTwvdGV4dD48L3N2Zz4=',
-		'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjZmY5ODAwIiByeD0iOCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjI0IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuKYljwvdGV4dD48L3N2Zz4=',
-		'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjNTY5ZGZmIiByeD0iOCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjI0IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuKYhTwvdGV4dD48L3N2Zz4=',
-		'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjZmY0NTU3IiByeD0iOCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjI0IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuKYhjwvdGV4dD48L3N2Zz4=',
+		'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjN2NiMzQyIiByeD0iMTYiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1zaXplPSIyNCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7imJU8L3RleHQ+PC9zdmc+',
+		'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjZmY5ODAwIiByeD0iMTYiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1zaXplPSIyNCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7imJY8L3RleHQ+PC9zdmc+',
+		'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjNTY5ZGZmIiByeD0iMTYiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1zaXplPSIyNCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7imIU8L3RleHQ+PC9zdmc+',
+		'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjZmY0NTU3IiByeD0iMTYiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1zaXplPSIyNCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7imIY8L3RleHQ+PC9zdmc+',
 	];
 	return images[index % images.length];
 };
@@ -237,26 +459,7 @@ const getValidityText = (item: CpnCouponInfoData) => {
 	if (daysLeft < 0) return '已过期';
 	if (daysLeft === 0) return '今天到期';
 	if (daysLeft <= 3) return `${daysLeft}天后到期`;
-	if (daysLeft <= 30) return `有效期至${endDate.slice(5)}`;
-	return `有效期至${endDate.slice(5)}`;
-};
-
-// 获取进度百分比（剩余数量占总数的百分比）
-const getProgressRate = (item: CpnCouponInfoData): number => {
-	if (!item.totalQuantity) return 0;
-	if (!item.remainingQuantity) return 0;
-	return (item.remainingQuantity / item.totalQuantity) * 100;
-};
-
-// 获取进度文本
-const getProgressText = (item: CpnCouponInfoData) => {
-	return `${item.remainingQuantity || 0}/${item.totalQuantity || 0}`;
-};
-
-// 获取进度颜色
-const getProgressColor = (index: number) => {
-	const colors = ['#07c160', '#ff9800', '#1989fa', '#ff4557'];
-	return colors[index % colors.length];
+	return `有效期至 ${endDate}`;
 };
 
 // 点击卡片 - 跳转到详情页
@@ -267,12 +470,6 @@ const onCardClick = (id?: string) => {
 		path,
 		query: { id },
 	});
-};
-
-// 下拉筛选变更处理
-const onFilterChange = () => {
-	// v-model 已经自动更新了 searchInfo.onlyValidAndNotFullyRedeemed
-	// 这里可以添加额外的处理逻辑，比如记录用户行为等
 };
 
 // 统一重置数据函数
@@ -296,7 +493,11 @@ const getCpnCouponInfoPageData = async (param: CpnCouponInfoData, cur: PageInfo)
 		data?.records?.forEach((item: CpnCouponInfoData) => {
 			item.currentRate = 0;
 		});
-		dataSource.value = [...dataSource.value, ...(data?.records || [])];
+		if (cur?.current === 1) {
+			dataSource.value = data?.records || [];
+		} else {
+			dataSource.value = [...dataSource.value, ...(data?.records || [])];
+		}
 		setTotal(data?.total || 0);
 		nextPage();
 		if ((pagination.total || 0) <= dataSource.value.length) {
@@ -307,29 +508,27 @@ const getCpnCouponInfoPageData = async (param: CpnCouponInfoData, cur: PageInfo)
 	}
 };
 
-// 搜索处理
+// 搜索处理 (如果需要立刻触发，可强制执行防抖函数)
 const onSearch = () => {
-	resetPagination();
-	dataSource.value = [];
-	onLoadMore();
+	debouncedQuery.flush();
 };
 
 // 取消搜索
 const onCancel = () => {
 	searchInfo.value.couponName = '';
-	searchInfo.value.onlyValidAndNotFullyRedeemed = true;
-	resetData();
-	getCpnCouponInfoPageData(searchInfo.value, pagination);
 };
 
 // 下拉刷新
 const onRefreshData = () => {
-	resetData();
+	resetPagination();
 	getCpnCouponInfoPageData(searchInfo.value, pagination);
 };
 
 // 加载更多
 const onLoadMore = () => {
+	if (isRefresh.value) {
+		return;
+	}
 	getCpnCouponInfoPageData(searchInfo.value, pagination);
 };
 
@@ -380,8 +579,8 @@ const confirmDelete = async () => {
 // 初始化
 onMounted(() => {
 	resetData();
-	searchInfo.value.onlyValidAndNotFullyRedeemed = true;
-	getCpnCouponInfoPageData(searchInfo.value, pagination);
+	activeStatus.value = 'AVAILABLE';
+	applyStatusFilter();
 });
 
 // 防抖查询函数
@@ -411,92 +610,144 @@ watch(
 	background-color: #f7f8fa;
 }
 
+.page-search {
+	padding: 12px 14px 8px;
+	background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
+
+.search-shell {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+
+	&__form {
+		flex: 1;
+	}
+
+	&__filter-btn {
+		width: 38px;
+		height: 38px;
+		padding: 0;
+		border-radius: 12px;
+		font-size: 18px; /* 调大一点图标 */
+	}
+}
+
+.search-bar {
+	--van-search-padding: 0;
+	--van-search-content-background: #f2f5fb;
+	--van-search-input-height: 38px;
+	background: transparent;
+
+	:deep(.van-search__content) {
+		border-radius: 14px;
+		padding-left: 12px;
+	}
+}
+
+.active-tags {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
+	padding-top: 10px;
+
+	&__item {
+		padding: 5px 10px;
+		background: #f4f8ff;
+		border-color: #d7e7ff;
+	}
+
+	&__clear {
+		border: none;
+		background: transparent;
+		color: #1677ff;
+		font-size: 12px;
+		padding: 0 2px;
+	}
+}
+
+.summary-bar {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 12px 16px 4px;
+	font-size: 13px;
+	color: #969799;
+
+	.highlight {
+		color: #1989fa;
+		font-weight: bold;
+		margin: 0 2px;
+	}
+
+	.sort-action {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+	}
+}
+
 .refresh-container {
 	flex: 1;
 	overflow-y: auto;
 }
 
 .content-wrapper {
-	padding: 12px 16px;
+	padding: 8px 16px 0;
 	position: relative;
 }
 
-.filter-dropdown {
-	position: absolute;
-	top: 0;
-	right: 16px;
-	z-index: 100;
-	background: transparent;
+.card-list-wrapper {
+	display: flex;
+	flex-direction: column;
+}
 
-	:deep(.van-dropdown-menu__bar) {
-		background: transparent;
-		box-shadow: none;
-		height: 40px;
-	}
+.card-item {
+	margin-bottom: 12px;
 
-	:deep(.van-dropdown-menu__title) {
-		padding: 0 8px;
-		font-size: 14px;
-		color: #1989fa;
-
-		&::after {
-			border-color: transparent transparent #1989fa #1989fa;
-		}
+	&:last-child {
+		margin-bottom: 0;
 	}
 }
 
-.coupon-list,
-.van-empty {
-	margin-top: 24px;
-}
-
-.coupon-list {
+.skeleton-list {
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
 }
 
+.skeleton-card {
+	background: #fff;
+	border-radius: 16px;
+	padding: 16px;
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
 .coupon-card {
 	background: #fff;
-	border-radius: 12px;
+	border-radius: 16px;
 	padding: 16px;
 	display: flex;
 	align-items: center;
-	gap: 12px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+	gap: 16px;
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
 	position: relative;
 	cursor: pointer;
 	transition:
 		transform 0.2s,
 		box-shadow 0.2s;
-	border-left: 4px solid;
 
 	&:active {
 		transform: scale(0.98);
-	}
-
-	&.border-green {
-		border-left-color: #07c160;
-	}
-
-	&.border-orange {
-		border-left-color: #ff9800;
-	}
-
-	&.border-blue {
-		border-left-color: #1989fa;
-	}
-
-	&.border-red {
-		border-left-color: #ff4557;
 	}
 }
 
 .coupon-icon {
 	flex-shrink: 0;
-	width: 60px;
-	height: 60px;
-	border-radius: 8px;
+	width: 64px;
+	height: 64px;
+	border-radius: 16px;
 	overflow: hidden;
 
 	img {
@@ -510,56 +761,58 @@ watch(
 	flex: 1;
 	display: flex;
 	flex-direction: column;
-	gap: 4px;
 	min-width: 0;
 
-	.coupon-name {
-		font-size: 16px;
-		font-weight: 600;
-		color: #323233;
+	.coupon-header {
 		display: flex;
 		align-items: center;
 		gap: 8px;
+		margin-bottom: 6px;
 
-		.text {
+		.coupon-name {
+			font-size: 16px;
+			font-weight: 600;
+			color: #323233;
 			overflow: hidden;
 			text-overflow: ellipsis;
 			white-space: nowrap;
 			flex: 0 1 auto;
 			min-width: 0;
 		}
-	}
 
-	.coupon-validity {
-		font-size: 12px;
-		color: #969799;
+		.status-tag {
+			flex-shrink: 0;
+			border-radius: 4px;
+		}
 	}
 
 	.coupon-price {
-		font-size: 18px;
-		font-weight: 600;
+		font-size: 20px;
+		font-weight: 700;
 		color: #1989fa;
-		margin-top: 2px;
+		margin-bottom: 8px;
+		letter-spacing: -0.5px;
+	}
+
+	.coupon-footer {
+		font-size: 12px;
+		color: #969799;
+		display: flex;
+		align-items: center;
+
+		.divider {
+			margin: 0 6px;
+			color: #dcdee0;
+		}
 	}
 }
 
-.coupon-progress {
+.coupon-arrow {
 	flex-shrink: 0;
 	display: flex;
-	flex-direction: column;
 	align-items: center;
-	gap: 4px;
-
-	.remaining-text {
-		font-size: 10px;
-		color: #969799;
-		text-align: center;
-	}
-}
-
-:deep(.van-circle__text) {
-	font-size: 12px;
-	font-weight: 600;
+	justify-content: center;
+	padding-left: 4px;
 }
 
 :deep(.van-swipe-cell__right) {

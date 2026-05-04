@@ -1,11 +1,11 @@
-# Graph Report - src  (2026-05-02)
+# Graph Report - src  (2026-05-04)
 
 ## Corpus Check
-- 221 files · ~83,062 words
+- 221 files · ~82,941 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 542 nodes · 735 edges · 20 communities detected
+- 542 nodes · 734 edges · 19 communities detected
 - Extraction: 67% EXTRACTED · 33% INFERRED · 0% AMBIGUOUS · INFERRED: 242 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
@@ -27,9 +27,8 @@
 - [[_COMMUNITY_Community 14|Community 14]]
 - [[_COMMUNITY_Community 15|Community 15]]
 - [[_COMMUNITY_Community 16|Community 16]]
-- [[_COMMUNITY_Community 17|Community 17]]
-- [[_COMMUNITY_Community 19|Community 19]]
-- [[_COMMUNITY_Community 32|Community 32]]
+- [[_COMMUNITY_Community 18|Community 18]]
+- [[_COMMUNITY_Community 31|Community 31]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `postData()` - 73 edges
@@ -46,24 +45,24 @@
 ## Surprising Connections (you probably didn't know these)
 - `postData()` --calls--> `addCpnCouponInfo()`  [INFERRED]
   src\views\common\api\index.ts → src\views\cpn-coupon\cpn-coupon-info\api\index.ts
-- `postData()` --calls--> `getConsumeCardRecordPage()`  [INFERRED]
-  src\views\common\api\index.ts → src\views\finance\consumeCardRecord\api\index.ts
-- `postData()` --calls--> `addConsumeCardRecord()`  [INFERRED]
-  src\views\common\api\index.ts → src\views\finance\consumeCardRecord\api\index.ts
 - `postData()` --calls--> `getDictManagerPage()`  [INFERRED]
   src\views\common\api\index.ts → src\views\finance\dict\api\index.ts
 - `postData()` --calls--> `addDictManager()`  [INFERRED]
   src\views\common\api\index.ts → src\views\finance\dict\api\index.ts
+- `postData()` --calls--> `addFinanceManger()`  [INFERRED]
+  src\views\common\api\index.ts → src\views\finance\financeManager\api\index.ts
+- `postData()` --calls--> `getShopStockPage()`  [INFERRED]
+  src\views\common\api\index.ts → src\views\finance\shopStock\api\index.ts
 
 ## Communities
 
 ### Community 0 - "Community 0"
 Cohesion: 0.03
-Nodes (89): addAccountRecordInfo(), addAccountRecordInfoTest(), addFileManager(), addFinanceManger(), addPmsBrand(), addPmsCategory(), addPmsShopProduct(), addPmsSkuInfo() (+81 more)
+Nodes (94): addAccountRecordInfo(), addAccountRecordInfoTest(), addConsumeCardRecord(), addFileManager(), addPmsBrand(), addPmsShopProduct(), addPmsShopWantProduct(), addPrepaidCardInfo() (+86 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.06
-Nodes (49): addMenuInfo(), addOrgUserInfo(), addPermissionInfo(), addPmsAttr(), addRoleInfo(), addRolePermissionInfo(), addRoleUserInfo(), deleteMenuInfo() (+41 more)
+Cohesion: 0.07
+Nodes (43): addMenuInfo(), addOrgInfo(), addOrgUserInfo(), addPmsAttr(), addRoleInfo(), addRoleUserInfo(), deleteMenuInfo(), deleteOrgInfo() (+35 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.06
@@ -86,16 +85,16 @@ Cohesion: 0.32
 Nodes (9): cancelDateInfo(), cancelInfo(), choose(), chooseDate(), getDictInfoList(), initInfoDate(), onSubmit(), selectDateInfo() (+1 more)
 
 ### Community 7 - "Community 7"
+Cohesion: 0.15
+Nodes (10): addPmsCategory(), addPmsSkuInfo(), deletePmsCategory(), deletePmsSkuInfo(), getPmsCategoryDetail(), getPmsCategoryPage(), getPmsSkuInfoDetail(), getPmsSkuInfoPage() (+2 more)
+
+### Community 8 - "Community 8"
 Cohesion: 0.2
 Nodes (3): confirmConsume(), getPrepaidCardInfoDetail(), getPrepaidCardInfoDetailInfo()
 
-### Community 8 - "Community 8"
-Cohesion: 0.39
-Nodes (7): _decode(), decrypt(), errorHandler(), redirectToLogin(), requestHandler(), requestHandlerFile(), responseHandler()
-
 ### Community 9 - "Community 9"
 Cohesion: 0.39
-Nodes (6): addOrgInfo(), deleteOrgInfo(), delOrgInfo(), getOrgInfoDetail(), getOrgInfoPage(), updateOrgInfo()
+Nodes (7): _decode(), decrypt(), errorHandler(), redirectToLogin(), requestHandler(), requestHandlerFile(), responseHandler()
 
 ### Community 10 - "Community 10"
 Cohesion: 0.25
@@ -103,62 +102,58 @@ Nodes (7): addUserManager(), deleteUserManager(), editUserManager(), fetchUsers(
 
 ### Community 11 - "Community 11"
 Cohesion: 0.29
-Nodes (1): vue (AutoImport)
+Nodes (6): addPermissionInfo(), deletePermissionInfo(), delPermissionInfo(), getPermissionInfoDetail(), getPermissionInfoPage(), updatePermissionInfo()
 
 ### Community 12 - "Community 12"
+Cohesion: 0.29
+Nodes (6): addRolePermissionInfo(), deleteRolePermissionInfo(), delRolePermissionInfo(), getRolePermissionInfoDetail(), getRolePermissionInfoPage(), updateRolePermissionInfo()
+
+### Community 13 - "Community 13"
+Cohesion: 0.29
+Nodes (1): vue (AutoImport)
+
+### Community 14 - "Community 14"
 Cohesion: 0.4
 Nodes (2): getChildren(), resolveViewComponent()
 
-### Community 13 - "Community 13"
-Cohesion: 0.33
-Nodes (5): addShopOrderDetail(), deleteShopOrderDetail(), getShopOrderDetailDetail(), getShopOrderDetailPage(), updateShopOrderDetail()
-
-### Community 14 - "Community 14"
-Cohesion: 0.33
-Nodes (5): addShopFinance(), deleteShopFinance(), getShopFinanceDetail(), getShopFinancePage(), updateShopFinance()
-
 ### Community 15 - "Community 15"
 Cohesion: 0.33
-Nodes (5): addPmsShopWantProduct(), deletePmsShopWantProduct(), getPmsShopWantProductDetail(), getPmsShopWantProductPage(), updatePmsShopWantProduct()
+Nodes (5): addFinanceManger(), deleteFinanceManager(), editFinanceManger(), getFinanceMangerDetail(), getFinanceMangerPage()
 
 ### Community 16 - "Community 16"
-Cohesion: 0.33
-Nodes (5): addConsumeCardRecord(), deleteConsumeCardRecord(), getConsumeCardRecordDetail(), getConsumeCardRecordPage(), updateConsumeCardRecord()
-
-### Community 17 - "Community 17"
 Cohesion: 0.5
 Nodes (1): algorithmProxy
 
-### Community 19 - "Community 19"
+### Community 18 - "Community 18"
 Cohesion: 0.67
 Nodes (1): vue-router (AutoImport)
 
-### Community 32 - "Community 32"
+### Community 31 - "Community 31"
 Cohesion: 1.0
 Nodes (1): pinia (AutoImport)
 
 ## Knowledge Gaps
 - **1 isolated node(s):** `pinia (AutoImport)`
   These have ≤1 connection - possible missing edges or undocumented components.
-- **Thin community `Community 11`** (7 nodes): `computed()`, `onMounted()`, `onUnmounted()`, `reactive()`, `ref()`, `watch()`, `vue (AutoImport)`
+- **Thin community `Community 13`** (7 nodes): `computed()`, `onMounted()`, `onUnmounted()`, `reactive()`, `ref()`, `watch()`, `vue (AutoImport)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 12`** (6 nodes): `addRouter()`, `getChildren()`, `judgePermission()`, `refreshRouter()`, `resolveViewComponent()`, `index.ts`
+- **Thin community `Community 14`** (6 nodes): `addRouter()`, `getChildren()`, `judgePermission()`, `refreshRouter()`, `resolveViewComponent()`, `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 17`** (4 nodes): `algorithmProxy`, `.constructor()`, `.increaseIndexes()`, `index.ts`
+- **Thin community `Community 16`** (4 nodes): `algorithmProxy`, `.constructor()`, `.increaseIndexes()`, `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 19`** (3 nodes): `useRoute()`, `useRouter()`, `vue-router (AutoImport)`
+- **Thin community `Community 18`** (3 nodes): `useRoute()`, `useRouter()`, `vue-router (AutoImport)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 32`** (2 nodes): `defineStore()`, `pinia (AutoImport)`
+- **Thin community `Community 31`** (2 nodes): `defineStore()`, `pinia (AutoImport)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `postData()` connect `Community 0` to `Community 1`, `Community 2`, `Community 3`, `Community 9`, `Community 10`, `Community 13`, `Community 14`, `Community 15`, `Community 16`?**
+- **Why does `postData()` connect `Community 0` to `Community 1`, `Community 2`, `Community 3`, `Community 7`, `Community 10`, `Community 11`, `Community 12`, `Community 15`?**
   _High betweenness centrality (0.149) - this node is a cross-community bridge._
-- **Why does `getData()` connect `Community 2` to `Community 0`, `Community 1`, `Community 3`, `Community 7`, `Community 9`, `Community 10`, `Community 13`, `Community 14`, `Community 15`, `Community 16`?**
+- **Why does `getData()` connect `Community 2` to `Community 0`, `Community 1`, `Community 3`, `Community 7`, `Community 8`, `Community 10`, `Community 11`, `Community 12`, `Community 15`?**
   _High betweenness centrality (0.128) - this node is a cross-community bridge._
-- **Why does `init()` connect `Community 1` to `Community 0`, `Community 2`, `Community 6`, `Community 7`, `Community 9`?**
+- **Why does `init()` connect `Community 1` to `Community 0`, `Community 2`, `Community 6`, `Community 8`, `Community 11`, `Community 12`?**
   _High betweenness centrality (0.084) - this node is a cross-community bridge._
 - **Are the 71 inferred relationships involving `postData()` (e.g. with `getCpnCouponInfoPage()` and `addCpnCouponInfo()`) actually correct?**
   _`postData()` has 71 INFERRED edges - model-reasoned connections that need verification._

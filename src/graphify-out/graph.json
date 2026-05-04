@@ -3231,7 +3231,7 @@
       "id": "views_finance_shopstockattrs_shopstockattrsdetail_index_vue",
       "community": 6,
       "norm_label": "index.vue",
-      "degree": 4
+      "degree": 2
     },
     {
       "label": "shopStockAttrsDetailTs.ts",
@@ -5449,7 +5449,7 @@
       "source_location": "AutoImport",
       "community": 153,
       "norm_label": "userouter",
-      "degree": 51,
+      "degree": 50,
       "synthetic_auto_import": true
     },
     {
@@ -5460,7 +5460,7 @@
       "source_location": "AutoImport",
       "community": 153,
       "norm_label": "useroute",
-      "degree": 48,
+      "degree": 47,
       "synthetic_auto_import": true
     },
     {
@@ -16044,30 +16044,6 @@
       "_src": "views_finance_shopstockattrs_shopstockattrsdetail_index_vue",
       "_tgt": "autoimport_api_onmounted",
       "source": "autoimport_api_onmounted",
-      "target": "views_finance_shopstockattrs_shopstockattrsdetail_index_vue",
-      "confidence_score": 1
-    },
-    {
-      "relation": "uses_auto_import_api",
-      "confidence": "EXTRACTED",
-      "source_file": "src\\views\\finance\\shopStockAttrs\\shopStockAttrsDetail\\index.vue",
-      "source_location": "script",
-      "weight": 1,
-      "_src": "views_finance_shopstockattrs_shopstockattrsdetail_index_vue",
-      "_tgt": "autoimport_api_userouter",
-      "source": "autoimport_api_userouter",
-      "target": "views_finance_shopstockattrs_shopstockattrsdetail_index_vue",
-      "confidence_score": 1
-    },
-    {
-      "relation": "uses_auto_import_api",
-      "confidence": "EXTRACTED",
-      "source_file": "src\\views\\finance\\shopStockAttrs\\shopStockAttrsDetail\\index.vue",
-      "source_location": "script",
-      "weight": 1,
-      "_src": "views_finance_shopstockattrs_shopstockattrsdetail_index_vue",
-      "_tgt": "autoimport_api_useroute",
-      "source": "autoimport_api_useroute",
       "target": "views_finance_shopstockattrs_shopstockattrsdetail_index_vue",
       "confidence_score": 1
     },
