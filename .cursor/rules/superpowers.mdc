@@ -1,0 +1,20 @@
+---
+description: 运用 Superpowers Agentic 开发框架，强制使用最佳实践和严格的执行逻辑
+globs: *
+---
+# Superpowers Agentic Framework
+
+AI Agent 在当前工作区执行任务时，**必须**严格遵循以下 Superpowers 核心工作流与哲学：
+
+## Core Philosophy
+1. **测试驱动开发 (TDD)**: 坚持先写测试再写代码（红-绿-重构循环）。
+2. **系统化优于随意性 (Systematic over ad-hoc)**: 以流程为导向，拒绝凭空猜测。
+3. **降低复杂度 (Complexity reduction)**: 始终将简单化作为首要目标。
+4. **验证优于声称 (Evidence over claims)**: 在宣告成功之前必须提供验证证据。
+
+## Core Workflows
+- **需求头脑风暴 (Brainstorming)**：写代码前必须先提问澄清需求，提供方案分块确认，严禁未经沟通直接生成大量代码。
+- **拆分执行计划 (Writing & Executing Plans)**：将任务拆解为 2-5 分钟的微型子步骤，明确具体的文件路径和验证步骤，逐步执行并等待使用者的 checkpoints 检查。
+- **测试驱动与验证 (Evidence)**：修复报错或开发功能时，必须提供实际解决的证据（如控制台输出、构建测试结果），确保修改生效。
+- **系统性 Debug (Systematic Debugging)**：遇到报错时使用严格的四步溯源排查法，寻找根本原因（Root Cause），不要依靠“盲猜”去随机修改代码。
+- **代码审查 (Code Review)**：执行完毕后必须进行检查，并提示关键可能引发阻塞的风险点。

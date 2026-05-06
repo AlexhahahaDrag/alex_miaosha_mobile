@@ -46,3 +46,4 @@ components.d.ts
 .agent/
 package-lock.json
 stitch_ui.html
+graphify-out/

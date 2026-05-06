@@ -99,7 +99,10 @@
 								width="28"
 								height="28"
 								:src="
-									selectedUser?.avatarUrl || selectedUser?.avatar || 'https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg'
+									selectedUser?.avatarThumbnailUrl ||
+										selectedUser?.avatarUrl ||
+										selectedUser?.avatar ||
+										'https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg'
 								"
 								class="avatar-img"
 							/>

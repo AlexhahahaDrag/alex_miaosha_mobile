@@ -3,5 +3,6 @@ export interface UserManagerData {
 	nickName?: string;
 	avatarUrl?: string;
 	avatar?: string;
+	avatarThumbnailUrl?: string;
 	[key: string]: unknown;
 }

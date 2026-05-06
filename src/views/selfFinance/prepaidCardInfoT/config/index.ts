@@ -12,7 +12,7 @@ export interface CardItem {
 	name: string;
 	balance: string;
 	bgColor: string;
-	id?: string | number;
+	id?: string;
 	cardName?: string;
 	cardType?: string;
 	status?: string;
@@ -26,7 +26,7 @@ export interface TransactionItem {
 	formattedAmount: string;
 	cardColor: string;
 	indicatorBg?: string;
-	id?: string | number;
+	id?: string;
 	transactionType?: string;
 	description?: string;
 	createTime?: string;
