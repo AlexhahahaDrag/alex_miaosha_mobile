@@ -1,5 +1,4 @@
 <template>
-	<NavBar :info="info"></NavBar>
 	<van-form
 		@submit="onSubmit"
 		:rules="rulesRef"
@@ -79,24 +78,20 @@
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-import type { OrgInfoData } from '../config';
+import type { OrgInfoData } from '@/views/user/orgInfo/config';
+import { useNavBar } from '@/composables/useNavBar';
 import { addOrgInfo, updateOrgInfo, getOrgInfoDetail } from '@/views/user/orgInfo/api';
 import type { Info } from '@/views/common/pop/selectPop.vue';
 import { getListName } from '@/views/common/config';
 import { getDictList } from '@/views/finance/dict/api';
 import type { DictInfo } from '@/views/finance/dict/api';
-import type { ResponseBody } from '@/types/api';
-
-interface NavBarInfo {
-	title?: string;
-	leftPath?: string;
-}
 
 const route = useRoute();
 const router = useRouter();
-const info = ref<NavBarInfo>({
-	title: route?.meta?.title || '机构表',
+useNavBar({
+	title: (route?.meta?.title as string) || '机构表',
 	leftPath: '/user/orgInfo',
+	visible: true,
 });
 
 const formInfo = ref<OrgInfoData>({});
@@ -143,11 +138,11 @@ const rulesRef = reactive({
 	],
 });
 
-const popInfo = ref<Info>({ showFlag: false });
+const popInfo = ref<Info<DictInfo>>({ showFlag: false });
 
 const statusName = ref<string>('');
 
-const statusInfo = ref<Info>({
+const statusInfo = ref<Info<DictInfo>>({
 	label: 'status',
 	labelName: label.status,
 	rule: rulesRef.status,
@@ -181,57 +176,58 @@ const cancelInfo = () => {
 	popInfo.value.showFlag = false;
 };
 
-function getDictInfoList(res: ResponseBody<DictInfo[]>) {
-	if (res.code == '200') {
-		statusInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'is_valid');
+function getDictInfoList(code: string, data: DictInfo[] | undefined, message?: string) {
+	if (code === '200') {
+		statusInfo.value.list = (data || []).filter((item) => item.belongTo === 'is_valid');
 		statusName.value = getListName(statusInfo.value.list || [], formInfo.value.status, 'typeCode', 'typeName');
 	} else {
-		showFailToast(res?.message || '查询失败，请联系管理员!');
+		showFailToast(message || '查询失败，请联系管理员!');
 	}
 }
 
-const onSubmit = () => {
+const onSubmit = async () => {
 	let method = 'post';
 	if (formInfo.value.id) {
 		method = 'put';
 	}
-	(method === 'put' ? updateOrgInfo : addOrgInfo)(formInfo.value).then((res: ResponseBody<OrgInfoData>) => {
-		if (res?.code == '200') {
-			showSuccessToast(res?.message || '保存成功!');
-			router.push({ path: '/user/orgInfo' });
-		} else {
-			showFailToast(res?.message || '保存失败，请联系管理员!');
-		}
-	});
+	const { code, message } = await (method === 'put' ? updateOrgInfo : addOrgInfo)(formInfo.value);
+	if (code === '200') {
+		showSuccessToast(message || '保存成功!');
+		router.push({ path: '/user/orgInfo' });
+	} else {
+		showFailToast(message || '保存失败，请联系管理员!');
+	}
 };
 
-function init() {
-	const id = route?.query?.id;
+const init = async () => {
+	const id = route?.query?.id as string | string[] | undefined;
 	if (id) {
-		Promise.all([getOrgInfoDetail(id || '-1'), getDictList('is_valid')])
-			.then(([detailRes, dictRes]) => {
-				const res = detailRes;
-				if (detailRes.code == '200' && detailRes.data) {
-					formInfo.value = detailRes.data;
-				} else {
-					showFailToast(res?.message || '查询详情失败，请联系管理员!');
-				}
-				getDictInfoList(dictRes);
-			})
-			.catch(() => {
-				showFailToast('系统问题，请联系管理员！');
-			});
+		try {
+			const safeId = Array.isArray(id) ? id[0] : id;
+			const [detailRes, dictRes] = await Promise.all([getOrgInfoDetail(safeId || '-1'), getDictList('is_valid')]);
+			const { code: detailCode, data: detailData, message: detailMessage } = detailRes;
+			const { code: dictCode, data: dictData, message: dictMessage } = dictRes;
+			if (detailCode === '200' && detailData) {
+				formInfo.value = detailData;
+			} else {
+				showFailToast(detailMessage || '查询详情失败，请联系管理员!');
+			}
+			getDictInfoList(dictCode, dictData, dictMessage);
+		} catch {
+			showFailToast('系统问题，请联系管理员！');
+		}
 	} else {
-		getDictList('is_valid').then((res: ResponseBody<DictInfo[]>) => {
-			getDictInfoList(res);
-		});
+		const { code, data, message } = await getDictList('is_valid');
+		getDictInfoList(code, data, message);
 		formInfo.value = {
 			status: 1,
 		};
 	}
-}
+};
 
-init();
+onMounted(() => {
+	init();
+});
 </script>
 <style lang="less" scoped>
 .subButton {

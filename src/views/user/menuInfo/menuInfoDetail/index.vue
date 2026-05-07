@@ -1,5 +1,4 @@
-<template>
-	<NavBar :info="info"></NavBar>
+﻿<template>
 	<van-form
 		@submit="onSubmit"
 		:rules="rulesRef"
@@ -12,7 +11,7 @@
 				:label="label.name + '：'"
 				:placeholder="'请输入' + label.name"
 				:rules="rulesRef.name"
-				:maxlength="name"
+				maxlength="128"
 			/>
 			<van-field
 				v-model="formInfo.path"
@@ -20,7 +19,7 @@
 				:label="label.path + '：'"
 				:placeholder="'请输入' + label.path"
 				:rules="rulesRef.path"
-				:maxlength="path"
+				maxlength="128"
 			/>
 			<van-field
 				v-model="formInfo.title"
@@ -28,7 +27,7 @@
 				:label="label.title + '：'"
 				:placeholder="'请输入' + label.title"
 				:rules="rulesRef.title"
-				:maxlength="title"
+				maxlength="128"
 			/>
 			<van-field
 				v-model="formInfo.component"
@@ -36,7 +35,7 @@
 				:label="label.component + '：'"
 				:placeholder="'请输入' + label.component"
 				:rules="rulesRef.component"
-				:maxlength="component"
+				maxlength="128"
 			/>
 			<van-field
 				v-model="formInfo.redirect"
@@ -44,7 +43,7 @@
 				:label="label.redirect + '：'"
 				:placeholder="'请输入' + label.redirect"
 				:rules="rulesRef.redirect"
-				:maxlength="redirect"
+				maxlength="128"
 			/>
 			<van-field
 				v-model="formInfo.icon"
@@ -52,7 +51,7 @@
 				:label="label.icon + '：'"
 				:placeholder="'请输入' + label.icon"
 				:rules="rulesRef.icon"
-				:maxlength="icon"
+				maxlength="128"
 			/>
 			<van-field
 				v-model="hideInMenuName"
@@ -69,7 +68,7 @@
 				:label="label.parentId + '：'"
 				:placeholder="'请输入' + label.parentId"
 				:rules="rulesRef.parentId"
-				:maxlength="parentId"
+				maxlength="128"
 			/>
 			<van-field
 				v-model="formInfo.summary"
@@ -77,7 +76,7 @@
 				:label="label.summary + '：'"
 				:placeholder="'请输入' + label.summary"
 				:rules="rulesRef.summary"
-				:maxlength="summary"
+				maxlength="200"
 			/>
 			<van-field
 				v-model="statusName"
@@ -94,7 +93,7 @@
 				:label="label.orderBy + '：'"
 				:placeholder="'请输入' + label.orderBy"
 				:rules="rulesRef.orderBy"
-				:maxlength="orderBy"
+				maxlength="19"
 			/>
 			<selectPop
 				:info="popInfo"
@@ -118,6 +117,7 @@
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
 import { label, rulesRef } from './menuInfoDetailTs';
+import { useNavBar } from '@/composables/useNavBar';
 import { getListName } from '@/views/common/config';
 import { addMenuInfo, updateMenuInfo, getMenuInfoDetail } from '@/views/user/menuInfo/api';
 import type { Info } from '@/views/common/pop/selectPop.vue';
@@ -125,12 +125,27 @@ import { getDictList } from '@/views/finance/dict/api';
 
 const route = useRoute();
 const router = useRouter();
-const info = ref<Params>({
-	title: route?.meta?.title || '菜单管理表',
+interface MenuInfoForm {
+	id?: string;
+	name?: string;
+	path?: string;
+	title?: string;
+	component?: string;
+	redirect?: string;
+	icon?: string;
+	hideInMenu?: string;
+	parentId?: string;
+	summary?: string;
+	status?: string;
+	orderBy?: string | number;
+}
+useNavBar({
+	title: (route?.meta?.title as string) || '菜单管理',
 	leftPath: '/user/menuInfo',
+	visible: true,
 });
 
-const formInfo = ref<Params>({});
+const formInfo = ref<MenuInfoForm>({});
 
 const popInfo = ref<Info>({ showFlag: false });
 
@@ -171,7 +186,7 @@ const choose = (type: string) => {
 	popInfo.value.showFlag = true;
 };
 
-const selectInfo = (type: string, value: Params, name: string) => {
+const selectInfo = (type: string, value: string, name: string) => {
 	popInfo.value.showFlag = false;
 	switch (type) {
 		case 'hideInMenu':
@@ -189,7 +204,7 @@ const cancelInfo = () => {
 	popInfo.value.showFlag = false;
 };
 
-function getDictInfoList(res: Params) {
+function getDictInfoList(res) {
 	if (res.code == '200') {
 		hideInMenuInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'true_or_false');
 		hideInMenuName.value = getListName(
@@ -201,7 +216,7 @@ function getDictInfoList(res: Params) {
 		statusInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'is_valid');
 		statusName.value = getListName(statusInfo.value.list || [], formInfo.value.status, 'typeCode', 'typeName');
 	} else {
-		showFailToast(res?.message || '查询失败，请联系管理员!');
+		showFailToast(res?.message || '查询失败，请联系管理员');
 	}
 }
 
@@ -210,40 +225,40 @@ const onSubmit = () => {
 	if (formInfo.value.id) {
 		method = 'put';
 	}
-	(method === 'put' ? updateMenuInfo : addMenuInfo)(formInfo.value).then((res: Params) => {
+	(method === 'put' ? updateMenuInfo : addMenuInfo)(formInfo.value).then((res) => {
 		if (res?.code == '200') {
-			showSuccessToast(res?.message || '保存成功!');
+			showSuccessToast(res?.message || '保存成功');
 			router.push({ path: '/user/menuInfo' });
 		} else {
-			showFailToast(res?.message || '保存失败，请联系管理员!');
+			showFailToast(res?.message || '保存失败，请联系管理员');
 		}
 	});
 };
 
 function init() {
-	const id: Params = route?.query?.id;
+	const id = route?.query?.id as string | undefined;
 	if (id) {
 		Promise.all([getMenuInfoDetail(id || '-1'), getDictList('true_or_false,is_valid')])
-			.then((res: Params) => {
+			.then((res) => {
 				if (res[0].code == '200') {
 					formInfo.value = res[0].data;
 				} else {
-					showFailToast(res?.message || '查询详情失败，请联系管理员!');
+					showFailToast(res?.message || '查询详情失败，请联系管理员');
 				}
 				getDictInfoList(res[1]);
 			})
 			.catch(() => {
-				showFailToast('系统问题，请联系管理员！');
+				showFailToast('系统异常，请联系管理员');
 			});
 	} else {
-		getDictList('true_or_false,is_valid').then((res: Params) => {
+		getDictList('true_or_false,is_valid').then((res) => {
 			getDictInfoList(res);
 		});
 		formInfo.value = {};
 	}
 }
 
-init();
+void init();
 </script>
 <style lang="less" scoped>
 .subButton {

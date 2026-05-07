@@ -1,5 +1,4 @@
-<template>
-	<navBar :info="info"></navBar>
+﻿<template>
 	<van-form required="auto">
 		<van-cell-group>
 			<van-field
@@ -29,7 +28,6 @@
 				name="isValid"
 				:label="label.isValid + '：'"
 				:placeholder="'请输入' + label.isValid"
-				@click="choose('isValid')"
 				readonly
 			/>
 			<van-field
@@ -37,7 +35,6 @@
 				name="saleDate"
 				:label="label.saleDate + '：'"
 				:placeholder="'请输入' + label.saleDate"
-				@click="chooseDate('saleDate')"
 				readonly
 			/>
 			<van-field
@@ -70,24 +67,33 @@ import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import { showFailToast } from 'vant';
 import { label } from './shopOrderDetailTs';
+import { useNavBar } from '@/composables/useNavBar';
 import { getListName } from '@/views/common/config';
 import { getShopOrderDetail } from '@/views/finance/shopOrder/api';
-import type { Info } from '@/views/common/pop/selectPop.vue';
+import type { ShopOrderData } from '@/views/finance/shopOrder/config';
 import { getDictList } from '@/views/finance/dict/api';
+import type { DatePickerInfo } from '@/utils/common';
+import type { DictInfo } from '@/views/common/config';
 
 const route = useRoute();
-const info = ref<Params>({
-	title: route?.meta?.title || '商店订单表',
+
+useNavBar({
+	title: (route?.meta?.title as string) || '商店订单表',
 	leftPath: '/finance/shopOrder',
+	visible: true,
 });
 
-const formInfo = ref<Params>({});
-
-const popInfo = ref<Info>({ showFlag: false });
+const formInfo = ref<ShopOrderData>({});
 
 const isValidName = ref<string>('');
 
-const isValidInfo = ref<Info>({
+const isValidInfo = ref<{
+	label: string;
+	labelName: string;
+	customFieldName: { text: string; value: string };
+	selectValue: unknown;
+	list?: DictInfo[];
+}>({
 	label: 'isValid',
 	labelName: label.isValid,
 	customFieldName: {
@@ -97,31 +103,13 @@ const isValidInfo = ref<Info>({
 	selectValue: formInfo.value.isValid,
 });
 
-const choose = (type: string): void => {
-	switch (type) {
-		case 'isValid':
-			popInfo.value = isValidInfo.value;
-			break;
-	}
-	popInfo.value.showFlag = true;
-};
-
-const getDictInfoList = (res: Params): void => {
-	if (res?.code == '200') {
-		isValidInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'is_valid');
-		isValidName.value = getListName(isValidInfo.value.list || [], formInfo.value.isValid, 'typeCode', 'typeName');
-	} else {
-		showFailToast(res?.message || '查询失败，请联系管理员!');
-	}
-};
-
 const saleDateName = ref<string>('');
-const saleDateInfo = ref<Params>({
+const saleDateInfo = ref<DatePickerInfo<Dayjs>>({
 	label: 'saleDate',
-	labelName: '销售日期',
+	labelName: label.saleDate,
 	selectValue: dayjs(),
 	showFlag: false,
-	formatter: (type: string, option: Params) => {
+	formatter: (type: string, option: { text: string }) => {
 		if (type === 'year') {
 			option.text += '年';
 		}
@@ -135,57 +123,55 @@ const saleDateInfo = ref<Params>({
 	},
 });
 
-const chooseDateInfo = ref<Info>({ showFlag: false });
-
-const chooseDate = (type: string): void => {
-	chooseDateInfo.value.showFlag = true;
-	switch (type) {
-		case 'saleDate':
-			chooseDateInfo.value = saleDateInfo.value;
-			break;
+function getDictInfoList(code: string, data: DictInfo[] | undefined, message?: string): void {
+	if (code === '200') {
+		isValidInfo.value.list = (data || []).filter((item) => item.belongTo === 'is_valid');
+		isValidName.value = getListName(isValidInfo.value.list || [], formInfo.value.isValid, 'typeCode', 'typeName');
+	} else {
+		showFailToast(message || '查询失败，请联系管理员！');
 	}
-};
+}
 
-const initInfoDate = (infoDate: Dayjs, type: string): void => {
+function initInfoDate(infoDate: Dayjs | string | undefined, type: string): void {
 	if (infoDate) {
 		switch (type) {
 			case 'saleDate':
 				saleDateName.value = dayjs(infoDate).format('YYYY-MM-DD');
-				saleDateInfo.value.selectValue = infoDate;
+				saleDateInfo.value.selectValue = dayjs(infoDate);
 				break;
 		}
 	}
-};
+}
 
-const init = (): void => {
-	const id: Params = route?.query?.id;
+async function init(): Promise<void> {
+	const id = route?.query?.id as string | undefined;
 	if (id) {
-		Promise.all([getShopOrderDetail(id || '-1'), getDictList('is_valid')])
-			.then((res: Params) => {
-				if (res[0].code == '200') {
-					formInfo.value = res[0].data;
-					formInfo.value.saleDate = dayjs(formInfo.value.saleDate);
-					initInfoDate(formInfo.value.saleDate, 'saleDate');
-				} else {
-					showFailToast(res?.message || '查询详情失败，请联系管理员!');
-				}
-				getDictInfoList(res[1]);
-			})
-			.catch(() => {
-				showFailToast('系统问题，请联系管理员！');
-			});
+		try {
+			const [detailRes, dictRes] = await Promise.all([getShopOrderDetail(id), getDictList('is_valid')]);
+			const { code: detailCode, data: detailData, message: detailMessage } = detailRes;
+			const { code: dictCode, data: dictData, message: dictMessage } = dictRes;
+
+			if (detailCode === '200' && detailData) {
+				formInfo.value = detailData;
+				initInfoDate(formInfo.value.saleDate, 'saleDate');
+			} else {
+				showFailToast(detailMessage || '查询详情失败，请联系管理员！');
+			}
+			getDictInfoList(dictCode, dictData as DictInfo[] | undefined, dictMessage);
+		} catch {
+			showFailToast('系统问题，请联系管理员！');
+		}
 	} else {
-		getDictList('is_valid').then((res: Params) => {
-			getDictInfoList(res);
-		});
+		const { code, data, message } = await getDictList('is_valid');
+		getDictInfoList(code, data as DictInfo[] | undefined, message);
 		formInfo.value = {
 			saleDate: dayjs(),
 		};
 		initInfoDate(formInfo.value.saleDate, 'saleDate');
 	}
-};
+}
 
-init();
+void init();
 </script>
 <style lang="less" scoped>
 .subButton {

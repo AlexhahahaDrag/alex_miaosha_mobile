@@ -1,4 +1,4 @@
-import type { ShopOrderData } from '../config';
+﻿import type { ShopOrderData } from '../config';
 import { getData, postData, putData, deleteData, baseService } from '@/views/common/api';
 import type { CommonPageResult, ResponseBody } from '@/types/api';
 
@@ -38,6 +38,6 @@ export function updateShopOrder(params: ShopOrderData): Promise<ResponseBody<Sho
 	return putData(baseService.finance + baseShopOrder + ShopOrderUrl.url, params);
 }
 
-export function submitOrder(data: Params): Promise<ResponseBody<ShopOrderData>> {
+export function submitOrder(data: ShopOrderData): Promise<ResponseBody<ShopOrderData>> {
 	return postData(baseService.finance + baseShopOrder + ShopOrderUrl.submitOrder, data);
 }

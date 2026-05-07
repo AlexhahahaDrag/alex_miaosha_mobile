@@ -1,8 +1,4 @@
-<template>
-	<NavBar
-		:info="info"
-		@click-right="addPermissionInfo"
-	></NavBar>
+﻿<template>
 	<common-pull-refresh
 		:style="{ height: 'calc(100% - 44px)' }"
 		v-model="isRefresh"
@@ -14,10 +10,10 @@
     <van-search
         v-model='searchInfo.typeCode'
         show-action
-        placeholder='请输入搜索关键词'
+        placeholder='璇疯緭鍏ユ悳绱㈠叧閿瘝'
         @search='onSearch'
         @cancel='onCancel'
-        action-text="清空"/>
+        action-text="娓呯┖"/>
     -->
 		</form>
 		<van-divider
@@ -36,7 +32,7 @@
 			@update:loading="onLoadingChange"
 			:finished="finished"
 			finished-text="没有更多了"
-			@load="onRefresh"
+			@load="onLoad"
 		>
 			<van-cell-group>
 				<van-swipe-cell
@@ -70,7 +66,7 @@
 										{{ item.permissionName }}
 									</div>
 								</div>
-								<div class="rightDiv"> item.status+item.options+; </div>
+								<div class="rightDiv">{{ item.status }} {{ item.options }}</div>
 							</div>
 						</template>
 					</van-cell>
@@ -93,116 +89,122 @@
 <script lang="ts" setup>
 import { showSuccessToast, showFailToast } from 'vant';
 import type { SearchInfo } from './permissionInfoTs';
+import { useNavBar } from '@/composables/useNavBar';
 import { usePagination } from '@/composables/usePagination';
 import { getPermissionInfoPage, deletePermissionInfo } from '@/views/user/permissionInfo/api';
 import { getUserManagerList } from '@/views/user/userManager/api';
 import type { PageInfo } from '@/views/common/config';
+import type { PermissionInfoData } from '@/views/user/permissionInfo/config';
+import type { UserManagerData } from '@/views/user/userManager/config';
+
+interface PermissionListItem extends PermissionInfoData {
+	id?: string;
+	permissionCode?: string;
+	permissionName?: string;
+	status?: string;
+	options?: string;
+}
 
 const router = useRouter();
 const route = useRoute();
-const info = ref<Params>({
-	title: route?.meta?.title || '财务管理11',
+
+useNavBar({
+	title: (route?.meta?.title as string) || '权限管理',
 	rightButton: '新增',
 	leftPath: '/',
+	visible: true,
+	onRightClick: () => {
+		router.push({ path: '/user/permissionInfo/permissionInfoDetail' });
+	},
 });
 const loading = ref<boolean>(false);
-const dataSource = ref<Params[]>([]);
+const dataSource = ref<PermissionListItem[]>([]);
 const searchInfo = ref<SearchInfo>({});
-
-const finished = ref<boolean>(false); //加载是否已经没有更多数据
-const isRefresh = ref<boolean>(false); //是否下拉刷新
+const finished = ref<boolean>(false); // 加载是否已全部完成
+const isRefresh = ref<boolean>(false); // 是否下拉刷新
 const { pagination, resetPagination, setTotal, nextPage } = usePagination();
+const userMap: Record<string | number, string> = {};
 
-// const onSearch = () => {
-//  pagination.value.current = 1;
-//  dataSource.value = []
-//  onRefresh();
-// };
-// const onCancel = () => {
-//   searchInfo.value.typeCode = '';
-//   pagination.value.current = 0;
-//   dataSource.value = [];
-//   getFinancePage(searchInfo.value, pagination.value);
-// };
-
-async function query(param: SearchInfo, cur: PageInfo) {
+async function query(_param: SearchInfo, cur: PageInfo) {
 	loading.value = true;
-	getPermissionInfoPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
-		.then((res: Params) => {
-			if (res?.code == '200') {
-				dataSource.value = [...dataSource.value, ...res.data.records];
-				setTotal(res.data.total);
-				nextPage();
-				if ((pagination.total || 0) <= dataSource.value.length) {
-					finished.value = true;
-				}
-			} else {
-				showFailToast(res?.message || '查询列表失败！');
-			}
-		})
-		.finally(() => {
-			isRefresh.value = false;
-			loading.value = false;
-		});
-}
-
-const addPermissionInfo = () => {
-	router.push({ path: '/user/permissionInfo/permissionInfoDetail' });
-};
-
-const userMap = {};
-function getUserInfoList() {
-	getUserManagerList({}).then((res: Params) => {
-		if (res?.code == '200') {
-			if (res?.data) {
-				res.data.forEach((user: { id: string | number; nickName: Params }) => {
-					userMap[user.id] = user.nickName;
-				});
-			}
+	try {
+		const { code, data, message } = await getPermissionInfoPage(
+			undefined,
+			cur?.current ? cur.current : 1,
+			cur?.pageSize || 10,
+		);
+		if (code === '200') {
+			const records = ((data?.records || []) as PermissionListItem[]) ?? [];
+			dataSource.value = [...dataSource.value, ...records];
+			setTotal(data?.total ?? 0);
+			nextPage();
+			finished.value = (pagination.total || 0) <= dataSource.value.length;
 		} else {
-			showFailToast(res?.message || '查询列表失败！');
+			showFailToast(message || '查询列表失败');
 		}
-	});
+	} finally {
+		isRefresh.value = false;
+		loading.value = false;
+	}
 }
 
-const refresh = () => {
+async function getUserInfoList() {
+	const { code, data, message } = await getUserManagerList({});
+	if (code === '200') {
+		(data || []).forEach((user: UserManagerData) => {
+			if (user.id !== undefined) {
+				userMap[user.id] = user.nickName || '';
+			}
+		});
+	} else {
+		showFailToast(message || '查询用户列表失败');
+	}
+}
+
+const refresh = async () => {
 	resetPagination();
+	finished.value = false;
 	dataSource.value = [];
-	query(searchInfo.value, pagination);
+	await query(searchInfo.value, pagination);
 };
 
-const onRefresh = () => {
-	query(searchInfo.value, pagination);
+const onLoad = async () => {
+	if (!finished.value) {
+		await query(searchInfo.value, pagination);
+	}
 };
 
 const onLoadingChange = (value: boolean) => {
 	loading.value = value;
 };
 
-const beforeClose = (_e: Params): void => {
+const beforeClose = (_e: unknown): void => {
 	// console.log(e);
 };
 
-const delPermissionInfo = (id: string) => {
-	deletePermissionInfo(`${id}`).then((res: Params) => {
-		if (res?.code == '200') {
-			refresh();
-			showSuccessToast(res?.message || '删除成功！');
-		} else {
-			showFailToast(res?.message || '删除失败，请联系管理员！');
-		}
-	});
+const delPermissionInfo = async (id: string | undefined) => {
+	if (!id) {
+		showFailToast('删除失败，缺少权限 ID');
+		return;
+	}
+	const { code, message } = await deletePermissionInfo(id);
+	if (code === '200') {
+		await refresh();
+		showSuccessToast(message || '删除成功');
+	} else {
+		showFailToast(message || '删除失败，请联系管理员！');
+	}
 };
 
-function init() {
+async function init() {
 	dataSource.value = [];
 	resetPagination();
-	query(searchInfo.value, pagination);
-	//获取用户信息
-	getUserInfoList();
+	await query(searchInfo.value, pagination);
+	// 获取用户信息
+	await getUserInfoList();
 }
 
-init();
+void init();
 </script>
 
 <style lang="less" scoped>

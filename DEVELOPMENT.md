@@ -130,7 +130,23 @@
 
 ---
 
-## 7. 开发/架构层面同步协议 (Sync Protocol)
+## 7. API 调用与响应解构规范
+
+- **统一解构响应**：
+  - 所有接口调用在业务代码中应优先使用解构赋值，避免频繁 `res.code` / `res.data` / `res.message` 点取。
+  - 推荐写法如下：
+
+  ```ts
+  const { code, data, message } = await api();
+  ```
+
+- **适用范围**：
+  - `async/await` 场景优先使用上述结构。
+  - `then` 场景建议尽量重构为 `async/await` 后再统一解构。
+
+---
+
+## 8. 开发/架构层面同步协议 (Sync Protocol)
 
 > [!IMPORTANT]
 > **凡涉及全局交互体系、基础设施、或 `src/views/components` 的结构性更改，Antigravity 必须自觉检查并更新本 `DEVELOPMENT.md` 文件。**

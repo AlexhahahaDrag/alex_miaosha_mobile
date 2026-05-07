@@ -1,8 +1,4 @@
-<template>
-	<NavBar
-		:info="info"
-		@click-right="addOrgUserInfo"
-	></NavBar>
+﻿<template>
 	<common-pull-refresh
 		:style="{ height: 'calc(100% - 44px)' }"
 		v-model="isRefresh"
@@ -14,10 +10,10 @@
     <van-search
         v-model='searchInfo.typeCode'
         show-action
-        placeholder='请输入搜索关键词'
+        placeholder='璇疯緭鍏ユ悳绱㈠叧閿瘝'
         @search='onSearch'
         @cancel='onCancel'
-        action-text="清空"/>
+        action-text="娓呯┖"/>
     -->
 		</form>
 		<van-divider
@@ -28,7 +24,7 @@
 		></van-divider>
 		<van-empty
 			v-if="dataSource.length == 0"
-			description="暂无数据"
+			description="鏆傛棤鏁版嵁"
 		></van-empty>
 		<van-list
 			v-else
@@ -79,7 +75,7 @@
 							@click="delOrgUserInfo(item.id)"
 							square
 							type="danger"
-							text="删除"
+							text="鍒犻櫎"
 						/>
 					</template>
 					<van-divider class="dividerClass"></van-divider>
@@ -92,6 +88,7 @@
 <script lang="ts" setup>
 import { showSuccessToast, showFailToast } from 'vant';
 import type { SearchInfo } from './orgUserInfoTs';
+import { useNavBar } from '@/composables/useNavBar';
 import { usePagination } from '@/composables/usePagination';
 import { getOrgUserInfoPage, deleteOrgUserInfo } from '@/views/user/orgUserInfo/api';
 import { getUserManagerList } from '@/views/user/userManager/api';
@@ -99,17 +96,21 @@ import type { PageInfo } from '@/views/common/config/index';
 
 const router = useRouter();
 const route = useRoute();
-const info = ref<Params>({
-	title: route?.meta?.title || '财务管理11',
-	rightButton: '新增',
+useNavBar({
+	title: route?.meta?.title || '璐㈠姟绠＄悊11',
+	rightIcon: 'plus',
 	leftPath: '/',
+	visible: true,
+	onRightClick: () => {
+		router.push({ path: '/user/orgUserInfo/orgUserInfoDetail' });
+	},
 });
 const loading = ref<boolean>(false);
 const dataSource = ref<Params[]>([]);
 const searchInfo = ref<SearchInfo>({});
 
-const finished = ref<boolean>(false); //加载是否已经没有更多数据
-const isRefresh = ref<boolean>(false); //是否下拉刷新
+const finished = ref<boolean>(false); //鍔犺浇鏄惁宸茬粡娌℃湁鏇村鏁版嵁
+const isRefresh = ref<boolean>(false); //鏄惁涓嬫媺鍒锋柊
 const { pagination, resetPagination, setTotal, nextPage } = usePagination();
 
 // const onSearch = () => {
@@ -127,7 +128,7 @@ const { pagination, resetPagination, setTotal, nextPage } = usePagination();
 async function query(param: SearchInfo, cur: PageInfo) {
 	loading.value = true;
 	getOrgUserInfoPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
-		.then((res: Params) => {
+		.then((res) => {
 			if (res?.code == '200') {
 				dataSource.value = [...dataSource.value, ...res.data.records];
 				setTotal(res.data.total);
@@ -136,7 +137,7 @@ async function query(param: SearchInfo, cur: PageInfo) {
 					finished.value = true;
 				}
 			} else {
-				showFailToast(res?.message || '查询列表失败！');
+				showFailToast(res?.message || '查询列表失败，请联系管理员！');
 			}
 		})
 		.finally(() => {
@@ -145,21 +146,17 @@ async function query(param: SearchInfo, cur: PageInfo) {
 		});
 }
 
-const addOrgUserInfo = () => {
-	router.push({ path: '/user/orgUserInfo/orgUserInfoDetail' });
-};
-
 const userMap = {};
 function getUserInfoList() {
-	getUserManagerList({}).then((res: Params) => {
+	getUserManagerList({}).then((res) => {
 		if (res?.code == '200') {
 			if (res?.data) {
-				res.data.forEach((user: { id: string | number; nickName: Params }) => {
+				res.data.forEach((user: { id: string | number; nickName: string }) => {
 					userMap[user.id] = user.nickName;
 				});
 			}
 		} else {
-			showFailToast(res?.message || '查询列表失败！');
+			showFailToast(res?.message || '查询列表失败，请联系管理员！');
 		}
 	});
 }
@@ -174,17 +171,17 @@ const onRefresh = () => {
 	query(searchInfo.value, pagination);
 };
 
-const beforeClose = (_e: Params): void => {
+const beforeClose = (_e: unknown): void => {
 	// console.log(e);
 };
 
 const delOrgUserInfo = (id: string) => {
-	deleteOrgUserInfo(`${id}`).then((res: Params) => {
+	deleteOrgUserInfo(`${id}`).then((res) => {
 		if (res?.code == '200') {
 			refresh();
 			showSuccessToast(res?.message || '删除成功！');
 		} else {
-			showFailToast(res?.message || '删除失败，请联系管理员！');
+			showFailToast(res?.message || '鍒犻櫎澶辫触锛岃鑱旂郴绠＄悊鍛橈紒');
 		}
 	});
 };
@@ -193,11 +190,11 @@ function init() {
 	dataSource.value = [];
 	resetPagination();
 	query(searchInfo.value, pagination);
-	//获取用户信息
+	//鑾峰彇鐢ㄦ埛淇℃伅
 	getUserInfoList();
 }
 
-init();
+void init();
 </script>
 
 <style lang="less" scoped>

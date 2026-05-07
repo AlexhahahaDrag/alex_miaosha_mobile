@@ -1,5 +1,4 @@
-<template>
-	<NavBar :info="info"></NavBar>
+﻿<template>
 	<div class="container">
 		<div class="content">
 			<van-cell-group>
@@ -52,7 +51,7 @@
 									</div>
 								</template>
 								<template #label>
-									<div class="amountInfo"> ￥{{ commonUtils.formatAmount(item.saleAmount || 0, 2, '') }} </div>
+									<div class="amountInfo">￥{{ commonUtils.formatAmount(item.saleAmount || 0, 2, '') }}</div>
 								</template>
 							</van-cell>
 						</div>
@@ -81,7 +80,7 @@
 		</div>
 		<div class="footer-container">
 			<div class="footer">
-				<div class="amount-info"> ￥{{ commonUtils.formatAmount(sumAmount || 0, 2, '') }} </div>
+				<div class="amount-info">￥{{ commonUtils.formatAmount(sumAmount || 0, 2, '') }}</div>
 				<div class="checkout-button">
 					<van-button
 						@click="settlementAmount"
@@ -91,7 +90,7 @@
 						type="danger"
 						loading-text="结算中..."
 					>
-						结 算
+						结算
 					</van-button>
 				</div>
 			</div>
@@ -101,15 +100,19 @@
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
+import { useNavBar } from '@/composables/useNavBar';
 import commonUtils from '@/utils/common/index';
 import type { ShopCartInfo } from '@/views/finance/shoppingCart/shoppingCartTs';
+import type { ShopCartData } from '@/views/finance/shopCart/config';
 import { getShopCartList, updateShopCart, deleteShopCart } from '@/views/finance/shopCart/api';
 
 const route = useRoute();
 const router = useRouter();
 
-const info = ref<Params>({
-	title: route?.meta?.title || '购物车',
+useNavBar({
+	title: (route?.meta?.title as string) || '购物车',
+	leftPath: '/',
+	visible: true,
 });
 
 const sumAmount = ref<number>(0);
@@ -126,37 +129,34 @@ const getSumAmount = (): void => {
 		return;
 	}
 	sumAmount.value = 0;
-	shopCartList.value.forEach((item: Params) => {
+	shopCartList.value.forEach((item: ShopCartInfo) => {
 		if (item?.checked) {
-			sumAmount.value = commonUtils.plus(sumAmount.value, commonUtils.multiply(item.saleAmount, item.saleNum));
+			sumAmount.value = commonUtils.plus(sumAmount.value, commonUtils.multiply(item.saleAmount || 0, item.saleNum || 0));
 		}
 	});
 };
 
-const changeCount = (item: ShopCartInfo): void => {
+const changeCount = async (item: ShopCartInfo): Promise<void> => {
 	// 保存购物车信息
-	updateShopCart({
+	await updateShopCart({
 		id: item.id,
-		saleNum: item.saleNum,
-	});
-	// 求和选中商品金额
+		saleNum: item.saleNum || 1,
+	} as unknown as ShopCartData);
+	// 计算选中商品总金额
 	getSumAmount();
 };
 
 const getShopCartListInfo = async () => {
-	await getShopCartList()
-		.then((res: Params) => {
-			if (res?.code == '200') {
-				if (res?.data) {
-					shopCartList.value = res.data;
-				} else {
-					showFailToast(res?.message || '获取购物车失败，请联系管理员！');
-				}
-			}
-		})
-		.catch((err: Params) => {
-			showFailToast(err?.message || '删除失败，请联系管理员！');
-		});
+	try {
+		const { code, data, message } = await getShopCartList();
+		if (code === '200') {
+			shopCartList.value = data || [];
+		} else {
+			showFailToast(message || '获取购物车失败，请联系管理员！');
+		}
+	} catch (err: unknown) {
+		showFailToast((err as Error)?.message || '获取购物车失败，请联系管理员！');
+	}
 };
 
 const selectProduct = (info: ShopCartInfo) => {
@@ -177,15 +177,15 @@ const delShopCartInfo = (id: string | null): void => {
 		return;
 	}
 	deleteShopCart(`${id}`)
-		.then((res: Params) => {
-			if (res?.code == '200') {
+		.then((res) => {
+			if (res?.code === '200') {
 				showSuccessToast('删除成功！');
-				init();
+				void init();
 			} else {
 				showFailToast(res?.message || '删除失败，请联系管理员！');
 			}
 		})
-		.catch((err: Params) => {
+		.catch((err) => {
 			showFailToast(err?.message || '删除失败，请联系管理员！');
 		});
 };
@@ -195,10 +195,8 @@ const init = async () => {
 	getSumAmount();
 };
 
-init();
-
 onMounted(async () => {
-	init();
+	await init();
 });
 </script>
 
@@ -223,13 +221,13 @@ onMounted(async () => {
 		.cell-info {
 			display: flex;
 			justify-content: space-between;
-			/* 使子元素分别对齐到容器的两端 */
+			/* 浣垮瓙鍏冪礌鍒嗗埆瀵归綈鍒板鍣ㄧ殑涓ょ */
 			align-items: center;
-			/* 纵向居中对齐 */
+			/* 绾靛悜灞呬腑瀵归綈 */
 			left: 0;
 			width: 100%;
 			padding: 10px;
-			/* 根据需要调整 */
+			/* 鏍规嵁闇€瑕佽皟鏁?*/
 			box-sizing: border-box;
 		}
 
@@ -242,20 +240,20 @@ onMounted(async () => {
 .footer {
 	display: flex;
 	justify-content: space-between;
-	/* 使子元素分别对齐到容器的两端 */
+	/* 浣垮瓙鍏冪礌鍒嗗埆瀵归綈鍒板鍣ㄧ殑涓ょ */
 	align-items: center;
-	/* 纵向居中对齐 */
+	/* 绾靛悜灞呬腑瀵归綈 */
 	position: fixed;
-	/* 或使用 absolute，根据需要 */
+	/* 鎴栦娇鐢?absolute锛屾牴鎹渶瑕?*/
 	left: 0;
 	bottom: 0;
 	width: 100%;
 	padding: 10px;
-	/* 根据需要调整 */
+	/* 鏍规嵁闇€瑕佽皟鏁?*/
 	box-sizing: border-box;
-	/* 确保内边距不会影响到元素的总宽度 */
+	/* 纭繚鍐呰竟璺濅笉浼氬奖鍝嶅埌鍏冪礌鐨勬€诲搴?*/
 	background-color: #f8f8f8;
-	/* 根据需要调整 */
+	/* 鏍规嵁闇€瑕佽皟鏁?*/
 }
 
 .amount-info {

@@ -77,7 +77,7 @@ const getChainAndYearInfo = async (dateStr: string) => {
 	} else {
 		showNotify({
 			type: 'danger',
-			message: (message as string) || '查询列表失败！',
+			message: message || '查询列表失败！',
 		});
 	}
 };
@@ -119,21 +119,20 @@ const getBenefitInfo = async (dateStr: string) => {
 	} else {
 		showNotify({
 			type: 'danger',
-			message: (message as string) || '查询列表失败！',
+			message: message || '查询列表失败！',
 		});
 	}
 };
 
-const init = (dateStr: string) => {
-	getChainAndYearInfo(dateStr);
-	getBenefitInfo(dateStr);
-};
+async function init(dateStr: string) {
+	await Promise.all([getChainAndYearInfo(dateStr), getBenefitInfo(dateStr)]);
+}
 
 watch(
 	() => [props.activeTab, props.dateStr, props.belongTo],
 	() => {
 		if (props.activeTab === '1') {
-			init(props.dateStr);
+			void init(props.dateStr);
 		}
 	},
 	{ immediate: true },

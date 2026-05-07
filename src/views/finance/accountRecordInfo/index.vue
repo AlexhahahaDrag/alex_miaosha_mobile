@@ -1,8 +1,4 @@
-<template>
-	<NavBar
-		:info="info"
-		@click-right="addAccountRecordInfo"
-	></NavBar>
+﻿<template>
 	<common-pull-refresh
 		:style="{ height: 'calc(100% - 44px)' }"
 		v-model="isRefresh"
@@ -10,7 +6,7 @@
 		ref="pullRefresh"
 	>
 		<form action="/">
-			<!--   <van-search v-model='searchInfo.typeCode' show-action placeholder='请输入搜索关键词' @search='onSearch'
+			<!--   <van-search v-model='searchInfo.typeCode' show-action placeholder='璇疯緭鍏ユ悳绱㈠叧閿瘝' @search='onSearch'
         @cancel='onCancel' /> -->
 		</form>
 		<van-divider
@@ -21,7 +17,7 @@
 		></van-divider>
 		<van-empty
 			v-if="dataSource.length == 0"
-			description="暂无数据"
+			description="鏆傛棤鏁版嵁"
 		/>
 		<van-list
 			v-else
@@ -37,7 +33,7 @@
 					:key="index"
 				>
 					<van-cell
-						:title="item.accountName + '的' + item.name"
+						:title="`${item.accountName || ''}的${item.name || ''}`"
 						:key="index"
 						is-link
 						:to="{
@@ -65,16 +61,14 @@
 										{{ item?.avliDate ? String(item.avliDate).substring(0, 10) : '--' }}
 									</div>
 								</div>
-								<div class="rightRedDiv">
-									{{ item.amount + '元' || '--' }}
-								</div>
+								<div class="rightRedDiv">{{ `${item.amount || '--'}元` }}</div>
 							</div>
 						</template>
 					</van-cell>
 					<template #right>
 						<van-button
 							class="right_info"
-							@click="delAccountRecordInfo(item.id ?? 0)"
+							@click="delAccountRecordInfo(item.id ?? '0')"
 							square
 							type="danger"
 							text="删除"
@@ -97,7 +91,7 @@
 </template>
 <script lang="ts" setup>
 import { showSuccessToast, showFailToast } from 'vant';
-import type { Params } from '@/types/global';
+import { useNavBar } from '@/composables/useNavBar';
 import type { PageInfo } from '@/views/common/config';
 import type { AccountRecordInfoData } from '@/views/finance/accountRecordInfo/config';
 import { usePagination } from '@/composables/usePagination';
@@ -106,17 +100,23 @@ import { getUserManagerList } from '@/views/user/userManager/api';
 
 const router = useRouter();
 const route = useRoute();
-const info = ref<Params>({
-	title: route?.meta?.title || '账号管理',
+useNavBar({
+	title: (route?.meta?.title as string) || '账户管理',
 	rightButton: '新增',
 	leftPath: '/',
+	visible: true,
+	onRightClick: () => {
+		router.push({
+			path: '/selfFinance/accountRecordInfo/accountRecordInfoDetail',
+		});
+	},
 });
 const loading = ref<boolean>(false);
 const dataSource = ref<AccountRecordInfoData[]>([]);
 const searchInfo = ref<AccountRecordInfoData>({});
 
-const finished = ref<boolean>(false); //加载是否已经没有更多数据
-const isRefresh = ref<boolean>(false); //是否下拉刷新
+const finished = ref<boolean>(false); //鍔犺浇鏄惁宸茬粡娌℃湁鏇村鏁版嵁
+const isRefresh = ref<boolean>(false); //鏄惁涓嬫媺鍒锋柊
 const { pagination, resetPagination, setTotal, nextPage } = usePagination();
 
 // const onSearch = () => {
@@ -150,14 +150,8 @@ const query = async (param: AccountRecordInfoData, cur: PageInfo) => {
 			finished.value = true;
 		}
 	} else {
-		showFailToast(message || '查询列表失败！');
+		showFailToast(message || '查询列表失败，请联系管理员！');
 	}
-};
-
-const addAccountRecordInfo = () => {
-	router.push({
-		path: '/selfFinance/accountRecordInfo/accountRecordInfoDetail',
-	});
 };
 
 const userMap = {};
@@ -165,12 +159,14 @@ const getUserInfoList = async () => {
 	const { code, message, data } = await getUserManagerList({});
 	if (code == '200') {
 		if (data) {
-			(data || []).forEach((user: { id: string | number; nickName: string }) => {
-				userMap[user.id] = user.nickName;
+			(data || []).forEach((user) => {
+				if (user?.id !== undefined) {
+					userMap[user.id] = user.nickName || '';
+				}
 			});
 		}
 	} else {
-		showFailToast(message || '查询列表失败！');
+		showFailToast(message || '查询列表失败，请联系管理员！');
 	}
 };
 
@@ -183,7 +179,7 @@ const onRefresh = () => {
 	query(searchInfo.value, pagination);
 };
 
-const beforeClose = (_e: Params): void => {
+const beforeClose = (_e: unknown): void => {
 	// console.log(e);
 };
 
@@ -193,7 +189,7 @@ const delAccountRecordInfo = async (id: string) => {
 		refresh();
 		showSuccessToast(message || '删除成功！');
 	} else {
-		showFailToast(message || '删除失败，请联系管理员！');
+		showFailToast(message || '鍒犻櫎澶辫触锛岃鑱旂郴绠＄悊鍛橈紒');
 	}
 };
 
@@ -201,11 +197,11 @@ function init() {
 	dataSource.value = [];
 	resetPagination();
 	query(searchInfo.value, pagination);
-	//获取用户信息
+	//鑾峰彇鐢ㄦ埛淇℃伅
 	getUserInfoList();
 }
 
-init();
+void init();
 </script>
 
 <style lang="less" scoped>

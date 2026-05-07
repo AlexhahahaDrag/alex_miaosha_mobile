@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="consume-page">
 		<!-- 消费金额输入区域 -->
 		<div class="amount-section">
@@ -17,12 +17,10 @@
 						class="amount-input"
 						:class="formData.type"
 						@input="validateAmount"
-						@focus="onAmountFocus"
-						@blur="onAmountBlur"
 					/>
 				</div>
 				<div class="balance-after">
-					<div class="balance-after-label"> {{ formData.type === 'recharge' ? '充值' : '消费' }}后余额 </div>
+					<div class="balance-after-label">{{ formData.type === 'recharge' ? '充值' : '消费' }}后余额</div>
 					<div
 						class="balance-after-amount"
 						:class="{ insufficient: balanceAfter < 0 }"
@@ -85,8 +83,8 @@
 	</div>
 	<datePop
 		:info="chooseDateInfo"
-		@select-info="selectDateInfo"
-		@cancel-info="cancelDateInfo"
+		@select-date-info="selectDateInfo"
+		@cancel-date-info="cancelDateInfo"
 	></datePop>
 </template>
 
@@ -94,6 +92,7 @@
 import { showToast, showSuccessToast, showFailToast } from 'vant';
 import dayjs, { type Dayjs } from 'dayjs';
 import { getPrepaidCardInfoDetail, prepaidCardConsumeAndRecharge } from '../api';
+import type { DatePickerInfo } from '@/utils/common';
 import { useNavBar } from '@/composables/useNavBar';
 import { useUserStore } from '@/store/modules/user/user';
 
@@ -102,23 +101,41 @@ const router = useRouter();
 
 const userInfo = useUserStore()?.getUserInfo;
 
-const formData = reactive<Params>({});
+interface ConsumeFormData {
+	id: string;
+	type: 'recharge' | 'consume';
+	amount: string;
+	cardName: string;
+	remark: string;
+	consumeTime: Dayjs;
+	balance: number;
+	cardId: string;
+}
 
-// 使用新的NavBar系统
+const formData = reactive<ConsumeFormData>({
+	id: '',
+	type: 'consume',
+	amount: '',
+	cardName: '',
+	remark: '',
+	consumeTime: dayjs(),
+	balance: 0,
+	cardId: '',
+});
+
+// 使用新的 NavBar 系统
 useNavBar({
-	title: formData.type === 'recharge' ? '充值' : '消费',
+	title: (route.query.type as string) === 'recharge' ? '充值' : '消费',
 	leftPath: `/selfFinance/prepaidCardInfoT?cardId=${route.query.cardId}`,
 	visible: true,
 });
 
-// 表单数据对象
-
-const chooseDateInfo = ref<Params>({
+const chooseDateInfo = ref<DatePickerInfo<Dayjs>>({
 	label: 'infoDate',
 	labelName: '消费时间',
 	selectValue: dayjs(),
 	showFlag: false,
-	formatter: (type: string, option: Params) => {
+	formatter: (type: string, option: { text: string }) => {
 		if (type === 'year') {
 			option.text += '年';
 		}
@@ -132,7 +149,7 @@ const chooseDateInfo = ref<Params>({
 	},
 });
 
-// 计算属性：消费后余额
+// 计算属性：操作后余额
 const balanceAfter = computed(() => {
 	const amountValue = parseFloat(formData.amount) || 0;
 	return formData.type === 'recharge' ? formData.balance + amountValue : formData.balance - amountValue;
@@ -145,11 +162,9 @@ const consumeTimeDisplay = computed(() => {
 
 // 加载状态
 const loading = ref<boolean>(false);
-// 金额输入聚焦状态
-const isAmountFocused = ref<boolean>(false);
 
 // 格式化日期时间显示
-function formatDateTime(date: Dayjs) {
+function formatDateTime(date: Dayjs | string) {
 	date = dayjs(date);
 	const now = dayjs().local();
 	const today = now.startOf('day').local();
@@ -172,16 +187,6 @@ function formatDateTime(date: Dayjs) {
 // 更新当前时间
 const updateCurrentTime = () => {
 	chooseDateInfo.value.showFlag = true;
-};
-
-// 金额输入聚焦
-const onAmountFocus = () => {
-	isAmountFocused.value = true;
-};
-
-// 金额输入失焦
-const onAmountBlur = () => {
-	isAmountFocused.value = false;
 };
 
 // 验证金额输入
@@ -213,7 +218,7 @@ const cancelDateInfo = () => {
 
 // 确认消费
 const confirmConsume = async () => {
-	// 验证必填字段
+	// 校验必填字段
 	if (!formData.amount || parseFloat(formData.amount) <= 0) {
 		const actionText = formData.type === 'recharge' ? '充值' : '消费';
 		showToast(`请输入有效的${actionText}金额`);
@@ -224,16 +229,17 @@ const confirmConsume = async () => {
 		return;
 	}
 
-	// 根据操作类型进行不同的校验
+	// 根据操作类型进行不同校验
 	if (formData.type === 'consume') {
 		// 消费校验：余额不足
 		if (parseFloat(formData.amount) > formData.balance) {
 			showToast('余额不足，无法完成消费');
 			return;
 		}
-	} else if (formData.type === 'recharge') {
-		// 充值校验：可以添加充值相关的校验逻辑
-		// 例如：充值金额上限等
+	}
+	if (!userInfo?.id) {
+		showFailToast('用户信息缺失，请重新登录');
+		return;
 	}
 	try {
 		const params = {
@@ -253,7 +259,7 @@ const confirmConsume = async () => {
 			showFailToast(message || '失败，请联系管理员!');
 		}
 	} catch {
-		// 用户取消消费
+		showFailToast('操作失败，请稍后重试');
 	}
 };
 
@@ -262,16 +268,14 @@ const getPrepaidCardInfoDetailInfo = async () => {
 	try {
 		const { code, data, message: messageInfo } = await getPrepaidCardInfoDetail(formData.id);
 		if (code === '200') {
-			// 取第一张卡片的信息
-			const cardInfo = data;
-			formData.cardName = cardInfo.cardName;
+			const cardInfo = data as { id?: string; cardName?: string; currentBalance?: number };
+			formData.cardName = cardInfo.cardName ?? '';
 			formData.balance = cardInfo.currentBalance ?? 0;
-			formData.cardId = cardInfo.id;
+			formData.cardId = cardInfo.id ?? '';
 		} else {
-			showToast(messageInfo?.description || '获取信息失败，请联系管理员！');
+			showToast(messageInfo || '获取信息失败，请联系管理员！');
 		}
 	} catch (error: unknown) {
-		// console.log('错误信息：', error);
 		// eslint-disable-next-line no-console
 		console.error('获取预付卡信息失败:', error);
 		showToast('获取信息失败，请稍后重试');
@@ -279,17 +283,17 @@ const getPrepaidCardInfoDetailInfo = async () => {
 };
 
 // 初始化
-const init = () => {
+const init = async () => {
 	// 获取路由参数
 	const { cardId, type } = route.query;
 	formData.id = cardId as string;
-	formData.type = type as string;
+	formData.type = (type as 'recharge' | 'consume') || 'consume';
 	formData.consumeTime = dayjs();
 	// 获取预付卡信息
-	getPrepaidCardInfoDetailInfo();
+	await getPrepaidCardInfoDetailInfo();
 };
 
-init();
+void init();
 </script>
 
 <style scoped lang="less">
@@ -524,7 +528,7 @@ init();
 	}
 }
 
-// vant组件样式覆盖
+// Vant 组件样式覆盖
 :deep(.van-nav-bar__title) {
 	color: #333;
 	font-weight: 600;

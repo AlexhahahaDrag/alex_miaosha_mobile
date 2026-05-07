@@ -274,7 +274,7 @@ const rebuildChartOptions = () => {
 // 卡片列表（示例数据，可替换为接口数据）
 const cardList = ref<CardItem[]>([
 	{
-		id: 1,
+		id: '1',
 		name: '海鲜达',
 		balance: '750',
 		currentBalance: 750,
@@ -282,7 +282,7 @@ const cardList = ref<CardItem[]>([
 		bgColor: getCardColor(0),
 	},
 	{
-		id: 2,
+		id: '2',
 		name: '百货通',
 		balance: '580',
 		currentBalance: 580,
@@ -290,7 +290,7 @@ const cardList = ref<CardItem[]>([
 		bgColor: getCardColor(1),
 	},
 	{
-		id: 3,
+		id: '3',
 		name: '咖啡联盟',
 		balance: '320',
 		currentBalance: 320,

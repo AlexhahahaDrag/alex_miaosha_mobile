@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<van-row gutter="20">
 		<div class="mainGrid">
 			<div class="div2">
@@ -31,6 +31,7 @@
 <script lang="ts" setup>
 import { showNotify } from 'vant';
 import type { ItemInfo } from './common';
+import type { ShopFinanceAnalysisData } from '@/views/finance/shopFinanceAnalysis/config';
 import { getShopNameInfo, getPayWayInfo } from '@/views/finance/shopFinanceAnalysis/api';
 
 interface Props {
@@ -41,63 +42,46 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const pieShopData = ref<object[]>([]);
-
-const getShopNameInfoInfo = (dateStr: string) => {
-	getShopNameInfo(dateStr).then((res: { code: string; data: Params[]; message: Params }) => {
-		if (res.code == '200') {
-			if (res.data) {
-				const shop: ItemInfo[] = [];
-				res.data.forEach((item: { shopName: Params; saleAmount: Params }) => {
-					shop.push({ name: item.shopName, value: item.saleAmount });
-				});
-				pieShopData.value = shop;
-			}
-		} else {
-			showNotify({
-				type: 'danger',
-				message: (res && res.message) || '查询列表失败！',
-			});
-		}
-	});
-};
-
-const piePayWayData = ref<object[]>([]);
-
-const getPayWayInfoInfo = (dateStr: string) => {
-	getPayWayInfo(dateStr).then((res: { code: string; data: Params[]; message: Params }) => {
-		if (res.code == '200') {
-			if (res.data) {
-				const shop: ItemInfo[] = [];
-				res.data.forEach((item: { payWayName: Params; saleAmount: Params }) => {
-					shop.push({ name: item.payWayName, value: item.saleAmount });
-				});
-				piePayWayData.value = shop;
-			}
-		} else {
-			showNotify({
-				type: 'danger',
-				message: (res && res.message) || '查询列表失败！',
-			});
-		}
-	});
-};
-
+const pieShopData = ref<ItemInfo[]>([]);
+const piePayWayData = ref<ItemInfo[]>([]);
 const tooltip = ref({
 	trigger: 'item',
 	formatter: '{b} : {c}元({d}%)',
 });
 
-const init = (dateStr: string) => {
-	getShopNameInfoInfo(dateStr);
-	getPayWayInfoInfo(dateStr);
-};
+async function getShopNameInfoInfo(dateStr: string) {
+	const { code, data, message } = await getShopNameInfo(dateStr);
+	if (code !== '200' || !Array.isArray(data)) {
+		showNotify({ type: 'danger', message: message || '查询列表失败！' });
+		return;
+	}
+	pieShopData.value = (data as ShopFinanceAnalysisData[]).map((item) => ({
+		name: item.shopName || '',
+		value: item.saleAmount || 0,
+	}));
+}
+
+async function getPayWayInfoInfo(dateStr: string) {
+	const { code, data, message } = await getPayWayInfo(dateStr);
+	if (code !== '200' || !Array.isArray(data)) {
+		showNotify({ type: 'danger', message: message || '查询列表失败！' });
+		return;
+	}
+	piePayWayData.value = (data as ShopFinanceAnalysisData[]).map((item) => ({
+		name: item.payWayName || '',
+		value: item.saleAmount || 0,
+	}));
+}
+
+async function init(dateStr: string) {
+	await Promise.all([getShopNameInfoInfo(dateStr), getPayWayInfoInfo(dateStr)]);
+}
 
 watch(
 	() => [props.activeTab, props.dateStr, props.belongTo],
 	() => {
 		if (props.activeTab === '2' && props.dateStr) {
-			init(props.dateStr);
+			void init(props.dateStr);
 		}
 	},
 	{ immediate: true },
