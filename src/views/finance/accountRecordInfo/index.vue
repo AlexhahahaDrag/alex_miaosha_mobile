@@ -139,7 +139,11 @@ const query = async (param: AccountRecordInfoData, cur: PageInfo) => {
 		loading.value = false;
 	});
 	if (code == '200') {
-		dataSource.value = [...dataSource.value, ...(data?.records || [])];
+		if (cur?.current === 1) {
+			dataSource.value = data?.records || [];
+		} else {
+			dataSource.value = [...dataSource.value, ...(data?.records || [])];
+		}
 		setTotal(data?.total || 0);
 		nextPage();
 		if ((pagination.total || 0) <= dataSource.value.length) {
@@ -172,7 +176,6 @@ const getUserInfoList = async () => {
 
 const refresh = () => {
 	resetPagination();
-	dataSource.value = [];
 	query(searchInfo.value, pagination);
 };
 

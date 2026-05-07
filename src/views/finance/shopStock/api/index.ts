@@ -23,11 +23,11 @@ export function getShopStockPage(
 }
 
 export function getShopStockDetail(id: string): Promise<ResponseBody<ShopStockData>> {
-	return getData(`${baseService.finance + baseShopStock + ShopStockUrl.url}`, { id });
+	return getData(baseService.finance + baseShopStock + ShopStockUrl.url, { id });
 }
 
 export function deleteShopStock(ids: string): Promise<ResponseBody<boolean>> {
-	return deleteData(`${baseService.finance + baseShopStock + ShopStockUrl.url}`, { ids });
+	return deleteData(baseService.finance + baseShopStock + ShopStockUrl.url, { ids });
 }
 
 export function addShopStock(params: ShopStockData): Promise<ResponseBody<ShopStockData>> {

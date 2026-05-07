@@ -75,12 +75,12 @@
 
 <script lang="ts" setup>
 import { type PropType } from 'vue';
-import type { ShopStockInfo } from '../shopStockTs';
+import type { ShopStockData } from '@/views/finance/shopStock/config';
 import commonUtils from '@/utils/common/index';
 
 const props = defineProps({
 	item: {
-		type: Object as PropType<ShopStockInfo>,
+		type: Object as PropType<ShopStockData>,
 		required: true,
 	},
 });
