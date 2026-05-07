@@ -3,7 +3,7 @@ import { createRouter, createWebHashHistory } from 'vue-router';
 import type { MenuDataItem } from './typing';
 import Layout from '@/layouts/index.vue';
 import { useUserStore } from '@/store/modules/user/user';
-import type { MenuInfo } from '@/store/modules/user/typing';
+import type { MenuInfoData } from '@/views/user/menuInfo/config';
 
 const modules = import.meta.glob([
 	'@/views/**/**.vue',
@@ -150,13 +150,15 @@ const addRouter = () => {
 	const userStore = useUserStore();
 	if (userStore.getMenuInfo?.length) {
 		const roleInfo = userStore.getRoleInfo;
-		if (roleInfo?.roleCode !== 'super_super' && !roleInfo?.permissionList?.length) {
+		const roleCode = getRoleCode(roleInfo);
+		const permissionList = getPermissionList(roleInfo);
+		if (roleCode !== 'super_super' && !permissionList.length) {
 			userStore.changeRouteStatus(true);
 			return;
 		}
-		userStore.getMenuInfo.forEach((item: MenuInfo) => {
-			if (judgePermission(roleInfo?.permissionList, item?.permissionCode, roleInfo.roleCode)) {
-				const newRouter = getChildren(item, roleInfo?.permissionList, roleInfo.roleCode);
+		userStore.getMenuInfo.forEach((item: MenuInfoData) => {
+			if (judgePermission(permissionList, getStringField(item, 'permissionCode'), roleCode)) {
+				const newRouter = getChildren(item, permissionList, roleCode);
 				if (newRouter.name && !router.hasRoute(newRouter.name)) {
 					router.addRoute(newRouter);
 					dynamicRouter.push(newRouter);
@@ -169,32 +171,63 @@ const addRouter = () => {
 };
 
 interface PermissionItem {
-	permissionCode: string;
-	[key: string]: any;
+	permissionCode?: string;
+	[key: string]: unknown;
 }
 
+const getStringField = (value: unknown, key: string): string => {
+	if (!value || typeof value !== 'object') return '';
+	const cur = (value as Record<string, unknown>)[key];
+	return typeof cur === 'string' ? cur : '';
+};
+
+const getChildrenField = (value: unknown): MenuInfoData[] => {
+	if (!value || typeof value !== 'object') return [];
+	const children = (value as Record<string, unknown>).children;
+	return Array.isArray(children) ? (children as MenuInfoData[]) : [];
+};
+
+const getRoleCode = (roleInfo: unknown): string => getStringField(roleInfo, 'roleCode');
+
+const getPermissionList = (roleInfo: unknown): PermissionItem[] => {
+	if (!roleInfo || typeof roleInfo !== 'object') return [];
+	const list = (roleInfo as Record<string, unknown>).permissionList;
+	return Array.isArray(list) ? (list as PermissionItem[]) : [];
+};
+
 const getChildren = (
-	item: MenuInfo,
+	item: MenuInfoData,
 	permissionList: PermissionItem[] | undefined,
-	roleCode: string,
+	roleCode?: string,
 ): MenuDataItem => {
+	const path = getStringField(item, 'path');
+	const component = getStringField(item, 'component');
+	const redirect = getStringField(item, 'redirect');
+	const name = getStringField(item, 'name');
+	const title = getStringField(item, 'title');
+	const icon = getStringField(item, 'icon');
+	const hideInMenu = getStringField(item, 'hideInMenu');
+	const showInHome = getStringField(item, 'showInHome');
+	const permissionCode = getStringField(item, 'permissionCode');
+
 	const routeInfo: MenuDataItem = {
-		path: item.path,
-		component: resolveViewComponent(item.component),
-		redirect: item.redirect,
-		name: item.name,
+		path,
+		component: resolveViewComponent(component),
+		redirect,
+		name,
 		meta: {
-			title: item.title,
-			icon: item.icon,
-			hideInMenu: item.hideInMenu != '0',
-			showInHome: item.showInHome == '1',
-			permissionCode: item.permissionCode,
+			title,
+			icon,
+			hideInMenu: hideInMenu != '0',
+			showInHome: showInHome == '1',
+			permissionCode,
 		},
 		children: [],
 	};
-	if (item?.children?.length) {
-		item.children.forEach((childItem: MenuInfo) => {
-			if (judgePermission(permissionList, childItem?.permissionCode, roleCode)) {
+	const children = getChildrenField(item);
+	if (children.length) {
+		children.forEach((childItem: MenuInfoData) => {
+			if (judgePermission(permissionList, getStringField(childItem, 'permissionCode'), roleCode)) {
 				const cur = getChildren(childItem, permissionList, roleCode);
 				if (cur.name && !router.hasRoute(cur.name)) {
 					routeInfo.children?.push(cur);
@@ -209,9 +242,12 @@ router.afterEach(() => {});
 
 const judgePermission = (
 	permissionList: PermissionItem[] | undefined,
-	permissionCode: string,
-	roleCode: string,
+	permissionCode?: string,
+	roleCode?: string,
 ) => {
+	if (!permissionCode) {
+		return true;
+	}
 	if (roleCode === 'super_super') {
 		return true;
 	}

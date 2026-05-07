@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia';
 import { showFailToast } from 'vant';
-import type { MenuInfo, UserState } from './typing';
+import type { UserState } from './typing';
+import type { MenuInfoData } from '@/views/user/menuInfo/config';
 import { loginApi } from '@/views/login/api';
 import type { LoginParams } from '@/views/login/api';
 import { piniaPersistConfig } from '@/config/piniaPersist';
 import { refreshRouter } from '@/router';
+import { buildPermissionContext } from '@/utils/permission';
 
 const createDefaultState = (): UserState => ({
 	userInfo: null,
@@ -28,7 +30,7 @@ export const useUserStore = defineStore('app-user', {
 		getToken(state): string {
 			return state.token || '';
 		},
-		getMenuInfo(state): MenuInfo[] | null {
+		getMenuInfo(state): MenuInfoData[] | null {
 			return state.menuInfo;
 		},
 		getSessionTimeout(state): boolean {
@@ -54,7 +56,7 @@ export const useUserStore = defineStore('app-user', {
 		setUserInfo(admin: UserState['userInfo']) {
 			this.userInfo = admin;
 		},
-		setMenuInfo(info: MenuInfo[] | null | undefined) {
+		setMenuInfo(info: MenuInfoData[] | null | undefined) {
 			this.menuInfo = info || null;
 		},
 		changeRouteStatus(state: boolean) {
@@ -80,11 +82,12 @@ export const useUserStore = defineStore('app-user', {
 				const data = await loginApi(loginParams);
 				if (data?.code == '200' && data.data) {
 					const { token, admin } = data.data;
+					const permissionContext = buildPermissionContext(admin);
 					this.setUserInfo(admin);
 					this.setToken(token);
-					this.setMenuInfo(admin.menuInfoVoList);
-					this.setRoleInfo(admin.roleInfoVo);
-					this.setOrgInfo(admin.orgInfoVo);
+					this.setMenuInfo(permissionContext.menuInfo || null);
+					this.setRoleInfo(permissionContext.roleInfo || null);
+					this.setOrgInfo(permissionContext.orgInfo || null);
 					this.changeRouteStatus(false);
 					refreshRouter();
 					return admin;

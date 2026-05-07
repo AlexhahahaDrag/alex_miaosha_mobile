@@ -1,10 +1,19 @@
-import type { MenuInfo, OrgInfo, RolePermissionInfo } from '@/store/modules/user/typing';
+import type { OrgInfoData } from '@/views/user/orgInfo/config';
+import type { RoleInfoData } from '@/views/user/roleInfo/config';
+import type { MenuInfoData } from '@/views/user/menuInfo/config';
 import type { UserInfo } from '@/types/store';
 
 export interface LoginAdminData extends UserInfo {
-	menuInfoVoList?: MenuInfo[];
-	roleInfoVo?: RolePermissionInfo | null;
-	orgInfoVo?: OrgInfo | null;
+	menuInfoVoList?: MenuInfoData[];
+	roleInfoVo?: RoleInfoData | null;
+	roleInfoVoList?: RoleInfoData[];
+	orgInfoVo?: OrgInfoData | null;
+	permissionContext?: {
+		menuInfoVoList?: MenuInfoData[];
+		roleInfoVo?: RoleInfoData | null;
+		roleInfoVoList?: RoleInfoData[];
+		orgInfoVo?: OrgInfoData | null;
+	};
 }
 
 export interface LoginResultData {
