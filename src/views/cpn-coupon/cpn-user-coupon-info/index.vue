@@ -224,7 +224,11 @@ const getCpnUserCouponPageData = async (param: CpnUserCouponInfoData, cur: PageI
 			isRefresh.value = false;
 		});
 	if (code === '200') {
-		dataSource.value = [...dataSource.value, ...(data?.records || [])];
+		if (cur?.current === 1) {
+			dataSource.value = data?.records || [];
+		} else {
+			dataSource.value = [...dataSource.value, ...(data?.records || [])];
+		}
 		setTotal(data?.total || 0);
 		nextPage();
 		if ((pagination.total || 0) <= dataSource.value.length) {

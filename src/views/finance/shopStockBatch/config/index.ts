@@ -1,3 +1,5 @@
+import type { Dayjs } from 'dayjs';
+
 export interface ShopStockBatchData {
 	id?: string;
 	batchCode?: string;
@@ -7,7 +9,7 @@ export interface ShopStockBatchData {
 	title?: string;
 	cost?: number;
 	travelExpense?: number;
-	purchaseDate?: string;
+	purchaseDate?: string | Dayjs;
 }
 
 export const label = reactive({

@@ -152,7 +152,11 @@ const getStockPage = async (param: ShopStockData, cur: PageInfo) => {
 	});
 
 	if (code === '200') {
-		dataSource.value = [...dataSource.value, ...(data?.records || [])];
+		if (cur?.current === 1) {
+			dataSource.value = data?.records || [];
+		} else {
+			dataSource.value = [...dataSource.value, ...(data?.records || [])];
+		}
 		setTotal(data?.total || 0);
 		finished.value = (pagination.total || 0) <= dataSource.value.length;
 	} else {
@@ -189,9 +193,9 @@ const onLoadMore = () => {
 };
 
 // 删除库存记录
-const onDeleteStock = async (id?: number) => {
+const onDeleteStock = async (id?: string) => {
 	if (!id) return;
-	const { code, message } = await deleteShopStock(`${id}`);
+	const { code, message } = await deleteShopStock(id);
 	if (code === '200') {
 		onRefreshData();
 		showSuccessToast(message || '删除成功！');

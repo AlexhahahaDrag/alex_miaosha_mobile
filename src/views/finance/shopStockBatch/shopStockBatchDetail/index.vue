@@ -167,6 +167,7 @@
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
+import dayjs from 'dayjs';
 import { label, rulesRef } from '@/views/finance/shopStockBatch/config';
 import type { ShopStockBatchData } from '@/views/finance/shopStockBatch/config';
 import { getListName } from '@/views/common/config';
@@ -175,6 +176,7 @@ import type { Info } from '@/views/common/pop/selectPop.vue';
 import { getDictList } from '@/views/finance/dict/api';
 import { useNavBar } from '@/composables/useNavBar';
 import type { DictInfo } from '@/views/common/config';
+import { formatDate, formatDayjs } from '@/utils/dayjs';
 
 const route = useRoute();
 const router = useRouter();
@@ -188,12 +190,12 @@ useNavBar({
 
 // --- Variables ---
 const formInfo = ref<ShopStockBatchData>({});
-const popInfo = ref<Info>({ showFlag: false });
+const popInfo = ref<Info<DictInfo>>({ showFlag: false });
 const isValidName = ref<string>('');
 const showDatePicker = ref<boolean>(false);
 const selectedDate = ref<string[]>([]);
 
-const isValidInfo = ref<Info>({
+const isValidInfo = ref<Info<DictInfo>>({
 	label: 'isValid',
 	labelName: label.isValid,
 	rule: rulesRef.isValid,
@@ -245,15 +247,19 @@ const onSubmit = async () => {
 	navigator.vibrate?.(50);
 	const isEdit = !!formInfo.value.id;
 	try {
-		const { code, message } = await (isEdit ? updateShopStockBatch(formInfo.value) : addShopStockBatch(formInfo.value));
+		const submitData = { ...formInfo.value };
+		if (submitData.purchaseDate) {
+			submitData.purchaseDate = formatDayjs(submitData.purchaseDate);
+		}
+		const { code, message } = await (isEdit ? updateShopStockBatch(submitData) : addShopStockBatch(submitData));
 		if (code == '200') {
 			showSuccessToast(message || '保存成功!');
 			router.push({ path: '/finance/shopStockBatch' });
 		} else {
 			showFailToast(message || '保存失败，请联系管理员!');
 		}
-	} catch {
-		showFailToast('系统问题，请联系管理员！');
+	} catch (error: unknown) {
+		showFailToast((error as Error)?.message || '系统问题，请联系管理员！');
 	}
 };
 
@@ -261,10 +267,12 @@ const init = async () => {
 	const id = route?.query?.id as string;
 	try {
 		const [detailRes, dictRes] = await Promise.all([
-			id ? getShopStockBatchDetail(Number(id)) : Promise.resolve({ code: '200', data: { isValid: '1' } }),
+			id
+				? getShopStockBatchDetail(id)
+				: Promise.resolve({ code: '200', data: { isValid: '1', purchaseDate: formatDate(dayjs()) } }),
 			getDictList('is_valid'),
 		]);
-
+		console.log('1111111111111111111111111', detailRes.data);
 		if (detailRes.code == '200') {
 			formInfo.value = detailRes.data || {};
 			if (!formInfo.value.id && !formInfo.value.isValid) {
