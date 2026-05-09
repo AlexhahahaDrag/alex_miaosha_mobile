@@ -1,5 +1,4 @@
-<template>
-	<NavBar :info="info"></NavBar>
+﻿<template>
 	<van-form
 		@submit="onSubmit"
 		:rules="rulesRef"
@@ -87,52 +86,65 @@
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
 import { label, rulesRef } from './pmsAttrDetailTs';
+import { useNavBar } from '@/composables/useNavBar';
 import { addPmsAttr, updatePmsAttr, getPmsAttrDetail } from '@/views/product/pmsAttr/api';
 
 const route = useRoute();
 const router = useRouter();
-const info = ref<Params>({
-	title: route?.meta?.title || '商品属性',
+interface PmsAttrForm {
+	id?: string;
+	attrName?: string;
+	searchType?: string | number;
+	icon?: string;
+	valueSelect?: string;
+	attrType?: string | number;
+	enable?: string | number;
+	catelogId?: string | number;
+	showDesc?: string | number;
+}
+useNavBar({
+	title: (route?.meta?.title as string) || '商品属性',
 	leftPath: '/product/pmsAttr',
+	visible: true,
 });
 
-const formInfo = ref<Params>({});
+const formInfo = ref<PmsAttrForm>({});
 
 const onSubmit = () => {
 	let method = 'post';
 	if (formInfo.value.id) {
 		method = 'put';
 	}
-	(method === 'put' ? updatePmsAttr : addPmsAttr)(formInfo.value).then((res: Params) => {
+	(method === 'put' ? updatePmsAttr : addPmsAttr)(formInfo.value).then((res) => {
 		if (res?.code == '200') {
-			showSuccessToast(res?.message || '保存成功!');
+			showSuccessToast(res?.message || '保存成功');
 			router.push({ path: '/product/pmsAttr' });
 		} else {
-			showFailToast(res?.message || '保存失败，请联系管理员!');
+			showFailToast(res?.message || '保存失败，请联系管理员');
 		}
 	});
 };
 
 function init() {
-	const id: Params = route?.query?.id;
+	const id = route?.query?.id as string | undefined;
 	if (id) {
 		Promise.all([getPmsAttrDetail(id || '-1')])
-			.then((res: Params) => {
+			.then((res) => {
 				if (res[0].code == '200') {
-					formInfo.value = res[0].data;
+					formInfo.value = (res[0].data || {}) as PmsAttrForm;
 				} else {
-					showFailToast(res?.message || '查询详情失败，请联系管理员!');
+					showFailToast(res[0]?.message || '查询详情失败，请联系管理员');
 				}
 			})
 			.catch(() => {
-				showFailToast('系统问题，请联系管理员！');
+				showFailToast('系统异常，请联系管理员');
 			});
 	} else {
 		formInfo.value = {};
 	}
 }
 
-init();
+void init();
 </script>
 <style lang="less" scoped>
 .subButton {

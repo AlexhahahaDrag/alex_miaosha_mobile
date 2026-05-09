@@ -1,5 +1,4 @@
-<template>
-	<NavBar :info="info"></NavBar>
+﻿<template>
 	<van-form
 		@submit="onSubmit"
 		:rules="rulesRef"
@@ -69,6 +68,7 @@
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
 import { label, rulesRef } from './permissionInfoDetailTs';
+import { useNavBar } from '@/composables/useNavBar';
 import { getListName } from '@/views/common/config';
 import { addPermissionInfo, updatePermissionInfo, getPermissionInfoDetail } from '@/views/user/permissionInfo/api';
 import type { Info } from '@/views/common/pop/selectPop.vue';
@@ -76,12 +76,21 @@ import { getDictList } from '@/views/finance/dict/api';
 
 const route = useRoute();
 const router = useRouter();
-const info = ref<Params>({
-	title: route?.meta?.title || '权限信息表',
+interface PermissionInfoForm {
+	id?: string;
+	permissionCode?: string;
+	permissionName?: string;
+	summary?: string;
+	status?: string;
+	options?: string;
+}
+useNavBar({
+	title: (route?.meta?.title as string) || '权限信息',
 	leftPath: '/user/permissionInfo',
+	visible: true,
 });
 
-const formInfo = ref<Params>({});
+const formInfo = ref<PermissionInfoForm>({});
 
 const popInfo = ref<Info>({ showFlag: false });
 
@@ -107,7 +116,7 @@ const choose = (type: string) => {
 	popInfo.value.showFlag = true;
 };
 
-const selectInfo = (type: string, value: Params, name: string) => {
+const selectInfo = (type: string, value: string, name: string) => {
 	popInfo.value.showFlag = false;
 	switch (type) {
 		case 'status':
@@ -121,12 +130,13 @@ const cancelInfo = () => {
 	popInfo.value.showFlag = false;
 };
 
-function getDictInfoList(res: Params) {
+function getDictInfoList(res: { code?: string; data?: Array<{ belongTo: string }>; message?: string }) {
 	if (res?.code == '200') {
-		statusInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'is_valid');
+		const dictList = (res.data || []).filter((item: { belongTo: string }) => item.belongTo == 'is_valid');
+		statusInfo.value.list = dictList;
 		statusName.value = getListName(statusInfo.value.list || [], formInfo.value.status, 'typeCode', 'typeName');
 	} else {
-		showFailToast(res?.message || '查询失败，请联系管理员!');
+		showFailToast(res?.message || '查询失败，请联系管理员');
 	}
 }
 
@@ -135,40 +145,40 @@ const onSubmit = () => {
 	if (formInfo.value.id) {
 		method = 'put';
 	}
-	(method === 'put' ? updatePermissionInfo : addPermissionInfo)(formInfo.value).then((res: Params) => {
+	(method === 'put' ? updatePermissionInfo : addPermissionInfo)(formInfo.value).then((res) => {
 		if (res?.code == '200') {
-			showSuccessToast(res?.message || '保存成功!');
+			showSuccessToast(res?.message || '保存成功');
 			router.push({ path: '/user/permissionInfo' });
 		} else {
-			showFailToast(res?.message || '保存失败，请联系管理员!');
+			showFailToast(res?.message || '保存失败，请联系管理员');
 		}
 	});
 };
 
 function init() {
-	const id: Params = route?.query?.id;
+	const id = route?.query?.id as string | undefined;
 	if (id) {
 		Promise.all([getPermissionInfoDetail(id || '-1'), getDictList('is_valid')])
-			.then((res: Params) => {
+			.then((res) => {
 				if (res[0].code == '200') {
 					formInfo.value = res[0].data;
 				} else {
-					showFailToast(res?.message || '查询详情失败，请联系管理员!');
+					showFailToast(res?.message || '查询详情失败，请联系管理员');
 				}
 				getDictInfoList(res[1]);
 			})
 			.catch(() => {
-				showFailToast('系统问题，请联系管理员！');
+				showFailToast('系统异常，请联系管理员');
 			});
 	} else {
-		getDictList('is_valid').then((res: Params) => {
+		getDictList('is_valid').then((res) => {
 			getDictInfoList(res);
 		});
 		formInfo.value = {};
 	}
 }
 
-init();
+void init();
 </script>
 <style lang="less" scoped>
 .subButton {

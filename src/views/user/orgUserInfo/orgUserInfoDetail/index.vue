@@ -1,5 +1,4 @@
-<template>
-	<NavBar :info="info"></NavBar>
+﻿<template>
 	<van-form
 		@submit="onSubmit"
 		:rules="rulesRef"
@@ -61,6 +60,7 @@
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
 import { label, rulesRef } from './orgUserInfoDetailTs';
+import { useNavBar } from '@/composables/useNavBar';
 import { getListName } from '@/views/common/config';
 import { addOrgUserInfo, updateOrgUserInfo, getOrgUserInfoDetail } from '@/views/user/orgUserInfo/api';
 import type { Info } from '@/views/common/pop/selectPop.vue';
@@ -68,12 +68,20 @@ import { getDictList } from '@/views/finance/dict/api';
 
 const route = useRoute();
 const router = useRouter();
-const info = ref<Params>({
-	title: route?.meta?.title || '用户公司信息表',
+interface OrgUserInfoForm {
+	id?: string;
+	orgId?: string;
+	userId?: string;
+	summary?: string;
+	status?: string;
+}
+useNavBar({
+	title: (route?.meta?.title as string) || '用户公司信息',
 	leftPath: '/user/orgUserInfo',
+	visible: true,
 });
 
-const formInfo = ref<Params>({});
+const formInfo = ref<OrgUserInfoForm>({});
 
 const popInfo = ref<Info>({ showFlag: false });
 
@@ -99,7 +107,7 @@ const choose = (type: string) => {
 	popInfo.value.showFlag = true;
 };
 
-const selectInfo = (type: string, value: Params, name: string) => {
+const selectInfo = (type: string, value: string, name: string) => {
 	popInfo.value.showFlag = false;
 	switch (type) {
 		case 'status':
@@ -113,12 +121,12 @@ const cancelInfo = () => {
 	popInfo.value.showFlag = false;
 };
 
-function getDictInfoList(res: Params) {
+function getDictInfoList(res) {
 	if (res?.code == '200') {
 		statusInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'is_valid');
 		statusName.value = getListName(statusInfo.value.list || [], formInfo.value.status, 'typeCode', 'typeName');
 	} else {
-		showFailToast(res?.message || '查询失败，请联系管理员!');
+		showFailToast(res?.message || '查询失败，请联系管理员');
 	}
 }
 
@@ -127,40 +135,40 @@ const onSubmit = () => {
 	if (formInfo.value.id) {
 		method = 'put';
 	}
-	(method === 'put' ? updateOrgUserInfo : addOrgUserInfo)(formInfo.value).then((res: Params) => {
+	(method === 'put' ? updateOrgUserInfo : addOrgUserInfo)(formInfo.value).then((res) => {
 		if (res?.code == '200') {
-			showSuccessToast(res?.message || '保存成功!');
+			showSuccessToast(res?.message || '保存成功');
 			router.push({ path: '/user/orgUserInfo' });
 		} else {
-			showFailToast(res?.message || '保存失败，请联系管理员!');
+			showFailToast(res?.message || '保存失败，请联系管理员');
 		}
 	});
 };
 
 function init() {
-	const id: Params = route?.query?.id;
+	const id = route?.query?.id as string | undefined;
 	if (id) {
 		Promise.all([getOrgUserInfoDetail(id || '-1'), getDictList('is_valid')])
-			.then((res: Params) => {
+			.then((res) => {
 				if (res[0].code == '200') {
 					formInfo.value = res[0].data;
 				} else {
-					showFailToast(res?.message || '查询详情失败，请联系管理员!');
+					showFailToast(res?.message || '查询详情失败，请联系管理员');
 				}
 				getDictInfoList(res[1]);
 			})
 			.catch(() => {
-				showFailToast('系统问题，请联系管理员！');
+				showFailToast('系统异常，请联系管理员');
 			});
 	} else {
-		getDictList('is_valid').then((res: Params) => {
+		getDictList('is_valid').then((res) => {
 			getDictInfoList(res);
 		});
 		formInfo.value = {};
 	}
 }
 
-init();
+void init();
 </script>
 <style lang="less" scoped>
 .subButton {

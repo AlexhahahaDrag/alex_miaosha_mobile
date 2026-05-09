@@ -1,8 +1,4 @@
 <template>
-	<NavBar
-		:info="info"
-		@click-right="addOrgInfo"
-	></NavBar>
 	<common-pull-refresh
 		:style="{ height: 'calc(100% - 44px)' }"
 		v-model="isRefresh"
@@ -92,24 +88,23 @@
 import { showSuccessToast, showFailToast } from 'vant';
 import type { OrgInfoData } from './config';
 import type { SearchInfo } from './orgInfoTs';
+import { useNavBar } from '@/composables/useNavBar';
 import { usePagination } from '@/composables/usePagination';
 import { getOrgInfoPage, deleteOrgInfo } from '@/views/user/orgInfo/api';
 import { getUserManagerList } from '@/views/user/userManager/api';
 import type { PageInfo } from '@/views/common/config';
-import type { CommonPageResult, ResponseBody } from '@/types/api';
-
-interface NavBarInfo {
-	title?: string;
-	rightButton?: string;
-	leftPath?: string;
-}
+import type { UserManagerData } from '@/views/user/userManager/config';
 
 const router = useRouter();
 const route = useRoute();
-const info = ref<NavBarInfo>({
-	title: route?.meta?.title || '财务管理11',
+useNavBar({
+	title: (route?.meta?.title as string) || '机构管理',
 	rightButton: '新增',
 	leftPath: '/',
+	visible: true,
+	onRightClick: () => {
+		router.push({ path: '/user/orgInfo/orgInfoDetail' });
+	},
 });
 const loading = ref<boolean>(false);
 const dataSource = ref<OrgInfoData[]>([]);
@@ -127,86 +122,84 @@ const onSearch = () => {
 const onCancel = () => {
 	searchInfo.value.orgName = '';
 	resetPagination();
+	finished.value = false;
 	dataSource.value = [];
-	query(searchInfo.value, pagination);
+	void query(searchInfo.value, pagination);
 };
 
 async function query(param: SearchInfo, cur: PageInfo) {
 	loading.value = true;
-	getOrgInfoPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
-		.then((res: ResponseBody<CommonPageResult<OrgInfoData>>) => {
-			if (res?.code == '200') {
-				dataSource.value = [...dataSource.value, ...res.data.records];
-				setTotal(res.data.total);
-				nextPage();
-				if ((pagination.total || 0) <= dataSource.value.length) {
-					finished.value = true;
-				}
-			} else {
-				showFailToast((res && res.message) || '查询列表失败！');
-			}
-		})
-		.finally(() => {
-			isRefresh.value = false;
-			loading.value = false;
-		});
+	try {
+		const { code, data, message } = await getOrgInfoPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10);
+		if (code === '200') {
+			const records = (data?.records || []) as OrgInfoData[];
+			dataSource.value = [...dataSource.value, ...records];
+			setTotal(data?.total ?? 0);
+			nextPage();
+			finished.value = (pagination.total || 0) <= dataSource.value.length;
+		} else {
+			showFailToast(message || '查询列表失败！');
+		}
+	} finally {
+		isRefresh.value = false;
+		loading.value = false;
+	}
 }
-
-const addOrgInfo = () => {
-	router.push({ path: '/user/orgInfo/orgInfoDetail' });
-};
 
 const userMap: Record<string | number, string> = {};
-function getUserInfoList() {
-	getUserManagerList({}).then((res) => {
-		if (res.code == '200') {
-			if (res?.data) {
-				res.data.forEach((user) => {
-					if (user.id !== undefined) {
-						userMap[user.id] = user.nickName;
-					}
-				});
+async function getUserInfoList() {
+	const { code, data, message } = await getUserManagerList({});
+	if (code === '200') {
+		(data || []).forEach((user: UserManagerData) => {
+			if (user.id !== undefined) {
+				userMap[user.id] = user.nickName || '';
 			}
-		} else {
-			showFailToast((res && res.message) || '查询列表失败！');
-		}
-	});
+		});
+	} else {
+		showFailToast(message || '查询用户列表失败！');
+	}
 }
 
-const refresh = () => {
+const refresh = async () => {
 	resetPagination();
+	finished.value = false;
 	dataSource.value = [];
-	query(searchInfo.value, pagination);
+	await query(searchInfo.value, pagination);
 };
 
-const onRefresh = () => {
-	query(searchInfo.value, pagination);
+const onRefresh = async () => {
+	if (!finished.value) {
+		await query(searchInfo.value, pagination);
+	}
 };
 
 const beforeClose = (_e: unknown): void => {
 	// console.log(e);
 };
 
-const delOrgInfo = (id: string) => {
-	deleteOrgInfo(`${id}`).then((res: ResponseBody<boolean>) => {
-		if (res?.code == '200') {
-			refresh();
-			showSuccessToast((res && res.message) || '删除成功！');
-		} else {
-			showFailToast((res && res.message) || '删除失败，请联系管理员！');
-		}
-	});
+const delOrgInfo = async (id: string | undefined) => {
+	if (!id) {
+		showFailToast('删除失败，缺少机构 ID！');
+		return;
+	}
+	const { code, message } = await deleteOrgInfo(`${id}`);
+	if (code === '200') {
+		await refresh();
+		showSuccessToast(message || '删除成功！');
+	} else {
+		showFailToast(message || '删除失败，请联系管理员！');
+	}
 };
 
-function init() {
+async function init() {
 	dataSource.value = [];
 	resetPagination();
-	query(searchInfo.value, pagination);
-	//获取用户信息
-	getUserInfoList();
+	await query(searchInfo.value, pagination);
+	// 获取用户信息
+	await getUserInfoList();
 }
 
-init();
+void init();
 </script>
 
 <style lang="less" scoped>
@@ -238,8 +231,8 @@ init();
 	color: #1989fa;
 	border-color: grey;
 	padding: 0 16px;
-	margin-top: 0px;
-	margin-bottom: 0px;
+	margin-top: 0;
+	margin-bottom: 0;
 }
 
 .validClass {

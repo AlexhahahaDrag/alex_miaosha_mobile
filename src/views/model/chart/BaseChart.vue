@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div
 		:id="id"
 		:style="style"
@@ -6,14 +6,14 @@
 </template>
 
 <script setup lang="ts">
-// 按需导入ECharts组件，减少包体积
+// 鎸夐渶瀵煎叆ECharts缁勪欢锛屽噺灏戝寘浣撶Н
 import * as echarts from 'echarts/core';
 import { BarChart, LineChart, PieChart } from 'echarts/charts';
 import { TitleComponent, TooltipComponent, GridComponent, LegendComponent, ToolboxComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import { nanoid } from 'nanoid';
 
-// 注册必要的组件
+// 娉ㄥ唽蹇呰鐨勭粍浠?
 echarts.use([
 	TitleComponent,
 	TooltipComponent,
@@ -52,7 +52,7 @@ const style = computed(() => ({
 
 const emit = defineEmits(['legend-change']);
 
-let chart: Params = null;
+let chart: unknown = null;
 const initEcharts = () => {
 	disposeChart();
 	if (!chart) {
@@ -94,7 +94,7 @@ onMounted(() => {
 	initEcharts();
 });
 
-// 监听窗口大小变化
+// 鐩戝惉绐楀彛澶у皬鍙樺寲
 onUnmounted(() => {
 	disposeChart();
 });

@@ -1,8 +1,4 @@
-<template>
-	<NavBar
-		:info="info"
-		@click-right="addRoleInfo"
-	></NavBar>
+﻿<template>
 	<common-pull-refresh
 		:style="{ height: 'calc(100% - 44px)' }"
 		v-model="isRefresh"
@@ -14,10 +10,10 @@
     <van-search
         v-model='searchInfo.typeCode'
         show-action
-        placeholder='请输入搜索关键词'
+        placeholder='璇疯緭鍏ユ悳绱㈠叧閿瘝'
         @search='onSearch'
         @cancel='onCancel'
-        action-text="清空"/>
+        action-text="娓呯┖"/>
     -->
 		</form>
 		<van-divider
@@ -69,7 +65,7 @@
 										{{ item.roleName }}
 									</div>
 								</div>
-								<div :class="true ? 'rightDiv' : 'rightRedDiv'"> item.status+; </div>
+								<div class="rightDiv">{{ item.status || '-' }}</div>
 							</div>
 						</template>
 					</van-cell>
@@ -92,24 +88,38 @@
 <script lang="ts" setup>
 import { showSuccessToast, showFailToast } from 'vant';
 import type { SearchInfo } from './roleInfoTs';
+import { useNavBar } from '@/composables/useNavBar';
 import { usePagination } from '@/composables/usePagination';
 import { getRoleInfoPage, deleteRoleInfo } from '@/views/user/roleInfo/api';
 import { getUserManagerList } from '@/views/user/userManager/api';
 import type { PageInfo } from '@/views/common/config/index';
+import type { RoleInfoData } from '@/views/user/roleInfo/config';
+import type { UserManagerData } from '@/views/user/userManager/config';
+
+interface RoleInfoItem extends RoleInfoData {
+	id?: string;
+	roleCode?: string;
+	roleName?: string;
+	status?: string;
+}
 
 const router = useRouter();
 const route = useRoute();
-const info = ref<Params>({
-	title: route?.meta?.title || '财务管理11',
-	rightButton: '新增',
+useNavBar({
+	title: (route?.meta?.title as string) || '角色管理',
+	rightIcon: 'plus',
 	leftPath: '/',
+	visible: true,
+	onRightClick: () => {
+		router.push({ path: '/user/roleInfo/roleInfoDetail' });
+	},
 });
 const loading = ref<boolean>(false);
-const dataSource = ref<Params[]>([]);
+const dataSource = ref<RoleInfoItem[]>([]);
 const searchInfo = ref<SearchInfo>({});
 
-const finished = ref<boolean>(false); //加载是否已经没有更多数据
-const isRefresh = ref<boolean>(false); //是否下拉刷新
+const finished = ref<boolean>(false); // 加载是否已全部完成
+const isRefresh = ref<boolean>(false); // 是否下拉刷新
 const { pagination, resetPagination, setTotal, nextPage } = usePagination();
 
 // const onSearch = () => {
@@ -126,42 +136,39 @@ const { pagination, resetPagination, setTotal, nextPage } = usePagination();
 
 async function query(param: SearchInfo, cur: PageInfo) {
 	loading.value = true;
-	getRoleInfoPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
-		.then((res: Params) => {
-			if (res?.code == '200') {
-				dataSource.value = [...dataSource.value, ...res.data.records];
-				setTotal(res.data.total);
-				nextPage();
-				if ((pagination.total || 0) <= dataSource.value.length) {
-					finished.value = true;
-				}
-			} else {
-				showFailToast(res?.message || '查询列表失败！');
-			}
-		})
-		.finally(() => {
-			isRefresh.value = false;
-			loading.value = false;
-		});
+	try {
+		const { code, data, message } = await getRoleInfoPage(
+			param as RoleInfoData,
+			cur?.current ? cur.current : 1,
+			cur?.pageSize || 10,
+		);
+		if (code === '200') {
+			const records = ((data?.records || []) as RoleInfoItem[]) ?? [];
+			dataSource.value = [...dataSource.value, ...records];
+			setTotal(data?.total ?? 0);
+			nextPage();
+			finished.value = (pagination.total || 0) <= dataSource.value.length;
+		} else {
+			showFailToast(message || '查询列表失败');
+		}
+	} finally {
+		isRefresh.value = false;
+		loading.value = false;
+	}
 }
 
-const addRoleInfo = () => {
-	router.push({ path: '/user/roleInfo/roleInfoDetail' });
-};
-
-const userMap = {};
-function getUserInfoList() {
-	getUserManagerList({}).then((res: Params) => {
-		if (res?.code == '200') {
-			if (res?.data) {
-				res.data.forEach((user: { id: string | number; nickName: Params }) => {
-					userMap[user.id] = user.nickName;
-				});
+const userMap: Record<string | number, string> = {};
+async function getUserInfoList() {
+	const { code, data, message } = await getUserManagerList({});
+	if (code === '200') {
+		(data || []).forEach((user: UserManagerData) => {
+			if (user.id !== undefined) {
+				userMap[user.id] = user.nickName || '';
 			}
-		} else {
-			showFailToast(res?.message || '查询列表失败！');
-		}
-	});
+		});
+	} else {
+		showFailToast(message || '查询用户列表失败');
+	}
 }
 
 const refresh = () => {
@@ -174,15 +181,19 @@ const onRefresh = () => {
 	query(searchInfo.value, pagination);
 };
 
-const beforeClose = (_e: Params): void => {
+const beforeClose = (_e: unknown): void => {
 	// console.log(e);
 };
 
-const delRoleInfo = (id: string) => {
-	deleteRoleInfo(`${id}`).then((res: Params) => {
+const delRoleInfo = (id: string | undefined) => {
+	if (!id) {
+		showFailToast('删除失败，缺少角色 ID');
+		return;
+	}
+	deleteRoleInfo(`${id}`).then((res) => {
 		if (res?.code == '200') {
 			refresh();
-			showSuccessToast(res?.message || '删除成功！');
+			showSuccessToast(res?.message || '删除成功');
 		} else {
 			showFailToast(res?.message || '删除失败，请联系管理员！');
 		}
@@ -193,11 +204,11 @@ function init() {
 	dataSource.value = [];
 	resetPagination();
 	query(searchInfo.value, pagination);
-	//获取用户信息
+	// 获取用户信息
 	getUserInfoList();
 }
 
-init();
+void init();
 </script>
 
 <style lang="less" scoped>

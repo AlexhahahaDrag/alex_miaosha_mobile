@@ -1,4 +1,5 @@
 import type { ShopStockAnalysisData } from '../config';
+import type { ResponseBody } from '@/types/api';
 import { getData, baseService } from '@/views/common/api';
 
 const baseFinanceAnalysis = '/shop-stock-analysis';

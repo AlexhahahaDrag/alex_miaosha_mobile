@@ -1,5 +1,4 @@
-<template>
-	<navBar :info="info"></navBar>
+﻿<template>
 	<van-form
 		@submit="onSubmit"
 		:rules="rulesRef"
@@ -65,23 +64,29 @@
 <script setup lang="ts">
 import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
-import type { Info } from '@/views/common/pop/selectPop.vue';
+import { useNavBar } from '@/composables/useNavBar';
 import { getListName } from '@/views/common/config';
+import type { DictInfo } from '@/views/common/config';
+import type { AccountRecordInfoData } from '@/views/finance/accountRecordInfo/config';
 import {
 	addAccountRecordInfo,
 	updateAccountRecordInfo,
 	getAccountRecordInfoDetail,
 } from '@/views/finance/accountRecordInfo/api';
 import { getDictList } from '@/views/finance/dict/api';
+import type { Info } from '@/views/common/pop/selectPop.vue';
+import type { DatePickerInfo } from '@/utils/common';
 
 const route = useRoute();
 const router = useRouter();
-const info = ref<Params>({
-	title: route?.meta?.title || '',
+
+useNavBar({
+	title: (route?.meta?.title as string) || '',
 	leftPath: '/selfFinance/accountRecordInfo',
+	visible: true,
 });
 
-const formInfo = ref<Params>({});
+const formInfo = ref<AccountRecordInfoData>({});
 
 const label = reactive({
 	name: '名称',
@@ -120,9 +125,9 @@ const rulesRef = reactive({
 
 const accountName = ref<string>('');
 
-const accountInfo = ref<Info>({
+const accountInfo = ref<Info<DictInfo>>({
 	label: 'account',
-	labelName: '账号',
+	labelName: label.account,
 	rule: rulesRef.account,
 	customFieldName: {
 		text: 'typeName',
@@ -131,18 +136,18 @@ const accountInfo = ref<Info>({
 	selectValue: formInfo.value.account,
 });
 
-const popInfo = ref<Info>({ showFlag: false });
+const popInfo = ref<Info<DictInfo>>({ showFlag: false });
 
-const choose = (type: string) => {
+function choose(type: string) {
 	switch (type) {
 		case 'account':
 			popInfo.value = accountInfo.value;
 			break;
 	}
 	popInfo.value.showFlag = true;
-};
+}
 
-const selectInfo = (type: string, value: Params, name: string) => {
+function selectInfo(type: string, value: string, name: string) {
 	popInfo.value.showFlag = false;
 	switch (type) {
 		case 'account':
@@ -150,20 +155,20 @@ const selectInfo = (type: string, value: Params, name: string) => {
 			accountName.value = name;
 			break;
 	}
-};
+}
 
-const cancelInfo = () => {
+function cancelInfo() {
 	popInfo.value.showFlag = false;
-};
+}
 
 const avliDateName = ref<string>('');
-const avliDateInfo = ref<Params>({
+const avliDateInfo = ref<DatePickerInfo<Dayjs>>({
 	label: 'avliDate',
-	labelName: 'field.comment',
+	labelName: label.avliDate,
 	rule: rulesRef.avliDate,
 	selectValue: dayjs(),
 	showFlag: false,
-	formatter: (type: string, option: Params) => {
+	formatter: (type: string, option: { text: string }) => {
 		if (type === 'year') {
 			option.text += '年';
 		}
@@ -177,18 +182,20 @@ const avliDateInfo = ref<Params>({
 	},
 });
 
-const chooseDateInfo = ref<Info>({ showFlag: false });
+const chooseDateInfo = ref<DatePickerInfo<Dayjs>>({
+	...avliDateInfo.value,
+});
 
-const chooseDate = (type: string) => {
+function chooseDate(type: string) {
 	chooseDateInfo.value.showFlag = true;
 	switch (type) {
 		case 'avliDate':
 			chooseDateInfo.value = avliDateInfo.value;
 			break;
 	}
-};
+}
 
-const selectDateInfo = (date: Dayjs, dateName: string, type: string) => {
+function selectDateInfo(date: Dayjs, dateName: string, type: string) {
 	switch (type) {
 		case 'avliDate':
 			formInfo.value.avliDate = date;
@@ -196,67 +203,68 @@ const selectDateInfo = (date: Dayjs, dateName: string, type: string) => {
 			break;
 	}
 	chooseDateInfo.value.showFlag = false;
-};
+}
 
-const cancelDateInfo = () => {
+function cancelDateInfo() {
 	chooseDateInfo.value.showFlag = false;
-};
+}
 
-const initInfoDate = (infoDate: Dayjs, type: string) => {
+function initInfoDate(infoDate: Dayjs | string | undefined, type: string) {
 	if (infoDate) {
 		switch (type) {
 			case 'avliDate':
 				avliDateName.value = dayjs(infoDate).format('YYYY-MM-DD');
-				avliDateInfo.value.selectValue = infoDate;
+				avliDateInfo.value.selectValue = dayjs(infoDate);
 				break;
 		}
 	}
-};
+}
 
-const onSubmit = async () => {
+async function onSubmit() {
 	let method = 'post';
 	if (formInfo.value.id) {
 		method = 'put';
 	}
 	const { code, message } = await (method === 'put' ? updateAccountRecordInfo : addAccountRecordInfo)(formInfo.value);
 	if (code == '200') {
-		showSuccessToast(message || '保存成功!');
+		showSuccessToast(message || '保存成功！');
 		router.push({ path: '/selfFinance/accountRecordInfo' });
 	} else {
-		showFailToast(message || '保存失败，请联系管理员!');
-	}
-};
-
-function getDictInfoList(res: Params) {
-	if (res.code == '200') {
-		accountInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'account_type');
-		accountName.value = getListName(accountInfo.value.list || [], formInfo.value.account, 'typeCode', 'typeName');
-	} else {
-		showFailToast(res?.message || '查询失败，请联系管理员!');
+		showFailToast(message || '保存失败，请联系管理员！');
 	}
 }
 
-function init() {
-	const id: Params = route?.query?.id;
-	if (id) {
-		Promise.all([getAccountRecordInfoDetail(id || '-1'), getDictList('account_type')])
-			.then((res: Params) => {
-				if (res[0].code == '200') {
-					formInfo.value = res[0].data;
-					initInfoDate(formInfo.value.avliDate, 'avliDate');
-					accountName.value = getListName(accountInfo.value.list || [], formInfo.value.account, 'typeCode', 'typeName');
-				} else {
-					showFailToast(res?.message || '查询详情失败，请联系管理员!');
-				}
-				getDictInfoList(res[1]);
-			})
-			.catch(() => {
-				showFailToast('系统问题，请联系管理员！');
-			});
+function getDictInfoList(code: string, data: DictInfo[] | undefined, message?: string): void {
+	if (code === '200') {
+		accountInfo.value.list = (data || []).filter((item) => item.belongTo === 'account_type');
+		accountName.value = getListName(accountInfo.value.list || [], formInfo.value.account, 'typeCode', 'typeName');
 	} else {
-		getDictList('account_type').then((res: Params) => {
-			getDictInfoList(res);
-		});
+		showFailToast(message || '查询失败，请联系管理员！');
+	}
+}
+
+async function init() {
+	const id = route?.query?.id as string | undefined;
+	if (id) {
+		try {
+			const [detailRes, dictRes] = await Promise.all([getAccountRecordInfoDetail(id), getDictList('account_type')]);
+			const { code: detailCode, data: detailData, message: detailMessage } = detailRes;
+			const { code: dictCode, data: dictData, message: dictMessage } = dictRes;
+
+			if (detailCode === '200' && detailData) {
+				formInfo.value = detailData;
+				initInfoDate(formInfo.value.avliDate, 'avliDate');
+				accountName.value = getListName(accountInfo.value.list || [], formInfo.value.account, 'typeCode', 'typeName');
+			} else {
+				showFailToast(detailMessage || '查询详情失败，请联系管理员！');
+			}
+			getDictInfoList(dictCode, dictData as DictInfo[] | undefined, dictMessage);
+		} catch {
+			showFailToast('系统问题，请联系管理员！');
+		}
+	} else {
+		const { code, data, message } = await getDictList('account_type');
+		getDictInfoList(code, data as DictInfo[] | undefined, message);
 		formInfo.value = {
 			avliDate: dayjs(),
 		};
@@ -264,7 +272,7 @@ function init() {
 	}
 }
 
-init();
+void init();
 </script>
 <style lang="less" scoped>
 .subButton {

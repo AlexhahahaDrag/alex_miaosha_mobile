@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<van-row gutter="20">
 		<div class="mainGrid">
 			<div class="div2">
@@ -29,6 +29,7 @@
 <script lang="ts" setup>
 import { showNotify } from 'vant';
 import type { ItemInfo } from './common';
+import type { ShopStockAnalysisData } from '@/views/finance/shopStockAnalysis/config';
 import { getAllAmount } from '@/views/finance/shopStockAnalysis/api';
 
 interface Props {
@@ -39,57 +40,29 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const pieShopData = ref<object[]>([]);
-
-const getAllAmountInfo = () => {
-	getAllAmount().then((res: { code: string; data: Params[]; message: Params }) => {
-		if (res.code == '200') {
-			if (res.data) {
-				const shop: ItemInfo[] = [];
-				res.data.forEach((item: { typeName: Params; amount: Params }) => {
-					shop.push({ name: item.typeName, value: item.amount });
-				});
-				pieShopData.value = shop;
-			}
-		} else {
-			showNotify({
-				type: 'danger',
-				message: (res && res.message) || '查询列表失败！',
-			});
-		}
-	});
-};
-
-const piePayWayData = ref<object[]>([]);
-
-// const getPayWayInfoInfo = (dateStr: string) => {
-//   getPayWayInfo(dateStr).then((res: { code: string; data: Params[]; message: Params }) => {
-//     if (res.code == '200') {
-//       if (res.data) {
-//         let shop: ItemInfo[] = [];
-//         res.data.forEach((item: { payWayName: Params; saleAmount: Params }) => {
-//           shop.push({ name: item.payWayName, value: item.saleAmount });
-//         });
-//         piePayWayData.value = shop;
-//       }
-//     } else {
-//       showNotify({
-//         type: 'danger',
-//         message: (res && res.message) || '查询列表失败！',
-//       });
-//     }
-//   });
-// };
+const pieShopData = ref<ItemInfo[]>([]);
+const piePayWayData = ref<ItemInfo[]>([]);
 
 const tooltip = ref({
 	trigger: 'item',
 	formatter: '{b} : {c}元({d}%)',
 });
 
-const init = () => {
-	getAllAmountInfo();
-	// getPayWayInfoInfo(dateStr);
-};
+async function getAllAmountInfo() {
+	const { code, data, message } = await getAllAmount();
+	if (code !== '200' || !Array.isArray(data)) {
+		showNotify({ type: 'danger', message: message || '查询列表失败！' });
+		return;
+	}
+	pieShopData.value = (data as ShopStockAnalysisData[]).map((item) => ({
+		name: item.typeName || '',
+		value: item.amount || 0,
+	}));
+}
+
+async function init() {
+	await getAllAmountInfo();
+}
 
 watch(
 	() => [props.activeTab, props.dateStr, props.belongTo],

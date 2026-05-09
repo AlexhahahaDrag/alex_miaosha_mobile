@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<van-grid :column-num="2">
 		<div class="box-content-show">
 			<div
@@ -23,7 +23,7 @@
 
 <script lang="ts" setup>
 import { showNotify } from 'vant';
-import type { ShopFinanceChainYear } from './common';
+import type { ShopStockAnalysisData } from '@/views/finance/shopStockAnalysis/config';
 import { getAllStock, getCashAmount } from '@/views/finance/shopStockAnalysis/api';
 import commonUtils from '@/utils/common/index';
 import type { Info } from '@/views/common/boardData/config';
@@ -37,71 +37,61 @@ interface Props {
 const props = defineProps<Props>();
 
 const stockList = ref<Info[]>([]);
-
-const getAllStockInfo = () => {
-	getAllStock().then((res: { code: string; data: ShopFinanceChainYear; message: Params }) => {
-		if (res.code == '200') {
-			// console.log('res:', res);
-			const arr: Info[] = [];
-			arr.push({
-				title: '库存金额',
-				value: res.data?.costAmount !== null ? commonUtils.formatAmount(res.data.costAmount || 0, 2, '') : '--',
-				icon: 'stockAmount',
-				unit: '元',
-				showChain: false,
-				showYear: false,
-				color: '#55aaff',
-			});
-			arr.push({
-				title: '库存数量',
-				value: res.data?.saleNum !== null ? commonUtils.formatAmount(res.data.saleNum || 0, 0, '') : '--',
-				icon: 'stockNum',
-				unit: '件',
-				showChain: false,
-				showYear: false,
-				color: '#55aaff',
-			});
-			stockList.value = arr;
-		} else {
-			showNotify({
-				type: 'danger',
-				message: (res && res.message) || '查询列表失败！',
-			});
-		}
-	});
-};
-
 const crashList = ref<Info[]>([]);
 
-const getCashAmountInfo = () => {
-	getCashAmount().then((res: Params) => {
-		if (res.code == '200') {
-			// console.log('res:', res);
-			const arr: Info[] = [];
-			arr.push({
-				title: '流动资金',
-				value: res.data?.amount !== null ? commonUtils.formatAmount(res.data.amount || 0, 2, '') : '--',
-				icon: 'stockAmount',
-				unit: '元',
-				showChain: false,
-				showYear: false,
-				color: '#1c54aa',
-			});
-			arr.push({});
-			crashList.value = arr;
-		} else {
-			showNotify({
-				type: 'danger',
-				message: (res && res.message) || '查询列表失败！',
-			});
-		}
+async function getAllStockInfo() {
+	const { code, data, message } = await getAllStock();
+	if (code !== '200') {
+		showNotify({ type: 'danger', message: message || '查询列表失败，请联系管理员！' });
+		return;
+	}
+	const stockData = data as ShopStockAnalysisData;
+	const arr: Info[] = [];
+	arr.push({
+		title: '库存金额',
+		value: stockData?.costAmount !== null ? commonUtils.formatAmount(stockData.costAmount || 0, 2, '') : '--',
+		icon: 'stockAmount',
+		unit: '元',
+		showChain: false,
+		showYear: false,
+		color: '#55aaff',
 	});
-};
+	arr.push({
+		title: '库存数量',
+		value: stockData?.saleNum !== null ? commonUtils.formatAmount(stockData.saleNum || 0, 0, '') : '--',
+		icon: 'stockNum',
+		unit: '件',
+		showChain: false,
+		showYear: false,
+		color: '#55aaff',
+	});
+	stockList.value = arr;
+}
 
-const init = () => {
-	getAllStockInfo();
-	getCashAmountInfo();
-};
+async function getCashAmountInfo() {
+	const { code, data, message } = await getCashAmount();
+	if (code !== '200') {
+		showNotify({ type: 'danger', message: message || '查询列表失败，请联系管理员！' });
+		return;
+	}
+	const cashData = data as ShopStockAnalysisData;
+	const arr: Info[] = [];
+	arr.push({
+		title: '流动资金',
+		value: cashData?.amount !== null ? commonUtils.formatAmount(cashData.amount || 0, 2, '') : '--',
+		icon: 'stockAmount',
+		unit: '元',
+		showChain: false,
+		showYear: false,
+		color: '#1c54aa',
+	});
+	arr.push({});
+	crashList.value = arr;
+}
+
+async function init() {
+	await Promise.all([getAllStockInfo(), getCashAmountInfo()]);
+}
 
 watch(
 	() => [props.activeTab, props.dateStr, props.belongTo],

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="prepaid-card-container">
 		<!-- 标题栏 -->
 		<div class="card-header">
@@ -76,7 +76,7 @@
 				class="card-empty"
 				v-if="!cardsLoading && cardList.length === 0"
 			>
-				<div class="empty-icon">📇</div>
+				<div class="empty-icon">💳</div>
 				<div class="empty-text">暂无消费卡</div>
 				<div
 					class="add-card-btn"
@@ -176,7 +176,7 @@
 					class="transaction-empty"
 					v-if="!transactionsLoading && transactionList.length === 0"
 				>
-					<div class="empty-icon">📋</div>
+					<div class="empty-icon">🧾</div>
 					<div class="empty-text">暂无交易记录</div>
 				</div>
 			</template>
@@ -197,9 +197,9 @@ import shopCarSvg from '@/assets/icons/shop/shop-car.svg';
 const router = useRouter();
 const route = useRoute();
 
-// 使用新的NavBar系统
+// 使用新的 NavBar 系统
 useNavBar({
-	title: (route?.meta?.title as string) || '财务明细',
+	title: (route?.meta?.title as string) || '预付卡',
 	leftPath: '/',
 	showRight: false,
 	visible: true,
@@ -224,7 +224,7 @@ const currentCard = computed(() => {
 // 交易记录列表
 const transactionList = ref<TransactionItem[]>([]);
 
-// 根据路由的cardId设置当前选中的index
+// 根据路由的 cardId 设置当前选中的 index
 const setCurrentCardIndexByRouteCardId = () => {
 	const { cardId } = route.query;
 	if (cardId && cardList.value.length > 0) {
@@ -241,19 +241,23 @@ const getCardList = async () => {
 	const { code, data, message } = await getPrepaidCardInfoList({});
 	if (code === '200') {
 		// 转换数据格式以匹配组件期望的结构
-		cardList.value = data.map((card: Params, index: number) => ({
-			name: card.cardName || `消费卡 ${index + 1}`,
-			balance: `￥ ${card.currentBalance || '0.00'}`,
+		const cardData = (data || []) as Array<Record<string, unknown>>;
+		cardList.value = cardData.map((card, index: number) => ({
+			name: String(card.cardName || `消费卡${index + 1}`),
+			balance: `¥${String(card.currentBalance || '0.00')}`,
 			bgColor: getCardColor(index), // 根据索引分配颜色
-			id: card.id,
-			...card,
+			id: String(card.id || ''),
+			cardName: String(card.cardName || ''),
+			cardType: String(card.cardType || ''),
+			status: String(card.status || ''),
+			currentBalance: card.currentBalance as number | string,
 		}));
 
-		// 根据路由的cardId设置当前选中的index
+		// 根据路由的 cardId 设置当前选中的 index
 		setCurrentCardIndexByRouteCardId();
 	} else {
 		cardList.value = [];
-		showFailToast(message || '查询失败，请联系管理员!');
+		showFailToast(message || '查询失败，请联系管理员！');
 	}
 	cardsLoading.value = false;
 };
@@ -261,19 +265,22 @@ const getCardList = async () => {
 const getCardDetail = async () => {
 	const { code, data, message } = await getPrepaidConsumeRecordPage({ cardId: currentCard.value?.id }, 1, 10);
 	if (code === '200') {
-		const records = data.records || [];
+		const records = ((data?.records || []) as Array<Record<string, unknown>>) ?? [];
 		// 转换数据格式以匹配组件期望的结构
-		transactionList.value = records.map((record: Params, index: number) => ({
-			name: record.cardName || record.description || '消费记录',
-			time: formatTime(record.createTime || record.transactionTime),
-			formattedAmount: formatAmount(record.amount, record.transactionType),
+		transactionList.value = records.map((record, index: number) => ({
+			name: String(record.cardName || record.description || '消费记录'),
+			time: formatTime(String(record.createTime || record.transactionTime || '')),
+			amount: String(record.amount || ''),
+			formattedAmount: formatAmount(Number(record.amount || 0), String(record.transactionType || '')),
 			cardColor: getCardColor(index),
-			id: record.id,
-			...record,
+			id: String(record.id || ''),
+			transactionType: String(record.transactionType || ''),
+			description: String(record.description || ''),
+			createTime: String(record.createTime || ''),
 		}));
 	} else {
 		transactionList.value = [];
-		showFailToast(message || '查询详情失败，请联系管理员!');
+		showFailToast(message || '查询详情失败，请联系管理员！');
 	}
 	transactionsLoading.value = false;
 };
@@ -290,8 +297,7 @@ const fetchData = async () => {
 		// 获取交易记录分页数据
 		await getCardDetail();
 	} catch (error: unknown) {
-		// console.log('错误信息：', error);
-		showFailToast(`获取数据失败，请重试！${(error as Error).message}` || '未知错误');
+		showFailToast(`获取数据失败，请重试：${(error as Error).message || '未知错误'}`);
 	}
 	cardsLoading.value = false;
 	transactionsLoading.value = false;
@@ -330,7 +336,7 @@ const handleCardChange = async (index: number) => {
 	await getCardDetail();
 };
 
-// 消费按钮点击处理函数
+// 消费/充值按钮点击处理函数
 const handleAmount = (type: 'consume' | 'recharge') => {
 	if (!currentCard.value) {
 		showToast('请先选择一张卡片');
@@ -373,12 +379,7 @@ const handleAddCard = () => {
 };
 
 // 定义事件
-const emit = defineEmits<{
-	(e: 'consume', cardIndex: number): void;
-	(e: 'recharge', cardIndex: number): void;
-	(e: 'viewMore'): void;
-	(e: 'transactionDetail', transaction: TransactionItem): void;
-}>();
+const emit = defineEmits(['consume', 'recharge', 'viewMore', 'transactionDetail']);
 
 // 生命周期钩子
 onMounted(() => {
@@ -387,7 +388,7 @@ onMounted(() => {
 </script>
 
 <style lang="less" scoped>
-// 主题颜色现在使用全局CSS变量（在 @/assets/styles/variables.css 中定义）
+// 主题颜色使用全局 CSS 变量（定义于 @/assets/styles/variables.css）
 .prepaid-card-container {
 	width: 100%;
 	height: 100%;
@@ -515,7 +516,7 @@ onMounted(() => {
 		}
 	}
 
-	// 无卡片状态
+	// 鏃犲崱鐗囩姸鎬?
 	.card-empty {
 		display: flex;
 		flex-direction: column;
@@ -819,7 +820,7 @@ onMounted(() => {
 		}
 	}
 
-	// 空状态
+	// 绌虹姸鎬?
 	.transaction-empty {
 		display: flex;
 		flex-direction: column;
@@ -900,7 +901,7 @@ onMounted(() => {
 			color: var(--text-color);
 
 			&.amount-positive {
-				color: var(--success-color); // 绿色 - 充值/收入
+				color: var(--success-color); // 缁胯壊 - 鍏呭€?鏀跺叆
 			}
 
 			&.amount-negative {

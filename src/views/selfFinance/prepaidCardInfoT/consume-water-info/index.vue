@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="transaction-history">
 		<!-- Main Content -->
 		<div class="main-content">
@@ -42,7 +42,7 @@
 				</div>
 			</div>
 
-			<!-- Vant下拉刷新 + 触底加载 -->
+			<!-- Vant 下拉刷新 + 触底加载 -->
 			<common-pull-refresh
 				v-model="refreshing"
 				@refresh="onRefresh"
@@ -191,6 +191,7 @@ import { typeIconMap } from '../config/index';
 import { getPrepaidCardInfoList } from '../api';
 import { useNavBar } from '@/composables/useNavBar';
 import { usePagination } from '@/composables/usePagination';
+import { getFormatTimeInfo } from '@/utils/dayjs';
 import {
 	getConsumeCardRecordPage,
 	type TransactionRecord,
@@ -200,7 +201,7 @@ import filterIcon from '@/assets/icons/shop/filter.svg';
 
 const route = useRoute();
 
-// 使用新的NavBar系统
+// 使用新的 NavBar 系统
 useNavBar({
 	title: (route?.meta?.title as string) || '消费流水记录',
 	leftPath: '/selfFinance/prepaidCardInfoT',
@@ -211,11 +212,11 @@ useNavBar({
 // 响应式数据
 const loading = ref<boolean>(false);
 const loadingMore = ref<boolean>(false);
-const refreshing = ref<boolean>(false); // 下拉刷新状态
+const refreshing = ref<boolean>(false); // 是否下拉刷新
 const transactionList = ref<TransactionRecord[]>([]);
 const { pagination, resetPagination, setTotal, nextPage } = usePagination();
 const hasMore = ref<boolean>(true);
-const finished = ref(false); // List组件的完成状态
+const finished = ref(false); // List 组件完成状态
 
 // 筛选参数
 const filterParams = reactive<TransactionQueryParams>({
@@ -240,28 +241,13 @@ const groupedTransactions = computed(() => {
 
 // 格式化日期分组
 function formatDateGroup(dateStr: string): string {
-	const today = new Date();
-	const yesterday = new Date(today);
-	yesterday.setDate(yesterday.getDate() - 1);
-	const transactionDate = new Date(dateStr);
-	if (transactionDate.toDateString() === today.toDateString()) {
-		return '今日';
-	} else if (transactionDate.toDateString() === yesterday.toDateString()) {
-		return '昨日';
-	} else {
-		return `${transactionDate
-			.toLocaleDateString('zh-CN', {
-				month: '2-digit',
-				day: '2-digit',
-			})
-			.replace('/', '月')}日`;
-	}
+	return getFormatTimeInfo(dateStr);
 }
 
 // 格式化金额显示
 function formatAmount(amount: number): string {
 	const prefix = amount >= 0 ? '+' : '-';
-	return `${prefix}￥${Math.abs(amount).toFixed(2)}`;
+	return `${prefix}${Math.abs(amount).toFixed(2)}`;
 }
 
 // 获取交易类型样式类
@@ -317,9 +303,9 @@ async function openCardPicker() {
 	if (cardColumns.value.length === 1) {
 		const { code, data, message } = await getPrepaidCardInfoList({});
 		if (code === '200') {
-			const options = (data || []).map((card: Params) => ({
+			const options = ((data as unknown as Array<{ id?: string | number; cardName?: string }>) || []).map((card) => ({
 				text: card.cardName || `卡片 ${card.id}`,
-				value: card.id,
+				value: card.id || '',
 			}));
 			cardColumns.value = [{ text: '全部卡片', value: '' }, ...options];
 		} else {
@@ -329,7 +315,7 @@ async function openCardPicker() {
 	cardPickerVisible.value = true;
 }
 
-function onCardConfirm(payload: Params) {
+function onCardConfirm(payload: Record<string, unknown>) {
 	const op = payload?.selectedOptions?.[0] || payload;
 	if (op) {
 		selectedCardId.value = op.value ?? '';
@@ -354,7 +340,7 @@ function resetFilters() {
 function applyFilters() {
 	// 应用筛选条件到查询参数
 	if (selectedCardId.value) {
-		filterParams.cardId = selectedCardId.value as Params;
+		filterParams.cardId = selectedCardId.value as string | number;
 	} else {
 		delete filterParams.cardId;
 	}
@@ -384,7 +370,7 @@ async function fetchTransactionData(isLoadMore = false) {
 		} else {
 			loading.value = true;
 			resetPagination();
-			finished.value = false; // 重置列表完成态，避免阻止后续加载
+			finished.value = false; // 重置列表完成状态，避免阻止后续加载
 		}
 		if (filterParams.type === 'all') {
 			delete filterParams.type;
@@ -395,22 +381,23 @@ async function fetchTransactionData(isLoadMore = false) {
 			pagination.pageSize || 10,
 		);
 		if (code === '200') {
+			const records = (data?.records || []) as unknown as TransactionRecord[];
 			if (isLoadMore) {
-				transactionList.value.push(...data.records);
+				transactionList.value.push(...records);
 			} else {
-				transactionList.value = data.records;
+				transactionList.value = records;
 			}
-			setTotal(data.total || 0);
+			setTotal(data?.total || 0);
 			hasMore.value = transactionList.value.length < (pagination.total || 0);
-			finished.value = !hasMore.value; // 同步finished，防止List误判一直加载
+			finished.value = !hasMore.value; // 同步 finished，防止 list 误判一直加载
 		} else {
 			setTotal(0);
 			hasMore.value = false;
 			finished.value = true;
-			showFailToast(message || '查询失败，请联系管理员');
+			showFailToast(message || '查询失败，请联系管理员！');
 		}
 	} catch (error: unknown) {
-		// console.log('错误信息：', error);
+		// console.log('閿欒淇℃伅锛?, error);
 		setTotal(0);
 		hasMore.value = false;
 		finished.value = true;
@@ -442,7 +429,7 @@ async function onRefresh() {
 	try {
 		await fetchTransactionData(false);
 	} catch (error: unknown) {
-		// console.log('错误信息：', error);
+		// console.log('閿欒淇℃伅锛?, error);
 		// eslint-disable-next-line no-console
 		console.error('刷新失败:', error);
 		showFailToast('刷新失败，请稍后重试');
@@ -464,7 +451,7 @@ async function onLoad() {
 	try {
 		await fetchTransactionData(true);
 	} catch (error: unknown) {
-		// console.log('错误信息：', error);
+		// console.log('閿欒淇℃伅锛?, error);
 		// eslint-disable-next-line no-console
 		console.error('加载更多失败:', error);
 		showFailToast('加载失败，请稍后重试');

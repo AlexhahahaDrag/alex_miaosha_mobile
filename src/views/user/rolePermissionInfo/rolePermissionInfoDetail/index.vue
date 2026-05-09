@@ -1,5 +1,4 @@
-<template>
-	<NavBar :info="info"></NavBar>
+﻿<template>
 	<van-form
 		@submit="onSubmit"
 		:rules="rulesRef"
@@ -61,29 +60,40 @@
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
 import { label, rulesRef } from './rolePermissionInfoDetailTs';
+import { useNavBar } from '@/composables/useNavBar';
 import { getListName } from '@/views/common/config';
 import {
 	addRolePermissionInfo,
 	updateRolePermissionInfo,
 	getRolePermissionInfoDetail,
 } from '@/views/user/rolePermissionInfo/api';
+import type { RolePermissionInfoData } from '@/views/user/rolePermissionInfo/config';
 import type { Info } from '@/views/common/pop/selectPop.vue';
-import { getDictList } from '@/views/finance/dict/api';
+import { getDictList, type DictInfo } from '@/views/finance/dict/api';
+
+interface RolePermissionDetailForm extends RolePermissionInfoData {
+	id?: string;
+	roleId?: string;
+	permissionId?: string;
+	summary?: string;
+	status?: string | number | null;
+}
 
 const route = useRoute();
 const router = useRouter();
-const info = ref<Params>({
-	title: route?.meta?.title || '角色权限信息表',
+useNavBar({
+	title: (route?.meta?.title as string) || '角色权限信息',
 	leftPath: '/user/rolePermissionInfo',
+	visible: true,
 });
 
-const formInfo = ref<Params>({});
+const formInfo = ref<RolePermissionDetailForm>({});
 
-const popInfo = ref<Info>({ showFlag: false });
+const popInfo = ref<Info<DictInfo>>({ showFlag: false });
 
 const statusName = ref<string>('');
 
-const statusInfo = ref<Info>({
+const statusInfo = ref<Info<DictInfo>>({
 	label: 'status',
 	labelName: label.status,
 	rule: rulesRef.status,
@@ -103,7 +113,7 @@ const choose = (type: string) => {
 	popInfo.value.showFlag = true;
 };
 
-const selectInfo = (type: string, value: Params, name: string) => {
+const selectInfo = (type: string, value: string, name: string) => {
 	popInfo.value.showFlag = false;
 	switch (type) {
 		case 'status':
@@ -117,54 +127,53 @@ const cancelInfo = () => {
 	popInfo.value.showFlag = false;
 };
 
-function getDictInfoList(res: Params) {
-	if (res?.code == '200') {
-		statusInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'is_valid');
+function getDictInfoList(code: string, data: DictInfo[] | undefined, message?: string) {
+	if (code === '200') {
+		statusInfo.value.list = (data || []).filter((item) => item.belongTo == 'is_valid');
 		statusName.value = getListName(statusInfo.value.list || [], formInfo.value.status, 'typeCode', 'typeName');
 	} else {
-		showFailToast(res?.message || '查询失败，请联系管理员!');
+		showFailToast(message || '查询失败，请联系管理员！');
 	}
 }
 
-const onSubmit = () => {
+const onSubmit = async () => {
 	let method = 'post';
 	if (formInfo.value.id) {
 		method = 'put';
 	}
-	(method === 'put' ? updateRolePermissionInfo : addRolePermissionInfo)(formInfo.value).then((res: Params) => {
-		if (res?.code == '200') {
-			showSuccessToast(res?.message || '保存成功!');
-			router.push({ path: '/user/rolePermissionInfo' });
-		} else {
-			showFailToast(res?.message || '保存失败，请联系管理员!');
-		}
-	});
+	const { code, message } = await (method === 'put' ? updateRolePermissionInfo : addRolePermissionInfo)(formInfo.value);
+	if (code === '200') {
+		showSuccessToast(message || '保存成功!');
+		router.push({ path: '/user/rolePermissionInfo' });
+	} else {
+		showFailToast(message || '保存失败，请联系管理员！');
+	}
 };
 
-function init() {
-	const id: Params = route?.query?.id;
+async function init() {
+	const id = route?.query?.id as string | undefined;
 	if (id) {
-		Promise.all([getRolePermissionInfoDetail(id || '-1'), getDictList('is_valid')])
-			.then((res: Params) => {
-				if (res[0].code == '200') {
-					formInfo.value = res[0].data;
-				} else {
-					showFailToast(res?.message || '查询详情失败，请联系管理员!');
-				}
-				getDictInfoList(res[1]);
-			})
-			.catch(() => {
-				showFailToast('系统问题，请联系管理员！');
-			});
+		try {
+			const [detailRes, dictRes] = await Promise.all([getRolePermissionInfoDetail(id || '-1'), getDictList('is_valid')]);
+			const { code: detailCode, data: detailData, message: detailMessage } = detailRes;
+			const { code: dictCode, data: dictData, message: dictMessage } = dictRes;
+			if (detailCode === '200') {
+				formInfo.value = (detailData as RolePermissionDetailForm) || {};
+			} else {
+				showFailToast(detailMessage || '查询详情失败，请联系管理员！');
+			}
+			getDictInfoList(dictCode, dictData, dictMessage);
+		} catch {
+			showFailToast('系统问题，请联系管理员！');
+		}
 	} else {
-		getDictList('is_valid').then((res: Params) => {
-			getDictInfoList(res);
-		});
+		const { code, data, message } = await getDictList('is_valid');
+		getDictInfoList(code, data, message);
 		formInfo.value = {};
 	}
 }
 
-init();
+void init();
 </script>
 <style lang="less" scoped>
 .subButton {
