@@ -151,3 +151,30 @@
 > [!IMPORTANT]
 > **凡涉及全局交互体系、基础设施、或 `src/views/components` 的结构性更改，Antigravity 必须自觉检查并更新本 `DEVELOPMENT.md` 文件。**
 > _业务逻辑、接口映射和变量挂载的变动则维持此前对 `FEATURE.md` 的检查协议。_
+
+---
+
+## 9. 礼尚往来移动端页面规范
+
+礼尚往来移动端页面统一放在 `src/views/finance/gift/`，页面顺序必须与管理端和菜单顺序一致：
+
+```text
+dashboard -> person -> event -> record -> analysis
+```
+
+### 交互规范
+
+- 移动端页面以卡片化布局为主，背景颜色保持浅色、低饱和，避免深色大面积铺底。
+- 快速记礼是核心流程，应尽量减少输入步骤，优先提供最近联系人、最近事由和常用金额快捷选择。
+- 列表页必须复用 `CommonPullRefresh`、`CommonList` 和 `usePagination`，禁止页面直接使用 `van-pull-refresh` 或自行重复实现分页。
+- 加载态使用 Skeleton，空状态使用 Empty，禁止只展示 Loading 文字。
+- 新增、保存、标记已回礼等高频操作需要触发 Haptic 反馈。
+- 礼金记录与回礼管理不拆页面，通过方向标签、回礼状态、待回金额展示。
+
+### 代码规范
+
+- 共享类型、枚举、配置放在 `src/views/finance/gift/config/`。
+- API 封装放在 `src/views/finance/gift/api/`。
+- 业务卡片组件放在 `src/views/finance/gift/components/`。
+- 页面样式优先复用 `src/views/finance/gift/shared.less`。
+- 接口调用统一使用响应解构：`const { code, data, message } = await api()`。
