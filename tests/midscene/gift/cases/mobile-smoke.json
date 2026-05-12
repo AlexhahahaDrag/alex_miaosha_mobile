@@ -1,0 +1,20 @@
+[
+	{
+		"caseId": "GIFT-MOBILE-001",
+		"title": "礼尚往来移动端页面加载与顺序",
+		"route": "/finance/gift/dashboard",
+		"level": "smoke"
+	},
+	{
+		"caseId": "GIFT-MOBILE-002",
+		"title": "移动端快速记礼弹窗与 Haptic",
+		"route": "/finance/gift/record",
+		"level": "smoke"
+	},
+	{
+		"caseId": "GIFT-MOBILE-003",
+		"title": "移动端列表、空状态与刷新加载",
+		"route": "/finance/gift/person",
+		"level": "smoke"
+	}
+]
