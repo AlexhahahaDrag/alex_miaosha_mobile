@@ -389,7 +389,7 @@ const getTimeBoundary = (): { start: Dayjs; end: Dayjs } | null => {
 		case '7d':
 			return { start: now.subtract(6, 'day').startOf('day'), end: now.endOf('day') };
 		case 'month':
-			return { start: now.startOf('month'), end: now.endOf('day') };
+			return { start: now.startOf('month'), end: now.endOf('month') };
 		case 'custom':
 			if (!customDateRange.value) {
 				return null;
