@@ -16,5 +16,19 @@
 		"title": "移动端列表、空状态与刷新加载",
 		"route": "/finance/gift/person",
 		"level": "smoke"
+	},
+	{
+		"caseId": "GIFT-MOBILE-PERSON-001",
+		"title": "亲友管理列表加载 business-page",
+		"route": "/finance/gift/person",
+		"level": "smoke",
+		"waitFor": "/gift-person-info-t/business-page"
+	},
+	{
+		"caseId": "GIFT-MOBILE-PERSON-002",
+		"title": "亲友新增-详情-编辑流程",
+		"route": "/finance/gift/person",
+		"level": "flow",
+		"persona": "gift_admin"
 	}
 ]

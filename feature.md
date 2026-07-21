@@ -143,3 +143,4 @@
 - **状态字段**：`direction`: `GIVE`-随礼, `RECEIVE`-收礼, `RETURN`-回礼; `returnedFlag`: 是否已回礼。
 - **关联 API**：`src/views/finance/gift/api/`
 - **权限标识**：页面权限 `gift:dashboard`、`gift:person`、`gift:event`、`gift:record`、`gift:analysis`; 按钮权限 `gift:view`、`gift:add`、`gift:edit`、`gift:delete`、`gift:export`。
+- **亲友管理**：列表走 `business-page`（汇总 + 关系筛选 + 收支摘要）；详情菜单 `giftPersonDetail`（`/finance/gift/person/giftPersonDetail`）同页切换档案/表单；按钮权限 `gift:view/add/edit/delete`。

@@ -173,8 +173,15 @@ dashboard -> person -> event -> record -> analysis
 
 ### 代码规范
 
-- 共享类型、枚举、配置放在 `src/views/finance/gift/config/`。
-- API 封装放在 `src/views/finance/gift/api/`。
+- 共享类型、枚举、配置放在 `src/views/finance/gift/config.ts`（或 `config/`）。
+- API 封装放在 `src/views/finance/gift/api/`；`*Id` 经 `normalizeGiftIds` 转 string。
 - 业务卡片组件放在 `src/views/finance/gift/components/`。
 - 页面样式优先复用 `src/views/finance/gift/shared.less`。
 - 接口调用统一使用响应解构：`const { code, data, message } = await api()`。
+- 按钮权限用 `usePermission().hasPermission`；关系选项用 `useGiftRelationOptions`。
+
+### 亲友管理
+
+- 列表：`/finance/gift/person` → `person/index.vue`（`getGiftPersonBusinessPage` + `getGiftPersonSummary`）。
+- 详情：`t_menu_info.name=giftPersonDetail`，path `/finance/gift/person/giftPersonDetail`，组件 `person/giftPersonDetail/index.vue`（档案 / 表单同页）。
+- 跳转详情用 `getRoutePathByName(router, 'giftPersonDetail')`，禁止散落硬编码 path。
