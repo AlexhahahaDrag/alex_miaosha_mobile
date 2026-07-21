@@ -6,7 +6,11 @@ import { loginApi } from '@/views/login/api';
 import type { LoginParams } from '@/views/login/api';
 import { piniaPersistConfig } from '@/config/piniaPersist';
 import { refreshRouter } from '@/router';
-import { buildPermissionContext } from '@/utils/permission';
+import {
+	buildPermissionContext,
+	normalizePermissionContext,
+	type PermissionContext,
+} from '@/utils/permission';
 
 const createDefaultState = (): UserState => ({
 	userInfo: null,
@@ -47,6 +51,17 @@ export const useUserStore = defineStore('app-user', {
 		},
 		getOrgInfo(state): UserState['orgInfo'] {
 			return state.orgInfo;
+		},
+		getPermissionContext(): PermissionContext | null {
+			const admin = this.userInfo;
+			if (!admin) return null;
+			return normalizePermissionContext({
+				...(admin as Record<string, unknown>),
+				roleInfoVo: this.roleInfo || undefined,
+				roleInfoVoList: this.roleInfo ? [this.roleInfo] : [],
+				menuInfoVoList: this.menuInfo || [],
+				orgInfoVo: this.orgInfo,
+			});
 		},
 	},
 	actions: {
