@@ -25,31 +25,33 @@
 
 ## File Map
 
-| 文件 | 职责 |
-|------|------|
-| `src/views/finance/gift/config.ts` | 类型、关系工具、金额/方向文案、路径常量 |
-| `src/views/finance/gift/api/index.ts` | person API + `normalizeGiftIds` |
-| `src/utils/permission/index.ts` | 权限上下文归一化 / Set / canAccess |
-| `src/store/modules/user/user.ts` | `getPermissionContext` getter |
-| `src/composables/usePermission.ts` | `hasPermission` |
-| `src/composables/useGiftRelationOptions.ts` | 关系选项加载与映射 |
-| `src/views/finance/gift/person/index.vue` | 列表页 |
-| `src/views/finance/gift/person/giftPersonDetail/index.vue` | 详情档案/表单 |
-| `../../backend/alex_miaosha/doc/sql/gift_person_detail_menu_20260720.sql` | `t_menu_info` 增量 |
-| `tests/checklists/gift-person-mobile.md` | 测试 checklist |
-| `tests/midscene/gift/cases/*.json` | Midscene 用例 |
-| `DEVELOPMENT.md` / `feature.md` | 文档同步 |
+| 文件                                                                      | 职责                                    |
+| ------------------------------------------------------------------------- | --------------------------------------- |
+| `src/views/finance/gift/config.ts`                                        | 类型、关系工具、金额/方向文案、路径常量 |
+| `src/views/finance/gift/api/index.ts`                                     | person API + `normalizeGiftIds`         |
+| `src/utils/permission/index.ts`                                           | 权限上下文归一化 / Set / canAccess      |
+| `src/store/modules/user/user.ts`                                          | `getPermissionContext` getter           |
+| `src/composables/usePermission.ts`                                        | `hasPermission`                         |
+| `src/composables/useGiftRelationOptions.ts`                               | 关系选项加载与映射                      |
+| `src/views/finance/gift/person/index.vue`                                 | 列表页                                  |
+| `src/views/finance/gift/person/giftPersonDetail/index.vue`                | 详情档案/表单                           |
+| `../../backend/alex_miaosha/doc/sql/gift_person_detail_menu_20260720.sql` | `t_menu_info` 增量                      |
+| `tests/checklists/gift-person-mobile.md`                                  | 测试 checklist                          |
+| `tests/midscene/gift/cases/*.json`                                        | Midscene 用例                           |
+| `DEVELOPMENT.md` / `feature.md`                                           | 文档同步                                |
 
 ---
 
 ### Task 1: Config 类型与纯函数 + Vitest
 
 **Files:**
+
 - Modify: `src/views/finance/gift/config.ts`
 - Create: `src/views/finance/gift/config.spec.ts`
 - Modify: `package.json`（加 `vitest` + `test:unit`）
 
 **Interfaces:**
+
 - Produces: `GiftId`, `GiftPersonBusinessInfo`, `GiftPersonSummary`, `GiftPersonProfile`, `GiftPersonQuery`, `GiftPersonRelationOptions`, `GiftRelationOptionItem`, `GiftPersonFormState`, `RELATION_CUSTOM`, `FALLBACK_GIFT_RELATION_OPTIONS`, `GIFT_PERSON_PATH`, `GIFT_PERSON_DETAIL_NAME`, `resolvePresetCode`, `mapRelationToFormFields`, `buildRelationTypeForSave`, `relationLabel`, `directionLabel`, `formatMoney`（保留现有别名兼容）
 
 - [ ] **Step 1: 安装 Vitest**
@@ -229,10 +231,12 @@ git commit -m "feat(gift): add person types and relation helpers with unit tests
 ### Task 2: API 层对齐 PC（含 normalizeGiftIds）
 
 **Files:**
+
 - Modify: `src/views/finance/gift/api/index.ts`
 - Create: `src/views/finance/gift/api/normalizeGiftIds.spec.ts`
 
 **Interfaces:**
+
 - Consumes: Task1 类型
 - Produces: `normalizeGiftIds`, `getGiftPersonBusinessPage`, `getGiftPersonSummary`, `getGiftPersonProfile`, `getGiftPersonRelationOptions`, `getGiftPersonDetail`, `updateGiftPerson`, `deleteGiftPerson`；保留/改写现有 `getGiftPersonPage` / `addGiftPerson` / `getGiftPersonList`
 
@@ -273,7 +277,9 @@ Expected: FAIL（未导出）
 按 PC `alex_miaosha_front/src/views/finance/gift/api/index.ts` 移植 person 段：
 
 ```ts
-export function normalizeGiftIds<T>(value: T): T { /* 同 PC */ }
+export function normalizeGiftIds<T>(value: T): T {
+	/* 同 PC */
+}
 
 function normalizeGiftResponse<T>(response: ResponseBody<T>): ResponseBody<T> {
 	if (!response.data) return response;
@@ -286,8 +292,7 @@ export const getGiftPersonBusinessPage = (params, pageNum?, pageSize?) =>
 		pageSize: pageSize || 10,
 	}).then(normalizeGiftResponse);
 
-export const getGiftPersonSummary = () =>
-	getData(`${baseUrl(api.person)}/summary`);
+export const getGiftPersonSummary = () => getData(`${baseUrl(api.person)}/summary`);
 
 export const getGiftPersonProfile = (id: string) =>
 	getData(`${baseUrl(api.person)}/profile`, { id }).then(normalizeGiftResponse);
@@ -301,8 +306,7 @@ export const getGiftPersonDetail = (id: string) =>
 export const updateGiftPerson = (params: GiftPersonInfo) =>
 	putData(baseUrl(api.person), normalizeGiftIds(params));
 
-export const deleteGiftPerson = (ids: string) =>
-	deleteData(baseUrl(api.person), { ids });
+export const deleteGiftPerson = (ids: string) => deleteData(baseUrl(api.person), { ids });
 ```
 
 注意：mobile 用 `getData`（无 `getDataOne`）。`addGiftPerson` / `getGiftPersonPage` / `getGiftPersonList` 补上 `.then(normalizeGiftResponse)` 与入参 `normalizeGiftIds`。
@@ -320,6 +324,7 @@ git commit -m "feat(gift): align person APIs with ID normalization"
 ### Task 3: 权限基建 `usePermission`
 
 **Files:**
+
 - Modify: `src/utils/permission/index.ts`
 - Modify: `src/store/modules/user/user.ts`
 - Modify: `src/store/modules/user/typing.ts`（如需）
@@ -327,6 +332,7 @@ git commit -m "feat(gift): align person APIs with ID normalization"
 - Create: `src/utils/permission/permission.spec.ts`
 
 **Interfaces:**
+
 - Consumes: login `admin` / `roleInfo.permissionList`
 - Produces: `normalizePermissionContext`, `buildPermissionSet`, `canAccessPermission`, `isSuperAdmin`, `usePermission().hasPermission`
 
@@ -398,11 +404,7 @@ export const usePermission = () => {
 	const context = computed(() => userStore.getPermissionContext);
 	const permissionSet = computed(() => buildPermissionSet(context.value));
 	const hasPermission = (permissionCode?: string) =>
-		canAccessPermission(
-			permissionSet.value,
-			permissionCode,
-			judgeSuperAdmin(context.value),
-		);
+		canAccessPermission(permissionSet.value, permissionCode, judgeSuperAdmin(context.value));
 	return {
 		permissionContext: context,
 		permissionSet,
@@ -425,9 +427,11 @@ git commit -m "feat: add usePermission for gift button codes"
 ### Task 4: `useGiftRelationOptions`
 
 **Files:**
+
 - Create: `src/composables/useGiftRelationOptions.ts`
 
 **Interfaces:**
+
 - Consumes: `getGiftPersonRelationOptions`, Task1 helpers
 - Produces: 与 PC 同名返回值：`loadRelationOptions`, `relationLabel`, `quickRelations`, `mapRelationToFormFields`, `resolveFilterRelationType`, `presetOptions`, `relationSelectOptions`
 
@@ -453,10 +457,12 @@ git commit -m "feat(gift): add useGiftRelationOptions composable"
 ### Task 5: 列表页 `person/index.vue`
 
 **Files:**
+
 - Modify: `src/views/finance/gift/person/index.vue`
 - Modify: `src/views/finance/gift/shared.less`（如需卡片样式）
 
 **Interfaces:**
+
 - Consumes: `getGiftPersonBusinessPage`, `getGiftPersonSummary`, `useGiftRelationOptions`, `usePermission`, `GIFT_PERSON_DETAIL_NAME`, `getRoutePathByName`
 
 - [ ] **Step 1: 删除页内 Popup 快速新增；改为路由跳转详情**
@@ -470,11 +476,12 @@ import { usePagination } from '@/composables/usePagination';
 import { usePermission } from '@/composables/usePermission';
 import { useGiftRelationOptions } from '@/composables/useGiftRelationOptions';
 import { getRoutePathByName } from '@/utils/router';
-import {
-	getGiftPersonBusinessPage,
-	getGiftPersonSummary,
-} from '@/views/finance/gift/api';
-import type { GiftPersonBusinessInfo, GiftPersonQuery, GiftPersonSummary } from '@/views/finance/gift/config';
+import { getGiftPersonBusinessPage, getGiftPersonSummary } from '@/views/finance/gift/api';
+import type {
+	GiftPersonBusinessInfo,
+	GiftPersonQuery,
+	GiftPersonSummary,
+} from '@/views/finance/gift/config';
 import {
 	GIFT_PERSON_DETAIL_NAME,
 	directionText,
@@ -484,12 +491,8 @@ import {
 
 const router = useRouter();
 const { hasPermission } = usePermission();
-const {
-	quickRelations,
-	loadRelationOptions,
-	relationLabel,
-	resolveFilterRelationType,
-} = useGiftRelationOptions();
+const { quickRelations, loadRelationOptions, relationLabel, resolveFilterRelationType } =
+	useGiftRelationOptions();
 
 const detailPath = () => getRoutePathByName(router, GIFT_PERSON_DETAIL_NAME);
 
@@ -514,6 +517,7 @@ useNavBar({
 ```
 
 模板要点：
+
 - `data-testid="gift-person-search"` / `gift-person-list` / `gift-person-card` / `gift-person-relation-tag`
 - 汇总区：`summary.personCount` / `yearTotalAmount` / `pendingReturnAmount`
 - 卡片展示 `formatMoney(totalGiveAmount/totalReceiveAmount)`、`latestRecordTime`、`relationLabel(relationType)`
@@ -536,14 +540,17 @@ git commit -m "feat(gift): upgrade mobile person list with business page"
 ### Task 6: 详情页 `giftPersonDetail`
 
 **Files:**
+
 - Create: `src/views/finance/gift/person/giftPersonDetail/index.vue`
 
 **Interfaces:**
+
 - Consumes: profile/detail/add/update/delete API、`useGiftRelationOptions`、`usePermission`、`buildRelationTypeForSave`
 
 - [ ] **Step 1: 新建页面**
 
 行为：
+
 - `route.query.id` 无 → `mode='form'` 新增
 - 有 id → 默认 `mode='profile'`；点编辑 → `mode='form'` 并 `getGiftPersonDetail`
 - NavBar：`leftPath` 用 `getRoutePathByName(router, 'giftPerson')`；标题随模式变
@@ -575,6 +582,7 @@ git commit -m "feat(gift): add giftPersonDetail profile and form page"
 ### Task 7: `t_menu_info` SQL + 文档
 
 **Files:**
+
 - Create: `f:/workplace/project/myself/backend/alex_miaosha/doc/sql/gift_person_detail_menu_20260720.sql`
 - Modify: `DEVELOPMENT.md`（§9 亲友管理补充）
 - Modify: `feature.md`（亲友管理能力说明）
@@ -633,6 +641,7 @@ git commit -m "chore(sql): add giftPersonDetail menu for mobile"
 ### Task 8: Checklist + Midscene
 
 **Files:**
+
 - Create: `tests/checklists/gift-person-mobile.md`
 - Modify: `tests/midscene/gift/cases/mobile-smoke.json`（或新增 `person-flow.json`）
 - Modify: `scripts/midscene/run-gift-smoke.mjs`（若需加载新 case 文件）
@@ -718,16 +727,16 @@ git commit -m "chore: update graphify after gift person mobile"
 
 ## Self-Review (plan vs spec)
 
-| Spec 要求 | Task |
-|-----------|------|
-| business-page 列表 + 汇总 + 关系筛选 | Task 5 |
-| giftPersonDetail 档案/表单/删除 | Task 6 |
-| API/normalizeGiftIds/类型 | Task 1–2 |
-| usePermission + gift:view/add/edit/delete | Task 3, 5–6 |
-| useGiftRelationOptions | Task 4 |
-| t_menu_info 隐藏菜单 | Task 7 |
-| checklist + Midscene | Task 8 |
-| 不做导出/批量标签 | 全任务未包含 |
-| DEVELOPMENT/feature/graphify | Task 7, 9 |
+| Spec 要求                                 | Task         |
+| ----------------------------------------- | ------------ |
+| business-page 列表 + 汇总 + 关系筛选      | Task 5       |
+| giftPersonDetail 档案/表单/删除           | Task 6       |
+| API/normalizeGiftIds/类型                 | Task 1–2     |
+| usePermission + gift:view/add/edit/delete | Task 3, 5–6  |
+| useGiftRelationOptions                    | Task 4       |
+| t_menu_info 隐藏菜单                      | Task 7       |
+| checklist + Midscene                      | Task 8       |
+| 不做导出/批量标签                         | 全任务未包含 |
+| DEVELOPMENT/feature/graphify              | Task 7, 9    |
 
 无 TBD；命名与 Task 间接口一致（`GIFT_PERSON_DETAIL_NAME='giftPersonDetail'`、`normalizeGiftIds`、`hasPermission`）。

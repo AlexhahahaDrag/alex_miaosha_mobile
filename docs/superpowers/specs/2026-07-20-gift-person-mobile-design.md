@@ -28,15 +28,15 @@
 
 ### 已有菜单
 
-| name | path | component | permission | hide_in_menu |
-|------|------|-----------|------------|--------------|
-| `giftPerson` | `/finance/gift/person` | `/src/views/finance/gift/person/index.vue` | `gift:person` | `0` |
+| name         | path                   | component                                  | permission    | hide_in_menu |
+| ------------ | ---------------------- | ------------------------------------------ | ------------- | ------------ |
+| `giftPerson` | `/finance/gift/person` | `/src/views/finance/gift/person/index.vue` | `gift:person` | `0`          |
 
 ### 需新增隐藏菜单
 
-| name | path | component | permission | hide_in_menu |
-|------|------|-----------|------------|--------------|
-| `giftPersonDetail` | `/finance/gift/person/giftPersonDetail` | `/src/views/finance/gift/person/giftPersonDetail/index.vue` | `gift:person` | `1` |
+| name               | path                                    | component                                                   | permission    | hide_in_menu |
+| ------------------ | --------------------------------------- | ----------------------------------------------------------- | ------------- | ------------ |
+| `giftPersonDetail` | `/finance/gift/person/giftPersonDetail` | `/src/views/finance/gift/person/giftPersonDetail/index.vue` | `gift:person` | `1`          |
 
 parent：礼尚往来顶级菜单 `gift`（id `1900000000000001000`），命名与路径遵循现有 mobile 惯例（如 `menuInfoDetail`、`personalGiftDetail`）。
 
@@ -58,14 +58,14 @@ parent：礼尚往来顶级菜单 `gift`（id `1900000000000001000`），命名�
 
 ### API（`src/views/finance/gift/api/index.ts`，对齐 PC）
 
-| 方法 | 路径意图 | 用途 |
-|------|----------|------|
-| `getGiftPersonBusinessPage` | `POST .../gift-person-info-t/business-page` | 列表（收支、最后往来） |
-| `getGiftPersonSummary` | `GET .../summary` | 汇总 |
-| `getGiftPersonProfile` | `GET .../profile?id=` | 档案 + 往来历史 |
-| `getGiftPersonRelationOptions` | `GET .../relation-options` | 关系预设/自定义 |
-| `getGiftPersonDetail` | `GET .../gift-person-info-t?id=` | 单条（表单回填备用） |
-| `addGiftPerson` / `updateGiftPerson` / `deleteGiftPerson` | POST/PUT/DELETE | CRUD |
+| 方法                                                      | 路径意图                                    | 用途                   |
+| --------------------------------------------------------- | ------------------------------------------- | ---------------------- |
+| `getGiftPersonBusinessPage`                               | `POST .../gift-person-info-t/business-page` | 列表（收支、最后往来） |
+| `getGiftPersonSummary`                                    | `GET .../summary`                           | 汇总                   |
+| `getGiftPersonProfile`                                    | `GET .../profile?id=`                       | 档案 + 往来历史        |
+| `getGiftPersonRelationOptions`                            | `GET .../relation-options`                  | 关系预设/自定义        |
+| `getGiftPersonDetail`                                     | `GET .../gift-person-info-t?id=`            | 单条（表单回填备用）   |
+| `addGiftPerson` / `updateGiftPerson` / `deleteGiftPerson` | POST/PUT/DELETE                             | CRUD                   |
 
 所有 `*Id` / `id` 经 `normalizeGiftIds` 转为 **string**，禁止按 number 处理。
 
@@ -107,18 +107,18 @@ parent：礼尚往来顶级菜单 `gift`（id `1900000000000001000`），命名�
 ### 详情
 
 - 档案：指标 + 基本信息 + 往来历史
-- 表单：姓名*、手机、关系 Picker（预设 + 自定义输入）、备注
+- 表单：姓名\*、手机、关系 Picker（预设 + 自定义输入）、备注
 - 底栏按权限显隐：编辑 / 删除 / 保存
 - 可交互节点挂 `data-testid`
 
 ### 权限矩阵
 
-| 能力 | 权限码 |
-|------|--------|
-| 进详情 | `gift:view` |
-| 新增 | `gift:add` |
-| 编辑 | `gift:edit` |
-| 删除 | `gift:delete` |
+| 能力     | 权限码                    |
+| -------- | ------------------------- |
+| 进详情   | `gift:view`               |
+| 新增     | `gift:add`                |
+| 编辑     | `gift:edit`               |
+| 删除     | `gift:delete`             |
 | 页面可见 | `gift:person`（菜单已控） |
 
 无权限隐藏按钮；写操作仍以后端鉴权为准。
@@ -135,12 +135,12 @@ parent：礼尚往来顶级菜单 `gift`（id `1900000000000001000`），命名�
 
 ## 5. 测试
 
-| 层 | 内容 |
-|----|------|
-| 单元 | `normalizeGiftIds`；关系映射；`hasPermission` 边界 |
-| 组件/集成 | 列表分页筛选；详情档案/表单切换；无权限按钮隐藏 |
-| Midscene | 扩 `tests/midscene/gift/cases/`：进 person → 新增 → 详情 → 编辑 → 删除；`waitForResponse` 等 business-page/profile；try/finally API 清理 |
-| Checklist | 新增 `tests/checklists/gift-person-mobile.md`（七点法、状态、权限矩阵、不测理由） |
+| 层        | 内容                                                                                                                                     |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| 单元      | `normalizeGiftIds`；关系映射；`hasPermission` 边界                                                                                       |
+| 组件/集成 | 列表分页筛选；详情档案/表单切换；无权限按钮隐藏                                                                                          |
+| Midscene  | 扩 `tests/midscene/gift/cases/`：进 person → 新增 → 详情 → 编辑 → 删除；`waitForResponse` 等 business-page/profile；try/finally API 清理 |
+| Checklist | 新增 `tests/checklists/gift-person-mobile.md`（七点法、状态、权限矩阵、不测理由）                                                        |
 
 Persona：`super_super` / `gift_admin` / `gift_user`（无 edit 时隐藏编辑）。
 
