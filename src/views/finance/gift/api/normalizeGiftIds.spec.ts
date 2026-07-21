@@ -4,8 +4,9 @@ import { normalizeGiftIds } from './normalizeGiftIds';
 describe('normalizeGiftIds', () => {
 	it('stringifies id and *Id fields recursively', () => {
 		const input = {
-			id: 1900000000000001002,
-			giverPersonId: 9001n,
+			// 雪花 ID 用 bigint，避免 Number 字面量精度丢失
+			id: 1900000000000001002n,
+			giverPersonId: 9001,
 			nested: { eventId: 42, name: 'x' },
 			list: [{ receiverPersonId: 7 }],
 		};
