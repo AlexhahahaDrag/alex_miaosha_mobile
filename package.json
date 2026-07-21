@@ -25,10 +25,12 @@
 		"graphify:update": "python -m graphify update src && npm run graphify:augment",
 		"graphify:codex": "python -m graphify codex install",
 		"graphify:antigravity": "python -m graphify antigravity install",
+		"test:unit": "vitest run",
 		"test:hooks": "echo 'Testing Git hooks setup...' && npm run lint:staged",
 		"prepare": "husky"
 	},
 	"dependencies": {
+		"@rollup/rollup-win32-x64-msvc": "^4.62.2",
 		"@tsparticles/slim": "^3.7.1",
 		"@tsparticles/vue3": "^3.0.1",
 		"axios": "^1.15.0",
@@ -80,6 +82,7 @@
 		"vite-plugin-compression": "^0.5.1",
 		"vite-plugin-qrcode": "^0.4.1",
 		"vite-plugin-svg-icons-ng": "^1.7.0",
+		"vitest": "^3.2.4",
 		"vue-eslint-parser": "^10.4.0"
 	},
 	"lint-staged": {
