@@ -21,6 +21,69 @@
 	height: calc(100% - 62px);
 }
 
+.gift-refresh--person {
+	height: calc(100% - 168px);
+}
+
+.relation-tags {
+	display: flex;
+	gap: 8px;
+	padding: 0 16px 8px;
+	overflow-x: auto;
+}
+
+.relation-tags__item {
+	flex: 0 0 auto;
+	padding: 6px 12px;
+	border: 0;
+	border-radius: 999px;
+	background: #eef5fb;
+	color: #5b6b7c;
+	font-size: 12px;
+}
+
+.relation-tags__item.active {
+	background: #2098ee;
+	color: #fff;
+}
+
+.person-summary {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 8px;
+	padding: 0 16px 10px;
+}
+
+.person-summary__item {
+	padding: 12px;
+	background: #fff;
+	border-radius: 16px;
+	box-shadow: 0 6px 18px rgba(32, 152, 238, 0.06);
+}
+
+.person-summary__item span {
+	display: block;
+	color: #8a94a6;
+	font-size: 12px;
+}
+
+.person-summary__item strong {
+	display: block;
+	margin-top: 6px;
+	color: #1f2937;
+	font-size: 16px;
+}
+
+.person-summary__pending {
+	grid-column: 1 / -1;
+	padding: 10px 12px;
+	border-radius: 12px;
+	background: #eaf6ff;
+	color: #1478d4;
+	font-size: 12px;
+	font-weight: 600;
+}
+
 .person-card {
 	display: flex;
 	align-items: center;

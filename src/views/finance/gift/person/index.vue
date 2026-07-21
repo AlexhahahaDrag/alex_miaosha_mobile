@@ -3,27 +3,55 @@
 		<section class="search-shell">
 			<van-search
 				v-model="searchInfo.keyword"
+				data-testid="gift-person-search"
 				placeholder="搜索亲友姓名或手机号"
 				shape="round"
 				@search="refresh"
 				@clear="refresh"
 			/>
-			<van-button
-				icon="plus"
-				type="primary"
-				round
-				size="small"
-				@click="openCreate"
-			>新增</van-button>
 		</section>
+
+		<section
+			v-if="quickRelations.length"
+			class="relation-tags"
+			data-testid="gift-person-relation-tags"
+		>
+			<button
+				v-for="item in quickRelations"
+				:key="item.id"
+				type="button"
+				:class="['relation-tags__item', { active: searchInfo.relationType === resolveFilterRelationType(item.id) }]"
+				data-testid="gift-person-relation-tag"
+				@click="selectRelation(item.id)"
+			>
+				{{ item.name }}
+			</button>
+		</section>
+
+		<section
+			class="person-summary"
+			data-testid="gift-person-summary"
+		>
+			<div class="person-summary__item">
+				<span>总联系人</span>
+				<strong>{{ summary.personCount || 0 }}</strong>
+			</div>
+			<div class="person-summary__item">
+				<span>年度往来</span>
+				<strong>{{ formatMoney(summary.yearTotalAmount) }}</strong>
+			</div>
+			<div class="person-summary__pending"> 待回礼 {{ formatMoney(summary.pendingReturnAmount) }} </div>
+		</section>
+
 		<common-pull-refresh
 			v-model="refreshing"
-			class="gift-refresh"
+			class="gift-refresh gift-refresh--person"
 			@refresh="refresh"
 		>
 			<common-list
 				id="gift-person-list"
 				v-model="loading"
+				data-testid="gift-person-list"
 				:loading="loading"
 				:refreshing="refreshing"
 				:finished="finished"
@@ -31,83 +59,96 @@
 				empty-text="暂无亲友"
 				@load="loadMore"
 			>
+				<template #skeleton>
+					<div
+						v-for="i in 4"
+						:key="i"
+						class="person-card person-card--skeleton"
+					>
+						<van-skeleton
+							title
+							:row="3"
+						/>
+					</div>
+				</template>
 				<div
 					v-for="item in dataSource"
 					:key="item.id"
 					class="person-card"
+					data-testid="gift-person-card"
+					@click="openDetail(item.id)"
 				>
 					<div class="avatar">{{ (item.personName || '?').slice(0, 1) }}</div>
 					<div class="person-card__main">
 						<strong>{{ item.personName || '未命名' }}</strong>
-						<span>{{ item.phone || '无手机号' }} · {{ item.relationType || '其他' }}</span>
-						<p>{{ item.remark || '无备注' }}</p>
+						<span> {{ item.phone || '无手机号' }} · {{ relationLabel(item.relationType) }} </span>
+						<p>
+							出 {{ formatMoney(item.totalGiveAmount) }} / 入
+							{{ formatMoney(item.totalReceiveAmount) }}
+						</p>
+						<p>
+							{{ item.latestRecordTime || '暂无往来' }}
+							<template v-if="item.latestDirection"> · {{ directionText(item.latestDirection) }} </template>
+						</p>
 					</div>
 				</div>
 			</common-list>
 		</common-pull-refresh>
-		<van-popup
-			v-model:show="showCreate"
-			position="bottom"
-			round
-		>
-			<div class="form-panel">
-				<h3>快速新增亲友</h3>
-				<van-form @submit="savePerson">
-					<van-field
-						v-model="formInfo.personName"
-						label="姓名"
-						:rules="[{ required: true, message: '请输入姓名' }]"
-					/>
-					<van-field
-						v-model="formInfo.phone"
-						label="手机号"
-					/>
-					<van-field
-						v-model="formInfo.relationType"
-						label="关系"
-					/>
-					<van-field
-						v-model="formInfo.remark"
-						label="备注"
-						type="textarea"
-						rows="2"
-						autosize
-					/>
-					<van-button
-						block
-						round
-						type="primary"
-						native-type="submit"
-					>保存</van-button>
-				</van-form>
-			</div>
-		</van-popup>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { showFailToast, showSuccessToast } from 'vant';
+import { showFailToast } from 'vant';
 import { useNavBar } from '@/composables/useNavBar';
 import { usePagination } from '@/composables/usePagination';
-import CommonPullRefresh from '@/views/components/CommonPullRefresh.vue';
-import CommonList from '@/views/components/CommonList.vue';
-import { addGiftPerson, getGiftPersonPage } from '@/views/finance/gift/api';
-import type { GiftPersonInfo } from '@/views/finance/gift/config';
+import { usePermission } from '@/composables/usePermission';
+import { useGiftRelationOptions } from '@/composables/useGiftRelationOptions';
+import { getRoutePathByName } from '@/utils/router';
+import { getGiftPersonBusinessPage, getGiftPersonSummary } from '@/views/finance/gift/api';
+import type { GiftPersonBusinessInfo, GiftPersonQuery, GiftPersonSummary } from '@/views/finance/gift/config';
+import { GIFT_PERSON_DETAIL_NAME, directionText, formatMoney } from '@/views/finance/gift/config';
 
-useNavBar({ title: '亲友管理', rightButton: '新增', visible: true, onRightClick: () => openCreate() });
+const router = useRouter();
+const { hasPermission } = usePermission();
+const { quickRelations, loadRelationOptions, relationLabel, resolveFilterRelationType } = useGiftRelationOptions();
 
 const loading = ref(false);
 const refreshing = ref(false);
 const finished = ref(false);
-const showCreate = ref(false);
-const dataSource = ref<GiftPersonInfo[]>([]);
-const searchInfo = ref<{ keyword?: string }>({});
-const formInfo = ref<GiftPersonInfo>({});
+const dataSource = ref<GiftPersonBusinessInfo[]>([]);
+const searchInfo = ref<GiftPersonQuery>({});
+const summary = ref<GiftPersonSummary>({});
 const { pagination, resetPagination, setTotal, nextPage } = usePagination();
+
+const detailPath = () => getRoutePathByName(router, GIFT_PERSON_DETAIL_NAME, '/finance/gift/person/giftPersonDetail');
+
+const openCreate = () => {
+	if (!hasPermission('gift:add')) return;
+	navigator.vibrate?.(50);
+	router.push({ path: detailPath() });
+};
+
+const openDetail = (id?: string) => {
+	if (!id || !hasPermission('gift:view')) return;
+	navigator.vibrate?.(50);
+	router.push({ path: detailPath(), query: { id: String(id) } });
+};
+
+useNavBar({
+	title: '亲友管理',
+	rightButton: hasPermission('gift:add') ? '新增' : '',
+	visible: true,
+	onRightClick: openCreate,
+});
+
+const loadSummary = async () => {
+	const { code, data } = await getGiftPersonSummary();
+	if (code === '200') summary.value = data || {};
+};
 
 const load = async () => {
 	loading.value = true;
-	const { code, data, message } = await getGiftPersonPage(
+	const { code, data, message } = await getGiftPersonBusinessPage(
 		searchInfo.value,
 		pagination.current,
 		pagination.pageSize,
@@ -116,7 +157,10 @@ const load = async () => {
 		refreshing.value = false;
 	});
 	if (code !== '200') return showFailToast(message || '亲友加载失败');
-	const list = data?.records || [];
+	const list = (data?.records || []).map((item) => ({
+		...item,
+		id: item.id != null ? String(item.id) : item.id,
+	}));
 	dataSource.value = pagination.current === 1 ? list : [...dataSource.value, ...list];
 	setTotal(data?.total || 0);
 	nextPage();
@@ -126,24 +170,23 @@ const load = async () => {
 const refresh = () => {
 	finished.value = false;
 	resetPagination();
+	void loadSummary();
 	void load();
 };
+
 const loadMore = () => load();
-const openCreate = () => {
+
+const selectRelation = (presetId: string) => {
 	navigator.vibrate?.(50);
-	formInfo.value = {};
-	showCreate.value = true;
-};
-const savePerson = async () => {
-	const { code, message } = await addGiftPerson(formInfo.value);
-	if (code === '200') {
-		showSuccessToast('保存成功');
-		showCreate.value = false;
-		refresh();
-	} else showFailToast(message || '保存失败');
+	const relationType = resolveFilterRelationType(presetId);
+	searchInfo.value.relationType = searchInfo.value.relationType === relationType ? undefined : relationType;
+	refresh();
 };
 
-refresh();
+onMounted(async () => {
+	await loadRelationOptions();
+	refresh();
+});
 </script>
 
 <style scoped lang="less">
