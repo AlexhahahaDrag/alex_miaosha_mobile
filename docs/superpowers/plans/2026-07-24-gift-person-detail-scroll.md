@@ -21,26 +21,28 @@
 
 ## File Map
 
-| File | Responsibility |
-|---|---|
-| `src/views/finance/gift/person/giftPersonDetail/index.vue` | 当前 bug 页：根节点补 border-box |
-| `src/views/finance/gift/analysis/index.vue` | 同类根节点 |
-| `src/views/finance/financeAnalysis/financeAnalysisDetail/overview.vue` | 同类根节点 |
-| `src/views/finance/financeAnalysis/financeAnalysisDetail/incomeAnalysis.vue` | 同类根节点 |
-| `src/views/finance/financeAnalysis/financeAnalysisDetail/incomeDetail.vue` | 同类根节点 |
-| `src/views/finance/shopStockBatch/shopStockBatchDetail/index.vue` | 同类根节点（padding-bottom） |
-| `src/views/selfFinance/prepaidCardInfoT/consume-overview-info/index.vue` | 同类根节点（padding 上下） |
-| `DEVELOPMENT.md` | 记录根节点约束 |
+| File                                                                         | Responsibility                   |
+| ---------------------------------------------------------------------------- | -------------------------------- |
+| `src/views/finance/gift/person/giftPersonDetail/index.vue`                   | 当前 bug 页：根节点补 border-box |
+| `src/views/finance/gift/analysis/index.vue`                                  | 同类根节点                       |
+| `src/views/finance/financeAnalysis/financeAnalysisDetail/overview.vue`       | 同类根节点                       |
+| `src/views/finance/financeAnalysis/financeAnalysisDetail/incomeAnalysis.vue` | 同类根节点                       |
+| `src/views/finance/financeAnalysis/financeAnalysisDetail/incomeDetail.vue`   | 同类根节点                       |
+| `src/views/finance/shopStockBatch/shopStockBatchDetail/index.vue`            | 同类根节点（padding-bottom）     |
+| `src/views/selfFinance/prepaidCardInfoT/consume-overview-info/index.vue`     | 同类根节点（padding 上下）       |
+| `DEVELOPMENT.md`                                                             | 记录根节点约束                   |
 
 ---
 
 ### Task 1: Fix giftPersonDetail (primary bug)
 
 **Files:**
+
 - Modify: `src/views/finance/gift/person/giftPersonDetail/index.vue` (`.gift-person-detail` style block)
 - Test: manual DevTools on 新增联系人
 
 **Interfaces:**
+
 - Consumes: none
 - Produces: `.gift-person-detail` uses `box-sizing: border-box`
 
@@ -94,6 +96,7 @@ git commit -m "fix(gift): prevent empty Y-scroll on person detail form"
 ### Task 2: Fix remaining same-pattern page roots
 
 **Files:**
+
 - Modify: `src/views/finance/gift/analysis/index.vue` (`.gift-analysis`)
 - Modify: `src/views/finance/financeAnalysis/financeAnalysisDetail/overview.vue` (`.overview-container`)
 - Modify: `src/views/finance/financeAnalysis/financeAnalysisDetail/incomeAnalysis.vue` (`.analysis-container`)
@@ -102,6 +105,7 @@ git commit -m "fix(gift): prevent empty Y-scroll on person detail form"
 - Modify: `src/views/selfFinance/prepaidCardInfoT/consume-overview-info/index.vue` (`.consume-overview-container`)
 
 **Interfaces:**
+
 - Consumes: Task 1 确认的规则（`min-height: 100%` + padding → `border-box`）
 - Produces: 上述根 class 均含 `box-sizing: border-box`
 
@@ -191,10 +195,12 @@ git commit -m "fix(ui): border-box page roots to stop empty Y-scroll"
 ### Task 3: Document constraint + graphify
 
 **Files:**
+
 - Modify: `DEVELOPMENT.md`（§1 全局 UI 架构附近新增一条）
 - Run: `npm run graphify:update`
 
 **Interfaces:**
+
 - Consumes: §4 修复规则（spec）
 - Produces: DEVELOPMENT.md 约束条文
 
@@ -225,12 +231,12 @@ git commit -m "docs: note min-height+padding requires border-box on page roots"
 
 ## Spec Coverage Checklist
 
-| Spec item | Task |
-|---|---|
-| 不动 layout 滚动契约 | Global Constraints + 无 layout 改动任务 |
-| giftPersonDetail border-box | Task 1 |
-| gift/analysis + financeAnalysisDetail + shopStockBatchDetail + consume-overview | Task 2 |
-| 排除 cpn-user-coupon-info | Global Constraints |
-| 验收短内容无滚 / 长内容可滚 | Task 1 Step 2–3, Task 2 Step 5 |
-| DEVELOPMENT.md 约束 | Task 3 |
-| 无强制 E2E | 全计划仅手动验收 |
+| Spec item                                                                       | Task                                    |
+| ------------------------------------------------------------------------------- | --------------------------------------- |
+| 不动 layout 滚动契约                                                            | Global Constraints + 无 layout 改动任务 |
+| giftPersonDetail border-box                                                     | Task 1                                  |
+| gift/analysis + financeAnalysisDetail + shopStockBatchDetail + consume-overview | Task 2                                  |
+| 排除 cpn-user-coupon-info                                                       | Global Constraints                      |
+| 验收短内容无滚 / 长内容可滚                                                     | Task 1 Step 2–3, Task 2 Step 5          |
+| DEVELOPMENT.md 约束                                                             | Task 3                                  |
+| 无强制 E2E                                                                      | 全计划仅手动验收                        |

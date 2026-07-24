@@ -56,21 +56,21 @@
 
 ## 5. 工具函数（`src/views/finance/gift/config.ts`）
 
-| 函数 | 行为 |
-|---|---|
-| `maskPhone(phone?: string): string` | 11 位国内号 → `182 **** 2222`；空 → `''`；非 11 位 → 原样返回 |
-| `shouldCollapseRemark(text?: string, limit = 60): boolean` | `trim` 后长度 `> limit` 为 true |
-| `collapseRemark(text?: string, limit = 60): string` | 折叠时截断并加 `…`（实现细节在 plan 中写死） |
+| 函数                                                       | 行为                                                          |
+| ---------------------------------------------------------- | ------------------------------------------------------------- |
+| `maskPhone(phone?: string): string`                        | 11 位国内号 → `182 **** 2222`；空 → `''`；非 11 位 → 原样返回 |
+| `shouldCollapseRemark(text?: string, limit = 60): boolean` | `trim` 后长度 `> limit` 为 true                               |
+| `collapseRemark(text?: string, limit = 60): string`        | 折叠时截断并加 `…`（实现细节在 plan 中写死）                  |
 
 拨号/复制逻辑留在页面方法（依赖浏览器 API），不强制抽到 config。
 
 ## 6. data-testid
 
-| 元素 | testid |
-|---|---|
-| 显隐手机号 | `gift-person-phone-toggle` |
-| 拨号 | `gift-person-phone-call` |
-| 复制 | `gift-person-phone-copy` |
+| 元素          | testid                      |
+| ------------- | --------------------------- |
+| 显隐手机号    | `gift-person-phone-toggle`  |
+| 拨号          | `gift-person-phone-call`    |
+| 复制          | `gift-person-phone-copy`    |
 | 备注展开/收起 | `gift-person-remark-toggle` |
 
 图标按钮需 `aria-label`：`显示手机号` / `隐藏手机号` / `拨打电话` / `复制手机号`。
@@ -94,5 +94,5 @@
 
 ## 10. 后续子项目（备忘，不在本 spec）
 
-2. 往来历史「全部」+ 分页/无限滚动  
+2. 往来历史「全部」+ 分页/无限滚动
 3. 危险按钮弱化、金额徽标、吸底 + `safe-area-inset-bottom`

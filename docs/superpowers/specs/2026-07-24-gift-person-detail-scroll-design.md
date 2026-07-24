@@ -14,9 +14,9 @@
 
 ```css
 .content-container {
-  flex: 1;
-  overflow-y: auto;
-  height: 0; /* flex 子项高度约束 */
+	flex: 1;
+	overflow-y: auto;
+	height: 0; /* flex 子项高度约束 */
 }
 ```
 
@@ -24,9 +24,9 @@
 
 ```css
 .gift-person-detail {
-  min-height: 100%;
-  padding: 16px;
-  /* 无 box-sizing: border-box */
+	min-height: 100%;
+	padding: 16px;
+	/* 无 box-sizing: border-box */
 }
 ```
 
@@ -42,23 +42,23 @@
 
 页面根节点：
 
-| 条件 | 处理 |
-|---|---|
+| 条件                          | 处理                                                 |
+| ----------------------------- | ---------------------------------------------------- |
 | 需要背景铺满 + 有垂直 padding | 保留 `min-height: 100%`，补 `box-sizing: border-box` |
-| 不需要背景铺满 | 删除 `min-height: 100%` |
+| 不需要背景铺满                | 删除 `min-height: 100%`                              |
 
 ## 5. 改动清单
 
-| 文件 | 处理 |
-|---|---|
-| `src/views/finance/gift/person/giftPersonDetail/index.vue` | `border-box`（当前 bug） |
-| `src/views/finance/gift/analysis/index.vue` | `border-box` |
-| `src/views/finance/financeAnalysis/financeAnalysisDetail/overview.vue` | `border-box` |
-| `src/views/finance/financeAnalysis/financeAnalysisDetail/incomeAnalysis.vue` | `border-box` |
-| `src/views/finance/financeAnalysis/financeAnalysisDetail/incomeDetail.vue` | `border-box` |
-| `src/views/finance/shopStockBatch/shopStockBatchDetail/index.vue` | `border-box`（含 `padding-bottom: 40px`） |
-| `src/views/selfFinance/prepaidCardInfoT/consume-overview-info/index.vue` | 按规则补 `border-box` 或删 `min-height` |
-| `DEVELOPMENT.md` | 补一条根节点约束说明 |
+| 文件                                                                         | 处理                                      |
+| ---------------------------------------------------------------------------- | ----------------------------------------- |
+| `src/views/finance/gift/person/giftPersonDetail/index.vue`                   | `border-box`（当前 bug）                  |
+| `src/views/finance/gift/analysis/index.vue`                                  | `border-box`                              |
+| `src/views/finance/financeAnalysis/financeAnalysisDetail/overview.vue`       | `border-box`                              |
+| `src/views/finance/financeAnalysis/financeAnalysisDetail/incomeAnalysis.vue` | `border-box`                              |
+| `src/views/finance/financeAnalysis/financeAnalysisDetail/incomeDetail.vue`   | `border-box`                              |
+| `src/views/finance/shopStockBatch/shopStockBatchDetail/index.vue`            | `border-box`（含 `padding-bottom: 40px`） |
+| `src/views/selfFinance/prepaidCardInfoT/consume-overview-info/index.vue`     | 按规则补 `border-box` 或删 `min-height`   |
+| `DEVELOPMENT.md`                                                             | 补一条根节点约束说明                      |
 
 ## 6. 验收
 

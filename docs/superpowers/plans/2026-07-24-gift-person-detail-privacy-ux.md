@@ -26,22 +26,24 @@
 
 ## File Map
 
-| File | Responsibility |
-|---|---|
-| `src/views/finance/gift/config.ts` | `maskPhone` / `shouldCollapseRemark` / `collapseRemark` |
-| `src/views/finance/gift/config.spec.ts` | 上述函数 Vitest |
-| `src/views/finance/gift/person/giftPersonDetail/index.vue` | profile UI + 拨号/复制/显隐/折叠/时间 |
-| `feature.md`（可选一句） | 隐私展示行为备忘 |
+| File                                                       | Responsibility                                          |
+| ---------------------------------------------------------- | ------------------------------------------------------- |
+| `src/views/finance/gift/config.ts`                         | `maskPhone` / `shouldCollapseRemark` / `collapseRemark` |
+| `src/views/finance/gift/config.spec.ts`                    | 上述函数 Vitest                                         |
+| `src/views/finance/gift/person/giftPersonDetail/index.vue` | profile UI + 拨号/复制/显隐/折叠/时间                   |
+| `feature.md`（可选一句）                                   | 隐私展示行为备忘                                        |
 
 ---
 
 ### Task 1: Phone/remark helpers (TDD)
 
 **Files:**
+
 - Modify: `src/views/finance/gift/config.ts`
 - Test: `src/views/finance/gift/config.spec.ts`
 
 **Interfaces:**
+
 - Consumes: none
 - Produces:
   - `maskPhone(phone?: string): string`
@@ -134,9 +136,11 @@ git commit -m "feat(gift): add maskPhone and remark collapse helpers"
 ### Task 2: Profile UI — header privacy actions + remark + time
 
 **Files:**
+
 - Modify: `src/views/finance/gift/person/giftPersonDetail/index.vue`
 
 **Interfaces:**
+
 - Consumes: `maskPhone`, `shouldCollapseRemark`, `collapseRemark` from `@/views/finance/gift/config`
 - Consumes: `formatTime`, `dataTimeFormat` from `@/utils/dayjs`
 - Produces: profile UI as per spec §4
@@ -397,10 +401,12 @@ git commit -m "feat(gift): privacy-friendly person detail profile header"
 ### Task 3: Docs + graphify
 
 **Files:**
+
 - Modify: `feature.md`（在礼尚往来/亲友相关小节补 1–2 句：详情默认脱敏手机号、支持显隐/拨号/复制、备注折叠、时间格式化）
 - Run graphify
 
 **Interfaces:**
+
 - Consumes: Task 1–2 行为
 - Produces: 文档与图谱同步
 
@@ -433,14 +439,14 @@ git commit -m "docs(gift): note person detail privacy UX and update graphify"
 
 ## Spec Coverage Checklist
 
-| Spec item | Task |
-|---|---|
-| 布局 B：头含关系+手机，基本信息仅备注 | Task 2 |
-| 默认脱敏 + 眼睛显隐 | Task 1 + 2 |
-| 拨号 / 复制 + toast + haptic | Task 2 |
-| 备注 >60 折叠 | Task 1 + 2 |
-| 时间 `YYYY-MM-DD HH:mm` | Task 2 |
-| testid / aria-label | Task 2 |
-| Vitest helpers | Task 1 |
-| 非目标未做 | Global Constraints |
-| feature.md + graphify | Task 3 |
+| Spec item                             | Task               |
+| ------------------------------------- | ------------------ |
+| 布局 B：头含关系+手机，基本信息仅备注 | Task 2             |
+| 默认脱敏 + 眼睛显隐                   | Task 1 + 2         |
+| 拨号 / 复制 + toast + haptic          | Task 2             |
+| 备注 >60 折叠                         | Task 1 + 2         |
+| 时间 `YYYY-MM-DD HH:mm`               | Task 2             |
+| testid / aria-label                   | Task 2             |
+| Vitest helpers                        | Task 1             |
+| 非目标未做                            | Global Constraints |
+| feature.md + graphify                 | Task 3             |

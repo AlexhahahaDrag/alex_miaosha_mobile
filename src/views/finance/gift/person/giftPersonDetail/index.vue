@@ -588,7 +588,7 @@ onMounted(() => {
 }
 
 .profile-hero__remark {
-	margin-top: 10px;
+	margin-top: 16px;
 	max-width: 100%;
 	text-align: center;
 	color: #94a3b8;
@@ -614,7 +614,7 @@ onMounted(() => {
 	padding: 0;
 	border: none;
 	background: transparent;
-	color: #2563eb;
+	color: #64748b;
 	font-size: 11px;
 	cursor: pointer;
 
@@ -626,6 +626,7 @@ onMounted(() => {
 		height: 44px;
 		border-radius: 999px;
 		background: #eff6ff;
+		color: #2563eb;
 		font-size: 20px;
 	}
 
@@ -789,12 +790,13 @@ onMounted(() => {
 	border: none;
 	padding: 10px;
 	background: transparent;
-	color: #9ca3af;
+	/* 微红灰：可读性优于纯浅灰，危险感仍克制 */
+	color: rgba(153, 27, 27, 0.55);
 	font-size: 14px;
 	cursor: pointer;
 
 	&:active {
-		color: #ef4444;
+		color: #991b1b;
 	}
 
 	&:disabled {

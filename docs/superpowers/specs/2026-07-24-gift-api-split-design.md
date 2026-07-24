@@ -44,11 +44,11 @@ gift/
 
 ## 3. Import 迁移
 
-| 调用方 | 新路径 |
-|--------|--------|
+| 调用方                                                                                           | 新路径                            |
+| ------------------------------------------------------------------------------------------------ | --------------------------------- |
 | `person/index.vue`、`person/giftPersonDetail/index.vue`、`composables/useGiftRelationOptions.ts` | `@/views/finance/gift/person/api` |
-| `event/index.vue` | `@/views/finance/gift/event/api` |
-| `record/index.vue`、`dashboard/index.vue`、`analysis/index.vue` | `@/views/finance/gift/record/api` |
+| `event/index.vue`                                                                                | `@/views/finance/gift/event/api`  |
+| `record/index.vue`、`dashboard/index.vue`、`analysis/index.vue`                                  | `@/views/finance/gift/record/api` |
 
 迁移后全仓禁止残留：
 

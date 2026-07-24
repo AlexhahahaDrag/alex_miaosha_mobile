@@ -1,116 +1,4 @@
-# Gift Person Detail Visual Redesign Implementation Plan
-
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
-
-**Goal:** 将联系人详情 profile 重构为 Hero + 胶囊栏 + Bento 金额 + 流水卡 + 渐变编辑/文字删除，并保留既有隐私交互。
-
-**Architecture:** 单文件改造 `giftPersonDetail/index.vue`；可选在 `gift/config.ts` 增加 `formatSignedMoney` / `directionIconName` 纯函数供流水卡使用。表单模式不动。无「全部」、无后端改动。
-
-**Tech Stack:** Vue 3 SFC + Less scoped + Vant icons + Vitest（helpers）
-
-## Global Constraints
-
-- 仅 profile 视觉重构；form 模式不改版。
-- 保留隐私：默认脱敏、显隐/电话/复制逻辑与 testid：`gift-person-phone-toggle` / `gift-person-phone-call` / `gift-person-phone-copy` / `gift-person-remark-toggle`。
-- 禁止 emoji；图标用 Vant SVG。
-- 不放「全部 >」；不做历史分页。
-- 删除保留 `showConfirmDialog`；文案改为「确认删除该联系人？」；按钮文案「删除联系人」。
-- 保留 `.gift-person-detail { box-sizing: border-box; min-height: 100%; }` 防空滚。
-- Token 精确值见 spec（`--gp-bg` `#F8FAFC` 等）。
-- 金额展示：现有 `formatMoney` 使用全角 `￥`；signed 助手保持同一货币符号风格。
-- auto-import 的 Vue/Vant 勿手动 import。
-- 改 `src` 后 graphify（Python 3.14 若 PATH 无模块）。
-- 提交英文 message。
-
----
-
-## File Map
-
-| File                                                       | Responsibility                            |
-| ---------------------------------------------------------- | ----------------------------------------- |
-| `src/views/finance/gift/config.ts`                         | `formatSignedMoney` / `directionIconName` |
-| `src/views/finance/gift/config.spec.ts`                    | 上述单测                                  |
-| `src/views/finance/gift/person/giftPersonDetail/index.vue` | Profile 模板与样式重构                    |
-| `feature.md`                                               | 一句视觉改版说明                          |
-
----
-
-### Task 1: Signed money + direction icon helpers (TDD)
-
-**Files:**
-
-- Modify: `src/views/finance/gift/config.ts`
-- Test: `src/views/finance/gift/config.spec.ts`
-
-**Interfaces:**
-
-- Consumes: `formatMoney`, `GiftDirection`
-- Produces:
-  - `formatSignedMoney(direction?: string, amount?: number | string): string` — `RECEIVE` → `+` + `formatMoney(amount)`；其他方向 → `-` + `formatMoney(amount)`（符号接在 `￥` 前：`+￥1.00` / `-￥1.00`）
-  - `directionIconName(direction?: string): string` — `RECEIVE` → `gift-o`；`GIVE` → `cash-back-record`；`RETURN` → `replay`；默认 `orders-o`
-
-- [ ] **Step 1: Write failing tests**
-
-```ts
-import { formatSignedMoney, directionIconName } from './config';
-
-describe('gift person visual helpers', () => {
-	it('formatSignedMoney prefixes + for RECEIVE', () => {
-		expect(formatSignedMoney('RECEIVE', 700)).toBe('+￥700.00');
-	});
-
-	it('formatSignedMoney prefixes - for GIVE and RETURN', () => {
-		expect(formatSignedMoney('GIVE', 100)).toBe('-￥100.00');
-		expect(formatSignedMoney('RETURN', 50)).toBe('-￥50.00');
-	});
-
-	it('directionIconName maps directions', () => {
-		expect(directionIconName('RECEIVE')).toBe('gift-o');
-		expect(directionIconName('GIVE')).toBe('cash-back-record');
-		expect(directionIconName('RETURN')).toBe('replay');
-		expect(directionIconName(undefined)).toBe('orders-o');
-	});
-});
-```
-
-- [ ] **Step 2: Run — expect FAIL**
-
-```bash
-npm run test:unit -- src/views/finance/gift/config.spec.ts
-```
-
-- [ ] **Step 3: Implement**
-
-```ts
-export function formatSignedMoney(direction?: string, amount?: number | string): string {
-	const money = formatMoney(amount);
-	return direction === 'RECEIVE' ? `+${money}` : `-${money}`;
-}
-
-export function directionIconName(direction?: string): string {
-	if (direction === 'RECEIVE') return 'gift-o';
-	if (direction === 'GIVE') return 'cash-back-record';
-	if (direction === 'RETURN') return 'replay';
-	return 'orders-o';
-}
-```
-
-- [ ] **Step 4: Run — expect PASS**
-
-```bash
-npm run test:unit -- src/views/finance/gift/config.spec.ts
-```
-
-- [ ] **Step 5: Commit**
-
-```bash
-git add src/views/finance/gift/config.ts src/views/finance/gift/config.spec.ts
-git commit -m "feat(gift): add signed money and direction icon helpers"
-```
-
----
-
-### Task 2: Profile template + styles redesign
+﻿### Task 2: Profile template + styles redesign
 
 **Files:**
 
@@ -118,16 +6,16 @@ git commit -m "feat(gift): add signed money and direction icon helpers"
 
 **Interfaces:**
 
-- Consumes: Task 1 helpers；现有 `maskPhone`/remark/phone actions 不变
-- Produces: Spec §4 UI
+- Consumes: Task 1 helpers锛涚幇鏈?`maskPhone`/remark/phone actions 涓嶅彉
+- Produces: Spec 搂4 UI
 
 - [ ] **Step 1: Update imports from config**
 
-增加：`formatSignedMoney`, `directionIconName`。
+澧炲姞锛歚formatSignedMoney`, `directionIconName`銆?
 
 - [ ] **Step 2: Replace profile template block**
 
-用下列结构替换 `v-if="isProfileMode"` 内内容（保留所有 phone/remark 方法与 computed）：
+鐢ㄤ笅鍒楃粨鏋勬浛鎹?`v-if="isProfileMode"` 鍐呭唴瀹癸紙淇濈暀鎵€鏈?phone/remark 鏂规硶涓?computed锛夛細
 
 ```vue
 <template v-if="isProfileMode">
@@ -138,8 +26,8 @@ git commit -m "feat(gift): add signed money and direction icon helpers"
 			<strong class="profile-hero__name">{{ profile.person?.personName || '-' }}</strong>
 			<p class="profile-hero__sub">
 				{{ relationLabel(profile.person?.relationType) }}
-				<template v-if="hasPhone"> · {{ displayPhone }}</template>
-				<template v-else> · -</template>
+				<template v-if="hasPhone"> 路 {{ displayPhone }}</template>
+				<template v-else> 路 -</template>
 			</p>
 			<div v-if="remarkText" class="profile-hero__remark">
 				<span>{{ displayRemark }}</span>
@@ -148,10 +36,10 @@ git commit -m "feat(gift): add signed money and direction icon helpers"
 					type="button"
 					class="remark-toggle"
 					data-testid="gift-person-remark-toggle"
-					:aria-label="remarkExpanded ? '收起备注' : '展开备注'"
+					:aria-label="remarkExpanded ? '鏀惰捣澶囨敞' : '灞曞紑澶囨敞'"
 					@click="remarkExpanded = !remarkExpanded"
 				>
-					{{ remarkExpanded ? '收起' : '展开' }}
+					{{ remarkExpanded ? '鏀惰捣' : '灞曞紑' }}
 				</button>
 			</div>
 			<div v-if="hasPhone" class="capsule-bar">
@@ -159,31 +47,31 @@ git commit -m "feat(gift): add signed money and direction icon helpers"
 					type="button"
 					class="capsule-btn"
 					data-testid="gift-person-phone-toggle"
-					:aria-label="phoneVisible ? '隐藏手机号' : '显示手机号'"
+					:aria-label="phoneVisible ? '闅愯棌鎵嬫満鍙? : '鏄剧ず鎵嬫満鍙?"
 					@click="togglePhoneVisible"
 				>
 					<van-icon :name="phoneVisible ? 'eye-o' : 'closed-eye'" />
-					<span>显隐</span>
+					<span>鏄鹃殣</span>
 				</button>
 				<button
 					type="button"
 					class="capsule-btn"
 					data-testid="gift-person-phone-call"
-					aria-label="拨打电话"
+					aria-label="鎷ㄦ墦鐢佃瘽"
 					@click="callPhone"
 				>
 					<van-icon name="phone-o" />
-					<span>电话</span>
+					<span>鐢佃瘽</span>
 				</button>
 				<button
 					type="button"
 					class="capsule-btn"
 					data-testid="gift-person-phone-copy"
-					aria-label="复制手机号"
+					aria-label="澶嶅埗鎵嬫満鍙?
 					@click="copyPhone"
 				>
 					<van-icon name="records" />
-					<span>复制</span>
+					<span>澶嶅埗</span>
 				</button>
 			</div>
 		</div>
@@ -191,18 +79,18 @@ git commit -m "feat(gift): add signed money and direction icon helpers"
 
 	<section class="profile-metrics">
 		<div class="metric-card metric-card--give">
-			<span>累计送礼</span>
-			<strong> <small>￥</small>{{ metricNumber(profile.person?.totalGiveAmount) }} </strong>
+			<span>绱閫佺ぜ</span>
+			<strong> <small>锟?/small>{{ metricNumber(profile.person?.totalGiveAmount) }} </strong>
 		</div>
 		<div class="metric-card metric-card--recv">
-			<span>累计收礼</span>
-			<strong> <small>￥</small>{{ metricNumber(profile.person?.totalReceiveAmount) }} </strong>
+			<span>绱鏀剁ぜ</span>
+			<strong> <small>锟?/small>{{ metricNumber(profile.person?.totalReceiveAmount) }} </strong>
 		</div>
 	</section>
 
 	<section class="history-block">
-		<h3>往来历史</h3>
-		<div v-if="!(profile.records || []).length" class="profile-empty"> 暂无往来记录 </div>
+		<h3>寰€鏉ュ巻鍙?/h3>
+		<div v-if="!(profile.records || []).length" class="profile-empty"> 鏆傛棤寰€鏉ヨ褰?</div>
 		<div v-for="item in profile.records || []" :key="item.id" class="history-card">
 			<div class="history-card__icon" :class="directionClass(item.direction)">
 				<van-icon :name="directionIconName(item.direction)" />
@@ -226,7 +114,7 @@ git commit -m "feat(gift): add signed money and direction icon helpers"
 			data-testid="gift-person-edit"
 			@click="openEdit"
 		>
-			编辑资料
+			缂栬緫璧勬枡
 		</van-button>
 		<button
 			v-if="hasPermission('gift:delete')"
@@ -236,7 +124,7 @@ git commit -m "feat(gift): add signed money and direction icon helpers"
 			:disabled="deleting"
 			@click="removePerson"
 		>
-			{{ deleting ? '删除中…' : '删除联系人' }}
+			{{ deleting ? '鍒犻櫎涓€? : '鍒犻櫎鑱旂郴浜? }}
 		</button>
 	</div>
 </template>
@@ -257,12 +145,12 @@ const metricNumber = (value?: number | string) => Number(value || 0).toFixed(2);
 - [ ] **Step 4: Update delete confirm copy**
 
 ```ts
-await showConfirmDialog({ title: '确认删除该联系人？' });
+await showConfirmDialog({ title: '纭鍒犻櫎璇ヨ仈绯讳汉锛? });
 ```
 
 - [ ] **Step 5: Replace profile-related styles**
 
-保留 form 相关样式不动。将 profile 样式改为（核心片段，可整段替换旧 `.profile-*` / `.detail-actions` profile 用途）：
+淇濈暀 form 鐩稿叧鏍峰紡涓嶅姩銆傚皢 profile 鏍峰紡鏀逛负锛堟牳蹇冪墖娈碉紝鍙暣娈垫浛鎹㈡棫 `.profile-*` / `.detail-actions` profile 鐢ㄩ€旓級锛?
 
 ```less
 .gift-person-detail {
@@ -557,7 +445,7 @@ await showConfirmDialog({ title: '确认删除该联系人？' });
 }
 ```
 
-删除已无用的旧 class：`.profile-head`、`.profile-block`（若 form 未用）、旧 `.icon-btn` 等，避免死样式堆积。
+鍒犻櫎宸叉棤鐢ㄧ殑鏃?class锛歚.profile-head`銆乣.profile-block`锛堣嫢 form 鏈敤锛夈€佹棫 `.icon-btn` 绛夛紝閬垮厤姝绘牱寮忓爢绉€?
 
 - [ ] **Step 6: Lint + unit**
 
@@ -568,11 +456,11 @@ npx eslint --max-warnings=0 "src/views/finance/gift/person/giftPersonDetail/inde
 
 - [ ] **Step 7: Manual smoke**
 
-1. Profile：Hero/胶囊/Bento/流水卡/渐变编辑/文字删除可见。
-2. 隐私：默认脱敏、显隐、复制 toast、时间无 `T`。
-3. 删除仍弹确认。
-4. 无「全部」。
-5. 表单新增/编辑仍可用。
+1. Profile锛欻ero/鑳跺泭/Bento/娴佹按鍗?娓愬彉缂栬緫/鏂囧瓧鍒犻櫎鍙銆?
+2. 闅愮锛氶粯璁よ劚鏁忋€佹樉闅愩€佸鍒?toast銆佹椂闂存棤 `T`銆?
+3. 鍒犻櫎浠嶅脊纭銆?
+4. 鏃犮€屽叏閮ㄣ€嶃€?
+5. 琛ㄥ崟鏂板/缂栬緫浠嶅彲鐢ㄣ€?
 
 - [ ] **Step 8: Commit**
 
@@ -583,50 +471,4 @@ git commit -m "feat(gift): redesign person detail profile visuals"
 
 ---
 
-### Task 3: Docs + graphify
 
-**Files:**
-
-- Modify: `feature.md`
-- Run graphify
-
-- [ ] **Step 1: feature.md**
-
-在亲友/联系人详情相关条目追加：
-
-```markdown
-- 联系人详情 profile 视觉：Hero 头图区、胶囊操作栏、Bento 收送礼金额、流水式往来历史；编辑为渐变主按钮，删除为弱文字按钮（二次确认保留）。
-```
-
-- [ ] **Step 2: graphify**
-
-```bash
-# Prefer:
-# "C:\Users\Administrator\AppData\Local\Programs\Python\Python314\python.exe" -m graphify update src
-# npm run graphify:augment
-npm run graphify:update
-```
-
-- [ ] **Step 3: Commit**
-
-```bash
-git add feature.md src/graphify-out
-git commit -m "docs(gift): note person detail visual redesign and update graphify"
-```
-
----
-
-## Spec Coverage Checklist
-
-| Spec item                      | Task               |
-| ------------------------------ | ------------------ |
-| Hero + 备注并入                | Task 2             |
-| 胶囊三键 + testid              | Task 2             |
-| Bento 金额色                   | Task 2             |
-| 流水卡 + signed money          | Task 1 + 2         |
-| 无「全部」                     | Task 2             |
-| 渐变编辑 / 文字删除 + 确认文案 | Task 2             |
-| Token / 防空滚                 | Task 2             |
-| 隐私保留                       | Task 2 smoke       |
-| feature.md + graphify          | Task 3             |
-| 表单不改版                     | Global Constraints |
