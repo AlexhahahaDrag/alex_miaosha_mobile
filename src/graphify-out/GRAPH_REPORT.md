@@ -1,12 +1,12 @@
 # Graph Report - F:\workplace\project\myself\frontend\alex_miaosha_mobile\src  (2026-07-24)
 
 ## Corpus Check
-- 237 files · ~90,587 words
+- 237 files · ~90,601 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 619 nodes · 864 edges · 158 communities detected
-- Extraction: 67% EXTRACTED · 33% INFERRED · 0% AMBIGUOUS · INFERRED: 281 edges (avg confidence: 0.8)
+- 621 nodes · 878 edges · 157 communities detected
+- Extraction: 67% EXTRACTED · 33% INFERRED · 0% AMBIGUOUS · INFERRED: 286 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -167,97 +167,96 @@
 - [[_COMMUNITY_Community 154|Community 154]]
 - [[_COMMUNITY_Community 155|Community 155]]
 - [[_COMMUNITY_Community 156|Community 156]]
-- [[_COMMUNITY_Community 157|Community 157]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `postData()` - 82 edges
 2. `getData()` - 57 edges
-3. `putData()` - 35 edges
-4. `deleteData()` - 35 edges
-5. `init()` - 32 edges
+3. `init()` - 36 edges
+4. `putData()` - 35 edges
+5. `deleteData()` - 35 edges
 6. `query()` - 22 edges
-7. `refresh()` - 18 edges
+7. `refresh()` - 19 edges
 8. `baseUrl()` - 16 edges
 9. `emit()` - 14 edges
-10. `onSearch()` - 10 edges
+10. `onSubmit()` - 12 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `onSubmit()` --calls--> `formatDayjs()`  [INFERRED]
+  F:\workplace\project\myself\frontend\alex_miaosha_mobile\src\views\user\rolePermissionInfo\rolePermissionInfoDetail\index.vue → D:\project\alex_miaosha_mobile\src\utils\dayjs\index.ts
+- `init()` --calls--> `formatDate()`  [INFERRED]
+  F:\workplace\project\myself\frontend\alex_miaosha_mobile\src\views\user\roleUserInfo\index.vue → D:\project\alex_miaosha_mobile\src\utils\dayjs\index.ts
 - `postData()` --calls--> `redeemCpnUserCouponInfo()`  [INFERRED]
   D:\project\alex_miaosha_mobile\src\views\common\api\index.ts → D:\project\alex_miaosha_mobile\src\views\cpn-coupon\cpn-user-coupon-info\api\index.ts
-- `postData()` --calls--> `getFilePage()`  [INFERRED]
-  D:\project\alex_miaosha_mobile\src\views\common\api\index.ts → D:\project\alex_miaosha_mobile\src\views\file\api\index.ts
-- `postData()` --calls--> `getDictManagerPage()`  [INFERRED]
-  D:\project\alex_miaosha_mobile\src\views\common\api\index.ts → D:\project\alex_miaosha_mobile\src\views\finance\dict\api\index.ts
-- `postData()` --calls--> `addDictManager()`  [INFERRED]
-  D:\project\alex_miaosha_mobile\src\views\common\api\index.ts → D:\project\alex_miaosha_mobile\src\views\finance\dict\api\index.ts
-- `postData()` --calls--> `addFinanceManger()`  [INFERRED]
-  D:\project\alex_miaosha_mobile\src\views\common\api\index.ts → D:\project\alex_miaosha_mobile\src\views\finance\financeManager\api\index.ts
+- `postData()` --calls--> `getAccountRecordInfoPage()`  [INFERRED]
+  D:\project\alex_miaosha_mobile\src\views\common\api\index.ts → D:\project\alex_miaosha_mobile\src\views\finance\accountRecordInfo\api\index.ts
+- `postData()` --calls--> `addAccountRecordInfo()`  [INFERRED]
+  D:\project\alex_miaosha_mobile\src\views\common\api\index.ts → D:\project\alex_miaosha_mobile\src\views\finance\accountRecordInfo\api\index.ts
 
 ## Communities
 
 ### Community 0 - "Community 0"
 Cohesion: 0.03
-Nodes (95): addAccountRecordInfo(), addAccountRecordInfoTest(), addConsumeCardRecord(), addCpnCouponInfo(), addPmsBrand(), addPmsCategory(), addPmsShopWantProduct(), addPmsSkuInfo() (+87 more)
+Nodes (99): addAccountRecordInfoTest(), addConsumeCardRecord(), addCpnCouponInfo(), addFileManager(), addPmsBrand(), addPmsCategory(), addPmsShopProduct(), addPmsShopWantProduct() (+91 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.05
-Nodes (44): fetchData(), addPmsShopProduct(), addShopStock(), deleteBlogById(), deletePmsShopProduct(), deleteShopStock(), getAllAmount(), getAllStock() (+36 more)
+Cohesion: 0.07
+Nodes (38): if(), addOrgInfo(), addPermissionInfo(), addPmsAttr(), addRolePermissionInfo(), addRoleUserInfo(), deleteOrgInfo(), deletePermissionInfo() (+30 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.07
-Nodes (40): addMenuInfo(), addOrgUserInfo(), addPermissionInfo(), addRolePermissionInfo(), addRoleUserInfo(), deleteMenuInfo(), deleteOrgUserInfo(), deletePermissionInfo() (+32 more)
+Cohesion: 0.06
+Nodes (37): addShopStock(), deleteBlogById(), deleteShopStock(), getAllAmount(), getAllStock(), getBalance(), getBenefit(), getCashAmount() (+29 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.08
-Nodes (19): emit(), onSelect(), onRefresh(), onCancel(), onClickOverlay(), onConfirm(), handleClick(), onDelete() (+11 more)
+Cohesion: 0.1
+Nodes (29): addGiftEvent(), addGiftPerson(), addGiftRecord(), baseUrl(), deleteGiftPerson(), deleteGiftRecord(), getGiftEventList(), getGiftEventPage() (+21 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.13
-Nodes (25): addGiftEvent(), addGiftPerson(), addGiftRecord(), baseUrl(), deleteGiftPerson(), deleteGiftRecord(), getGiftEventList(), getGiftEventPage() (+17 more)
+Cohesion: 0.12
+Nodes (16): addShopStockBatch(), cancelDateInfo(), cancelInfo(), choose(), chooseDate(), confirmConsume(), deleteShopStockBatch(), getDictInfoList() (+8 more)
 
 ### Community 5 - "Community 5"
 Cohesion: 0.08
-Nodes (6): formatAmount(), formatTime(), getDetailRoutePath(), getListName(), getRoutePathByName(), if()
+Nodes (19): emit(), onSelect(), onRefresh(), onCancel(), onClickOverlay(), onConfirm(), handleClick(), onDelete() (+11 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.14
-Nodes (18): addFinanceManger(), cancelRedeemCpnUserCouponInfo(), deleteFinanceManager(), editFinanceManger(), getCpnUserCouponInfoDetail(), getCpnUserCouponInfoPage(), getCpnUserCouponPageData(), getFinanceMangerDetail() (+10 more)
+Cohesion: 0.08
+Nodes (8): formatAmount(), formatDate(), formatDayjs(), formatTime(), getDetailRoutePath(), getListName(), getRoutePathByName(), if()
 
 ### Community 7 - "Community 7"
-Cohesion: 0.2
-Nodes (9): cancelDateInfo(), cancelInfo(), choose(), chooseDate(), getDictInfoList(), initInfoDate(), onSubmit(), selectDateInfo() (+1 more)
+Cohesion: 0.16
+Nodes (18): addFinanceManger(), cancelRedeemCpnUserCouponInfo(), deleteFinanceManager(), editFinanceManger(), getCpnUserCouponInfoDetail(), getCpnUserCouponInfoPage(), getCpnUserCouponPageData(), getFinanceMangerDetail() (+10 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.12
 Nodes (14): buildGiftRelationSelectOptions(), buildRelationTypeForSave(), findOptionIdByRelationType(), formatMoney(), mapRelationToFormFields(), toSelectOptions(), directionText(), goList() (+6 more)
 
 ### Community 9 - "Community 9"
-Cohesion: 0.15
-Nodes (11): addDictManager(), addFileManager(), deleteDictManager(), editDictManager(), editFileManager(), fetchCategories(), getDictList(), getDictManagerDetail() (+3 more)
-
-### Community 10 - "Community 10"
 Cohesion: 0.33
 Nodes (7): addRouter(), getChildren(), getChildrenField(), getPermissionList(), getRoleCode(), getStringField(), resolveViewComponent()
 
-### Community 11 - "Community 11"
+### Community 10 - "Community 10"
 Cohesion: 0.39
 Nodes (7): _decode(), decrypt(), errorHandler(), redirectToLogin(), requestHandler(), requestHandlerFile(), responseHandler()
 
-### Community 12 - "Community 12"
+### Community 11 - "Community 11"
 Cohesion: 0.32
 Nodes (4): buildPermissionContext(), normalizePermissionContext(), pickPrimaryRole(), uniq()
 
-### Community 13 - "Community 13"
+### Community 12 - "Community 12"
 Cohesion: 0.25
 Nodes (7): addUserManager(), deleteUserManager(), editUserManager(), fetchUsers(), getUserManagerDetail(), getUserManagerList(), getUserManagerPage()
 
+### Community 13 - "Community 13"
+Cohesion: 0.29
+Nodes (6): addDictManager(), editDictManager(), fetchCategories(), getDictList(), getDictManagerDetail(), getDictManagerPage()
+
 ### Community 14 - "Community 14"
 Cohesion: 0.29
-Nodes (6): addPmsAttr(), deletePmsAttr(), delPmsAttr(), getPmsAttrDetail(), getPmsAttrPage(), updatePmsAttr()
+Nodes (6): addMenuInfo(), deleteMenuInfo(), delMenuInfo(), getMenuInfoDetail(), getMenuInfoPage(), updateMenuInfo()
 
 ### Community 15 - "Community 15"
-Cohesion: 0.48
-Nodes (5): addOrgInfo(), deleteOrgInfo(), getOrgInfoDetail(), getOrgInfoPage(), updateOrgInfo()
+Cohesion: 0.29
+Nodes (6): addOrgUserInfo(), deleteOrgUserInfo(), delOrgUserInfo(), getOrgUserInfoDetail(), getOrgUserInfoPage(), updateOrgUserInfo()
 
 ### Community 16 - "Community 16"
 Cohesion: 0.29
@@ -265,7 +264,7 @@ Nodes (1): vue (AutoImport)
 
 ### Community 17 - "Community 17"
 Cohesion: 0.33
-Nodes (5): addRoleInfo(), deleteRoleInfo(), getRoleInfoDetail(), getRoleInfoPage(), updateRoleInfo()
+Nodes (5): addAccountRecordInfo(), deleteAccountRecordInfo(), getAccountRecordInfoDetail(), getAccountRecordInfoPage(), updateAccountRecordInfo()
 
 ### Community 18 - "Community 18"
 Cohesion: 0.5
@@ -823,10 +822,6 @@ Nodes (0):
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 157 - "Community 157"
-Cohesion: 1.0
-Nodes (0): 
-
 ## Knowledge Gaps
 - **1 isolated node(s):** `pinia (AutoImport)`
   These have ≤1 connection - possible missing edges or undocumented components.
@@ -850,7 +845,7 @@ Nodes (0):
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 29`** (2 nodes): `user.ts`, `createDefaultState()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 30`** (2 nodes): `index.vue`, `openCreate()`
+- **Thin community `Community 30`** (2 nodes): `incomeAnalysis.vue`, `if()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 31`** (2 nodes): `index.ts`, `getCardColor()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
@@ -928,13 +923,13 @@ Nodes (0):
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 68`** (1 nodes): `common.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 69`** (1 nodes): `incomeAnalysis.vue`
+- **Thin community `Community 69`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 70`** (1 nodes): `index.ts`
+- **Thin community `Community 70`** (1 nodes): `index.vue`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 71`** (1 nodes): `index.vue`
+- **Thin community `Community 71`** (1 nodes): `config.spec.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 72`** (1 nodes): `config.spec.ts`
+- **Thin community `Community 72`** (1 nodes): `index.vue`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 73`** (1 nodes): `GiftRecordCard.vue`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
@@ -1016,27 +1011,27 @@ Nodes (0):
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 112`** (1 nodes): `index.vue`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 113`** (1 nodes): `index.vue`
+- **Thin community `Community 113`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 114`** (1 nodes): `index.ts`
+- **Thin community `Community 114`** (1 nodes): `index.vue`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 115`** (1 nodes): `index.vue`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 116`** (1 nodes): `index.vue`
+- **Thin community `Community 116`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 117`** (1 nodes): `index.ts`
+- **Thin community `Community 117`** (1 nodes): `BarChart.vue`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 118`** (1 nodes): `BarChart.vue`
+- **Thin community `Community 118`** (1 nodes): `bar.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 119`** (1 nodes): `bar.ts`
+- **Thin community `Community 119`** (1 nodes): `PieChart.vue`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 120`** (1 nodes): `PieChart.vue`
+- **Thin community `Community 120`** (1 nodes): `pmsAttrTs.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 121`** (1 nodes): `pmsAttrTs.ts`
+- **Thin community `Community 121`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 122`** (1 nodes): `index.ts`
+- **Thin community `Community 122`** (1 nodes): `pmsAttrDetailTs.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 123`** (1 nodes): `pmsAttrDetailTs.ts`
+- **Thin community `Community 123`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 124`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
@@ -1048,7 +1043,7 @@ Nodes (0):
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 128`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 129`** (1 nodes): `index.ts`
+- **Thin community `Community 129`** (1 nodes): `index.vue`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 130`** (1 nodes): `index.vue`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
@@ -1056,71 +1051,69 @@ Nodes (0):
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 132`** (1 nodes): `index.vue`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 133`** (1 nodes): `index.vue`
+- **Thin community `Community 133`** (1 nodes): `typing.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 134`** (1 nodes): `typing.ts`
+- **Thin community `Community 134`** (1 nodes): `menuInfoTs.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 135`** (1 nodes): `menuInfoTs.ts`
+- **Thin community `Community 135`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 136`** (1 nodes): `index.ts`
+- **Thin community `Community 136`** (1 nodes): `menuInfoDetailTs.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 137`** (1 nodes): `menuInfoDetailTs.ts`
+- **Thin community `Community 137`** (1 nodes): `orgInfoTs.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 138`** (1 nodes): `orgInfoTs.ts`
+- **Thin community `Community 138`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 139`** (1 nodes): `index.ts`
+- **Thin community `Community 139`** (1 nodes): `orgInfoDetailTs.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 140`** (1 nodes): `orgInfoDetailTs.ts`
+- **Thin community `Community 140`** (1 nodes): `orgUserInfoTs.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 141`** (1 nodes): `orgUserInfoTs.ts`
+- **Thin community `Community 141`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 142`** (1 nodes): `index.ts`
+- **Thin community `Community 142`** (1 nodes): `orgUserInfoDetailTs.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 143`** (1 nodes): `orgUserInfoDetailTs.ts`
+- **Thin community `Community 143`** (1 nodes): `permissionInfoTs.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 144`** (1 nodes): `permissionInfoTs.ts`
+- **Thin community `Community 144`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 145`** (1 nodes): `index.ts`
+- **Thin community `Community 145`** (1 nodes): `permissionInfoDetailTs.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 146`** (1 nodes): `permissionInfoDetailTs.ts`
+- **Thin community `Community 146`** (1 nodes): `roleInfoTs.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 147`** (1 nodes): `roleInfoTs.ts`
+- **Thin community `Community 147`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 148`** (1 nodes): `index.ts`
+- **Thin community `Community 148`** (1 nodes): `roleInfoDetailTs.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 149`** (1 nodes): `roleInfoDetailTs.ts`
+- **Thin community `Community 149`** (1 nodes): `rolePermissionInfoTs.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 150`** (1 nodes): `rolePermissionInfoTs.ts`
+- **Thin community `Community 150`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 151`** (1 nodes): `index.ts`
+- **Thin community `Community 151`** (1 nodes): `rolePermissionInfoDetailTs.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 152`** (1 nodes): `rolePermissionInfoDetailTs.ts`
+- **Thin community `Community 152`** (1 nodes): `roleUserInfoTs.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 153`** (1 nodes): `roleUserInfoTs.ts`
+- **Thin community `Community 153`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 154`** (1 nodes): `index.ts`
+- **Thin community `Community 154`** (1 nodes): `roleUserInfoDetailTs.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 155`** (1 nodes): `roleUserInfoDetailTs.ts`
+- **Thin community `Community 155`** (1 nodes): `index.vue`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 156`** (1 nodes): `index.vue`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 157`** (1 nodes): `index.ts`
+- **Thin community `Community 156`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `getData()` connect `Community 1` to `Community 0`, `Community 2`, `Community 4`, `Community 6`, `Community 9`, `Community 13`, `Community 14`, `Community 15`, `Community 17`?**
-  _High betweenness centrality (0.150) - this node is a cross-community bridge._
-- **Why does `postData()` connect `Community 0` to `Community 1`, `Community 2`, `Community 4`, `Community 6`, `Community 9`, `Community 13`, `Community 14`, `Community 15`, `Community 17`?**
-  _High betweenness centrality (0.133) - this node is a cross-community bridge._
-- **Why does `init()` connect `Community 2` to `Community 0`, `Community 7`, `Community 8`, `Community 9`, `Community 14`, `Community 15`, `Community 17`?**
-  _High betweenness centrality (0.096) - this node is a cross-community bridge._
+- **Why does `getData()` connect `Community 2` to `Community 0`, `Community 1`, `Community 3`, `Community 4`, `Community 7`, `Community 12`, `Community 13`, `Community 14`, `Community 15`, `Community 17`?**
+  _High betweenness centrality (0.140) - this node is a cross-community bridge._
+- **Why does `postData()` connect `Community 0` to `Community 1`, `Community 2`, `Community 3`, `Community 4`, `Community 7`, `Community 12`, `Community 13`, `Community 14`, `Community 15`, `Community 17`?**
+  _High betweenness centrality (0.134) - this node is a cross-community bridge._
+- **Why does `init()` connect `Community 1` to `Community 0`, `Community 4`, `Community 6`, `Community 8`, `Community 13`, `Community 14`, `Community 15`, `Community 17`?**
+  _High betweenness centrality (0.090) - this node is a cross-community bridge._
 - **Are the 80 inferred relationships involving `postData()` (e.g. with `getCpnCouponInfoPage()` and `addCpnCouponInfo()`) actually correct?**
   _`postData()` has 80 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 55 inferred relationships involving `getData()` (e.g. with `getCpnCouponInfoDetail()` and `getCpnUserCouponInfoDetail()`) actually correct?**
   _`getData()` has 55 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 13 inferred relationships involving `init()` (e.g. with `if()` and `getShopStockBatchDetail()`) actually correct?**
+  _`init()` has 13 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 33 inferred relationships involving `putData()` (e.g. with `editCpnCouponInfo()` and `editFileManager()`) actually correct?**
   _`putData()` has 33 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 33 inferred relationships involving `deleteData()` (e.g. with `deleteCpnCouponInfo()` and `deleteDictManager()`) actually correct?**
-  _`deleteData()` has 33 INFERRED edges - model-reasoned connections that need verification._
