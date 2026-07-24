@@ -355,6 +355,7 @@ watch(
 
 <style lang="less" scoped>
 .analysis-container {
+	box-sizing: border-box;
 	padding: 10px;
 	background-color: #f5f7fa;
 	min-height: 100%;

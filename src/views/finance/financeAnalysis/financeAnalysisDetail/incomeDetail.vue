@@ -250,6 +250,7 @@ watch(
 
 <style lang="less" scoped>
 .income-detail {
+	box-sizing: border-box;
 	padding: 16px;
 	background-color: #f5f7fa;
 	min-height: 100%;

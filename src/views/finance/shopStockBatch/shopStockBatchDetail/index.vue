@@ -296,6 +296,7 @@ init();
 
 <style lang="less" scoped>
 .shop-stock-batch-detail-container {
+	box-sizing: border-box;
 	min-height: 100%;
 	background-color: #f8fafc;
 	padding-bottom: 40px;

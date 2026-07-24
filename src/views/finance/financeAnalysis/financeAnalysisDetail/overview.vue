@@ -297,6 +297,7 @@ watch(
 
 <style lang="less" scoped>
 .overview-container {
+	box-sizing: border-box;
 	padding: 16px;
 	background-color: #f7f8fa;
 	min-height: 100%;

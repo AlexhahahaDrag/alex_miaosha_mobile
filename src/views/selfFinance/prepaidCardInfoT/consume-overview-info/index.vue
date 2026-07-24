@@ -343,6 +343,7 @@ onMounted(() => {
 
 <style lang="less" scoped>
 .consume-overview-container {
+	box-sizing: border-box;
 	background: #f9fafb;
 	min-height: 100%;
 	padding: 16px 0 72px; // 预留底部 Tabbar 高度

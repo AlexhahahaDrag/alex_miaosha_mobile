@@ -68,6 +68,7 @@ void load();
 
 <style scoped lang="less">
 .gift-analysis {
+	box-sizing: border-box;
 	min-height: 100%;
 	padding: 14px;
 	background: #f8fbff;
