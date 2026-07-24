@@ -3,6 +3,8 @@ import {
 	RELATION_CUSTOM,
 	buildRelationTypeForSave,
 	collapseRemark,
+	directionIconName,
+	formatSignedMoney,
 	mapRelationToFormFields,
 	maskPhone,
 	relationLabel,
@@ -10,6 +12,24 @@ import {
 	shouldCollapseRemark,
 	FALLBACK_GIFT_RELATION_OPTIONS,
 } from './config';
+
+describe('gift person visual helpers', () => {
+	it('formatSignedMoney prefixes + for RECEIVE', () => {
+		expect(formatSignedMoney('RECEIVE', 700)).toBe('+￥700.00');
+	});
+
+	it('formatSignedMoney prefixes - for GIVE and RETURN', () => {
+		expect(formatSignedMoney('GIVE', 100)).toBe('-￥100.00');
+		expect(formatSignedMoney('RETURN', 50)).toBe('-￥50.00');
+	});
+
+	it('directionIconName maps directions', () => {
+		expect(directionIconName('RECEIVE')).toBe('gift-o');
+		expect(directionIconName('GIVE')).toBe('cash-back-record');
+		expect(directionIconName('RETURN')).toBe('replay');
+		expect(directionIconName(undefined)).toBe('orders-o');
+	});
+});
 
 describe('gift person relation helpers', () => {
 	it('resolvePresetCode maps 亲属 id to RELATIVE', () => {

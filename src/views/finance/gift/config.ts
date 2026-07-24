@@ -151,6 +151,18 @@ export const formatMoney = (value?: number | string) => {
 	return `￥${amount.toFixed(2)}`;
 };
 
+export function formatSignedMoney(direction?: string, amount?: number | string): string {
+	const money = formatMoney(amount);
+	return direction === 'RECEIVE' ? `+${money}` : `-${money}`;
+}
+
+export function directionIconName(direction?: string): string {
+	if (direction === 'RECEIVE') return 'gift-o';
+	if (direction === 'GIVE') return 'cash-back-record';
+	if (direction === 'RETURN') return 'replay';
+	return 'orders-o';
+}
+
 export const directionClass = (direction?: string) => {
 	if (direction === 'RECEIVE') return 'is-income';
 	if (direction === 'RETURN') return 'is-return';
