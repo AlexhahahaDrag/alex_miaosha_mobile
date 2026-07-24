@@ -31,7 +31,7 @@
 <script setup lang="ts">
 import { showFailToast } from 'vant';
 import { useNavBar } from '@/composables/useNavBar';
-import { getGiftRecordPage } from '@/views/finance/gift/api';
+import { getGiftRecordPage } from '@/views/finance/gift/record/api';
 import { directionText, formatMoney } from '@/views/finance/gift/config';
 
 useNavBar({ title: '统计报表', visible: true });

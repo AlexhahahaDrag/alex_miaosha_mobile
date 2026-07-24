@@ -1,5 +1,5 @@
 import { ref, computed } from 'vue';
-import { getGiftPersonRelationOptions } from '@/views/finance/gift/api';
+import { getGiftPersonRelationOptions } from '@/views/finance/gift/person/api';
 import {
 	FALLBACK_GIFT_RELATION_OPTIONS,
 	buildGiftRelationSelectOptions,

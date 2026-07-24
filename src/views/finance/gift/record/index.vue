@@ -163,7 +163,7 @@ import {
 	getGiftRecordPage,
 	getPendingReturnAmount,
 	markGiftReturned,
-} from '@/views/finance/gift/api';
+} from '@/views/finance/gift/record/api';
 import type { GiftDirection, GiftRecordInfo, GiftRecordQuery } from '@/views/finance/gift/config';
 import { directionOptions, formatMoney, quickAmounts } from '@/views/finance/gift/config';
 import type { PageInfo } from '@/views/common/config';

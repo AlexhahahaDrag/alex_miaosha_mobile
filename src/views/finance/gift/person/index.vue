@@ -104,7 +104,7 @@ import { usePagination } from '@/composables/usePagination';
 import { usePermission } from '@/composables/usePermission';
 import { useGiftRelationOptions } from '@/composables/useGiftRelationOptions';
 import { getRoutePathByName } from '@/utils/router';
-import { getGiftPersonBusinessPage, getGiftPersonSummary } from '@/views/finance/gift/api';
+import { getGiftPersonBusinessPage, getGiftPersonSummary } from '@/views/finance/gift/person/api';
 import type { GiftPersonBusinessInfo, GiftPersonQuery, GiftPersonSummary } from '@/views/finance/gift/config';
 import { GIFT_PERSON_DETAIL_NAME, directionText, formatMoney } from '@/views/finance/gift/config';
 

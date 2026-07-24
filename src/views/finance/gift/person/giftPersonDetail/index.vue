@@ -171,7 +171,7 @@ import {
 	getGiftPersonDetail,
 	getGiftPersonProfile,
 	updateGiftPerson,
-} from '@/views/finance/gift/api';
+} from '@/views/finance/gift/person/api';
 import type { GiftPersonFormState, GiftPersonInfo, GiftPersonProfile } from '@/views/finance/gift/config';
 import { RELATION_CUSTOM, buildRelationTypeForSave, directionText, formatMoney } from '@/views/finance/gift/config';
 

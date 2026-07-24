@@ -174,7 +174,7 @@ dashboard -> person -> event -> record -> analysis
 ### 代码规范
 
 - 共享类型、枚举、配置放在 `src/views/finance/gift/config.ts`（或 `config/`）。
-- API 封装放在 `src/views/finance/gift/api/`；`*Id` 经 `normalizeGiftIds` 转 string。
+- API 按子域放在 `person/api`、`event/api`、`record/api`（无聚合 barrel）；ID 靠前端 `GiftId=string` + 后端 `Long2StringSerializer`。
 - 业务卡片组件放在 `src/views/finance/gift/components/`。
 - 页面样式优先复用 `src/views/finance/gift/shared.less`。
 - 接口调用统一使用响应解构：`const { code, data, message } = await api()`。

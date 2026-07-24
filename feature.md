@@ -141,6 +141,6 @@
 - **页面顺序**：数据概览、亲友管理、事由管理、礼金记录、统计报表。
 - **核心流程**：快速记礼、最近联系人、最近事由、常用金额、待回礼标记。
 - **状态字段**：`direction`: `GIVE`-随礼, `RECEIVE`-收礼, `RETURN`-回礼; `returnedFlag`: 是否已回礼。
-- **关联 API**：`src/views/finance/gift/api/`
+- **关联 API**：`src/views/finance/gift/{person,event,record}/api/`
 - **权限标识**：页面权限 `gift:dashboard`、`gift:person`、`gift:event`、`gift:record`、`gift:analysis`; 按钮权限 `gift:view`、`gift:add`、`gift:edit`、`gift:delete`、`gift:export`。
 - **亲友管理**：列表走 `business-page`（汇总 + 关系筛选 + 收支摘要）；详情菜单 `giftPersonDetail`（`/finance/gift/person/giftPersonDetail`）同页切换档案/表单；按钮权限 `gift:view/add/edit/delete`。

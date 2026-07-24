@@ -46,7 +46,7 @@ import { usePagination } from '@/composables/usePagination';
 import CommonPullRefresh from '@/views/components/CommonPullRefresh.vue';
 import CommonList from '@/views/components/CommonList.vue';
 import GiftRecordCard from '@/views/finance/gift/components/GiftRecordCard.vue';
-import { getGiftRecordPage } from '@/views/finance/gift/api';
+import { getGiftRecordPage } from '@/views/finance/gift/record/api';
 import type { GiftRecordInfo } from '@/views/finance/gift/config';
 import { formatMoney } from '@/views/finance/gift/config';
 

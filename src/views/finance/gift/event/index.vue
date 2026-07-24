@@ -87,7 +87,7 @@ import { useNavBar } from '@/composables/useNavBar';
 import { usePagination } from '@/composables/usePagination';
 import CommonPullRefresh from '@/views/components/CommonPullRefresh.vue';
 import CommonList from '@/views/components/CommonList.vue';
-import { addGiftEvent, getGiftEventPage } from '@/views/finance/gift/api';
+import { addGiftEvent, getGiftEventPage } from '@/views/finance/gift/event/api';
 import type { GiftEventInfo } from '@/views/finance/gift/config';
 
 useNavBar({ title: '事由管理', rightButton: '新增', visible: true, onRightClick: () => openCreate() });
