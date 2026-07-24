@@ -7,10 +7,45 @@
 			<section class="profile-head">
 				<div class="avatar">{{ firstName(profile.person?.personName) }}</div>
 				<strong>{{ profile.person?.personName || '-' }}</strong>
-				<span>
-					{{ relationLabel(profile.person?.relationType) }} ·
-					{{ profile.person?.phone || '-' }}
-				</span>
+				<div class="profile-head-meta">
+					<span>
+						{{ relationLabel(profile.person?.relationType) }}
+						<template v-if="hasPhone"> · {{ displayPhone }}</template>
+						<template v-else> · -</template>
+					</span>
+					<div
+						v-if="hasPhone"
+						class="profile-phone-actions"
+					>
+						<button
+							type="button"
+							class="icon-btn"
+							data-testid="gift-person-phone-toggle"
+							:aria-label="phoneVisible ? '隐藏手机号' : '显示手机号'"
+							@click="togglePhoneVisible"
+						>
+							<van-icon :name="phoneVisible ? 'eye-o' : 'closed-eye'" />
+						</button>
+						<button
+							type="button"
+							class="icon-btn"
+							data-testid="gift-person-phone-call"
+							aria-label="拨打电话"
+							@click="callPhone"
+						>
+							<van-icon name="phone-o" />
+						</button>
+						<button
+							type="button"
+							class="icon-btn"
+							data-testid="gift-person-phone-copy"
+							aria-label="复制手机号"
+							@click="copyPhone"
+						>
+							<van-icon name="records" />
+						</button>
+					</div>
+				</div>
 			</section>
 			<section class="profile-metrics">
 				<div>
@@ -24,18 +59,22 @@
 			</section>
 			<section class="profile-block">
 				<h3>基本信息</h3>
-				<van-cell
-					title="手机号"
-					:value="profile.person?.phone || '-'"
-				/>
-				<van-cell
-					title="关系"
-					:value="relationLabel(profile.person?.relationType)"
-				/>
-				<van-cell
-					title="备注"
-					:value="profile.person?.remark || '-'"
-				/>
+				<van-cell title="备注">
+					<template #value>
+						<div class="remark-value">
+							<span>{{ displayRemark }}</span>
+							<button
+								v-if="remarkCollapsible"
+								type="button"
+								class="remark-toggle"
+								data-testid="gift-person-remark-toggle"
+								@click="remarkExpanded = !remarkExpanded"
+							>
+								{{ remarkExpanded ? '收起' : '展开' }}
+							</button>
+						</div>
+					</template>
+				</van-cell>
 			</section>
 			<section class="profile-block">
 				<h3>往来历史</h3>
@@ -52,7 +91,7 @@
 				>
 					<div>
 						<strong> {{ directionText(item.direction) }} {{ formatMoney(item.amount) }} </strong>
-						<p>{{ item.payTime || '-' }} {{ item.remark || '' }}</p>
+						<p>{{ formatPayTime(item.payTime) }} {{ item.remark || '' }}</p>
 					</div>
 				</div>
 			</section>
@@ -164,6 +203,7 @@ import { showConfirmDialog, showFailToast, showSuccessToast } from 'vant';
 import { useNavBar } from '@/composables/useNavBar';
 import { usePermission } from '@/composables/usePermission';
 import { useGiftRelationOptions } from '@/composables/useGiftRelationOptions';
+import { formatTime, dataTimeFormat } from '@/utils/dayjs';
 import { getRoutePathByName } from '@/utils/router';
 import {
 	addGiftPerson,
@@ -173,7 +213,15 @@ import {
 	updateGiftPerson,
 } from '@/views/finance/gift/person/api';
 import type { GiftPersonFormState, GiftPersonInfo, GiftPersonProfile } from '@/views/finance/gift/config';
-import { RELATION_CUSTOM, buildRelationTypeForSave, directionText, formatMoney } from '@/views/finance/gift/config';
+import {
+	RELATION_CUSTOM,
+	buildRelationTypeForSave,
+	collapseRemark,
+	directionText,
+	formatMoney,
+	maskPhone,
+	shouldCollapseRemark,
+} from '@/views/finance/gift/config';
 
 const route = useRoute();
 const router = useRouter();
@@ -195,6 +243,23 @@ const deleting = ref(false);
 const showRelationPicker = ref(false);
 const formState = ref<GiftPersonFormState>({});
 const profile = ref<GiftPersonProfile>({});
+const phoneVisible = ref(false);
+const remarkExpanded = ref(false);
+
+const rawPhone = computed(() => profile.value.person?.phone?.trim() || '');
+const hasPhone = computed(() => !!rawPhone.value);
+const displayPhone = computed(() => {
+	if (!rawPhone.value) return '-';
+	return phoneVisible.value ? rawPhone.value : maskPhone(rawPhone.value) || rawPhone.value;
+});
+
+const remarkText = computed(() => profile.value.person?.remark?.trim() || '');
+const remarkCollapsible = computed(() => shouldCollapseRemark(remarkText.value));
+const displayRemark = computed(() => {
+	if (!remarkText.value) return '-';
+	if (!remarkCollapsible.value || remarkExpanded.value) return remarkText.value;
+	return collapseRemark(remarkText.value);
+});
 
 const listPath = computed(() => getRoutePathByName(router, 'giftPerson', '/finance/gift/person'));
 
@@ -264,6 +329,46 @@ const customRelationRules = [
 
 const firstName = (value?: string) => value?.slice(0, 1) || '-';
 
+const formatPayTime = (payTime?: string) => {
+	if (!payTime) return '-';
+	return formatTime(payTime, dataTimeFormat) || '-';
+};
+
+const togglePhoneVisible = () => {
+	navigator.vibrate?.(50);
+	phoneVisible.value = !phoneVisible.value;
+};
+
+const callPhone = () => {
+	if (!rawPhone.value) return;
+	navigator.vibrate?.(50);
+	window.location.href = `tel:${rawPhone.value}`;
+};
+
+const copyPhone = async () => {
+	if (!rawPhone.value) return;
+	navigator.vibrate?.(50);
+	try {
+		if (navigator.clipboard?.writeText) {
+			await navigator.clipboard.writeText(rawPhone.value);
+		} else {
+			const input = document.createElement('textarea');
+			input.value = rawPhone.value;
+			input.setAttribute('readonly', 'true');
+			input.style.position = 'fixed';
+			input.style.opacity = '0';
+			document.body.appendChild(input);
+			input.select();
+			const ok = document.execCommand('copy');
+			document.body.removeChild(input);
+			if (!ok) throw new Error('copy failed');
+		}
+		showSuccessToast('已复制');
+	} catch {
+		showFailToast('复制失败');
+	}
+};
+
 const toSavePayload = (): GiftPersonInfo => {
 	const { relationMode: _relationMode, customRelation: _customRelation, ...rest } = formState.value;
 	return {
@@ -288,6 +393,8 @@ const loadProfile = async () => {
 		const { code, data, message } = await getGiftPersonProfile(personId.value);
 		if (code === '200') {
 			profile.value = data || {};
+			phoneVisible.value = false;
+			remarkExpanded.value = false;
 		} else {
 			showFailToast(message || '联系人详情加载失败');
 		}
@@ -429,12 +536,61 @@ onMounted(() => {
 		color: #1f2937;
 		font-size: 18px;
 	}
+}
 
-	span {
-		margin-top: 6px;
+.profile-head-meta {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	margin-top: 6px;
+	width: 100%;
+
+	> span {
 		color: #8a94a6;
 		font-size: 13px;
 	}
+}
+
+.profile-phone-actions {
+	display: flex;
+	gap: 12px;
+}
+
+.icon-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	padding: 0;
+	border: none;
+	border-radius: 50%;
+	background: #eaf6ff;
+	color: #2098ee;
+	cursor: pointer;
+
+	&:active {
+		transform: scale(0.96);
+	}
+}
+
+.remark-value {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 4px;
+	max-width: 70%;
+	text-align: right;
+	word-break: break-all;
+}
+
+.remark-toggle {
+	border: none;
+	padding: 0;
+	background: transparent;
+	color: #1989fa;
+	font-size: 12px;
 }
 
 .profile-metrics {
