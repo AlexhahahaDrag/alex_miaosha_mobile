@@ -275,3 +275,22 @@ export function relationLabel(
 	const preset = presets.find((item) => PRESET_NAME_TO_CODE[item.name] === relation);
 	return preset?.name ?? relation;
 }
+
+const CHINA_MOBILE_11 = /^1[3-9]\d{9}$/;
+
+export function maskPhone(phone?: string): string {
+	const value = phone?.trim() ?? '';
+	if (!value) return '';
+	if (!CHINA_MOBILE_11.test(value)) return value;
+	return `${value.slice(0, 3)} **** ${value.slice(7)}`;
+}
+
+export function shouldCollapseRemark(text?: string, limit = 60): boolean {
+	return (text?.trim().length ?? 0) > limit;
+}
+
+export function collapseRemark(text?: string, limit = 60): string {
+	const value = text?.trim() ?? '';
+	if (value.length <= limit) return value;
+	return `${value.slice(0, limit)}…`;
+}

@@ -2,9 +2,12 @@ import { describe, expect, it } from 'vitest';
 import {
 	RELATION_CUSTOM,
 	buildRelationTypeForSave,
+	collapseRemark,
 	mapRelationToFormFields,
+	maskPhone,
 	relationLabel,
 	resolvePresetCode,
+	shouldCollapseRemark,
 	FALLBACK_GIFT_RELATION_OPTIONS,
 } from './config';
 
@@ -28,5 +31,32 @@ describe('gift person relation helpers', () => {
 
 	it('relationLabel resolves RELATIVE to 亲属', () => {
 		expect(relationLabel('RELATIVE', FALLBACK_GIFT_RELATION_OPTIONS)).toBe('亲属');
+	});
+});
+
+describe('gift person privacy helpers', () => {
+	it('maskPhone masks 11-digit china mobile', () => {
+		expect(maskPhone('18222222222')).toBe('182 **** 2222');
+	});
+
+	it('maskPhone returns empty for empty input', () => {
+		expect(maskPhone('')).toBe('');
+		expect(maskPhone(undefined)).toBe('');
+	});
+
+	it('maskPhone keeps non-11-digit as-is', () => {
+		expect(maskPhone('12345')).toBe('12345');
+	});
+
+	it('shouldCollapseRemark uses trim length > 60', () => {
+		expect(shouldCollapseRemark('a'.repeat(60))).toBe(false);
+		expect(shouldCollapseRemark('a'.repeat(61))).toBe(true);
+		expect(shouldCollapseRemark(`  ${'a'.repeat(61)}  `)).toBe(true);
+	});
+
+	it('collapseRemark truncates with ellipsis when over limit', () => {
+		const text = 'a'.repeat(61);
+		expect(collapseRemark(text)).toBe(`${'a'.repeat(60)}…`);
+		expect(collapseRemark('short')).toBe('short');
 	});
 });
