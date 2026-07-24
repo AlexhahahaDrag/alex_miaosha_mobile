@@ -179,7 +179,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\router\\index.ts",
       "source_location": "L1",
       "id": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_router_index_ts",
-      "community": 9,
+      "community": 10,
       "norm_label": "index.ts",
       "degree": 9
     },
@@ -189,7 +189,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\router\\index.ts",
       "source_location": "L25",
       "id": "index_resolveviewcomponent",
-      "community": 9,
+      "community": 10,
       "norm_label": "resolveviewcomponent()",
       "degree": 2
     },
@@ -199,7 +199,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\router\\index.ts",
       "source_location": "L149",
       "id": "index_addrouter",
-      "community": 9,
+      "community": 10,
       "norm_label": "addrouter()",
       "degree": 3
     },
@@ -209,7 +209,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\router\\index.ts",
       "source_location": "L178",
       "id": "index_getstringfield",
-      "community": 9,
+      "community": 10,
       "norm_label": "getstringfield()",
       "degree": 3
     },
@@ -219,7 +219,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\router\\index.ts",
       "source_location": "L184",
       "id": "index_getchildrenfield",
-      "community": 9,
+      "community": 10,
       "norm_label": "getchildrenfield()",
       "degree": 2
     },
@@ -229,7 +229,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\router\\index.ts",
       "source_location": "L190",
       "id": "index_getrolecode",
-      "community": 9,
+      "community": 10,
       "norm_label": "getrolecode()",
       "degree": 3
     },
@@ -239,7 +239,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\router\\index.ts",
       "source_location": "L192",
       "id": "index_getpermissionlist",
-      "community": 9,
+      "community": 10,
       "norm_label": "getpermissionlist()",
       "degree": 2
     },
@@ -249,7 +249,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\router\\index.ts",
       "source_location": "L198",
       "id": "index_getchildren",
-      "community": 9,
+      "community": 10,
       "norm_label": "getchildren()",
       "degree": 4
     },
@@ -259,7 +259,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\router\\index.ts",
       "source_location": "L243",
       "id": "index_judgepermission",
-      "community": 9,
+      "community": 10,
       "norm_label": "judgepermission()",
       "degree": 1
     },
@@ -269,7 +269,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\router\\index.ts",
       "source_location": "L265",
       "id": "index_refreshrouter",
-      "community": 9,
+      "community": 10,
       "norm_label": "refreshrouter()",
       "degree": 1
     },
@@ -479,7 +479,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\utils\\common\\index.ts",
       "source_location": "L1",
       "id": "d_project_alex_miaosha_mobile_src_utils_common_index_ts",
-      "community": 6,
+      "community": 8,
       "norm_label": "index.ts",
       "degree": 5
     },
@@ -489,7 +489,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\utils\\common\\index.ts",
       "source_location": "L5",
       "id": "index_plus",
-      "community": 6,
+      "community": 8,
       "norm_label": "plus()",
       "degree": 1
     },
@@ -499,7 +499,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\utils\\common\\index.ts",
       "source_location": "L18",
       "id": "index_minus",
-      "community": 6,
+      "community": 8,
       "norm_label": "minus()",
       "degree": 1
     },
@@ -509,7 +509,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\utils\\common\\index.ts",
       "source_location": "L31",
       "id": "index_multiply",
-      "community": 6,
+      "community": 8,
       "norm_label": "multiply()",
       "degree": 1
     },
@@ -519,7 +519,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\utils\\common\\index.ts",
       "source_location": "L44",
       "id": "index_divide",
-      "community": 6,
+      "community": 8,
       "norm_label": "divide()",
       "degree": 1
     },
@@ -529,7 +529,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\finance\\personalGift\\index.vue",
       "source_location": "L145",
       "id": "index_formatamount",
-      "community": 6,
+      "community": 8,
       "norm_label": "formatamount()",
       "degree": 3
     },
@@ -539,7 +539,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\utils\\crypto\\index.ts",
       "source_location": "L1",
       "id": "d_project_alex_miaosha_mobile_src_utils_crypto_index_ts",
-      "community": 10,
+      "community": 11,
       "norm_label": "index.ts",
       "degree": 2
     },
@@ -549,7 +549,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\utils\\crypto\\index.ts",
       "source_location": "L3",
       "id": "index_decode",
-      "community": 10,
+      "community": 11,
       "norm_label": "_decode()",
       "degree": 2
     },
@@ -559,7 +559,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\utils\\crypto\\index.ts",
       "source_location": "L5",
       "id": "index_decrypt",
-      "community": 10,
+      "community": 11,
       "norm_label": "decrypt()",
       "degree": 4
     },
@@ -569,7 +569,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\utils\\dayjs\\index.ts",
       "source_location": "L1",
       "id": "d_project_alex_miaosha_mobile_src_utils_dayjs_index_ts",
-      "community": 6,
+      "community": 8,
       "norm_label": "index.ts",
       "degree": 6
     },
@@ -579,7 +579,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\utils\\dayjs\\index.ts",
       "source_location": "L23",
       "id": "index_formatdayjs",
-      "community": 6,
+      "community": 8,
       "norm_label": "formatdayjs()",
       "degree": 2
     },
@@ -589,7 +589,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\utils\\dayjs\\index.ts",
       "source_location": "L34",
       "id": "index_formatdate",
-      "community": 6,
+      "community": 8,
       "norm_label": "formatdate()",
       "degree": 2
     },
@@ -599,7 +599,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\common\\config\\index.ts",
       "source_location": "L20",
       "id": "index_formattime",
-      "community": 6,
+      "community": 8,
       "norm_label": "formattime()",
       "degree": 2
     },
@@ -609,7 +609,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\utils\\dayjs\\index.ts",
       "source_location": "L62",
       "id": "index_datepickerformatter",
-      "community": 6,
+      "community": 8,
       "norm_label": "datepickerformatter()",
       "degree": 1
     },
@@ -619,7 +619,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\utils\\dayjs\\index.ts",
       "source_location": "L82",
       "id": "index_getformattimeinfo",
-      "community": 6,
+      "community": 8,
       "norm_label": "getformattimeinfo()",
       "degree": 1
     },
@@ -629,7 +629,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\utils\\dayjs\\index.ts",
       "source_location": "L108",
       "id": "index_formatheaderdate",
-      "community": 6,
+      "community": 8,
       "norm_label": "formatheaderdate()",
       "degree": 1
     },
@@ -639,7 +639,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\utils\\permission\\index.ts",
       "source_location": "L1",
       "id": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_utils_permission_index_ts",
-      "community": 11,
+      "community": 12,
       "norm_label": "index.ts",
       "degree": 7
     },
@@ -649,7 +649,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\utils\\permission\\index.ts",
       "source_location": "L49",
       "id": "index_uniq",
-      "community": 11,
+      "community": 12,
       "norm_label": "uniq()",
       "degree": 2
     },
@@ -659,7 +659,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\utils\\permission\\index.ts",
       "source_location": "L52",
       "id": "index_pickprimaryrole",
-      "community": 11,
+      "community": 12,
       "norm_label": "pickprimaryrole()",
       "degree": 2
     },
@@ -669,7 +669,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\utils\\permission\\index.ts",
       "source_location": "L61",
       "id": "index_buildpermissioncontext",
-      "community": 11,
+      "community": 12,
       "norm_label": "buildpermissioncontext()",
       "degree": 2
     },
@@ -679,7 +679,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\utils\\permission\\index.ts",
       "source_location": "L75",
       "id": "index_normalizepermissioncontext",
-      "community": 11,
+      "community": 12,
       "norm_label": "normalizepermissioncontext()",
       "degree": 2
     },
@@ -689,7 +689,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\utils\\permission\\index.ts",
       "source_location": "L115",
       "id": "index_buildpermissionset",
-      "community": 11,
+      "community": 12,
       "norm_label": "buildpermissionset()",
       "degree": 1
     },
@@ -699,7 +699,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\utils\\permission\\index.ts",
       "source_location": "L118",
       "id": "index_issuperadmin",
-      "community": 11,
+      "community": 12,
       "norm_label": "issuperadmin()",
       "degree": 1
     },
@@ -709,7 +709,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\utils\\permission\\index.ts",
       "source_location": "L130",
       "id": "index_canaccesspermission",
-      "community": 11,
+      "community": 12,
       "norm_label": "canaccesspermission()",
       "degree": 1
     },
@@ -729,7 +729,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\utils\\request\\request.ts",
       "source_location": "L1",
       "id": "d_project_alex_miaosha_mobile_src_utils_request_request_ts",
-      "community": 10,
+      "community": 11,
       "norm_label": "request.ts",
       "degree": 5
     },
@@ -739,7 +739,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\utils\\request\\request.ts",
       "source_location": "L17",
       "id": "request_redirecttologin",
-      "community": 10,
+      "community": 11,
       "norm_label": "redirecttologin()",
       "degree": 5
     },
@@ -749,7 +749,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\utils\\request\\request.ts",
       "source_location": "L23",
       "id": "request_errorhandler",
-      "community": 10,
+      "community": 11,
       "norm_label": "errorhandler()",
       "degree": 3
     },
@@ -759,7 +759,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\utils\\request\\request.ts",
       "source_location": "L42",
       "id": "request_requesthandler",
-      "community": 10,
+      "community": 11,
       "norm_label": "requesthandler()",
       "degree": 2
     },
@@ -769,7 +769,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\utils\\request\\request.ts",
       "source_location": "L57",
       "id": "request_requesthandlerfile",
-      "community": 10,
+      "community": 11,
       "norm_label": "requesthandlerfile()",
       "degree": 2
     },
@@ -779,7 +779,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\utils\\request\\request.ts",
       "source_location": "L72",
       "id": "request_responsehandler",
-      "community": 10,
+      "community": 11,
       "norm_label": "responsehandler()",
       "degree": 3
     },
@@ -789,7 +789,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\utils\\router\\index.ts",
       "source_location": "L1",
       "id": "d_project_alex_miaosha_mobile_src_utils_router_index_ts",
-      "community": 6,
+      "community": 8,
       "norm_label": "index.ts",
       "degree": 1
     },
@@ -799,7 +799,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\utils\\router\\index.ts",
       "source_location": "L10",
       "id": "index_getroutepathbyname",
-      "community": 6,
+      "community": 8,
       "norm_label": "getroutepathbyname()",
       "degree": 2
     },
@@ -899,7 +899,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\common\\config\\index.ts",
       "source_location": "L1",
       "id": "d_project_alex_miaosha_mobile_src_views_common_config_index_ts",
-      "community": 6,
+      "community": 8,
       "norm_label": "index.ts",
       "degree": 3
     },
@@ -909,7 +909,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\common\\config\\index.ts",
       "source_location": "L95",
       "id": "index_getlistname",
-      "community": 6,
+      "community": 8,
       "norm_label": "getlistname()",
       "degree": 3
     },
@@ -1399,7 +1399,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\file\\api\\index.ts",
       "source_location": "L1",
       "id": "d_project_alex_miaosha_mobile_src_views_file_api_index_ts",
-      "community": 0,
+      "community": 9,
       "norm_label": "index.ts",
       "degree": 5
     },
@@ -1409,7 +1409,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\file\\api\\index.ts",
       "source_location": "L19",
       "id": "index_getfilepage",
-      "community": 0,
+      "community": 9,
       "norm_label": "getfilepage()",
       "degree": 2
     },
@@ -1419,7 +1419,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\file\\api\\index.ts",
       "source_location": "L30",
       "id": "index_getfiledetail",
-      "community": 0,
+      "community": 9,
       "norm_label": "getfiledetail()",
       "degree": 2
     },
@@ -1429,7 +1429,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\file\\api\\index.ts",
       "source_location": "L34",
       "id": "index_addfilemanager",
-      "community": 0,
+      "community": 9,
       "norm_label": "addfilemanager()",
       "degree": 2
     },
@@ -1439,7 +1439,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\file\\api\\index.ts",
       "source_location": "L41",
       "id": "index_editfilemanager",
-      "community": 0,
+      "community": 9,
       "norm_label": "editfilemanager()",
       "degree": 2
     },
@@ -1449,7 +1449,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\finance\\dict\\api\\index.ts",
       "source_location": "L40",
       "id": "index_deletedictmanager",
-      "community": 0,
+      "community": 9,
       "norm_label": "deletedictmanager()",
       "degree": 3
     },
@@ -1481,7 +1481,7 @@
       "id": "index_if",
       "community": 6,
       "norm_label": "if()",
-      "degree": 8
+      "degree": 9
     },
     {
       "label": "accountRecordInfoDetailTs.ts",
@@ -1589,7 +1589,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\finance\\accountRecordInfo\\api\\index.ts",
       "source_location": "L1",
       "id": "d_project_alex_miaosha_mobile_src_views_finance_accountrecordinfo_api_index_ts",
-      "community": 17,
+      "community": 0,
       "norm_label": "index.ts",
       "degree": 5
     },
@@ -1599,7 +1599,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\finance\\accountRecordInfo\\api\\index.ts",
       "source_location": "L12",
       "id": "index_getaccountrecordinfopage",
-      "community": 17,
+      "community": 0,
       "norm_label": "getaccountrecordinfopage()",
       "degree": 2
     },
@@ -1609,7 +1609,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\finance\\accountRecordInfo\\api\\index.ts",
       "source_location": "L24",
       "id": "index_getaccountrecordinfodetail",
-      "community": 17,
+      "community": 0,
       "norm_label": "getaccountrecordinfodetail()",
       "degree": 3
     },
@@ -1619,7 +1619,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\finance\\accountRecordInfo\\api\\index.ts",
       "source_location": "L32",
       "id": "index_deleteaccountrecordinfo",
-      "community": 17,
+      "community": 0,
       "norm_label": "deleteaccountrecordinfo()",
       "degree": 2
     },
@@ -1629,7 +1629,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\finance\\accountRecordInfo\\api\\index.ts",
       "source_location": "L38",
       "id": "index_addaccountrecordinfo",
-      "community": 17,
+      "community": 0,
       "norm_label": "addaccountrecordinfo()",
       "degree": 2
     },
@@ -1639,7 +1639,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\finance\\accountRecordInfo\\api\\index.ts",
       "source_location": "L44",
       "id": "index_updateaccountrecordinfo",
-      "community": 17,
+      "community": 0,
       "norm_label": "updateaccountrecordinfo()",
       "degree": 2
     },
@@ -1799,7 +1799,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\finance\\dict\\api\\index.ts",
       "source_location": "L1",
       "id": "d_project_alex_miaosha_mobile_src_views_finance_dict_api_index_ts",
-      "community": 13,
+      "community": 9,
       "norm_label": "index.ts",
       "degree": 6
     },
@@ -1809,7 +1809,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\finance\\dict\\api\\index.ts",
       "source_location": "L20",
       "id": "index_getdictmanagerpage",
-      "community": 13,
+      "community": 9,
       "norm_label": "getdictmanagerpage()",
       "degree": 2
     },
@@ -1819,7 +1819,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\finance\\dict\\api\\index.ts",
       "source_location": "L32",
       "id": "index_getdictlist",
-      "community": 13,
+      "community": 9,
       "norm_label": "getdictlist()",
       "degree": 4
     },
@@ -1829,7 +1829,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\finance\\dict\\api\\index.ts",
       "source_location": "L36",
       "id": "index_getdictmanagerdetail",
-      "community": 13,
+      "community": 9,
       "norm_label": "getdictmanagerdetail()",
       "degree": 2
     },
@@ -1839,7 +1839,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\finance\\dict\\api\\index.ts",
       "source_location": "L44",
       "id": "index_adddictmanager",
-      "community": 13,
+      "community": 9,
       "norm_label": "adddictmanager()",
       "degree": 2
     },
@@ -1849,7 +1849,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\finance\\dict\\api\\index.ts",
       "source_location": "L48",
       "id": "index_editdictmanager",
-      "community": 13,
+      "community": 9,
       "norm_label": "editdictmanager()",
       "degree": 2
     },
@@ -2039,7 +2039,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\financeManager\\index.vue",
       "source_location": "L365",
       "id": "index_fetchcategories",
-      "community": 13,
+      "community": 9,
       "norm_label": "fetchcategories()",
       "degree": 2
     },
@@ -2049,7 +2049,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\financeManager\\index.vue",
       "source_location": "L372",
       "id": "index_fetchusers",
-      "community": 12,
+      "community": 13,
       "norm_label": "fetchusers()",
       "degree": 2
     },
@@ -2059,7 +2059,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\finance\\personalGift\\index.vue",
       "source_location": "L122",
       "id": "index_getdetailroutepath",
-      "community": 6,
+      "community": 8,
       "norm_label": "getdetailroutepath()",
       "degree": 3
     },
@@ -2199,9 +2199,9 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\config.ts",
       "source_location": "L1",
       "id": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_gift_config_ts",
-      "community": 8,
+      "community": 6,
       "norm_label": "config.ts",
-      "degree": 12
+      "degree": 15
     },
     {
       "label": "directionText()",
@@ -2209,7 +2209,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\config.ts",
       "source_location": "L143",
       "id": "config_directiontext",
-      "community": 8,
+      "community": 6,
       "norm_label": "directiontext()",
       "degree": 1
     },
@@ -2219,7 +2219,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\config.ts",
       "source_location": "L146",
       "id": "config_directionlabel",
-      "community": 8,
+      "community": 6,
       "norm_label": "directionlabel()",
       "degree": 1
     },
@@ -2229,7 +2229,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\config.ts",
       "source_location": "L149",
       "id": "config_formatmoney",
-      "community": 8,
+      "community": 6,
       "norm_label": "formatmoney()",
       "degree": 3
     },
@@ -2239,7 +2239,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\config.ts",
       "source_location": "L154",
       "id": "config_directionclass",
-      "community": 8,
+      "community": 6,
       "norm_label": "directionclass()",
       "degree": 1
     },
@@ -2249,7 +2249,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\config.ts",
       "source_location": "L160",
       "id": "config_toselectoptions",
-      "community": 8,
+      "community": 6,
       "norm_label": "toselectoptions()",
       "degree": 2
     },
@@ -2259,7 +2259,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\config.ts",
       "source_location": "L164",
       "id": "config_resolvepresetcode",
-      "community": 8,
+      "community": 6,
       "norm_label": "resolvepresetcode()",
       "degree": 1
     },
@@ -2269,7 +2269,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\config.ts",
       "source_location": "L175",
       "id": "config_buildgiftrelationselectoptions",
-      "community": 8,
+      "community": 6,
       "norm_label": "buildgiftrelationselectoptions()",
       "degree": 2
     },
@@ -2279,7 +2279,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\config.ts",
       "source_location": "L193",
       "id": "config_ispresetrelationtype",
-      "community": 8,
+      "community": 6,
       "norm_label": "ispresetrelationtype()",
       "degree": 1
     },
@@ -2289,7 +2289,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\config.ts",
       "source_location": "L206",
       "id": "config_findoptionidbyrelationtype",
-      "community": 8,
+      "community": 6,
       "norm_label": "findoptionidbyrelationtype()",
       "degree": 2
     },
@@ -2299,9 +2299,9 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\config.ts",
       "source_location": "L221",
       "id": "config_maprelationtoformfields",
-      "community": 8,
+      "community": 6,
       "norm_label": "maprelationtoformfields()",
-      "degree": 3
+      "degree": 2
     },
     {
       "label": "buildRelationTypeForSave()",
@@ -2309,9 +2309,9 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\config.ts",
       "source_location": "L257",
       "id": "config_buildrelationtypeforsave",
-      "community": 8,
+      "community": 6,
       "norm_label": "buildrelationtypeforsave()",
-      "degree": 2
+      "degree": 1
     },
     {
       "label": "relationLabel()",
@@ -2319,8 +2319,38 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\config.ts",
       "source_location": "L270",
       "id": "config_relationlabel",
-      "community": 8,
+      "community": 6,
       "norm_label": "relationlabel()",
+      "degree": 1
+    },
+    {
+      "label": "maskPhone()",
+      "file_type": "code",
+      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\config.ts",
+      "source_location": "L281",
+      "id": "config_maskphone",
+      "community": 6,
+      "norm_label": "maskphone()",
+      "degree": 1
+    },
+    {
+      "label": "shouldCollapseRemark()",
+      "file_type": "code",
+      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\config.ts",
+      "source_location": "L288",
+      "id": "config_shouldcollapseremark",
+      "community": 6,
+      "norm_label": "shouldcollapseremark()",
+      "degree": 1
+    },
+    {
+      "label": "collapseRemark()",
+      "file_type": "code",
+      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\config.ts",
+      "source_location": "L292",
+      "id": "config_collapseremark",
+      "community": 6,
+      "norm_label": "collapseremark()",
       "degree": 1
     },
     {
@@ -2541,7 +2571,7 @@
       "id": "index_getgiftpersonprofile",
       "community": 3,
       "norm_label": "getgiftpersonprofile()",
-      "degree": 4
+      "degree": 3
     },
     {
       "label": "getGiftPersonRelationOptions()",
@@ -2561,7 +2591,7 @@
       "id": "index_getgiftpersondetail",
       "community": 3,
       "norm_label": "getgiftpersondetail()",
-      "degree": 4
+      "degree": 3
     },
     {
       "label": "getGiftPersonList()",
@@ -2601,7 +2631,7 @@
       "id": "index_deletegiftperson",
       "community": 3,
       "norm_label": "deletegiftperson()",
-      "degree": 4
+      "degree": 3
     },
     {
       "label": "index.vue",
@@ -2609,109 +2639,29 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
       "source_location": "L1",
       "id": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_gift_person_giftpersondetail_index_vue",
-      "community": 8,
+      "community": 6,
       "norm_label": "index.vue",
-      "degree": 10
+      "degree": 3
     },
     {
       "label": "directionText()",
       "file_type": "code",
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L54",
+      "source_location": "L93",
       "id": "index_directiontext",
-      "community": 8,
+      "community": 6,
       "norm_label": "directiontext()",
       "degree": 2
     },
     {
-      "label": "toSavePayload()",
+      "label": "formatPayTime()",
       "file_type": "code",
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L267",
-      "id": "index_tosavepayload",
-      "community": 8,
-      "norm_label": "tosavepayload()",
-      "degree": 3
-    },
-    {
-      "label": "goList()",
-      "file_type": "code",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L275",
-      "id": "index_golist",
-      "community": 8,
-      "norm_label": "golist()",
-      "degree": 5
-    },
-    {
-      "label": "loadProfile()",
-      "file_type": "code",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L279",
-      "id": "index_loadprofile",
-      "community": 8,
-      "norm_label": "loadprofile()",
-      "degree": 4
-    },
-    {
-      "label": "loadForm()",
-      "file_type": "code",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L299",
-      "id": "index_loadform",
-      "community": 8,
-      "norm_label": "loadform()",
-      "degree": 5
-    },
-    {
-      "label": "openEdit()",
-      "file_type": "code",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L318",
-      "id": "index_openedit",
-      "community": 8,
-      "norm_label": "openedit()",
-      "degree": 2
-    },
-    {
-      "label": "onRelationConfirm()",
-      "file_type": "code",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L325",
-      "id": "index_onrelationconfirm",
-      "community": 8,
-      "norm_label": "onrelationconfirm()",
+      "source_location": "L94",
+      "id": "index_formatpaytime",
+      "community": 6,
+      "norm_label": "formatpaytime()",
       "degree": 1
-    },
-    {
-      "label": "savePerson()",
-      "file_type": "code",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L334",
-      "id": "index_saveperson",
-      "community": 8,
-      "norm_label": "saveperson()",
-      "degree": 3
-    },
-    {
-      "label": "removePerson()",
-      "file_type": "code",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L355",
-      "id": "index_removeperson",
-      "community": 8,
-      "norm_label": "removeperson()",
-      "degree": 3
-    },
-    {
-      "label": "init()",
-      "file_type": "code",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\roleUserInfo\\index.vue",
-      "source_location": "L189",
-      "id": "index_init",
-      "community": 1,
-      "norm_label": "init()",
-      "degree": 36
     },
     {
       "label": "index.vue",
@@ -2719,7 +2669,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\record\\index.vue",
       "source_location": "L1",
       "id": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_gift_record_index_vue",
-      "community": 3,
+      "community": 7,
       "norm_label": "index.vue",
       "degree": 7
     },
@@ -2729,7 +2679,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\record\\index.vue",
       "source_location": "L229",
       "id": "index_openquickrecord",
-      "community": 3,
+      "community": 7,
       "norm_label": "openquickrecord()",
       "degree": 1
     },
@@ -2839,7 +2789,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\finance\\orgInfo\\api\\index.ts",
       "source_location": "L1",
       "id": "d_project_alex_miaosha_mobile_src_views_finance_orginfo_api_index_ts",
-      "community": 1,
+      "community": 14,
       "norm_label": "index.ts",
       "degree": 5
     },
@@ -2849,7 +2799,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\orgInfo\\api\\index.ts",
       "source_location": "L12",
       "id": "index_getorginfopage",
-      "community": 1,
+      "community": 14,
       "norm_label": "getorginfopage()",
       "degree": 4
     },
@@ -2859,7 +2809,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\orgInfo\\api\\index.ts",
       "source_location": "L24",
       "id": "index_getorginfodetail",
-      "community": 1,
+      "community": 14,
       "norm_label": "getorginfodetail()",
       "degree": 4
     },
@@ -2869,7 +2819,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\orgInfo\\api\\index.ts",
       "source_location": "L28",
       "id": "index_deleteorginfo",
-      "community": 1,
+      "community": 14,
       "norm_label": "deleteorginfo()",
       "degree": 4
     },
@@ -2879,7 +2829,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\orgInfo\\api\\index.ts",
       "source_location": "L32",
       "id": "index_addorginfo",
-      "community": 1,
+      "community": 14,
       "norm_label": "addorginfo()",
       "degree": 3
     },
@@ -2889,7 +2839,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\orgInfo\\api\\index.ts",
       "source_location": "L36",
       "id": "index_updateorginfo",
-      "community": 1,
+      "community": 14,
       "norm_label": "updateorginfo()",
       "degree": 3
     },
@@ -2909,7 +2859,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\finance\\personalGift\\index.vue",
       "source_location": "L1",
       "id": "d_project_alex_miaosha_mobile_src_views_finance_personalgift_index_vue",
-      "community": 6,
+      "community": 8,
       "norm_label": "index.vue",
       "degree": 3
     },
@@ -2919,7 +2869,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\finance\\personalGift\\index.vue",
       "source_location": "L153",
       "id": "index_getdateclass",
-      "community": 6,
+      "community": 8,
       "norm_label": "getdateclass()",
       "degree": 1
     },
@@ -3059,7 +3009,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\finance\\shopCart\\api\\index.ts",
       "source_location": "L25",
       "id": "index_getshopcartdetail",
-      "community": 0,
+      "community": 2,
       "norm_label": "getshopcartdetail()",
       "degree": 2
     },
@@ -4194,6 +4144,16 @@
       "degree": 1
     },
     {
+      "label": "init()",
+      "file_type": "code",
+      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\roleUserInfo\\index.vue",
+      "source_location": "L189",
+      "id": "index_init",
+      "community": 1,
+      "norm_label": "init()",
+      "degree": 32
+    },
+    {
       "label": "index.vue",
       "file_type": "code",
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\goods\\index.vue",
@@ -4429,7 +4389,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\product\\pmsAttr\\index.vue",
       "source_location": "L180",
       "id": "index_delpmsattr",
-      "community": 1,
+      "community": 15,
       "norm_label": "delpmsattr()",
       "degree": 2
     },
@@ -4449,7 +4409,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\product\\pmsAttr\\api\\index.ts",
       "source_location": "L1",
       "id": "d_project_alex_miaosha_mobile_src_views_product_pmsattr_api_index_ts",
-      "community": 1,
+      "community": 15,
       "norm_label": "index.ts",
       "degree": 5
     },
@@ -4459,7 +4419,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\product\\pmsAttr\\api\\index.ts",
       "source_location": "L12",
       "id": "index_getpmsattrpage",
-      "community": 1,
+      "community": 15,
       "norm_label": "getpmsattrpage()",
       "degree": 3
     },
@@ -4469,7 +4429,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\product\\pmsAttr\\api\\index.ts",
       "source_location": "L24",
       "id": "index_getpmsattrdetail",
-      "community": 1,
+      "community": 15,
       "norm_label": "getpmsattrdetail()",
       "degree": 3
     },
@@ -4479,7 +4439,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\product\\pmsAttr\\api\\index.ts",
       "source_location": "L28",
       "id": "index_deletepmsattr",
-      "community": 1,
+      "community": 15,
       "norm_label": "deletepmsattr()",
       "degree": 3
     },
@@ -4489,7 +4449,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\product\\pmsAttr\\api\\index.ts",
       "source_location": "L32",
       "id": "index_addpmsattr",
-      "community": 1,
+      "community": 15,
       "norm_label": "addpmsattr()",
       "degree": 2
     },
@@ -4499,7 +4459,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\product\\pmsAttr\\api\\index.ts",
       "source_location": "L36",
       "id": "index_updatepmsattr",
-      "community": 1,
+      "community": 15,
       "norm_label": "updatepmsattr()",
       "degree": 2
     },
@@ -4959,7 +4919,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\selfFinance\\prepaidCardInfoT\\api\\index.ts",
       "source_location": "L21",
       "id": "index_getprepaidcardinfodetail",
-      "community": 2,
+      "community": 0,
       "norm_label": "getprepaidcardinfodetail()",
       "degree": 2
     },
@@ -5029,7 +4989,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\selfFinance\\prepaidCardInfoT\\api\\index.ts",
       "source_location": "L72",
       "id": "index_getprepaidconsumerecorddetail",
-      "community": 2,
+      "community": 0,
       "norm_label": "getprepaidconsumerecorddetail()",
       "degree": 2
     },
@@ -5149,7 +5109,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\selfFinance\\prepaidCardInfoT\\consume-info\\index.vue",
       "source_location": "L220",
       "id": "index_confirmconsume",
-      "community": 4,
+      "community": 0,
       "norm_label": "confirmconsume()",
       "degree": 2
     },
@@ -5239,7 +5199,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\menuInfo\\index.vue",
       "source_location": "L180",
       "id": "index_delmenuinfo",
-      "community": 14,
+      "community": 1,
       "norm_label": "delmenuinfo()",
       "degree": 2
     },
@@ -5259,7 +5219,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\menuInfo\\api\\index.ts",
       "source_location": "L1",
       "id": "d_project_alex_miaosha_mobile_src_views_user_menuinfo_api_index_ts",
-      "community": 14,
+      "community": 1,
       "norm_label": "index.ts",
       "degree": 5
     },
@@ -5269,7 +5229,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\menuInfo\\api\\index.ts",
       "source_location": "L12",
       "id": "index_getmenuinfopage",
-      "community": 14,
+      "community": 1,
       "norm_label": "getmenuinfopage()",
       "degree": 3
     },
@@ -5279,7 +5239,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\menuInfo\\api\\index.ts",
       "source_location": "L24",
       "id": "index_getmenuinfodetail",
-      "community": 14,
+      "community": 1,
       "norm_label": "getmenuinfodetail()",
       "degree": 3
     },
@@ -5289,7 +5249,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\menuInfo\\api\\index.ts",
       "source_location": "L28",
       "id": "index_deletemenuinfo",
-      "community": 14,
+      "community": 1,
       "norm_label": "deletemenuinfo()",
       "degree": 3
     },
@@ -5299,7 +5259,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\menuInfo\\api\\index.ts",
       "source_location": "L32",
       "id": "index_addmenuinfo",
-      "community": 14,
+      "community": 1,
       "norm_label": "addmenuinfo()",
       "degree": 2
     },
@@ -5309,7 +5269,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\menuInfo\\api\\index.ts",
       "source_location": "L36",
       "id": "index_updatemenuinfo",
-      "community": 14,
+      "community": 1,
       "norm_label": "updatemenuinfo()",
       "degree": 2
     },
@@ -5379,7 +5339,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\orgInfo\\api\\index.ts",
       "source_location": "L1",
       "id": "d_project_alex_miaosha_mobile_src_views_user_orginfo_api_index_ts",
-      "community": 1,
+      "community": 14,
       "norm_label": "index.ts",
       "degree": 5
     },
@@ -5429,7 +5389,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\orgUserInfo\\index.vue",
       "source_location": "L178",
       "id": "index_delorguserinfo",
-      "community": 15,
+      "community": 1,
       "norm_label": "delorguserinfo()",
       "degree": 2
     },
@@ -5449,7 +5409,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\orgUserInfo\\api\\index.ts",
       "source_location": "L1",
       "id": "d_project_alex_miaosha_mobile_src_views_user_orguserinfo_api_index_ts",
-      "community": 15,
+      "community": 1,
       "norm_label": "index.ts",
       "degree": 5
     },
@@ -5459,7 +5419,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\orgUserInfo\\api\\index.ts",
       "source_location": "L12",
       "id": "index_getorguserinfopage",
-      "community": 15,
+      "community": 1,
       "norm_label": "getorguserinfopage()",
       "degree": 3
     },
@@ -5469,7 +5429,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\orgUserInfo\\api\\index.ts",
       "source_location": "L24",
       "id": "index_getorguserinfodetail",
-      "community": 15,
+      "community": 1,
       "norm_label": "getorguserinfodetail()",
       "degree": 3
     },
@@ -5479,7 +5439,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\orgUserInfo\\api\\index.ts",
       "source_location": "L28",
       "id": "index_deleteorguserinfo",
-      "community": 15,
+      "community": 1,
       "norm_label": "deleteorguserinfo()",
       "degree": 3
     },
@@ -5489,7 +5449,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\orgUserInfo\\api\\index.ts",
       "source_location": "L32",
       "id": "index_addorguserinfo",
-      "community": 15,
+      "community": 1,
       "norm_label": "addorguserinfo()",
       "degree": 2
     },
@@ -5499,7 +5459,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\orgUserInfo\\api\\index.ts",
       "source_location": "L36",
       "id": "index_updateorguserinfo",
-      "community": 15,
+      "community": 1,
       "norm_label": "updateorguserinfo()",
       "degree": 2
     },
@@ -5679,7 +5639,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\roleInfo\\api\\index.ts",
       "source_location": "L1",
       "id": "d_project_alex_miaosha_mobile_src_views_user_roleinfo_api_index_ts",
-      "community": 0,
+      "community": 1,
       "norm_label": "index.ts",
       "degree": 5
     },
@@ -5689,7 +5649,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\roleInfo\\api\\index.ts",
       "source_location": "L12",
       "id": "index_getroleinfopage",
-      "community": 0,
+      "community": 1,
       "norm_label": "getroleinfopage()",
       "degree": 3
     },
@@ -5699,7 +5659,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\roleInfo\\api\\index.ts",
       "source_location": "L24",
       "id": "index_getroleinfodetail",
-      "community": 0,
+      "community": 1,
       "norm_label": "getroleinfodetail()",
       "degree": 3
     },
@@ -5709,7 +5669,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\roleInfo\\api\\index.ts",
       "source_location": "L28",
       "id": "index_deleteroleinfo",
-      "community": 0,
+      "community": 1,
       "norm_label": "deleteroleinfo()",
       "degree": 2
     },
@@ -5719,7 +5679,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\roleInfo\\api\\index.ts",
       "source_location": "L32",
       "id": "index_addroleinfo",
-      "community": 0,
+      "community": 1,
       "norm_label": "addroleinfo()",
       "degree": 2
     },
@@ -5729,7 +5689,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\roleInfo\\api\\index.ts",
       "source_location": "L36",
       "id": "index_updateroleinfo",
-      "community": 0,
+      "community": 1,
       "norm_label": "updateroleinfo()",
       "degree": 2
     },
@@ -5779,7 +5739,7 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\rolePermissionInfo\\index.vue",
       "source_location": "L183",
       "id": "index_delrolepermissioninfo",
-      "community": 1,
+      "community": 16,
       "norm_label": "delrolepermissioninfo()",
       "degree": 2
     },
@@ -5799,7 +5759,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\rolePermissionInfo\\api\\index.ts",
       "source_location": "L1",
       "id": "d_project_alex_miaosha_mobile_src_views_user_rolepermissioninfo_api_index_ts",
-      "community": 1,
+      "community": 16,
       "norm_label": "index.ts",
       "degree": 5
     },
@@ -5809,7 +5769,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\rolePermissionInfo\\api\\index.ts",
       "source_location": "L12",
       "id": "index_getrolepermissioninfopage",
-      "community": 1,
+      "community": 16,
       "norm_label": "getrolepermissioninfopage()",
       "degree": 3
     },
@@ -5819,7 +5779,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\rolePermissionInfo\\api\\index.ts",
       "source_location": "L24",
       "id": "index_getrolepermissioninfodetail",
-      "community": 1,
+      "community": 16,
       "norm_label": "getrolepermissioninfodetail()",
       "degree": 3
     },
@@ -5829,7 +5789,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\rolePermissionInfo\\api\\index.ts",
       "source_location": "L32",
       "id": "index_deleterolepermissioninfo",
-      "community": 1,
+      "community": 16,
       "norm_label": "deleterolepermissioninfo()",
       "degree": 3
     },
@@ -5839,7 +5799,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\rolePermissionInfo\\api\\index.ts",
       "source_location": "L38",
       "id": "index_addrolepermissioninfo",
-      "community": 1,
+      "community": 16,
       "norm_label": "addrolepermissioninfo()",
       "degree": 2
     },
@@ -5849,7 +5809,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\rolePermissionInfo\\api\\index.ts",
       "source_location": "L44",
       "id": "index_updaterolepermissioninfo",
-      "community": 1,
+      "community": 16,
       "norm_label": "updaterolepermissioninfo()",
       "degree": 2
     },
@@ -6019,7 +5979,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\userManager\\api\\index.ts",
       "source_location": "L1",
       "id": "d_project_alex_miaosha_mobile_src_views_user_usermanager_api_index_ts",
-      "community": 12,
+      "community": 13,
       "norm_label": "index.ts",
       "degree": 6
     },
@@ -6029,7 +5989,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\userManager\\api\\index.ts",
       "source_location": "L13",
       "id": "index_getusermanagerpage",
-      "community": 12,
+      "community": 13,
       "norm_label": "getusermanagerpage()",
       "degree": 2
     },
@@ -6039,7 +5999,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\userManager\\api\\index.ts",
       "source_location": "L25",
       "id": "index_getusermanagerdetail",
-      "community": 12,
+      "community": 13,
       "norm_label": "getusermanagerdetail()",
       "degree": 2
     },
@@ -6049,7 +6009,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\userManager\\api\\index.ts",
       "source_location": "L29",
       "id": "index_deleteusermanager",
-      "community": 12,
+      "community": 13,
       "norm_label": "deleteusermanager()",
       "degree": 2
     },
@@ -6059,7 +6019,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\userManager\\api\\index.ts",
       "source_location": "L33",
       "id": "index_addusermanager",
-      "community": 12,
+      "community": 13,
       "norm_label": "addusermanager()",
       "degree": 2
     },
@@ -6069,7 +6029,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\userManager\\api\\index.ts",
       "source_location": "L37",
       "id": "index_editusermanager",
-      "community": 12,
+      "community": 13,
       "norm_label": "editusermanager()",
       "degree": 2
     },
@@ -6079,7 +6039,7 @@
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\userManager\\api\\index.ts",
       "source_location": "L41",
       "id": "index_getusermanagerlist",
-      "community": 12,
+      "community": 13,
       "norm_label": "getusermanagerlist()",
       "degree": 4
     },
@@ -6786,8 +6746,8 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\shopStockBatch\\shopStockBatchDetail\\index.vue",
       "source_location": "L252",
       "weight": 1,
-      "_src": "index_onsubmit",
-      "_tgt": "index_formatdayjs",
+      "_src": "index_formatdayjs",
+      "_tgt": "index_onsubmit",
       "source": "index_formatdayjs",
       "target": "index_onsubmit"
     },
@@ -6798,8 +6758,8 @@
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\shopStockBatch\\shopStockBatchDetail\\index.vue",
       "source_location": "L272",
       "weight": 1,
-      "_src": "index_init",
-      "_tgt": "index_formatdate",
+      "_src": "index_formatdate",
+      "_tgt": "index_init",
       "source": "index_formatdate",
       "target": "index_init"
     },
@@ -10562,6 +10522,18 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
+      "source_location": "L352",
+      "weight": 1,
+      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_gift_person_giftpersondetail_index_vue",
+      "_tgt": "index_if",
+      "source": "index_if",
+      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_gift_person_giftpersondetail_index_vue",
+      "confidence_score": 1
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\finance\\shopFinance\\shopFinanceDetail\\index.vue",
       "source_location": "L382",
       "weight": 1,
@@ -11976,6 +11948,42 @@
       "confidence_score": 1
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\config.ts",
+      "source_location": "L281",
+      "weight": 1,
+      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_gift_config_ts",
+      "_tgt": "config_maskphone",
+      "source": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_gift_config_ts",
+      "target": "config_maskphone",
+      "confidence_score": 1
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\config.ts",
+      "source_location": "L288",
+      "weight": 1,
+      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_gift_config_ts",
+      "_tgt": "config_shouldcollapseremark",
+      "source": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_gift_config_ts",
+      "target": "config_shouldcollapseremark",
+      "confidence_score": 1
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\config.ts",
+      "source_location": "L292",
+      "weight": 1,
+      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_gift_config_ts",
+      "_tgt": "config_collapseremark",
+      "source": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_gift_config_ts",
+      "target": "config_collapseremark",
+      "confidence_score": 1
+    },
+    {
       "relation": "calls",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
@@ -12022,30 +12030,6 @@
       "source": "config_findoptionidbyrelationtype",
       "target": "config_maprelationtoformfields",
       "confidence_score": 1
-    },
-    {
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L309",
-      "weight": 1,
-      "_src": "config_maprelationtoformfields",
-      "_tgt": "index_loadform",
-      "source": "config_maprelationtoformfields",
-      "target": "index_loadform"
-    },
-    {
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L271",
-      "weight": 1,
-      "_src": "config_buildrelationtypeforsave",
-      "_tgt": "index_tosavepayload",
-      "source": "config_buildrelationtypeforsave",
-      "target": "index_tosavepayload"
     },
     {
       "relation": "contains",
@@ -12840,46 +12824,10 @@
       "confidence_score": 1
     },
     {
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L288",
-      "weight": 1,
-      "_src": "index_getgiftpersonprofile",
-      "_tgt": "index_loadprofile",
-      "source": "index_getgiftpersonprofile",
-      "target": "index_loadprofile"
-    },
-    {
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L307",
-      "weight": 1,
-      "_src": "index_getgiftpersondetail",
-      "_tgt": "index_loadform",
-      "source": "index_getgiftpersondetail",
-      "target": "index_loadform"
-    },
-    {
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L365",
-      "weight": 1,
-      "_src": "index_deletegiftperson",
-      "_tgt": "index_removeperson",
-      "source": "index_deletegiftperson",
-      "target": "index_removeperson"
-    },
-    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L54",
+      "source_location": "L93",
       "weight": 1,
       "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_gift_person_giftpersondetail_index_vue",
       "_tgt": "index_directiontext",
@@ -12891,541 +12839,13 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L267",
+      "source_location": "L94",
       "weight": 1,
       "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_gift_person_giftpersondetail_index_vue",
-      "_tgt": "index_tosavepayload",
+      "_tgt": "index_formatpaytime",
       "source": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_gift_person_giftpersondetail_index_vue",
-      "target": "index_tosavepayload",
+      "target": "index_formatpaytime",
       "confidence_score": 1
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L275",
-      "weight": 1,
-      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_gift_person_giftpersondetail_index_vue",
-      "_tgt": "index_golist",
-      "source": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_gift_person_giftpersondetail_index_vue",
-      "target": "index_golist",
-      "confidence_score": 1
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L279",
-      "weight": 1,
-      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_gift_person_giftpersondetail_index_vue",
-      "_tgt": "index_loadprofile",
-      "source": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_gift_person_giftpersondetail_index_vue",
-      "target": "index_loadprofile",
-      "confidence_score": 1
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L299",
-      "weight": 1,
-      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_gift_person_giftpersondetail_index_vue",
-      "_tgt": "index_loadform",
-      "source": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_gift_person_giftpersondetail_index_vue",
-      "target": "index_loadform",
-      "confidence_score": 1
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L318",
-      "weight": 1,
-      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_gift_person_giftpersondetail_index_vue",
-      "_tgt": "index_openedit",
-      "source": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_gift_person_giftpersondetail_index_vue",
-      "target": "index_openedit",
-      "confidence_score": 1
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L325",
-      "weight": 1,
-      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_gift_person_giftpersondetail_index_vue",
-      "_tgt": "index_onrelationconfirm",
-      "source": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_gift_person_giftpersondetail_index_vue",
-      "target": "index_onrelationconfirm",
-      "confidence_score": 1
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L334",
-      "weight": 1,
-      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_gift_person_giftpersondetail_index_vue",
-      "_tgt": "index_saveperson",
-      "source": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_gift_person_giftpersondetail_index_vue",
-      "target": "index_saveperson",
-      "confidence_score": 1
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L355",
-      "weight": 1,
-      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_gift_person_giftpersondetail_index_vue",
-      "_tgt": "index_removeperson",
-      "source": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_gift_person_giftpersondetail_index_vue",
-      "target": "index_removeperson",
-      "confidence_score": 1
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L377",
-      "weight": 1,
-      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_gift_person_giftpersondetail_index_vue",
-      "_tgt": "index_init",
-      "source": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_gift_person_giftpersondetail_index_vue",
-      "target": "index_init",
-      "confidence_score": 1
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L343",
-      "weight": 1,
-      "_src": "index_saveperson",
-      "_tgt": "index_tosavepayload",
-      "source": "index_tosavepayload",
-      "target": "index_saveperson",
-      "confidence_score": 1
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L283",
-      "weight": 1,
-      "_src": "index_loadprofile",
-      "_tgt": "index_golist",
-      "source": "index_golist",
-      "target": "index_loadprofile",
-      "confidence_score": 1
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L346",
-      "weight": 1,
-      "_src": "index_saveperson",
-      "_tgt": "index_golist",
-      "source": "index_golist",
-      "target": "index_saveperson",
-      "confidence_score": 1
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L368",
-      "weight": 1,
-      "_src": "index_removeperson",
-      "_tgt": "index_golist",
-      "source": "index_golist",
-      "target": "index_removeperson",
-      "confidence_score": 1
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L385",
-      "weight": 1,
-      "_src": "index_init",
-      "_tgt": "index_golist",
-      "source": "index_golist",
-      "target": "index_init",
-      "confidence_score": 1
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L380",
-      "weight": 1,
-      "_src": "index_init",
-      "_tgt": "index_loadprofile",
-      "source": "index_loadprofile",
-      "target": "index_init",
-      "confidence_score": 1
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L322",
-      "weight": 1,
-      "_src": "index_openedit",
-      "_tgt": "index_loadform",
-      "source": "index_loadform",
-      "target": "index_openedit",
-      "confidence_score": 1
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\gift\\person\\giftPersonDetail\\index.vue",
-      "source_location": "L389",
-      "weight": 1,
-      "_src": "index_init",
-      "_tgt": "index_loadform",
-      "source": "index_loadform",
-      "target": "index_init",
-      "confidence_score": 1
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\shopStockBatch\\shopStockBatchDetail\\index.vue",
-      "source_location": "L266",
-      "weight": 1,
-      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_shopstockbatch_shopstockbatchdetail_index_vue",
-      "_tgt": "index_init",
-      "source": "index_init",
-      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_shopstockbatch_shopstockbatchdetail_index_vue",
-      "confidence_score": 1
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\rolePermissionInfo\\rolePermissionInfoDetail\\index.vue",
-      "source_location": "L165",
-      "weight": 1,
-      "_src": "index_init",
-      "_tgt": "index_getdictinfolist",
-      "source": "index_init",
-      "target": "index_getdictinfolist",
-      "confidence_score": 1
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\product\\pmsAttr\\index.vue",
-      "source_location": "L191",
-      "weight": 1,
-      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_product_pmsattr_index_vue",
-      "_tgt": "index_init",
-      "source": "index_init",
-      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_product_pmsattr_index_vue",
-      "confidence_score": 1
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\roleUserInfo\\index.vue",
-      "source_location": "L192",
-      "weight": 1,
-      "_src": "index_init",
-      "_tgt": "index_query",
-      "source": "index_init",
-      "target": "index_query",
-      "confidence_score": 1
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\roleUserInfo\\index.vue",
-      "source_location": "L194",
-      "weight": 1,
-      "_src": "index_init",
-      "_tgt": "index_getuserinfolist",
-      "source": "index_init",
-      "target": "index_getuserinfolist",
-      "confidence_score": 1
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\product\\pmsAttr\\pmsAttrDetail\\index.vue",
-      "source_location": "L128",
-      "weight": 1,
-      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_product_pmsattr_pmsattrdetail_index_vue",
-      "_tgt": "index_init",
-      "source": "index_init",
-      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_product_pmsattr_pmsattrdetail_index_vue",
-      "confidence_score": 1
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\selfFinance\\prepaidCardInfoT\\consume-info\\index.vue",
-      "source_location": "L286",
-      "weight": 1,
-      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_selffinance_prepaidcardinfot_consume_info_index_vue",
-      "_tgt": "index_init",
-      "source": "index_init",
-      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_selffinance_prepaidcardinfot_consume_info_index_vue",
-      "confidence_score": 1
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\menuInfo\\index.vue",
-      "source_location": "L191",
-      "weight": 1,
-      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_menuinfo_index_vue",
-      "_tgt": "index_init",
-      "source": "index_init",
-      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_menuinfo_index_vue",
-      "confidence_score": 1
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\menuInfo\\menuInfoDetail\\index.vue",
-      "source_location": "L238",
-      "weight": 1,
-      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_menuinfo_menuinfodetail_index_vue",
-      "_tgt": "index_init",
-      "source": "index_init",
-      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_menuinfo_menuinfodetail_index_vue",
-      "confidence_score": 1
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\orgInfo\\index.vue",
-      "source_location": "L194",
-      "weight": 1,
-      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_orginfo_index_vue",
-      "_tgt": "index_init",
-      "source": "index_init",
-      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_orginfo_index_vue",
-      "confidence_score": 1
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\orgInfo\\orgInfoDetail\\index.vue",
-      "source_location": "L202",
-      "weight": 1,
-      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_orginfo_orginfodetail_index_vue",
-      "_tgt": "index_init",
-      "source": "index_init",
-      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_orginfo_orginfodetail_index_vue",
-      "confidence_score": 1
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\orgUserInfo\\index.vue",
-      "source_location": "L189",
-      "weight": 1,
-      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_orguserinfo_index_vue",
-      "_tgt": "index_init",
-      "source": "index_init",
-      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_orguserinfo_index_vue",
-      "confidence_score": 1
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\orgUserInfo\\orgUserInfoDetail\\index.vue",
-      "source_location": "L148",
-      "weight": 1,
-      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_orguserinfo_orguserinfodetail_index_vue",
-      "_tgt": "index_init",
-      "source": "index_init",
-      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_orguserinfo_orguserinfodetail_index_vue",
-      "confidence_score": 1
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\permissionInfo\\index.vue",
-      "source_location": "L199",
-      "weight": 1,
-      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_permissioninfo_index_vue",
-      "_tgt": "index_init",
-      "source": "index_init",
-      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_permissioninfo_index_vue",
-      "confidence_score": 1
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\roleInfo\\index.vue",
-      "source_location": "L203",
-      "weight": 1,
-      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_roleinfo_index_vue",
-      "_tgt": "index_init",
-      "source": "index_init",
-      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_roleinfo_index_vue",
-      "confidence_score": 1
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\roleInfo\\roleInfoDetail\\index.vue",
-      "source_location": "L149",
-      "weight": 1,
-      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_roleinfo_roleinfodetail_index_vue",
-      "_tgt": "index_init",
-      "source": "index_init",
-      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_roleinfo_roleinfodetail_index_vue",
-      "confidence_score": 1
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\rolePermissionInfo\\index.vue",
-      "source_location": "L194",
-      "weight": 1,
-      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_rolepermissioninfo_index_vue",
-      "_tgt": "index_init",
-      "source": "index_init",
-      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_rolepermissioninfo_index_vue",
-      "confidence_score": 1
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\rolePermissionInfo\\rolePermissionInfoDetail\\index.vue",
-      "source_location": "L153",
-      "weight": 1,
-      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_rolepermissioninfo_rolepermissioninfodetail_index_vue",
-      "_tgt": "index_init",
-      "source": "index_init",
-      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_rolepermissioninfo_rolepermissioninfodetail_index_vue",
-      "confidence_score": 1
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\roleUserInfo\\index.vue",
-      "source_location": "L189",
-      "weight": 1,
-      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_roleuserinfo_index_vue",
-      "_tgt": "index_init",
-      "source": "index_init",
-      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_roleuserinfo_index_vue",
-      "confidence_score": 1
-    },
-    {
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\shopStockBatch\\shopStockBatchDetail\\index.vue",
-      "source_location": "L271",
-      "weight": 1,
-      "_src": "index_init",
-      "_tgt": "index_getshopstockbatchdetail",
-      "source": "index_init",
-      "target": "index_getshopstockbatchdetail"
-    },
-    {
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "src\\views\\product\\pmsAttr\\pmsAttrDetail\\index.vue",
-      "source_location": "L119",
-      "weight": 1,
-      "_src": "index_init",
-      "_tgt": "index_getpmsattrdetail",
-      "source": "index_init",
-      "target": "index_getpmsattrdetail"
-    },
-    {
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "src\\views\\user\\menuInfo\\menuInfoDetail\\index.vue",
-      "source_location": "L226",
-      "weight": 1,
-      "_src": "index_init",
-      "_tgt": "index_getmenuinfodetail",
-      "source": "index_init",
-      "target": "index_getmenuinfodetail"
-    },
-    {
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "src\\views\\user\\orgInfo\\orgInfoDetail\\index.vue",
-      "source_location": "L211",
-      "weight": 1,
-      "_src": "index_init",
-      "_tgt": "index_getorginfodetail",
-      "source": "index_init",
-      "target": "index_getorginfodetail"
-    },
-    {
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "src\\views\\user\\orgUserInfo\\orgUserInfoDetail\\index.vue",
-      "source_location": "L143",
-      "weight": 1,
-      "_src": "index_init",
-      "_tgt": "index_getorguserinfodetail",
-      "source": "index_init",
-      "target": "index_getorguserinfodetail"
-    },
-    {
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "src\\views\\user\\roleInfo\\roleInfoDetail\\index.vue",
-      "source_location": "L143",
-      "weight": 1,
-      "_src": "index_init",
-      "_tgt": "index_getroleinfodetail",
-      "source": "index_init",
-      "target": "index_getroleinfodetail"
-    },
-    {
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "src\\views\\user\\rolePermissionInfo\\rolePermissionInfoDetail\\index.vue",
-      "source_location": "L147",
-      "weight": 1,
-      "_src": "index_init",
-      "_tgt": "index_getrolepermissioninfodetail",
-      "source": "index_init",
-      "target": "index_getrolepermissioninfodetail"
-    },
-    {
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "src\\views\\user\\permissionInfo\\permissionInfoDetail\\index.vue",
-      "source_location": "L155",
-      "weight": 1,
-      "_src": "index_init",
-      "_tgt": "index_getpermissioninfodetail",
-      "source": "index_init",
-      "target": "index_getpermissioninfodetail"
-    },
-    {
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "src\\views\\user\\roleUserInfo\\roleUserInfoDetail\\index.vue",
-      "source_location": "L143",
-      "weight": 1,
-      "_src": "index_init",
-      "_tgt": "index_getroleuserinfodetail",
-      "source": "index_init",
-      "target": "index_getroleuserinfodetail"
     },
     {
       "relation": "contains",
@@ -13692,6 +13112,18 @@
       "confidence_score": 1
     },
     {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src\\views\\user\\orgInfo\\orgInfoDetail\\index.vue",
+      "source_location": "L211",
+      "weight": 1,
+      "_src": "index_init",
+      "_tgt": "index_getorginfodetail",
+      "source": "index_getorginfodetail",
+      "target": "index_init"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\alex_miaosha_mobile\\src\\views\\user\\orgInfo\\api\\index.ts",
@@ -13833,6 +13265,18 @@
       "_tgt": "index_getdictinfolist",
       "source": "index_getdictinfolist",
       "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_shopstockbatch_shopstockbatchdetail_index_vue",
+      "confidence_score": 1
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\rolePermissionInfo\\rolePermissionInfoDetail\\index.vue",
+      "source_location": "L165",
+      "weight": 1,
+      "_src": "index_init",
+      "_tgt": "index_getdictinfolist",
+      "source": "index_getdictinfolist",
+      "target": "index_init",
       "confidence_score": 1
     },
     {
@@ -14844,6 +14288,18 @@
       "confidence_score": 1
     },
     {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\shopStockBatch\\shopStockBatchDetail\\index.vue",
+      "source_location": "L271",
+      "weight": 1,
+      "_src": "index_init",
+      "_tgt": "index_getshopstockbatchdetail",
+      "source": "index_getshopstockbatchdetail",
+      "target": "index_init"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\shopStockBatch\\shopStockBatchDetail\\index.vue",
@@ -14854,6 +14310,306 @@
       "source": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_shopstockbatch_shopstockbatchdetail_index_vue",
       "target": "index_ondateconfirm",
       "confidence_score": 1
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\finance\\shopStockBatch\\shopStockBatchDetail\\index.vue",
+      "source_location": "L266",
+      "weight": 1,
+      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_shopstockbatch_shopstockbatchdetail_index_vue",
+      "_tgt": "index_init",
+      "source": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_finance_shopstockbatch_shopstockbatchdetail_index_vue",
+      "target": "index_init",
+      "confidence_score": 1
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\product\\pmsAttr\\index.vue",
+      "source_location": "L191",
+      "weight": 1,
+      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_product_pmsattr_index_vue",
+      "_tgt": "index_init",
+      "source": "index_init",
+      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_product_pmsattr_index_vue",
+      "confidence_score": 1
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\roleUserInfo\\index.vue",
+      "source_location": "L192",
+      "weight": 1,
+      "_src": "index_init",
+      "_tgt": "index_query",
+      "source": "index_init",
+      "target": "index_query",
+      "confidence_score": 1
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\roleUserInfo\\index.vue",
+      "source_location": "L194",
+      "weight": 1,
+      "_src": "index_init",
+      "_tgt": "index_getuserinfolist",
+      "source": "index_init",
+      "target": "index_getuserinfolist",
+      "confidence_score": 1
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\product\\pmsAttr\\pmsAttrDetail\\index.vue",
+      "source_location": "L128",
+      "weight": 1,
+      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_product_pmsattr_pmsattrdetail_index_vue",
+      "_tgt": "index_init",
+      "source": "index_init",
+      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_product_pmsattr_pmsattrdetail_index_vue",
+      "confidence_score": 1
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\selfFinance\\prepaidCardInfoT\\consume-info\\index.vue",
+      "source_location": "L286",
+      "weight": 1,
+      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_selffinance_prepaidcardinfot_consume_info_index_vue",
+      "_tgt": "index_init",
+      "source": "index_init",
+      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_selffinance_prepaidcardinfot_consume_info_index_vue",
+      "confidence_score": 1
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\menuInfo\\index.vue",
+      "source_location": "L191",
+      "weight": 1,
+      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_menuinfo_index_vue",
+      "_tgt": "index_init",
+      "source": "index_init",
+      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_menuinfo_index_vue",
+      "confidence_score": 1
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\menuInfo\\menuInfoDetail\\index.vue",
+      "source_location": "L238",
+      "weight": 1,
+      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_menuinfo_menuinfodetail_index_vue",
+      "_tgt": "index_init",
+      "source": "index_init",
+      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_menuinfo_menuinfodetail_index_vue",
+      "confidence_score": 1
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\orgInfo\\index.vue",
+      "source_location": "L194",
+      "weight": 1,
+      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_orginfo_index_vue",
+      "_tgt": "index_init",
+      "source": "index_init",
+      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_orginfo_index_vue",
+      "confidence_score": 1
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\orgInfo\\orgInfoDetail\\index.vue",
+      "source_location": "L202",
+      "weight": 1,
+      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_orginfo_orginfodetail_index_vue",
+      "_tgt": "index_init",
+      "source": "index_init",
+      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_orginfo_orginfodetail_index_vue",
+      "confidence_score": 1
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\orgUserInfo\\index.vue",
+      "source_location": "L189",
+      "weight": 1,
+      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_orguserinfo_index_vue",
+      "_tgt": "index_init",
+      "source": "index_init",
+      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_orguserinfo_index_vue",
+      "confidence_score": 1
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\orgUserInfo\\orgUserInfoDetail\\index.vue",
+      "source_location": "L148",
+      "weight": 1,
+      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_orguserinfo_orguserinfodetail_index_vue",
+      "_tgt": "index_init",
+      "source": "index_init",
+      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_orguserinfo_orguserinfodetail_index_vue",
+      "confidence_score": 1
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\permissionInfo\\index.vue",
+      "source_location": "L199",
+      "weight": 1,
+      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_permissioninfo_index_vue",
+      "_tgt": "index_init",
+      "source": "index_init",
+      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_permissioninfo_index_vue",
+      "confidence_score": 1
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\roleInfo\\index.vue",
+      "source_location": "L203",
+      "weight": 1,
+      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_roleinfo_index_vue",
+      "_tgt": "index_init",
+      "source": "index_init",
+      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_roleinfo_index_vue",
+      "confidence_score": 1
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\roleInfo\\roleInfoDetail\\index.vue",
+      "source_location": "L149",
+      "weight": 1,
+      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_roleinfo_roleinfodetail_index_vue",
+      "_tgt": "index_init",
+      "source": "index_init",
+      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_roleinfo_roleinfodetail_index_vue",
+      "confidence_score": 1
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\rolePermissionInfo\\index.vue",
+      "source_location": "L194",
+      "weight": 1,
+      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_rolepermissioninfo_index_vue",
+      "_tgt": "index_init",
+      "source": "index_init",
+      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_rolepermissioninfo_index_vue",
+      "confidence_score": 1
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\rolePermissionInfo\\rolePermissionInfoDetail\\index.vue",
+      "source_location": "L153",
+      "weight": 1,
+      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_rolepermissioninfo_rolepermissioninfodetail_index_vue",
+      "_tgt": "index_init",
+      "source": "index_init",
+      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_rolepermissioninfo_rolepermissioninfodetail_index_vue",
+      "confidence_score": 1
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "F:\\workplace\\project\\myself\\frontend\\alex_miaosha_mobile\\src\\views\\user\\roleUserInfo\\index.vue",
+      "source_location": "L189",
+      "weight": 1,
+      "_src": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_roleuserinfo_index_vue",
+      "_tgt": "index_init",
+      "source": "index_init",
+      "target": "f_workplace_project_myself_frontend_alex_miaosha_mobile_src_views_user_roleuserinfo_index_vue",
+      "confidence_score": 1
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src\\views\\product\\pmsAttr\\pmsAttrDetail\\index.vue",
+      "source_location": "L119",
+      "weight": 1,
+      "_src": "index_init",
+      "_tgt": "index_getpmsattrdetail",
+      "source": "index_init",
+      "target": "index_getpmsattrdetail"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src\\views\\user\\menuInfo\\menuInfoDetail\\index.vue",
+      "source_location": "L226",
+      "weight": 1,
+      "_src": "index_init",
+      "_tgt": "index_getmenuinfodetail",
+      "source": "index_init",
+      "target": "index_getmenuinfodetail"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src\\views\\user\\orgUserInfo\\orgUserInfoDetail\\index.vue",
+      "source_location": "L143",
+      "weight": 1,
+      "_src": "index_init",
+      "_tgt": "index_getorguserinfodetail",
+      "source": "index_init",
+      "target": "index_getorguserinfodetail"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src\\views\\user\\roleInfo\\roleInfoDetail\\index.vue",
+      "source_location": "L143",
+      "weight": 1,
+      "_src": "index_init",
+      "_tgt": "index_getroleinfodetail",
+      "source": "index_init",
+      "target": "index_getroleinfodetail"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src\\views\\user\\rolePermissionInfo\\rolePermissionInfoDetail\\index.vue",
+      "source_location": "L147",
+      "weight": 1,
+      "_src": "index_init",
+      "_tgt": "index_getrolepermissioninfodetail",
+      "source": "index_init",
+      "target": "index_getrolepermissioninfodetail"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src\\views\\user\\permissionInfo\\permissionInfoDetail\\index.vue",
+      "source_location": "L155",
+      "weight": 1,
+      "_src": "index_init",
+      "_tgt": "index_getpermissioninfodetail",
+      "source": "index_init",
+      "target": "index_getpermissioninfodetail"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src\\views\\user\\roleUserInfo\\roleUserInfoDetail\\index.vue",
+      "source_location": "L143",
+      "weight": 1,
+      "_src": "index_init",
+      "_tgt": "index_getroleuserinfodetail",
+      "source": "index_init",
+      "target": "index_getroleuserinfodetail"
     },
     {
       "relation": "contains",

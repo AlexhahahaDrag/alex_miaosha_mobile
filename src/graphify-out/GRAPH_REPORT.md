@@ -1,12 +1,12 @@
 # Graph Report - F:\workplace\project\myself\frontend\alex_miaosha_mobile\src  (2026-07-24)
 
 ## Corpus Check
-- 237 files · ~90,601 words
+- 237 files · ~91,082 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 621 nodes · 878 edges · 157 communities detected
-- Extraction: 67% EXTRACTED · 33% INFERRED · 0% AMBIGUOUS · INFERRED: 286 edges (avg confidence: 0.8)
+- 617 nodes · 861 edges · 157 communities detected
+- Extraction: 67% EXTRACTED · 33% INFERRED · 0% AMBIGUOUS · INFERRED: 281 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -171,9 +171,9 @@
 ## God Nodes (most connected - your core abstractions)
 1. `postData()` - 82 edges
 2. `getData()` - 57 edges
-3. `init()` - 36 edges
-4. `putData()` - 35 edges
-5. `deleteData()` - 35 edges
+3. `putData()` - 35 edges
+4. `deleteData()` - 35 edges
+5. `init()` - 32 edges
 6. `query()` - 22 edges
 7. `refresh()` - 19 edges
 8. `baseUrl()` - 16 edges
@@ -181,90 +181,90 @@
 10. `onSubmit()` - 12 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `onSubmit()` --calls--> `formatDayjs()`  [INFERRED]
-  F:\workplace\project\myself\frontend\alex_miaosha_mobile\src\views\user\rolePermissionInfo\rolePermissionInfoDetail\index.vue → D:\project\alex_miaosha_mobile\src\utils\dayjs\index.ts
-- `init()` --calls--> `formatDate()`  [INFERRED]
-  F:\workplace\project\myself\frontend\alex_miaosha_mobile\src\views\user\roleUserInfo\index.vue → D:\project\alex_miaosha_mobile\src\utils\dayjs\index.ts
+- `formatDayjs()` --calls--> `onSubmit()`  [INFERRED]
+  D:\project\alex_miaosha_mobile\src\utils\dayjs\index.ts → F:\workplace\project\myself\frontend\alex_miaosha_mobile\src\views\user\rolePermissionInfo\rolePermissionInfoDetail\index.vue
+- `formatDate()` --calls--> `init()`  [INFERRED]
+  D:\project\alex_miaosha_mobile\src\utils\dayjs\index.ts → F:\workplace\project\myself\frontend\alex_miaosha_mobile\src\views\user\roleUserInfo\index.vue
 - `postData()` --calls--> `redeemCpnUserCouponInfo()`  [INFERRED]
   D:\project\alex_miaosha_mobile\src\views\common\api\index.ts → D:\project\alex_miaosha_mobile\src\views\cpn-coupon\cpn-user-coupon-info\api\index.ts
-- `postData()` --calls--> `getAccountRecordInfoPage()`  [INFERRED]
-  D:\project\alex_miaosha_mobile\src\views\common\api\index.ts → D:\project\alex_miaosha_mobile\src\views\finance\accountRecordInfo\api\index.ts
-- `postData()` --calls--> `addAccountRecordInfo()`  [INFERRED]
-  D:\project\alex_miaosha_mobile\src\views\common\api\index.ts → D:\project\alex_miaosha_mobile\src\views\finance\accountRecordInfo\api\index.ts
+- `postData()` --calls--> `getFilePage()`  [INFERRED]
+  D:\project\alex_miaosha_mobile\src\views\common\api\index.ts → D:\project\alex_miaosha_mobile\src\views\file\api\index.ts
+- `postData()` --calls--> `getDictManagerPage()`  [INFERRED]
+  D:\project\alex_miaosha_mobile\src\views\common\api\index.ts → D:\project\alex_miaosha_mobile\src\views\finance\dict\api\index.ts
 
 ## Communities
 
 ### Community 0 - "Community 0"
 Cohesion: 0.03
-Nodes (99): addAccountRecordInfoTest(), addConsumeCardRecord(), addCpnCouponInfo(), addFileManager(), addPmsBrand(), addPmsCategory(), addPmsShopProduct(), addPmsShopWantProduct() (+91 more)
+Nodes (96): addAccountRecordInfo(), addAccountRecordInfoTest(), addConsumeCardRecord(), addCpnCouponInfo(), addPmsBrand(), addPmsCategory(), addPmsShopProduct(), addPmsShopWantProduct() (+88 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.07
-Nodes (38): if(), addOrgInfo(), addPermissionInfo(), addPmsAttr(), addRolePermissionInfo(), addRoleUserInfo(), deleteOrgInfo(), deletePermissionInfo() (+30 more)
+Nodes (38): if(), addMenuInfo(), addOrgUserInfo(), addPermissionInfo(), addRoleInfo(), addRoleUserInfo(), deleteMenuInfo(), deleteOrgUserInfo() (+30 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.06
-Nodes (37): addShopStock(), deleteBlogById(), deleteShopStock(), getAllAmount(), getAllStock(), getBalance(), getBenefit(), getCashAmount() (+29 more)
+Nodes (36): addShopStock(), deleteBlogById(), deleteShopStock(), getAllAmount(), getAllStock(), getBalance(), getBenefit(), getCashAmount() (+28 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.1
 Nodes (29): addGiftEvent(), addGiftPerson(), addGiftRecord(), baseUrl(), deleteGiftPerson(), deleteGiftRecord(), getGiftEventList(), getGiftEventPage() (+21 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.12
-Nodes (16): addShopStockBatch(), cancelDateInfo(), cancelInfo(), choose(), chooseDate(), confirmConsume(), deleteShopStockBatch(), getDictInfoList() (+8 more)
+Cohesion: 0.13
+Nodes (15): addShopStockBatch(), cancelDateInfo(), cancelInfo(), choose(), chooseDate(), deleteShopStockBatch(), getDictInfoList(), getShopStockBatchDetail() (+7 more)
 
 ### Community 5 - "Community 5"
 Cohesion: 0.08
 Nodes (19): emit(), onSelect(), onRefresh(), onCancel(), onClickOverlay(), onConfirm(), handleClick(), onDelete() (+11 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.08
-Nodes (8): formatAmount(), formatDate(), formatDayjs(), formatTime(), getDetailRoutePath(), getListName(), getRoutePathByName(), if()
+Cohesion: 0.09
+Nodes (7): buildGiftRelationSelectOptions(), findOptionIdByRelationType(), formatMoney(), mapRelationToFormFields(), toSelectOptions(), directionText(), if()
 
 ### Community 7 - "Community 7"
-Cohesion: 0.16
+Cohesion: 0.14
 Nodes (18): addFinanceManger(), cancelRedeemCpnUserCouponInfo(), deleteFinanceManager(), editFinanceManger(), getCpnUserCouponInfoDetail(), getCpnUserCouponInfoPage(), getCpnUserCouponPageData(), getFinanceMangerDetail() (+10 more)
 
 ### Community 8 - "Community 8"
-Cohesion: 0.12
-Nodes (14): buildGiftRelationSelectOptions(), buildRelationTypeForSave(), findOptionIdByRelationType(), formatMoney(), mapRelationToFormFields(), toSelectOptions(), directionText(), goList() (+6 more)
+Cohesion: 0.1
+Nodes (7): formatAmount(), formatDate(), formatDayjs(), formatTime(), getDetailRoutePath(), getListName(), getRoutePathByName()
 
 ### Community 9 - "Community 9"
+Cohesion: 0.15
+Nodes (11): addDictManager(), addFileManager(), deleteDictManager(), editDictManager(), editFileManager(), fetchCategories(), getDictList(), getDictManagerDetail() (+3 more)
+
+### Community 10 - "Community 10"
 Cohesion: 0.33
 Nodes (7): addRouter(), getChildren(), getChildrenField(), getPermissionList(), getRoleCode(), getStringField(), resolveViewComponent()
 
-### Community 10 - "Community 10"
+### Community 11 - "Community 11"
 Cohesion: 0.39
 Nodes (7): _decode(), decrypt(), errorHandler(), redirectToLogin(), requestHandler(), requestHandlerFile(), responseHandler()
 
-### Community 11 - "Community 11"
+### Community 12 - "Community 12"
 Cohesion: 0.32
 Nodes (4): buildPermissionContext(), normalizePermissionContext(), pickPrimaryRole(), uniq()
 
-### Community 12 - "Community 12"
+### Community 13 - "Community 13"
 Cohesion: 0.25
 Nodes (7): addUserManager(), deleteUserManager(), editUserManager(), fetchUsers(), getUserManagerDetail(), getUserManagerList(), getUserManagerPage()
 
-### Community 13 - "Community 13"
-Cohesion: 0.29
-Nodes (6): addDictManager(), editDictManager(), fetchCategories(), getDictList(), getDictManagerDetail(), getDictManagerPage()
-
 ### Community 14 - "Community 14"
-Cohesion: 0.29
-Nodes (6): addMenuInfo(), deleteMenuInfo(), delMenuInfo(), getMenuInfoDetail(), getMenuInfoPage(), updateMenuInfo()
+Cohesion: 0.48
+Nodes (5): addOrgInfo(), deleteOrgInfo(), getOrgInfoDetail(), getOrgInfoPage(), updateOrgInfo()
 
 ### Community 15 - "Community 15"
 Cohesion: 0.29
-Nodes (6): addOrgUserInfo(), deleteOrgUserInfo(), delOrgUserInfo(), getOrgUserInfoDetail(), getOrgUserInfoPage(), updateOrgUserInfo()
+Nodes (6): addPmsAttr(), deletePmsAttr(), delPmsAttr(), getPmsAttrDetail(), getPmsAttrPage(), updatePmsAttr()
 
 ### Community 16 - "Community 16"
 Cohesion: 0.29
-Nodes (1): vue (AutoImport)
+Nodes (6): addRolePermissionInfo(), deleteRolePermissionInfo(), delRolePermissionInfo(), getRolePermissionInfoDetail(), getRolePermissionInfoPage(), updateRolePermissionInfo()
 
 ### Community 17 - "Community 17"
-Cohesion: 0.33
-Nodes (5): addAccountRecordInfo(), deleteAccountRecordInfo(), getAccountRecordInfoDetail(), getAccountRecordInfoPage(), updateAccountRecordInfo()
+Cohesion: 0.29
+Nodes (1): vue (AutoImport)
 
 ### Community 18 - "Community 18"
 Cohesion: 0.5
@@ -1103,17 +1103,17 @@ Nodes (0):
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `getData()` connect `Community 2` to `Community 0`, `Community 1`, `Community 3`, `Community 4`, `Community 7`, `Community 12`, `Community 13`, `Community 14`, `Community 15`, `Community 17`?**
-  _High betweenness centrality (0.140) - this node is a cross-community bridge._
-- **Why does `postData()` connect `Community 0` to `Community 1`, `Community 2`, `Community 3`, `Community 4`, `Community 7`, `Community 12`, `Community 13`, `Community 14`, `Community 15`, `Community 17`?**
-  _High betweenness centrality (0.134) - this node is a cross-community bridge._
-- **Why does `init()` connect `Community 1` to `Community 0`, `Community 4`, `Community 6`, `Community 8`, `Community 13`, `Community 14`, `Community 15`, `Community 17`?**
-  _High betweenness centrality (0.090) - this node is a cross-community bridge._
+- **Why does `getData()` connect `Community 2` to `Community 0`, `Community 1`, `Community 3`, `Community 4`, `Community 7`, `Community 9`, `Community 13`, `Community 14`, `Community 15`, `Community 16`?**
+  _High betweenness centrality (0.146) - this node is a cross-community bridge._
+- **Why does `postData()` connect `Community 0` to `Community 1`, `Community 2`, `Community 3`, `Community 4`, `Community 7`, `Community 9`, `Community 13`, `Community 14`, `Community 15`, `Community 16`?**
+  _High betweenness centrality (0.137) - this node is a cross-community bridge._
+- **Why does `init()` connect `Community 1` to `Community 0`, `Community 4`, `Community 8`, `Community 9`, `Community 14`, `Community 15`, `Community 16`?**
+  _High betweenness centrality (0.068) - this node is a cross-community bridge._
 - **Are the 80 inferred relationships involving `postData()` (e.g. with `getCpnCouponInfoPage()` and `addCpnCouponInfo()`) actually correct?**
   _`postData()` has 80 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 55 inferred relationships involving `getData()` (e.g. with `getCpnCouponInfoDetail()` and `getCpnUserCouponInfoDetail()`) actually correct?**
   _`getData()` has 55 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 13 inferred relationships involving `init()` (e.g. with `if()` and `getShopStockBatchDetail()`) actually correct?**
-  _`init()` has 13 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 33 inferred relationships involving `putData()` (e.g. with `editCpnCouponInfo()` and `editFileManager()`) actually correct?**
   _`putData()` has 33 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 33 inferred relationships involving `deleteData()` (e.g. with `deleteCpnCouponInfo()` and `deleteDictManager()`) actually correct?**
+  _`deleteData()` has 33 INFERRED edges - model-reasoned connections that need verification._

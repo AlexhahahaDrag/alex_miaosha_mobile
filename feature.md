@@ -144,3 +144,4 @@
 - **关联 API**：`src/views/finance/gift/{person,event,record}/api/`
 - **权限标识**：页面权限 `gift:dashboard`、`gift:person`、`gift:event`、`gift:record`、`gift:analysis`; 按钮权限 `gift:view`、`gift:add`、`gift:edit`、`gift:delete`、`gift:export`。
 - **亲友管理**：列表走 `business-page`（汇总 + 关系筛选 + 收支摘要）；详情菜单 `giftPersonDetail`（`/finance/gift/person/giftPersonDetail`）同页切换档案/表单；按钮权限 `gift:view/add/edit/delete`。
+- 联系人详情（profile）：头部展示关系与脱敏手机号（默认隐藏中间四位，可显隐）；支持拨号与复制；基本信息仅保留备注（超 60 字折叠）；往来历史时间格式为 `YYYY-MM-DD HH:mm`。
