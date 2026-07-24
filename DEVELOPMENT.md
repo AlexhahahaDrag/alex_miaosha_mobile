@@ -21,6 +21,8 @@
   - 加载占位符首推骨架屏（Skeleton Screen，如 `<van-skeleton>`）而非空洞的 Loading 文本组件，以缓和首屏/列表下发时的加载焦虑。
   - 空状态应统一使用插画友好提示补充，替换原本默认的“暂无数据”。
 
+- **页面根节点高度**：挂在 layout `.content-container` 下的页面根节点若同时使用 `min-height: 100%` 与垂直 `padding`，必须设置 `box-sizing: border-box`，避免 content-box 下 padding 把总高度撑出无意义 Y 轴滚动条。不要改 layout 的 `overflow-y: auto` 契约。
+
 ---
 
 ## 2. 公共基础组件目录 (Common Components)
