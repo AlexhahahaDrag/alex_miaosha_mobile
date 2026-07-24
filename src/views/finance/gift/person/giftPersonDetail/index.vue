@@ -396,6 +396,7 @@ onMounted(() => {
 
 <style scoped lang="less">
 .gift-person-detail {
+	box-sizing: border-box;
 	min-height: 100%;
 	padding: 16px;
 	background: #f8fbff;
