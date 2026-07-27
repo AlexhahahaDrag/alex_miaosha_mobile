@@ -7,7 +7,15 @@
 			<section class="profile-hero">
 				<div class="profile-hero__wash" />
 				<div class="profile-hero__card">
-					<div class="avatar">{{ firstName(profile.person?.personName) }}</div>
+					<div class="avatar">
+						<img
+							v-if="profileAvatarUrl"
+							class="avatar-img"
+							:src="profileAvatarUrl"
+							alt=""
+						/>
+						<template v-else>{{ firstName(profile.person?.personName) }}</template>
+					</div>
 					<strong class="profile-hero__name">{{ profile.person?.personName || '-' }}</strong>
 					<p class="profile-hero__sub">
 						{{ relationLabel(profile.person?.relationType) }}
@@ -349,6 +357,11 @@ const displayRemark = computed(() => {
 	if (!remarkCollapsible.value || remarkExpanded.value) return remarkText.value;
 	return collapseRemark(remarkText.value);
 });
+
+/** 详情 Hero：缩略图优先，否则原图 */
+const profileAvatarUrl = computed(
+	() => profile.value.person?.avatarThumbnailUrl || profile.value.person?.avatarUrl || '',
+);
 
 const listPath = computed(() => getRoutePathByName(router, 'giftPerson', '/finance/gift/person'));
 
@@ -711,6 +724,7 @@ onMounted(() => {
 	height: 64px;
 	margin-bottom: 12px;
 	border-radius: 20px;
+	overflow: hidden;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -718,6 +732,13 @@ onMounted(() => {
 	background: #eff6ff;
 	font-weight: 800;
 	font-size: 24px;
+}
+
+.avatar-img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
 }
 
 .profile-hero__name {

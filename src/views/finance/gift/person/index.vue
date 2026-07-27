@@ -78,7 +78,15 @@
 					data-testid="gift-person-card"
 					@click="openDetail(item.id)"
 				>
-					<div class="avatar">{{ (item.personName || '?').slice(0, 1) }}</div>
+					<div class="avatar">
+						<img
+							v-if="item.avatarThumbnailUrl || item.avatarUrl"
+							class="avatar-img"
+							:src="item.avatarThumbnailUrl || item.avatarUrl"
+							alt=""
+						/>
+						<template v-else>{{ (item.personName || '?').slice(0, 1) }}</template>
+					</div>
 					<div class="person-card__main">
 						<strong>{{ item.personName || '未命名' }}</strong>
 						<span> {{ item.phone || '无手机号' }} · {{ relationLabel(item.relationType) }} </span>
@@ -191,4 +199,16 @@ onMounted(async () => {
 
 <style scoped lang="less">
 @import '../shared.less';
+
+.avatar {
+	border-radius: 20px;
+	overflow: hidden;
+}
+
+.avatar-img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
 </style>
