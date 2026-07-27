@@ -193,16 +193,21 @@ async function runCase(testCase, runtime, page, agent) {
 			await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
 			await agent.aiAssert('列表区域支持继续加载或已经显示没有更多数据');
 			break;
-		case 'GIFT-MOBILE-PERSON-001':
+		case 'GIFT-MOBILE-PERSON-001': {
+			// Register waiter before navigation — response may finish during goto.
+			const personApi = waitForGiftApi(page, testCase.waitFor || '/gift-person-info-t/business-page');
 			await gotoRoute(page, runtime, testCase.route);
-			await waitForGiftApi(page, testCase.waitFor || '/gift-person-info-t/business-page');
+			await personApi;
 			await assertVisibleTestIds(page, ['gift-person-summary', 'gift-person-list']);
 			break;
-		case 'GIFT-MOBILE-EVENT-001':
+		}
+		case 'GIFT-MOBILE-EVENT-001': {
+			const eventApi = waitForGiftApi(page, testCase.waitFor || '/gift-event-info-t/business-page');
 			await gotoRoute(page, runtime, testCase.route);
-			await waitForGiftApi(page, testCase.waitFor || '/gift-event-info-t/business-page');
+			await eventApi;
 			await assertVisibleTestIds(page, ['gift-event-summary', 'gift-event-list']);
 			break;
+		}
 		case 'GIFT-MOBILE-EVENT-002': {
 			let createdEventId = null;
 			try {
