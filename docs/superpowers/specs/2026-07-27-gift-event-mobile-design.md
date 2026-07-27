@@ -13,13 +13,13 @@ Mobile 现状（`event/index.vue`）仅为 keyword 列表 + 底部 popup 快速�
 
 ## 2. 已锁定决策
 
-| 项 | 选择 |
-| --- | --- |
-| 能力档位 | PC 能力对等；**不做**事由 profile + 关联礼金历史 |
-| 表单承载 | 独立页 `giftEventDetail`（对齐亲友） |
-| 列表点击 | 直接进编辑表单（需 `gift:edit`） |
-| 筛选/摘要 | PC 全量：summary + keyword + 快捷 tag + 类别 + 时间范围 |
-| 实现路径 | 镜像 person 模块（列表 + 详情表单 + composable + config helpers） |
+| 项        | 选择                                                              |
+| --------- | ----------------------------------------------------------------- |
+| 能力档位  | PC 能力对等；**不做**事由 profile + 关联礼金历史                  |
+| 表单承载  | 独立页 `giftEventDetail`（对齐亲友）                              |
+| 列表点击  | 直接进编辑表单（需 `gift:edit`）                                  |
+| 筛选/摘要 | PC 全量：summary + keyword + 快捷 tag + 类别 + 时间范围           |
+| 实现路径  | 镜像 person 模块（列表 + 详情表单 + composable + config helpers） |
 
 ## 3. 目标
 
@@ -39,15 +39,15 @@ Mobile 现状（`event/index.vue`）仅为 keyword 列表 + 底部 popup 快速�
 
 ## 5. 架构
 
-| 单元 | 路径 | 职责 |
-| --- | --- | --- |
-| 列表 | `src/views/finance/gift/event/index.vue` | summary + 筛选 + business 列表 + 跳转编辑/新增 |
-| 表单 | `src/views/finance/gift/event/giftEventDetail/index.vue` | 新增/编辑/删除；吸底保存 |
-| API | `src/views/finance/gift/event/api/index.ts` | business-page / summary / detail / add / update / delete / event-type-options；ID 转 string |
-| Config | `src/views/finance/gift/config.ts` | `GiftEventInfo/Business/Summary/Query/FormState` + `EVENT_TYPE_CUSTOM` + map/build/eventLabel 等 |
-| Composable | `src/composables/useGiftEventTypeOptions.ts` | 对齐 PC：options / quickEvents / load / resolveFilter / map |
-| Checklist | `tests/checklists/gift-event-mobile.md` | 七点法、状态机、权限、不测理由 |
-| 路由 | 动态菜单或静态补充 | name：`giftEventDetail`；列表支持 `?open=create` |
+| 单元       | 路径                                                     | 职责                                                                                             |
+| ---------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| 列表       | `src/views/finance/gift/event/index.vue`                 | summary + 筛选 + business 列表 + 跳转编辑/新增                                                   |
+| 表单       | `src/views/finance/gift/event/giftEventDetail/index.vue` | 新增/编辑/删除；吸底保存                                                                         |
+| API        | `src/views/finance/gift/event/api/index.ts`              | business-page / summary / detail / add / update / delete / event-type-options；ID 转 string      |
+| Config     | `src/views/finance/gift/config.ts`                       | `GiftEventInfo/Business/Summary/Query/FormState` + `EVENT_TYPE_CUSTOM` + map/build/eventLabel 等 |
+| Composable | `src/composables/useGiftEventTypeOptions.ts`             | 对齐 PC：options / quickEvents / load / resolveFilter / map                                      |
+| Checklist  | `tests/checklists/gift-event-mobile.md`                  | 七点法、状态机、权限、不测理由                                                                   |
+| 路由       | 动态菜单或静态补充                                       | name：`giftEventDetail`；列表支持 `?open=create`                                                 |
 
 数据流：列表筛选 → Query → business-page；摘要独立 summary；表单 detail → FormState → add/update；类型选项缓存于 composable。
 
@@ -69,13 +69,13 @@ Mobile 现状（`event/index.vue`）仅为 keyword 列表 + 底部 popup 快速�
 
 仅 form 模式（无 profile）。标题：新增事由 / 编辑事由。
 
-| 字段 | 规则 |
-| --- | --- |
-| 事由名称 | 必填 |
-| 类型 | ActionSheet；preset +「自定义…」 |
-| 自定义类型 | CUSTOM 时必填，≤20，不可与 preset 重名 |
-| 事由时间 | 可选；datetime picker → `YYYY-MM-DDTHH:mm:ss`（`@/utils/dayjs`） |
-| 备注 | 可选，不硬限 50 |
+| 字段       | 规则                                                             |
+| ---------- | ---------------------------------------------------------------- |
+| 事由名称   | 必填                                                             |
+| 类型       | ActionSheet；preset +「自定义…」                                 |
+| 自定义类型 | CUSTOM 时必填，≤20，不可与 preset 重名                           |
+| 事由时间   | 可选；datetime picker → `YYYY-MM-DDTHH:mm:ss`（`@/utils/dayjs`） |
+| 备注       | 可选，不硬限 50                                                  |
 
 **保存：** `canSave` = 名称非空 + 已选类型（CUSTOM 时自定义非空）；吸底 `gift-event-save`；「保存」/「保存更改」；payload 用 `buildEventTypeForSave`；成功回列表。
 
@@ -129,11 +129,11 @@ Mobile 现状（`event/index.vue`）仅为 keyword 列表 + 底部 popup 快速�
 
 ## 10. 实现顺序（供 plan 拆分）
 
-1. Config + helpers + composable + Vitest  
-2. Event API 补齐 + ID 规范化  
-3. 列表页重构（summary/筛选/business/权限/testid）  
-4. 表单页新建（路由/菜单、CRUD、吸底、删除）  
-5. Checklist + Midscene 抽样 + 文档/graphify  
+1. Config + helpers + composable + Vitest
+2. Event API 补齐 + ID 规范化
+3. 列表页重构（summary/筛选/business/权限/testid）
+4. 表单页新建（路由/菜单、CRUD、吸底、删除）
+5. Checklist + Midscene 抽样 + 文档/graphify
 
 ## 11. 风险与约束
 

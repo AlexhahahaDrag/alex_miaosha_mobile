@@ -36,11 +36,10 @@ ALTER TABLE `alex_finance`.`gift_person_info_t`
 
 ### 4.2 Entity / VO
 
-| 字段 | 类型 | 说明 |
-|---|---|---|
-| `avatar` | `Long` | 写库；序列化 `Long2StringSerializer` |
-| `avatarUrl` | `String` | 只读，OSS 原图/预览 URL |
-| `avatarThumbnailUrl` | `String` | 只读，缩略图 URL |
+| 字段         | 类型         | 说明                                              |
+| ------------ | ------------ | ------------------------------------------------- |
+| `avatar`     | `Long`       | 写库；序列化 `Long2StringSerializer`              |
+| `fileInfoVo` | `FileInfoVo` | 只读，OSS 回填（`preUrl` / `preThumbnailUrl` 等） |
 
 增改请求只接收 `avatar`（string/long id）；忽略客户端传入的 URL。
 
@@ -91,15 +90,15 @@ ALTER TABLE `alex_finance`.`gift_person_info_t`
 
 ## 6. 展示侧
 
-- **详情 Hero / 列表卡片**：`avatarThumbnailUrl || avatarUrl` 优先；否则首字（保持现视觉语言）
+- **详情 Hero / 列表卡片**：`fileInfoVo.preThumbnailUrl || fileInfoVo.preUrl` 优先；否则首字（保持现视觉语言）
 - Profile 隐私能力（脱敏等）不变
 
 ## 7. 测试
 
-| 层 | 内容 |
-|---|---|
-| 单元 | `formatPhoneDisplay` / `normalizePhoneDigits`；可选 `maskPhone` 回归 |
-| 后端 | OSS 回填 mock（有 fileId → URL；无/失败 → 空） |
+| 层              | 内容                                                                         |
+| --------------- | ---------------------------------------------------------------------------- |
+| 单元            | `formatPhoneDisplay` / `normalizePhoneDigits`；可选 `maskPhone` 回归         |
+| 后端            | OSS 回填 mock（有 fileId → URL；无/失败 → 空）                               |
 | 手动 / Midscene | 上传头像保存后详情可见；无头像首字；手机号格式；吸底；disabled；备注 50 截断 |
 
 `data-testid`：`gift-person-form`、`gift-person-save`、`gift-person-avatar-upload`、`gift-person-avatar-clear`。
@@ -112,8 +111,8 @@ ALTER TABLE `alex_finance`.`gift_person_info_t`
 
 ## 9. 与前序关系
 
-| 项 | 状态 |
-|---|---|
+| 项                  | 状态                             |
+| ------------------- | -------------------------------- |
 | Profile 视觉 / 隐私 | 已完成，本轮 form + 头像展示对齐 |
-| 历史分页 | 仍搁置 |
-| PC 编辑 UI | 非本轮 |
+| 历史分页            | 仍搁置                           |
+| PC 编辑 UI          | 非本轮                           |

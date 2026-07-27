@@ -27,38 +27,40 @@
 
 ### Backend (`alex_miaosha`)
 
-| File | Responsibility |
-|---|---|
-| `doc/sql/gift_person_avatar_20260727.sql` | 增量 ALTER |
+| File                                       | Responsibility                 |
+| ------------------------------------------ | ------------------------------ |
+| `doc/sql/gift_person_avatar_20260727.sql`  | 增量 ALTER                     |
 | `doc/sql/alex_finance_gift_management.sql` | 绿场 CREATE 同步加 `avatar` 列 |
-| `.../entity/GiftPersonInfo.java` | `avatar` 字段 |
-| `.../vo/GiftPersonInfoVo.java` | `avatar` + URL 字段 |
-| `finance_boot/pom.xml` | `oss_api` 依赖 |
-| `FinanceApplication.java` | Feign scan `com.alex.api.oss` |
-| `GiftPersonInfoServiceImp.java` | 回填 URL；增改透传 avatar |
+| `.../entity/GiftPersonInfo.java`           | `avatar` 字段                  |
+| `.../vo/GiftPersonInfoVo.java`             | `avatar` + URL 字段            |
+| `finance_boot/pom.xml`                     | `oss_api` 依赖                 |
+| `FinanceApplication.java`                  | Feign scan `com.alex.api.oss`  |
+| `GiftPersonInfoServiceImp.java`            | 回填 URL；增改透传 avatar      |
 
 ### Mobile (`alex_miaosha_mobile`)
 
-| File | Responsibility |
-|---|---|
-| `src/views/finance/gift/config.ts` | 类型 + phone helpers |
-| `src/views/finance/gift/config.spec.ts` | phone helpers 单测 |
+| File                                                       | Responsibility                   |
+| ---------------------------------------------------------- | -------------------------------- |
+| `src/views/finance/gift/config.ts`                         | 类型 + phone helpers             |
+| `src/views/finance/gift/config.spec.ts`                    | phone helpers 单测               |
 | `src/views/finance/gift/person/giftPersonDetail/index.vue` | form 重构 + 上传；profile 显示图 |
-| `src/views/finance/gift/person/index.vue` | 列表头像 |
-| `src/views/file/api/index.ts` | 确认上传返回类型（必要时修类型） |
-| `feature.md` | 文档 |
+| `src/views/finance/gift/person/index.vue`                  | 列表头像                         |
+| `src/views/file/api/index.ts`                              | 确认上传返回类型（必要时修类型） |
+| `feature.md`                                               | 文档                             |
 
 ---
 
 ### Task 1: Backend DDL + entity/VO fields
 
 **Files (backend repo):**
+
 - Create: `doc/sql/gift_person_avatar_20260727.sql`
 - Modify: `doc/sql/alex_finance_gift_management.sql`（CREATE TABLE `gift_person_info_t` 在 `phone` 后加列）
 - Modify: `alex_miaosha_finance/finance_boot/.../entity/GiftPersonInfo.java`
 - Modify: `alex_miaosha_finance/finance_api/.../vo/GiftPersonInfoVo.java`
 
 **Interfaces:**
+
 - Produces: entity/VO `avatar: Long`；VO `avatarUrl` / `avatarThumbnailUrl: String`
 
 - [ ] **Step 1: Write migrate SQL**
@@ -114,12 +116,14 @@ git commit -m "feat(gift): add person avatar file id column and VO fields"
 ### Task 2: Backend OssApi wiring + URL fill
 
 **Files (backend):**
+
 - Modify: `alex_miaosha_finance/finance_boot/pom.xml`（加 `oss_api`）
 - Modify: `alex_miaosha_finance/finance_boot/.../FinanceApplication.java`
 - Modify: `GiftPersonInfoServiceImp.java`
 - Create test (optional but preferred): `.../gift/person/GiftPersonAvatarFillTest.java` 或现有测试目录同风格
 
 **Interfaces:**
+
 - Consumes: `OssApi.getFileInfo(List<Long>)` → `FileInfoVo.preUrl` / `preThumbnailUrl`（对齐 `TUserServiceImpl.setAvatarUrls`）
 - Produces: `toVo` / 批量列表出口均带 URL（失败留空）
 
@@ -161,8 +165,8 @@ private void fillAvatarUrls(Collection<? extends GiftPersonInfoVo> records) { /*
 
 最小用例：
 
-1. `avatar != null` 且 OSS 返回 success → URL 被设置  
-2. OSS 抛异常 → VO 仍返回，URL 为 null  
+1. `avatar != null` 且 OSS 返回 success → URL 被设置
+2. OSS 抛异常 → VO 仍返回，URL 为 null
 
 - [ ] **Step 5: Compile**
 
@@ -188,10 +192,12 @@ git commit -m "feat(gift): resolve person avatar URLs via OssApi"
 ### Task 3: Mobile phone helpers (TDD)
 
 **Files (mobile):**
+
 - Modify: `src/views/finance/gift/config.ts`
 - Test: `src/views/finance/gift/config.spec.ts`
 
 **Interfaces:**
+
 - Produces:
   - `normalizePhoneDigits(phone?: string): string` — 仅保留数字
   - `formatPhoneDisplay(phone?: string): string` — 11 位 → `182 2222 2222`；否则原样（已 normalize 后的数字串）
@@ -244,11 +250,13 @@ git commit -m "feat(gift): add phone display and normalize helpers"
 ### Task 4: Types + form UI (avatar upload, groups, sticky save)
 
 **Files (mobile):**
+
 - Modify: `src/views/finance/gift/config.ts`（`GiftPersonInfo` 加 `avatar?` / `avatarUrl?` / `avatarThumbnailUrl?`）
 - Modify: `src/views/finance/gift/person/giftPersonDetail/index.vue`
 - Modify if needed: `src/views/file/api/index.ts`（返回类型改为 `ResponseBody<FileInfoData>` 若实际返回对象）
 
 **Interfaces:**
+
 - Consumes: Task 3 helpers；`addFileManager` from `@/views/file/api`
 - Produces: form 模式完整 UI；保存 payload 含 `avatar` string id、phone 纯数字、remark ≤50
 
@@ -282,22 +290,22 @@ avatarThumbnailUrl?: string;
 
 ```ts
 const canSave = computed(() => {
-  const nameOk = !!formState.value.personName?.trim();
-  if (!formState.value.relationMode) return false;
-  if (formState.value.relationMode === RELATION_CUSTOM) {
-    return nameOk && !!formState.value.customRelation?.trim();
-  }
-  return nameOk;
+	const nameOk = !!formState.value.personName?.trim();
+	if (!formState.value.relationMode) return false;
+	if (formState.value.relationMode === RELATION_CUSTOM) {
+		return nameOk && !!formState.value.customRelation?.trim();
+	}
+	return nameOk;
 });
 
 const onAvatarAfterRead = async (file: any) => {
-  // FormData + addFileManager('image' or project type), parse { code, data }
-  // data.id → formState.avatar; preview from data.preThumbnailUrl || data.preUrl
+	// FormData + addFileManager('image' or project type), parse { code, data }
+	// data.id → formState.avatar; preview from data.preThumbnailUrl || data.preUrl
 };
 
 const clearAvatar = () => {
-  formState.value.avatar = undefined;
-  // clear local preview url
+	formState.value.avatar = undefined;
+	// clear local preview url
 };
 
 // toSavePayload: phone = normalizePhoneDigits(...); remark truncated 50; include avatar
@@ -330,10 +338,12 @@ git commit -m "feat(gift): redesign person form with sticky save and avatar uplo
 ### Task 5: Profile + list avatar display
 
 **Files:**
+
 - Modify: `giftPersonDetail/index.vue`（profile Hero）
 - Modify: `person/index.vue`（列表卡片 avatar）
 
 **Interfaces:**
+
 - Consumes: `avatarThumbnailUrl || avatarUrl`
 
 - [ ] **Step 1: Profile Hero**
@@ -356,6 +366,7 @@ git commit -m "feat(gift): show person avatar image on detail and list"
 ### Task 6: Docs + graphify
 
 **Files:**
+
 - Modify mobile: `feature.md`
 - Backend: 在 `doc/sql` 旁或 finance README/注释一句（若无 DEVELOPMENT 则仅 SQL 即可）
 - Run: mobile `graphify`（Python314）；backend 若有 graphify 规则则按 AGENTS
@@ -385,17 +396,17 @@ git commit -m "docs(gift): note person form avatar UX and update graphify"
 
 ## Spec Coverage Checklist
 
-| Spec item | Task |
-|---|---|
-| DDL avatar | Task 1 |
-| VO + Long2String + URLs | Task 1–2 |
-| OssApi fill | Task 2 |
-| Phone 3-4-4 helpers | Task 3–4 |
-| Form groups / sticky / 0/50 / disabled | Task 4 |
-| Upload / clear testids | Task 4 |
-| Detail + list image | Task 5 |
-| feature.md + graphify | Task 6 |
-| PC UI 非目标 | Global Constraints |
+| Spec item                              | Task               |
+| -------------------------------------- | ------------------ |
+| DDL avatar                             | Task 1             |
+| VO + Long2String + URLs                | Task 1–2           |
+| OssApi fill                            | Task 2             |
+| Phone 3-4-4 helpers                    | Task 3–4           |
+| Form groups / sticky / 0/50 / disabled | Task 4             |
+| Upload / clear testids                 | Task 4             |
+| Detail + list image                    | Task 5             |
+| feature.md + graphify                  | Task 6             |
+| PC UI 非目标                           | Global Constraints |
 
 ## Manual DB note
 

@@ -23,28 +23,30 @@
 
 ## File Map
 
-| File | Responsibility |
-| --- | --- |
-| `src/views/finance/gift/config.ts` | Event types + helpers + `canSaveGiftEvent` + `GIFT_EVENT_DETAIL_NAME` |
-| `src/views/finance/gift/config.spec.ts` | Event helper unit tests |
-| `src/views/finance/gift/event/api/index.ts` | Full event API |
-| `src/composables/useGiftEventTypeOptions.ts` | Type options composable（对齐 PC / person relation） |
-| `src/views/finance/gift/event/index.vue` | List：summary / 筛选 / business / 跳转 |
-| `src/views/finance/gift/event/giftEventDetail/index.vue` | Form CRUD + sticky save + delete |
-| `doc/sql/...`（backend） | `giftEventDetail` 隐藏菜单 INSERT |
-| `tests/checklists/gift-event-mobile.md` | Checklist |
-| Midscene cases / scripts | smoke/flow 抽样 |
-| `feature.md` + graphify | 文档同步 |
+| File                                                     | Responsibility                                                        |
+| -------------------------------------------------------- | --------------------------------------------------------------------- |
+| `src/views/finance/gift/config.ts`                       | Event types + helpers + `canSaveGiftEvent` + `GIFT_EVENT_DETAIL_NAME` |
+| `src/views/finance/gift/config.spec.ts`                  | Event helper unit tests                                               |
+| `src/views/finance/gift/event/api/index.ts`              | Full event API                                                        |
+| `src/composables/useGiftEventTypeOptions.ts`             | Type options composable（对齐 PC / person relation）                  |
+| `src/views/finance/gift/event/index.vue`                 | List：summary / 筛选 / business / 跳转                                |
+| `src/views/finance/gift/event/giftEventDetail/index.vue` | Form CRUD + sticky save + delete                                      |
+| `doc/sql/...`（backend）                                 | `giftEventDetail` 隐藏菜单 INSERT                                     |
+| `tests/checklists/gift-event-mobile.md`                  | Checklist                                                             |
+| Midscene cases / scripts                                 | smoke/flow 抽样                                                       |
+| `feature.md` + graphify                                  | 文档同步                                                              |
 
 ---
 
 ### Task 1: Config types + event helpers (TDD)
 
 **Files:**
+
 - Modify: `src/views/finance/gift/config.ts`
 - Test: `src/views/finance/gift/config.spec.ts`
 
 **Interfaces:**
+
 - Produces: `GiftEventInfo`（扩展）、`GiftEventBusinessInfo`、`GiftEventSummary`、`GiftEventQuery`、`GiftEventFormState`、`GiftEventTypeOptionItem`、`GiftEventTypeOptions`、`EVENT_TYPE_CUSTOM`、`FALLBACK_GIFT_EVENT_OPTIONS`、`GIFT_EVENT_DETAIL_NAME`、`resolveEventPresetCode`、`buildGiftEventTypeSelectOptions`、`isPresetEventType`、`findEventTypeOptionId`、`mapEventTypeToFormFields`、`buildEventTypeForSave`、`eventLabel`、`canSaveGiftEvent`、`eventStatusText`
 
 - [ ] **Step 1: Failing tests**
@@ -75,9 +77,9 @@ describe('gift event type helpers', () => {
 	});
 
 	it('buildEventTypeForSave returns eventTypeOptionId for preset mode', () => {
-		expect(
-			buildEventTypeForSave({ eventTypeMode: '9100000000000000002' }),
-		).toEqual({ eventTypeOptionId: '9100000000000000002' });
+		expect(buildEventTypeForSave({ eventTypeMode: '9100000000000000002' })).toEqual({
+			eventTypeOptionId: '9100000000000000002',
+		});
 	});
 
 	it('eventLabel resolves WEDDING to 婚礼', () => {
@@ -227,10 +229,12 @@ git commit -m "feat(gift): add event type helpers and form save guard"
 ### Task 2: Event API + useGiftEventTypeOptions
 
 **Files:**
+
 - Modify: `src/views/finance/gift/event/api/index.ts`
 - Create: `src/composables/useGiftEventTypeOptions.ts`
 
 **Interfaces:**
+
 - Consumes: Task 1 types；`getData`/`postData`/`putData`/`deleteData` from `@/views/common/api`
 - Produces: `getGiftEventBusinessPage`、`getGiftEventSummary`、`getGiftEventTypeOptions`、`getGiftEventDetail`、`updateGiftEvent`、`deleteGiftEvent`（保留 page/list/add）；composable API 对齐 PC
 
@@ -338,9 +342,11 @@ git commit -m "feat(gift): wire event API and event type options composable"
 ### Task 3: List page parity
 
 **Files:**
+
 - Modify: `src/views/finance/gift/event/index.vue`（整体重写，去掉 popup 新增）
 
 **Interfaces:**
+
 - Consumes: Task 2 API + composable；`usePagination`；`formatMoney` / `eventLabel` / `eventStatusText` / `GIFT_EVENT_DETAIL_NAME`
 - Produces: 可交互列表页（testid 齐全）
 
@@ -350,18 +356,18 @@ git commit -m "feat(gift): wire event API and event type options composable"
 
 1. `van-search` `data-testid="gift-event-search"` → keyword → `refresh`
 2. `gift-event-type-tags`：`quickEvents` toggle → `resolveFilterEventType` → `searchInfo.eventType`
-3. 展开区：  
-   - 类别：`van-cell` 打开 ActionSheet（`giftEventTypeOptions` / presets+customs 扁平或分组）  
+3. 展开区：
+   - 类别：`van-cell` 打开 ActionSheet（`giftEventTypeOptions` / presets+customs 扁平或分组）
    - 时间：`van-calendar` `type="range"`（参考 `financeManager/index.vue`）；confirm 后  
      `eventTimeStart = dayjs(start).startOf('day').format('YYYY-MM-DDTHH:mm:ss')`  
-     `eventTimeEnd = dayjs(end).endOf('day').format('YYYY-MM-DDTHH:mm:ss')`  
+     `eventTimeEnd = dayjs(end).endOf('day').format('YYYY-MM-DDTHH:mm:ss')`
    - 用 `@/utils/dayjs` 的 dayjs 或已有封装；禁止裸 `new Date` 拼串除非与现网一致
 4. Summary `gift-event-summary`：三卡 `monthPendingCount` / `formatMoney(totalAmount)` / `activePersonCount`；`getGiftEventSummary`
 5. `CommonPullRefresh` + `CommonList` + skeleton；`getGiftEventBusinessPage`；每条 `id: String(item.id)`
-6. 卡片字段：名称；`eventLabel` · 时间；地点/状态/人数/总额；remark 截断  
-7. `@click` → `gift:edit` 校验 → `router.push({ path: detailPath(), query: { id } })` + haptic  
-8. NavBar 右「新增」仅 `gift:add` → `detailPath()` 无 id；`data-testid="gift-event-add"`  
-9. `onMounted`：`loadEventTypeOptions`；若 `route.query.open === 'create'` 且有 add 权限则跳转详情新增并 `router.replace` 清 query  
+6. 卡片字段：名称；`eventLabel` · 时间；地点/状态/人数/总额；remark 截断
+7. `@click` → `gift:edit` 校验 → `router.push({ path: detailPath(), query: { id } })` + haptic
+8. NavBar 右「新增」仅 `gift:add` → `detailPath()` 无 id；`data-testid="gift-event-add"`
+9. `onMounted`：`loadEventTypeOptions`；若 `route.query.open === 'create'` 且有 add 权限则跳转详情新增并 `router.replace` 清 query
 10. 删除现有 `van-popup` 快速新增与搜索栏裸 `+`
 
 关键逻辑片段：
@@ -399,11 +405,13 @@ git commit -m "feat(gift): rebuild mobile event list with summary and filters"
 ### Task 4: Form page + hidden menu SQL
 
 **Files:**
+
 - Create: `src/views/finance/gift/event/giftEventDetail/index.vue`
 - Create (backend): `doc/sql/gift_event_detail_menu_20260727.sql`（或并入 `alex_finance_gift_management.sql` 一节，二选一：优先独立 migrate + greenfield 同步 INSERT）
 - Modify greenfield SQL section if independent file used
 
 **Interfaces:**
+
 - Consumes: `canSaveGiftEvent`、`buildEventTypeForSave`、`mapEventTypeToFormFields`、event API、`useGiftEventTypeOptions`、`useNavBar`、`usePermission`
 - Produces: 可保存/删除的表单页
 
@@ -476,12 +484,14 @@ git commit -m "feat(gift): add mobile event form page with sticky save"
 ### Task 5: Checklist + Midscene + docs + graphify
 
 **Files:**
+
 - Create: `tests/checklists/gift-event-mobile.md`
 - Modify/Create: Midscene cases under `tests/midscene/`（按现有 gift smoke 结构追加 event 条目或独立 json）
 - Modify: `feature.md`
 - Run graphify；commit GRAPH_REPORT / graph.html / graph.json only
 
 **Interfaces:**
+
 - Consumes: 全功能可跑路径与 testid
 
 - [ ] **Step 1: Checklist**
@@ -492,9 +502,9 @@ git commit -m "feat(gift): add mobile event form page with sticky save"
 
 在现有 gift midscene cases 增加（或新文件）：
 
-- smoke：打开 `/finance/gift/event`，断言 `[data-testid="gift-event-summary"]`、`gift-event-list` 可见  
-- flow：点击 `gift-event-add` → 填名称/类型 → `gift-event-save` → `waitForResponse` 含 `gift-event-info-t` → 回列表  
-- 清理：try/finally 调 delete API  
+- smoke：打开 `/finance/gift/event`，断言 `[data-testid="gift-event-summary"]`、`gift-event-list` 可见
+- flow：点击 `gift-event-add` → 填名称/类型 → `gift-event-save` → `waitForResponse` 含 `gift-event-info-t` → 回列表
+- 清理：try/finally 调 delete API
 
 禁止中文精确匹配；用 testid。
 
@@ -522,15 +532,15 @@ git commit -m "docs(gift): add event mobile checklist and note feature parity"
 
 ## Spec Coverage Checklist
 
-| Spec item | Task |
-| --- | --- |
-| Config / helpers / canSave | Task 1 |
-| API + composable | Task 2 |
-| List summary + filters + business + permissions + open=create | Task 3 |
-| Form page CRUD + sticky + delete | Task 4 |
-| Menu giftEventDetail | Task 4 |
-| Checklist + Midscene + docs/graphify | Task 5 |
-| 无 profile / 无 record picker | Global Constraints |
+| Spec item                                                     | Task               |
+| ------------------------------------------------------------- | ------------------ |
+| Config / helpers / canSave                                    | Task 1             |
+| API + composable                                              | Task 2             |
+| List summary + filters + business + permissions + open=create | Task 3             |
+| Form page CRUD + sticky + delete                              | Task 4             |
+| Menu giftEventDetail                                          | Task 4             |
+| Checklist + Midscene + docs/graphify                          | Task 5             |
+| 无 profile / 无 record picker                                 | Global Constraints |
 
 ## Manual DB note
 
