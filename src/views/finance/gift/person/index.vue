@@ -80,9 +80,9 @@
 				>
 					<div class="avatar">
 						<img
-							v-if="item.avatarThumbnailUrl || item.avatarUrl"
+							v-if="personAvatarSrc(item)"
 							class="avatar-img"
-							:src="item.avatarThumbnailUrl || item.avatarUrl"
+							:src="personAvatarSrc(item)"
 							alt=""
 						/>
 						<template v-else>{{ (item.personName || '?').slice(0, 1) }}</template>
@@ -114,7 +114,7 @@ import { useGiftRelationOptions } from '@/composables/useGiftRelationOptions';
 import { getRoutePathByName } from '@/utils/router';
 import { getGiftPersonBusinessPage, getGiftPersonSummary } from '@/views/finance/gift/person/api';
 import type { GiftPersonBusinessInfo, GiftPersonQuery, GiftPersonSummary } from '@/views/finance/gift/config';
-import { GIFT_PERSON_DETAIL_NAME, directionText, formatMoney } from '@/views/finance/gift/config';
+import { GIFT_PERSON_DETAIL_NAME, directionText, formatMoney, personAvatarSrc } from '@/views/finance/gift/config';
 
 const router = useRouter();
 const { hasPermission } = usePermission();

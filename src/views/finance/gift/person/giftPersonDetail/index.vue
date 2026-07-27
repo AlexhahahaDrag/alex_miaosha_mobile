@@ -314,6 +314,7 @@ import {
 	formatSignedMoney,
 	maskPhone,
 	normalizePhoneDigits,
+	personAvatarSrc,
 	shouldCollapseRemark,
 } from '@/views/finance/gift/config';
 
@@ -359,9 +360,7 @@ const displayRemark = computed(() => {
 });
 
 /** 详情 Hero：缩略图优先，否则原图 */
-const profileAvatarUrl = computed(
-	() => profile.value.person?.avatarThumbnailUrl || profile.value.person?.avatarUrl || '',
-);
+const profileAvatarUrl = computed(() => personAvatarSrc(profile.value.person));
 
 const listPath = computed(() => getRoutePathByName(router, 'giftPerson', '/finance/gift/person'));
 
@@ -498,8 +497,7 @@ const toSavePayload = (): GiftPersonInfo => {
 	const {
 		relationMode: _relationMode,
 		customRelation: _customRelation,
-		avatarUrl: _avatarUrl,
-		avatarThumbnailUrl: _avatarThumbnailUrl,
+		fileInfoVo: _fileInfoVo,
 		...rest
 	} = formState.value;
 	const phone = normalizePhoneDigits(formState.value.phone);
@@ -516,8 +514,7 @@ const toSavePayload = (): GiftPersonInfo => {
 const clearAvatar = () => {
 	navigator.vibrate?.(50);
 	formState.value.avatar = undefined;
-	formState.value.avatarUrl = undefined;
-	formState.value.avatarThumbnailUrl = undefined;
+	formState.value.fileInfoVo = undefined;
 	avatarPreviewUrl.value = '';
 };
 
@@ -585,7 +582,7 @@ const loadForm = async () => {
 			const person = data || {};
 			formState.value = mapRelationToFormFields(person);
 			// 编辑回填：优先缩略图
-			avatarPreviewUrl.value = person.avatarThumbnailUrl || person.avatarUrl || '';
+			avatarPreviewUrl.value = personAvatarSrc(person);
 			if (person.avatar != null) {
 				formState.value.avatar = String(person.avatar);
 			}
