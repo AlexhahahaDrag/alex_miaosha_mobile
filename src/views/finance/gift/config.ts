@@ -290,6 +290,16 @@ export function relationLabel(
 
 const CHINA_MOBILE_11 = /^1[3-9]\d{9}$/;
 
+export function normalizePhoneDigits(phone?: string): string {
+	return (phone ?? '').replace(/\D/g, '');
+}
+
+export function formatPhoneDisplay(phone?: string): string {
+	const digits = normalizePhoneDigits(phone);
+	if (digits.length !== 11) return digits || (phone?.trim() ?? '');
+	return `${digits.slice(0, 3)} ${digits.slice(3, 7)} ${digits.slice(7)}`;
+}
+
 export function maskPhone(phone?: string): string {
 	const value = phone?.trim() ?? '';
 	if (!value) return '';

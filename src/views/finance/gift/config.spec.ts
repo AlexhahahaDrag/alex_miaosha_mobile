@@ -4,9 +4,11 @@ import {
 	buildRelationTypeForSave,
 	collapseRemark,
 	directionIconName,
+	formatPhoneDisplay,
 	formatSignedMoney,
 	mapRelationToFormFields,
 	maskPhone,
+	normalizePhoneDigits,
 	relationLabel,
 	resolvePresetCode,
 	shouldCollapseRemark,
@@ -51,6 +53,18 @@ describe('gift person relation helpers', () => {
 
 	it('relationLabel resolves RELATIVE to 亲属', () => {
 		expect(relationLabel('RELATIVE', FALLBACK_GIFT_RELATION_OPTIONS)).toBe('亲属');
+	});
+});
+
+describe('gift person phone format helpers', () => {
+	it('normalizePhoneDigits strips non-digits', () => {
+		expect(normalizePhoneDigits('182 2222 2222')).toBe('18222222222');
+		expect(normalizePhoneDigits(undefined)).toBe('');
+	});
+
+	it('formatPhoneDisplay applies 3-4-4 for 11 digits', () => {
+		expect(formatPhoneDisplay('18222222222')).toBe('182 2222 2222');
+		expect(formatPhoneDisplay('12345')).toBe('12345');
 	});
 });
 
