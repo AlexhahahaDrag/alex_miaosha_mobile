@@ -34,7 +34,7 @@ export function getFileDetail(id: string): Promise<ResponseBody<FileInfoData>> {
 export function addFileManager(
 	type: string,
 	params: FileInfoFormData,
-): Promise<ResponseBody<boolean>> {
+): Promise<ResponseBody<FileInfoData>> {
 	return postFileData(`${baseService.file + baseFileManager + fileUrl.url}?type=${type}`, params);
 }
 

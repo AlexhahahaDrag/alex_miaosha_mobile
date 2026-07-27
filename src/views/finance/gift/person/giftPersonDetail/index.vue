@@ -137,61 +137,128 @@
 
 		<template v-else>
 			<van-form
+				class="person-form"
 				data-testid="gift-person-form"
 				@submit="savePerson"
 			>
-				<van-cell-group inset>
-					<van-field
-						v-model="formState.personName"
-						label="姓名"
-						placeholder="请输入姓名"
-						required
-						:rules="[{ required: true, message: '请输入姓名' }]"
-					/>
-					<van-field
-						v-model="formState.phone"
-						label="手机号"
-						placeholder="请输入手机号"
-						maxlength="11"
-						:rules="phoneRules"
-					/>
-					<van-field
-						v-model="relationDisplay"
-						label="关系"
-						placeholder="请选择关系"
-						readonly
-						is-link
-						required
-						:rules="[{ required: true, message: '请选择关系' }]"
-						@click="showRelationPicker = true"
-					/>
-					<van-field
-						v-if="formState.relationMode === RELATION_CUSTOM"
-						v-model="formState.customRelation"
-						label="自定义关系"
-						placeholder="如：发小、同学"
-						maxlength="20"
-						:rules="customRelationRules"
-					/>
-					<van-field
-						v-model="formState.remark"
-						label="备注"
-						type="textarea"
-						rows="2"
-						autosize
-						placeholder="请输入备注"
-					/>
-				</van-cell-group>
-				<div class="detail-actions">
+				<div class="form-scroll">
+					<section class="form-card form-avatar-card">
+						<van-uploader
+							:after-read="onAvatarAfterRead"
+							:max-count="1"
+							reupload
+							:preview-image="false"
+							accept="image/*"
+							:disabled="uploadingAvatar"
+						>
+							<div
+								class="form-avatar-trigger"
+								data-testid="gift-person-avatar-upload"
+								role="button"
+								aria-label="上传头像"
+							>
+								<img
+									v-if="avatarPreviewUrl"
+									class="form-avatar-img"
+									:src="avatarPreviewUrl"
+									alt=""
+								/>
+								<span
+									v-else
+									class="form-avatar-fallback"
+								>
+									{{ firstName(formState.personName) }}
+								</span>
+								<span class="form-avatar-camera">
+									<van-icon name="photograph" />
+								</span>
+								<span
+									v-if="uploadingAvatar"
+									class="form-avatar-loading"
+								>
+									上传中…
+								</span>
+							</div>
+						</van-uploader>
+						<p class="form-avatar-hint">更换头像</p>
+						<button
+							v-if="formState.avatar || avatarPreviewUrl"
+							type="button"
+							class="form-avatar-clear"
+							data-testid="gift-person-avatar-clear"
+							@click="clearAvatar"
+						>
+							清除头像
+						</button>
+					</section>
+
+					<section class="form-card">
+						<h3 class="form-group-title">基础信息</h3>
+						<van-cell-group :border="false">
+							<van-field
+								v-model="formState.personName"
+								placeholder="请输入姓名"
+								:rules="[{ required: true, message: '请输入姓名' }]"
+							>
+								<template #label> <span class="req">*</span>姓名 </template>
+							</van-field>
+							<van-field
+								v-model="phoneDisplay"
+								label="手机号"
+								placeholder="请输入手机号"
+								clearable
+								type="tel"
+								:rules="phoneRules"
+							/>
+							<van-field
+								v-model="relationDisplay"
+								placeholder="请选择关系"
+								readonly
+								is-link
+								:rules="[{ required: true, message: '请选择关系' }]"
+								@click="showRelationPicker = true"
+							>
+								<template #label> <span class="req">*</span>关系 </template>
+							</van-field>
+							<van-field
+								v-if="formState.relationMode === RELATION_CUSTOM"
+								v-model="formState.customRelation"
+								label="自定义关系"
+								placeholder="如：发小、同学"
+								maxlength="20"
+								:rules="customRelationRules"
+							/>
+						</van-cell-group>
+					</section>
+
+					<section class="form-card">
+						<h3 class="form-group-title">更多信息</h3>
+						<van-cell-group :border="false">
+							<van-field
+								v-model="formState.remark"
+								label="备注"
+								type="textarea"
+								rows="3"
+								autosize
+								maxlength="50"
+								placeholder="请输入备注"
+							/>
+							<div class="remark-count">{{ remarkLen }}/50</div>
+						</van-cell-group>
+					</section>
+				</div>
+
+				<div class="sticky-save">
 					<van-button
 						block
 						round
-						type="primary"
 						native-type="submit"
+						class="btn-save"
 						data-testid="gift-person-save"
 						:loading="saving"
+						:disabled="!canSave"
 					>
-						保存
+						{{ saveLabel }}
 					</van-button>
 				</div>
 			</van-form>
@@ -219,6 +286,7 @@ import { usePermission } from '@/composables/usePermission';
 import { useGiftRelationOptions } from '@/composables/useGiftRelationOptions';
 import { formatTime, dataTimeFormat } from '@/utils/dayjs';
 import { getRoutePathByName } from '@/utils/router';
+import { addFileManager } from '@/views/file/api';
 import {
 	addGiftPerson,
 	deleteGiftPerson,
@@ -234,8 +302,10 @@ import {
 	directionClass,
 	directionIconName,
 	directionText,
+	formatPhoneDisplay,
 	formatSignedMoney,
 	maskPhone,
+	normalizePhoneDigits,
 	shouldCollapseRemark,
 } from '@/views/finance/gift/config';
 
@@ -256,11 +326,14 @@ const mode = ref<'profile' | 'form'>('form');
 const isProfileMode = computed(() => mode.value === 'profile');
 const saving = ref(false);
 const deleting = ref(false);
+const uploadingAvatar = ref(false);
 const showRelationPicker = ref(false);
 const formState = ref<GiftPersonFormState>({});
 const profile = ref<GiftPersonProfile>({});
 const phoneVisible = ref(false);
 const remarkExpanded = ref(false);
+/** 本地头像预览（上传成功或详情回填） */
+const avatarPreviewUrl = ref('');
 
 const rawPhone = computed(() => profile.value.person?.phone?.trim() || '');
 const hasPhone = computed(() => !!rawPhone.value);
@@ -282,6 +355,27 @@ const listPath = computed(() => getRoutePathByName(router, 'giftPerson', '/finan
 const navTitle = computed(() => {
 	if (isProfileMode.value) return '联系人详情';
 	return formState.value.id ? '编辑联系人' : '新增联系人';
+});
+
+const saveLabel = computed(() => (formState.value.id ? '保存更改' : '保存'));
+
+const remarkLen = computed(() => Math.min(formState.value.remark?.length ?? 0, 50));
+
+/** 展示 3-4-4；写入纯数字（最多 11 位） */
+const phoneDisplay = computed({
+	get: () => formatPhoneDisplay(formState.value.phone),
+	set: (value: string) => {
+		formState.value.phone = normalizePhoneDigits(value).slice(0, 11);
+	},
+});
+
+const canSave = computed(() => {
+	const nameOk = !!formState.value.personName?.trim();
+	if (!formState.value.relationMode) return false;
+	if (formState.value.relationMode === RELATION_CUSTOM) {
+		return nameOk && !!formState.value.customRelation?.trim();
+	}
+	return nameOk;
 });
 
 const { setNavBar } = useNavBar({
@@ -322,7 +416,7 @@ const relationPickerColumns = computed(() =>
 const phoneRules = [
 	{
 		validator: (value: string) => {
-			const phone = value?.trim();
+			const phone = normalizePhoneDigits(value);
 			if (!phone) return true;
 			return CHINA_MOBILE.test(phone);
 		},
@@ -388,11 +482,54 @@ const copyPhone = async () => {
 };
 
 const toSavePayload = (): GiftPersonInfo => {
-	const { relationMode: _relationMode, customRelation: _customRelation, ...rest } = formState.value;
+	const {
+		relationMode: _relationMode,
+		customRelation: _customRelation,
+		avatarUrl: _avatarUrl,
+		avatarThumbnailUrl: _avatarThumbnailUrl,
+		...rest
+	} = formState.value;
+	const phone = normalizePhoneDigits(formState.value.phone);
+	const remark = (formState.value.remark ?? '').slice(0, 50);
 	return {
 		...rest,
+		phone: phone || undefined,
+		remark: remark || undefined,
+		avatar: formState.value.avatar ? String(formState.value.avatar) : undefined,
 		...buildRelationTypeForSave(formState.value, presetOptions.value),
 	};
+};
+
+const clearAvatar = () => {
+	navigator.vibrate?.(50);
+	formState.value.avatar = undefined;
+	formState.value.avatarUrl = undefined;
+	formState.value.avatarThumbnailUrl = undefined;
+	avatarPreviewUrl.value = '';
+};
+
+const onAvatarAfterRead = async (file: unknown) => {
+	const raw = (Array.isArray(file) ? file[0] : file) as { file?: File } | undefined;
+	const blob = raw?.file;
+	if (!blob) return;
+	uploadingAvatar.value = true;
+	navigator.vibrate?.(50);
+	try {
+		const formData = new FormData();
+		formData.append('file', blob);
+		const { code, data, message } = await addFileManager('common', formData);
+		if (code === '200' && data?.id != null) {
+			formState.value.avatar = String(data.id);
+			avatarPreviewUrl.value = String(data.preThumbnailUrl || data.preUrl || '');
+			showSuccessToast('头像已上传');
+		} else {
+			showFailToast(message || '上传失败');
+		}
+	} catch {
+		showFailToast('上传失败');
+	} finally {
+		uploadingAvatar.value = false;
+	}
 };
 
 const goList = () => {
@@ -426,12 +563,19 @@ const loadForm = async () => {
 	await loadRelationOptions(id);
 	if (!id) {
 		formState.value = {};
+		avatarPreviewUrl.value = '';
 		return;
 	}
 	try {
 		const { code, data, message } = await getGiftPersonDetail(id);
 		if (code === '200') {
-			formState.value = mapRelationToFormFields(data || {});
+			const person = data || {};
+			formState.value = mapRelationToFormFields(person);
+			// 编辑回填：优先缩略图
+			avatarPreviewUrl.value = person.avatarThumbnailUrl || person.avatarUrl || '';
+			if (person.avatar != null) {
+				formState.value.avatar = String(person.avatar);
+			}
 		} else {
 			showFailToast(message || '联系人加载失败');
 		}
@@ -811,5 +955,162 @@ onMounted(() => {
 	background: transparent;
 	color: #2563eb;
 	font-size: 12px;
+}
+
+/* —— form mode —— */
+.req {
+	color: #ef4444;
+	font-size: 12px;
+	margin-right: 2px;
+}
+
+.person-form {
+	margin: 0 -16px;
+}
+
+.form-scroll {
+	padding: 0 16px calc(72px + env(safe-area-inset-bottom, 0px));
+}
+
+.form-card {
+	margin-bottom: 12px;
+	padding: 14px 4px 6px;
+	background: var(--gp-card);
+	border-radius: var(--gp-radius);
+	box-shadow: var(--gp-shadow);
+	overflow: hidden;
+
+	:deep(.van-cell) {
+		background: transparent;
+	}
+
+	:deep(.van-cell-group) {
+		background: transparent;
+	}
+}
+
+.form-avatar-card {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 22px 16px 16px;
+}
+
+.form-group-title {
+	margin: 0 12px 4px;
+	color: #0f172a;
+	font-size: 15px;
+	font-weight: 700;
+}
+
+.form-avatar-trigger {
+	position: relative;
+	width: 88px;
+	height: 88px;
+	border-radius: 20px;
+	overflow: hidden;
+	background: #eff6ff;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	&:active {
+		transform: scale(0.98);
+	}
+}
+
+.form-avatar-img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.form-avatar-fallback {
+	color: #2563eb;
+	font-size: 32px;
+	font-weight: 800;
+}
+
+.form-avatar-camera {
+	position: absolute;
+	right: 4px;
+	bottom: 4px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	border-radius: 999px;
+	background: rgba(15, 23, 42, 0.72);
+	color: #fff;
+	font-size: 16px;
+}
+
+.form-avatar-loading {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(255, 255, 255, 0.72);
+	color: #2563eb;
+	font-size: 12px;
+}
+
+.form-avatar-hint {
+	margin: 10px 0 0;
+	color: #64748b;
+	font-size: 13px;
+}
+
+.form-avatar-clear {
+	margin-top: 8px;
+	border: none;
+	padding: 4px 8px;
+	background: transparent;
+	color: #94a3b8;
+	font-size: 12px;
+	cursor: pointer;
+
+	&:active {
+		color: #64748b;
+	}
+}
+
+.remark-count {
+	padding: 0 16px 10px;
+	color: #94a3b8;
+	font-size: 12px;
+	text-align: right;
+}
+
+.sticky-save {
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 20;
+	padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+	background: rgba(255, 255, 255, 0.92);
+	backdrop-filter: blur(12px);
+	border-top: 1px solid #f1f5f9;
+}
+
+.btn-save {
+	border: none;
+	background: linear-gradient(90deg, var(--gp-primary-from), var(--gp-primary-to));
+	box-shadow: 0 8px 18px rgba(37, 99, 235, 0.28);
+	color: #fff;
+
+	&:disabled,
+	&.van-button--disabled {
+		opacity: 0.45;
+		color: #fff;
+	}
+}
+
+:deep(.van-uploader__input-wrapper),
+:deep(.van-uploader__wrapper) {
+	display: block;
 }
 </style>

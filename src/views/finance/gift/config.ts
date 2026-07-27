@@ -9,6 +9,10 @@ export interface GiftPersonInfo {
 	bindUserId?: GiftId;
 	personName?: string;
 	phone?: string;
+	/** 头像 OSS 文件 ID（读写）；URL 字段只读 */
+	avatar?: GiftId;
+	avatarUrl?: string;
+	avatarThumbnailUrl?: string;
 	relationType?: string;
 	relationOptionId?: string;
 	remark?: string;
