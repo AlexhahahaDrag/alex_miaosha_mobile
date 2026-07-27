@@ -1,3 +1,5 @@
+import type { FileInfoData } from '@/views/file/config';
+
 export type GiftDirection = 'GIVE' | 'RECEIVE' | 'RETURN';
 export type GiftId = string;
 export type GiftPersonScope = 'CONTACT' | 'ORG_MEMBER' | 'ALL';
@@ -9,10 +11,10 @@ export interface GiftPersonInfo {
 	bindUserId?: GiftId;
 	personName?: string;
 	phone?: string;
-	/** 头像 OSS 文件 ID（读写）；URL 字段只读；清除时传 null 落库 */
+	/** 头像 OSS 文件 ID（读写）；清除时传 null 落库 */
 	avatar?: GiftId | null;
-	avatarUrl?: string;
-	avatarThumbnailUrl?: string;
+	/** 只读：后端 OssApi 回填的 FileInfoVo */
+	fileInfoVo?: FileInfoData;
 	relationType?: string;
 	relationOptionId?: string;
 	remark?: string;
@@ -73,12 +75,52 @@ export interface GiftPersonFormState extends GiftPersonInfo {
 
 export interface GiftEventInfo {
 	id?: GiftId;
+	orgId?: GiftId;
+	userId?: GiftId;
 	eventName?: string;
 	eventType?: string;
+	eventTypeOptionId?: GiftId;
 	eventTime?: string;
 	hostPersonId?: GiftId;
 	remark?: string;
 	createTime?: string;
+}
+
+export interface GiftEventBusinessInfo extends GiftEventInfo {
+	participantCount?: number;
+	totalAmount?: number;
+	receiveAmount?: number;
+	giveAmount?: number;
+	eventStatus?: string;
+	locationText?: string;
+}
+
+export interface GiftEventSummary {
+	monthPendingCount?: number;
+	totalAmount?: number;
+	activePersonCount?: number;
+}
+
+export interface GiftEventQuery {
+	keyword?: string;
+	eventType?: string;
+	eventTimeStart?: string;
+	eventTimeEnd?: string;
+}
+
+export interface GiftEventTypeOptionItem {
+	id: string;
+	name: string;
+}
+
+export interface GiftEventTypeOptions {
+	presets?: GiftEventTypeOptionItem[];
+	customs?: GiftEventTypeOptionItem[];
+}
+
+export interface GiftEventFormState extends GiftEventInfo {
+	eventTypeMode?: string;
+	customEventType?: string;
 }
 
 export interface GiftRecordInfo {
@@ -123,6 +165,7 @@ export const quickAmounts = [100, 200, 500, 1000];
 
 export const GIFT_PERSON_PATH = '/finance/gift/person';
 export const GIFT_PERSON_DETAIL_NAME = 'giftPersonDetail';
+export const GIFT_EVENT_DETAIL_NAME = 'giftEventDetail';
 
 /** 接口不可用时的兜底预设 */
 export const FALLBACK_GIFT_RELATION_OPTIONS: GiftRelationOptionItem[] = [
@@ -135,6 +178,28 @@ export const FALLBACK_GIFT_RELATION_OPTIONS: GiftRelationOptionItem[] = [
 
 /** 表单「自定义关系」选项值，不入库 */
 export const RELATION_CUSTOM = 'CUSTOM';
+
+/** 接口不可用时的兜底预设事由类型 */
+export const FALLBACK_GIFT_EVENT_OPTIONS: GiftEventTypeOptionItem[] = [
+	{ id: '9100000000000000001', name: '婚礼' },
+	{ id: '9100000000000000002', name: '满月' },
+	{ id: '9100000000000000003', name: '乔迁' },
+	{ id: '9100000000000000004', name: '升学' },
+	{ id: '9100000000000000005', name: '寿宴' },
+	{ id: '9100000000000000006', name: '其他' },
+];
+
+const EVENT_PRESET_NAME_TO_CODE: Record<string, string> = {
+	婚礼: 'WEDDING',
+	满月: 'BIRTH',
+	乔迁: 'HOUSEWARMING',
+	升学: 'EDUCATION',
+	寿宴: 'BIRTHDAY',
+	其他: 'OTHER',
+};
+
+/** 表单「自定义事由类型」选项值，不入库 */
+export const EVENT_TYPE_CUSTOM = 'CUSTOM';
 
 const PRESET_NAME_TO_CODE: Record<string, string> = {
 	亲属: 'RELATIVE',
@@ -292,7 +357,144 @@ export function relationLabel(
 	return preset?.name ?? relation;
 }
 
+export function resolveEventPresetCode(
+	presetId: string,
+	presets: GiftEventTypeOptionItem[] = FALLBACK_GIFT_EVENT_OPTIONS,
+): string {
+	const preset = presets.find((item) => item.id === presetId);
+	if (!preset) {
+		return presetId;
+	}
+	return EVENT_PRESET_NAME_TO_CODE[preset.name] || preset.name;
+}
+
+export function buildGiftEventTypeSelectOptions(
+	presets: GiftEventTypeOptionItem[] = FALLBACK_GIFT_EVENT_OPTIONS,
+	customOptions: GiftEventTypeOptionItem[] = [],
+): GiftRelationSelectGroup[] {
+	const groups: GiftRelationSelectGroup[] = [{ label: '常用', options: toSelectOptions(presets) }];
+	if (customOptions.length) {
+		groups.push({
+			label: '家庭组',
+			options: toSelectOptions(customOptions),
+		});
+	}
+	groups.push({
+		label: '其他',
+		options: [{ label: '自定义…', value: EVENT_TYPE_CUSTOM }],
+	});
+	return groups;
+}
+
+export function isPresetEventType(
+	eventType?: string,
+	presets: GiftEventTypeOptionItem[] = FALLBACK_GIFT_EVENT_OPTIONS,
+) {
+	if (!eventType) {
+		return false;
+	}
+	return (
+		Object.values(EVENT_PRESET_NAME_TO_CODE).includes(eventType) ||
+		presets.some((item) => EVENT_PRESET_NAME_TO_CODE[item.name] === eventType)
+	);
+}
+
+export function findEventTypeOptionId(
+	eventType?: string,
+	presets: GiftEventTypeOptionItem[] = FALLBACK_GIFT_EVENT_OPTIONS,
+	customOptions: GiftEventTypeOptionItem[] = [],
+): string | undefined {
+	if (!eventType) {
+		return undefined;
+	}
+	const preset = presets.find((item) => EVENT_PRESET_NAME_TO_CODE[item.name] === eventType);
+	if (preset) {
+		return preset.id;
+	}
+	return customOptions.find((item) => item.name === eventType)?.id;
+}
+
+export function mapEventTypeToFormFields(
+	data: GiftEventInfo = {},
+	customOptions: GiftEventTypeOptionItem[] = [],
+	presets: GiftEventTypeOptionItem[] = FALLBACK_GIFT_EVENT_OPTIONS,
+): GiftEventFormState {
+	const { eventType, eventTypeOptionId, ...rest } = data;
+	if (eventTypeOptionId) {
+		return {
+			...rest,
+			eventType,
+			eventTypeOptionId,
+			eventTypeMode: eventTypeOptionId,
+			customEventType: '',
+		};
+	}
+	if (!eventType) {
+		return { ...rest, eventTypeMode: undefined, customEventType: '' };
+	}
+	const matchedId = findEventTypeOptionId(eventType, presets, customOptions);
+	if (matchedId) {
+		return {
+			...rest,
+			eventType,
+			eventTypeOptionId: matchedId,
+			eventTypeMode: matchedId,
+			customEventType: '',
+		};
+	}
+	return {
+		...rest,
+		eventType,
+		eventTypeMode: EVENT_TYPE_CUSTOM,
+		customEventType: eventType,
+	};
+}
+
+export function buildEventTypeForSave(
+	form: GiftEventFormState,
+): Pick<GiftEventInfo, 'eventType' | 'eventTypeOptionId'> {
+	if (form.eventTypeMode === EVENT_TYPE_CUSTOM) {
+		return { eventType: form.customEventType?.trim() || '' };
+	}
+	if (!form.eventTypeMode) {
+		return {};
+	}
+	return { eventTypeOptionId: form.eventTypeMode };
+}
+
+export function eventLabel(
+	eventType?: string,
+	presets: GiftEventTypeOptionItem[] = FALLBACK_GIFT_EVENT_OPTIONS,
+	customOptions: GiftEventTypeOptionItem[] = [],
+) {
+	if (!eventType) return '-';
+	const preset = presets.find((item) => EVENT_PRESET_NAME_TO_CODE[item.name] === eventType);
+	if (preset) {
+		return preset.name;
+	}
+	const custom = customOptions.find((item) => item.name === eventType);
+	return custom?.name ?? eventType;
+}
+
+export function canSaveGiftEvent(form: GiftEventFormState): boolean {
+	if (!form.eventName?.trim()) return false;
+	if (!form.eventTypeMode) return false;
+	if (form.eventTypeMode === EVENT_TYPE_CUSTOM) {
+		return !!form.customEventType?.trim();
+	}
+	return true;
+}
+
+export function eventStatusText(status?: string): string {
+	return status?.trim() || '进行中';
+}
+
 const CHINA_MOBILE_11 = /^1[3-9]\d{9}$/;
+
+/** 列表/详情头像展示：缩略图优先 */
+export function personAvatarSrc(person?: Pick<GiftPersonInfo, 'fileInfoVo'> | null): string {
+	return person?.fileInfoVo?.preThumbnailUrl || person?.fileInfoVo?.preUrl || '';
+}
 
 export function normalizePhoneDigits(phone?: string): string {
 	return (phone ?? '').replace(/\D/g, '');
