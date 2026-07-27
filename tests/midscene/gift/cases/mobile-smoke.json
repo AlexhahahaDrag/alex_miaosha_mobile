@@ -30,5 +30,19 @@
 		"route": "/finance/gift/person",
 		"level": "flow",
 		"persona": "gift_admin"
+	},
+	{
+		"caseId": "GIFT-MOBILE-EVENT-001",
+		"title": "事由管理列表 summary 与 business-page",
+		"route": "/finance/gift/event",
+		"level": "smoke",
+		"waitFor": "/gift-event-info-t/business-page"
+	},
+	{
+		"caseId": "GIFT-MOBILE-EVENT-002",
+		"title": "事由新增保存并回列表",
+		"route": "/finance/gift/event?open=create",
+		"level": "flow",
+		"persona": "gift_admin"
 	}
 ]

@@ -108,6 +108,39 @@ async function gotoRoute(page, runtime, routePath) {
 	});
 }
 
+async function readAuthHeaders(page) {
+	return page.evaluate(() => {
+		const raw = localStorage.getItem('app-user');
+		if (!raw) return {};
+		try {
+			const parsed = JSON.parse(raw);
+			const token = parsed?.token ?? parsed?.state?.token;
+			return token ? { Authorization: String(token) } : {};
+		} catch {
+			return {};
+		}
+	});
+}
+
+async function cleanupGiftEvent(page, runtime, eventId) {
+	if (!eventId) return;
+	const headers = await readAuthHeaders(page);
+	const url = `${runtime.baseUrl}/api/am-finance/api/v1/gift-event-info-t?ids=${encodeURIComponent(eventId)}`;
+	await page.request.delete(url, { headers }).catch(() => undefined);
+}
+
+async function assertVisibleTestIds(page, testIds) {
+	for (const testId of testIds) {
+		await page.getByTestId(testId).waitFor({ state: 'visible', timeout: 15000 });
+	}
+}
+
+async function waitForGiftApi(page, urlPart) {
+	await page.waitForResponse((response) => response.url().includes(urlPart) && response.ok(), {
+		timeout: 20000,
+	});
+}
+
 async function assertGiftPage(agent, pageName) {
 	const anchors = {
 		dashboard: '页面显示数据概览、统计卡片、近期礼金记录或空状态',
@@ -160,6 +193,45 @@ async function runCase(testCase, runtime, page, agent) {
 			await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
 			await agent.aiAssert('列表区域支持继续加载或已经显示没有更多数据');
 			break;
+		case 'GIFT-MOBILE-PERSON-001':
+			await gotoRoute(page, runtime, testCase.route);
+			await waitForGiftApi(page, testCase.waitFor || '/gift-person-info-t/business-page');
+			await assertVisibleTestIds(page, ['gift-person-summary', 'gift-person-list']);
+			break;
+		case 'GIFT-MOBILE-EVENT-001':
+			await gotoRoute(page, runtime, testCase.route);
+			await waitForGiftApi(page, testCase.waitFor || '/gift-event-info-t/business-page');
+			await assertVisibleTestIds(page, ['gift-event-summary', 'gift-event-list']);
+			break;
+		case 'GIFT-MOBILE-EVENT-002': {
+			let createdEventId = null;
+			try {
+				await gotoRoute(page, runtime, testCase.route);
+				await page.getByTestId('gift-event-detail').waitFor({ state: 'visible', timeout: 15000 });
+				const eventName = `MidsceneEvt${Date.now()}`;
+				const form = page.getByTestId('gift-event-form');
+				await form.locator('input').first().fill(eventName);
+				await form.locator('.van-field--is-link').first().click();
+				await page.locator('.van-action-sheet__item').first().click();
+				const saveResponsePromise = page.waitForResponse(
+					(response) =>
+						response.request().method() === 'POST' &&
+						response.url().includes('/gift-event-info-t') &&
+						!response.url().includes('business-page') &&
+						!response.url().includes('/page'),
+				);
+				await page.getByTestId('gift-event-save').click();
+				const saveResponse = await saveResponsePromise;
+				const saveBody = await saveResponse.json().catch(() => ({}));
+				if (saveBody?.data?.id != null) {
+					createdEventId = String(saveBody.data.id);
+				}
+				await page.getByTestId('gift-event-list').waitFor({ state: 'visible', timeout: 15000 });
+			} finally {
+				await cleanupGiftEvent(page, runtime, createdEventId);
+			}
+			break;
+		}
 		default:
 			throw new Error(`Unsupported caseId=${testCase.caseId}`);
 	}
