@@ -9,8 +9,8 @@ export interface GiftPersonInfo {
 	bindUserId?: GiftId;
 	personName?: string;
 	phone?: string;
-	/** 头像 OSS 文件 ID（读写）；URL 字段只读 */
-	avatar?: GiftId;
+	/** 头像 OSS 文件 ID（读写）；URL 字段只读；清除时传 null 落库 */
+	avatar?: GiftId | null;
 	avatarUrl?: string;
 	avatarThumbnailUrl?: string;
 	relationType?: string;

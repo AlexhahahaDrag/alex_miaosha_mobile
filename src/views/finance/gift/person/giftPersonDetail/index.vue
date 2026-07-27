@@ -495,7 +495,7 @@ const toSavePayload = (): GiftPersonInfo => {
 		...rest,
 		phone: phone || undefined,
 		remark: remark || undefined,
-		avatar: formState.value.avatar ? String(formState.value.avatar) : undefined,
+		avatar: formState.value.avatar ? String(formState.value.avatar) : null,
 		...buildRelationTypeForSave(formState.value, presetOptions.value),
 	};
 };
