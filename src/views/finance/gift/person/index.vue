@@ -108,13 +108,20 @@
 <script setup lang="ts">
 import { showFailToast } from 'vant';
 import { useNavBar } from '@/composables/useNavBar';
+import { useTabBar } from '@/composables/useTabBar';
 import { usePagination } from '@/composables/usePagination';
 import { usePermission } from '@/composables/usePermission';
 import { useGiftRelationOptions } from '@/composables/useGiftRelationOptions';
 import { getRoutePathByName } from '@/utils/router';
 import { getGiftPersonBusinessPage, getGiftPersonSummary } from '@/views/finance/gift/person/api';
 import type { GiftPersonBusinessInfo, GiftPersonQuery, GiftPersonSummary } from '@/views/finance/gift/config';
-import { GIFT_PERSON_DETAIL_NAME, directionText, formatMoney, personAvatarSrc } from '@/views/finance/gift/config';
+import {
+	GIFT_PERSON_DETAIL_NAME,
+	GIFT_TAB_BAR,
+	directionText,
+	formatMoney,
+	personAvatarSrc,
+} from '@/views/finance/gift/config';
 
 const router = useRouter();
 const { hasPermission } = usePermission();
@@ -147,6 +154,11 @@ useNavBar({
 	rightButton: hasPermission('gift:add') ? '新增' : '',
 	visible: true,
 	onRightClick: openCreate,
+});
+
+useTabBar({
+	visible: true,
+	data: [...GIFT_TAB_BAR],
 });
 
 const loadSummary = async () => {

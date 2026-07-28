@@ -153,6 +153,7 @@
 <script setup lang="ts">
 import { showConfirmDialog, showFailToast, showSuccessToast, showToast } from 'vant';
 import { useNavBar } from '@/composables/useNavBar';
+import { useTabBar } from '@/composables/useTabBar';
 import { usePagination } from '@/composables/usePagination';
 import CommonPullRefresh from '@/views/components/CommonPullRefresh.vue';
 import CommonList from '@/views/components/CommonList.vue';
@@ -165,7 +166,7 @@ import {
 	markGiftReturned,
 } from '@/views/finance/gift/record/api';
 import type { GiftDirection, GiftRecordInfo, GiftRecordQuery } from '@/views/finance/gift/config';
-import { directionOptions, formatMoney, quickAmounts } from '@/views/finance/gift/config';
+import { GIFT_TAB_BAR, directionOptions, formatMoney, quickAmounts } from '@/views/finance/gift/config';
 import type { PageInfo } from '@/views/common/config';
 
 useNavBar({
@@ -173,6 +174,11 @@ useNavBar({
 	rightButton: '快速记礼',
 	visible: true,
 	onRightClick: () => openQuickRecord(),
+});
+
+useTabBar({
+	visible: true,
+	data: [...GIFT_TAB_BAR],
 });
 
 const loading = ref(false);

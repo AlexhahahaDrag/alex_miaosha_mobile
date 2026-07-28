@@ -31,10 +31,16 @@
 <script setup lang="ts">
 import { showFailToast } from 'vant';
 import { useNavBar } from '@/composables/useNavBar';
+import { useTabBar } from '@/composables/useTabBar';
 import { getGiftRecordPage } from '@/views/finance/gift/record/api';
-import { directionText, formatMoney } from '@/views/finance/gift/config';
+import { GIFT_TAB_BAR, directionText, formatMoney } from '@/views/finance/gift/config';
 
 useNavBar({ title: '统计报表', visible: true });
+
+useTabBar({
+	visible: true,
+	data: [...GIFT_TAB_BAR],
+});
 
 const report = reactive({ receive: 0, give: 0, net: 0 });
 const rows = ref<{ label: string; count: number; amount: number }[]>([]);

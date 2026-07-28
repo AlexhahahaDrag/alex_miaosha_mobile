@@ -166,13 +166,14 @@ import dayjs from 'dayjs';
 import { showFailToast } from 'vant';
 import { useGiftEventTypeOptions } from '@/composables/useGiftEventTypeOptions';
 import { useNavBar } from '@/composables/useNavBar';
+import { useTabBar } from '@/composables/useTabBar';
 import { usePagination } from '@/composables/usePagination';
 import { usePermission } from '@/composables/usePermission';
 import { formatTime } from '@/utils/dayjs';
 import { getRoutePathByName } from '@/utils/router';
 import { getGiftEventBusinessPage, getGiftEventSummary } from '@/views/finance/gift/event/api';
 import type { GiftEventBusinessInfo, GiftEventQuery, GiftEventSummary } from '@/views/finance/gift/config';
-import { GIFT_EVENT_DETAIL_NAME, eventStatusText, formatMoney } from '@/views/finance/gift/config';
+import { GIFT_EVENT_DETAIL_NAME, GIFT_TAB_BAR, eventStatusText, formatMoney } from '@/views/finance/gift/config';
 
 interface TypeSheetAction {
 	name: string;
@@ -250,6 +251,11 @@ useNavBar({
 	rightButton: hasPermission('gift:add') ? '新增' : '',
 	visible: true,
 	onRightClick: openCreate,
+});
+
+useTabBar({
+	visible: true,
+	data: [...GIFT_TAB_BAR],
 });
 
 const loadSummary = async () => {
