@@ -13,14 +13,14 @@ Mobile 现状（`record/index.vue`）为 keyword + 方向 Tab 列表 + 快速记
 
 ## 2. 已锁定决策
 
-| 项 | 选择 |
-| --- | --- |
-| 能力档位 | PC 能力对等；**不做**独立只读详情页 |
-| 表单承载 | 独立页 `giftRecordDetail` |
-| 列表点击 | 直接进编辑表单（需 `gift:edit`） |
-| 回礼 | 保留左滑「标记已回」+ 待回金额提示；**不**强制走 RETURN 表单（RETURN 方向仍可在新增/编辑表单中使用） |
-| 筛选/汇总 | PC 全量：summary 四卡 + keyword + 方向 tag + 金额区间 + 支付时间范围 |
-| 实现路径 | 镜像 event/person（列表 + 详情表单 + pickers + config helpers） |
+| 项        | 选择                                                                                                 |
+| --------- | ---------------------------------------------------------------------------------------------------- |
+| 能力档位  | PC 能力对等；**不做**独立只读详情页                                                                  |
+| 表单承载  | 独立页 `giftRecordDetail`                                                                            |
+| 列表点击  | 直接进编辑表单（需 `gift:edit`）                                                                     |
+| 回礼      | 保留左滑「标记已回」+ 待回金额提示；**不**强制走 RETURN 表单（RETURN 方向仍可在新增/编辑表单中使用） |
+| 筛选/汇总 | PC 全量：summary 四卡 + keyword + 方向 tag + 金额区间 + 支付时间范围                                 |
+| 实现路径  | 镜像 event/person（列表 + 详情表单 + pickers + config helpers）                                      |
 
 ## 3. 目标
 
@@ -40,16 +40,16 @@ Mobile 现状（`record/index.vue`）为 keyword + 方向 Tab 列表 + 快速记
 
 ## 5. 架构
 
-| 单元 | 路径 | 职责 |
-| --- | --- | --- |
-| 列表 | `src/views/finance/gift/record/index.vue` | summary + 筛选 + 列表 + 跳转/左滑 |
-| 卡片 | `src/views/finance/gift/components/GiftRecordCard.vue` | 展示增强 + 点击/滑动事件 |
-| 表单 | `src/views/finance/gift/record/giftRecordDetail/index.vue` | 新增/编辑 + 吸底保存 |
-| Pickers | `src/views/finance/gift/components/*-picker`（或同级轻量实现） | event / contact / org-member / pending-return |
-| API | `src/views/finance/gift/record/api/index.ts` | page / summary / detail / add / update / delete / pending / mark-returned |
-| Config | `src/views/finance/gift/config.ts` | Record 类型扩展 + `canSaveGiftRecord` + 快捷金额对齐 |
-| 菜单 SQL | backend `doc/sql/` | 隐藏菜单 `giftRecordDetail` |
-| Checklist | `tests/checklists/gift-record-mobile.md` | 七点法、状态机、权限、不测理由 |
+| 单元      | 路径                                                           | 职责                                                                      |
+| --------- | -------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| 列表      | `src/views/finance/gift/record/index.vue`                      | summary + 筛选 + 列表 + 跳转/左滑                                         |
+| 卡片      | `src/views/finance/gift/components/GiftRecordCard.vue`         | 展示增强 + 点击/滑动事件                                                  |
+| 表单      | `src/views/finance/gift/record/giftRecordDetail/index.vue`     | 新增/编辑 + 吸底保存                                                      |
+| Pickers   | `src/views/finance/gift/components/*-picker`（或同级轻量实现） | event / contact / org-member / pending-return                             |
+| API       | `src/views/finance/gift/record/api/index.ts`                   | page / summary / detail / add / update / delete / pending / mark-returned |
+| Config    | `src/views/finance/gift/config.ts`                             | Record 类型扩展 + `canSaveGiftRecord` + 快捷金额对齐                      |
+| 菜单 SQL  | backend `doc/sql/`                                             | 隐藏菜单 `giftRecordDetail`                                               |
+| Checklist | `tests/checklists/gift-record-mobile.md`                       | 七点法、状态机、权限、不测理由                                            |
 
 数据流：列表筛选 → Query → page + summary；表单 detail → FormState → add/update；picker 数据来自 person/event/record list API。
 
@@ -68,6 +68,7 @@ Mobile 现状（`record/index.vue`）为 keyword + 方向 Tab 列表 + 快速记
 **卡片字段：** 对方姓名、`eventName`、方向 Tag、`formatSignedMoney`、时间、回礼状态、备注截断 — `gift-record-card`。
 
 **交互：**
+
 - 点击 → `giftRecordDetail?id=`（需 `gift:edit`，否则 toast）+ haptic
 - 左滑删除需 `gift:delete`；「标记已回」需 `gift:edit`（与 PC 操作权限对齐）
 - 收礼待回：保留金额提示（Toast/Dialog），不跳转 RETURN 表单
@@ -80,14 +81,14 @@ Mobile 现状（`record/index.vue`）为 keyword + 方向 Tab 列表 + 快速记
 
 仅 form。标题：快速记礼 / 编辑礼金记录。
 
-| 字段 | 规则 |
-| --- | --- |
-| 方向 | 必填 GIVE / RECEIVE / RETURN |
-| RETURN | 关联收礼记录必选；选中回填 event/人员/金额 |
+| 字段      | 规则                                                         |
+| --------- | ------------------------------------------------------------ |
+| 方向      | 必填 GIVE / RECEIVE / RETURN                                 |
+| RETURN    | 关联收礼记录必选；选中回填 event/人员/金额                   |
 | 非 RETURN | 事由必选；GIVE：送礼人=机构成员、收礼人=联系人；RECEIVE 反之 |
-| 金额 | 必填 `> 0`；快捷 `[200, 500, 1000, 2000]`（对齐 PC） |
-| 礼金时间 | 可选 datetime → `YYYY-MM-DDTHH:mm:ss` |
-| 备注 | 可选 |
+| 金额      | 必填 `> 0`；快捷 `[200, 500, 1000, 2000]`（对齐 PC）         |
+| 礼金时间  | 可选 datetime → `YYYY-MM-DDTHH:mm:ss`                        |
+| 备注      | 可选                                                         |
 
 **保存：** `canSaveGiftRecord` = 方向 +（RETURN→relatedRecordId / 否则 eventId+双方）+ 金额>0 + 双方非同一人；吸底 `gift-record-save`；文案「保存」/「保存更改」；成功回列表。
 
@@ -147,12 +148,12 @@ Mobile 现状（`record/index.vue`）为 keyword + 方向 Tab 列表 + 快速记
 
 ## 10. 实现顺序（供 plan 拆分）
 
-1. Config 类型扩展 + `canSaveGiftRecord` + Vitest  
-2. Record API 补齐（summary/detail/update + org-member 若缺）  
-3. Pickers（event / contact / org-member / pending-return）  
-4. 列表页重构（summary/筛选/卡片/权限/去 popup）  
-5. 表单页 + 隐藏菜单 SQL  
-6. Checklist + Midscene + docs/graphify  
+1. Config 类型扩展 + `canSaveGiftRecord` + Vitest
+2. Record API 补齐（summary/detail/update + org-member 若缺）
+3. Pickers（event / contact / org-member / pending-return）
+4. 列表页重构（summary/筛选/卡片/权限/去 popup）
+5. 表单页 + 隐藏菜单 SQL
+6. Checklist + Midscene + docs/graphify
 
 ## 11. 风险与约束
 
