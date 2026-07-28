@@ -1,7 +1,7 @@
-# Graph Report - F:\workplace\project\myself\frontend\alex_miaosha_mobile\src  (2026-07-27)
+# Graph Report - F:\workplace\project\myself\frontend\alex_miaosha_mobile\src  (2026-07-28)
 
 ## Corpus Check
-- 239 files · ~94,862 words
+- 239 files · ~95,054 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
