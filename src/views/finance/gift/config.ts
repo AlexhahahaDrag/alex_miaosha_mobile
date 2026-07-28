@@ -167,6 +167,19 @@ export const GIFT_PERSON_PATH = '/finance/gift/person';
 export const GIFT_PERSON_DETAIL_NAME = 'giftPersonDetail';
 export const GIFT_EVENT_DETAIL_NAME = 'giftEventDetail';
 
+export const GIFT_PERSON_NAME = 'giftPerson';
+export const GIFT_EVENT_NAME = 'giftEvent';
+export const GIFT_RECORD_NAME = 'giftRecord';
+export const GIFT_ANALYSIS_NAME = 'giftAnalysis';
+
+/** 礼金子模块底栏（四主页 useTabBar.data） */
+export const GIFT_TAB_BAR = [
+	{ name: GIFT_PERSON_NAME, title: '亲友', icon: 'user-circle' },
+	{ name: GIFT_EVENT_NAME, title: '事由', icon: 'dict' },
+	{ name: GIFT_RECORD_NAME, title: '记账', icon: 'gift' },
+	{ name: GIFT_ANALYSIS_NAME, title: '分析', icon: 'financeAnalysis' },
+] as const;
+
 /** 接口不可用时的兜底预设 */
 export const FALLBACK_GIFT_RELATION_OPTIONS: GiftRelationOptionItem[] = [
 	{ id: '9000000000000000001', name: '亲属' },

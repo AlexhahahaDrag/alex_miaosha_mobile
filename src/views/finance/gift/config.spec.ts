@@ -2,6 +2,11 @@ import { describe, expect, it } from 'vitest';
 import {
 	EVENT_TYPE_CUSTOM,
 	FALLBACK_GIFT_EVENT_OPTIONS,
+	GIFT_ANALYSIS_NAME,
+	GIFT_EVENT_NAME,
+	GIFT_PERSON_NAME,
+	GIFT_RECORD_NAME,
+	GIFT_TAB_BAR,
 	RELATION_CUSTOM,
 	buildEventTypeForSave,
 	buildRelationTypeForSave,
@@ -23,6 +28,25 @@ import {
 	shouldCollapseRemark,
 	FALLBACK_GIFT_RELATION_OPTIONS,
 } from './config';
+
+describe('gift mobile tab bar', () => {
+	it('exposes four tabs in order with locked titles and route names', () => {
+		expect(GIFT_TAB_BAR.map((item) => item.title)).toEqual(['亲友', '事由', '记账', '分析']);
+		expect(GIFT_TAB_BAR.map((item) => item.name)).toEqual([
+			GIFT_PERSON_NAME,
+			GIFT_EVENT_NAME,
+			GIFT_RECORD_NAME,
+			GIFT_ANALYSIS_NAME,
+		]);
+		expect(GIFT_PERSON_NAME).toBe('giftPerson');
+		expect(GIFT_EVENT_NAME).toBe('giftEvent');
+		expect(GIFT_RECORD_NAME).toBe('giftRecord');
+		expect(GIFT_ANALYSIS_NAME).toBe('giftAnalysis');
+		for (const item of GIFT_TAB_BAR) {
+			expect(item.icon.length).toBeGreaterThan(0);
+		}
+	});
+});
 
 describe('gift person visual helpers', () => {
 	it('formatSignedMoney prefixes + for RECEIVE', () => {
