@@ -141,6 +141,7 @@
 - **业务逻辑**：管理个人、家庭或企业账本中的随礼、收礼、回礼和人情统计。
 - **代码路径**：`src/views/finance/gift/`
 - **页面顺序**：数据概览、亲友管理、事由管理、礼金记录、统计报表。
+- **底栏导航**：移动端礼金模块底栏可在亲友/事由/记账/分析间切换（`GIFT_TAB_BAR` + `useTabBar`）。
 - **核心流程**：快速记礼、最近联系人、最近事由、常用金额、待回礼标记。
 - **状态字段**：`direction`: `GIVE`-随礼, `RECEIVE`-收礼, `RETURN`-回礼; `returnedFlag`: 是否已回礼。
 - **关联 API**：`src/views/finance/gift/{person,event,record}/api/`

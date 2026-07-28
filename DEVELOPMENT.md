@@ -166,6 +166,7 @@ dashboard -> person -> event -> record -> analysis
 
 ### 交互规范
 
+- 礼金子模块四主页（亲友/事由/记账/分析）通过 `useTabBar` + `GIFT_TAB_BAR` 替换底栏；详情页 `visible: false`。
 - 移动端页面以卡片化布局为主，背景颜色保持浅色、低饱和，避免深色大面积铺底。
 - 快速记礼是核心流程，应尽量减少输入步骤，优先提供最近联系人、最近事由和常用金额快捷选择。
 - 列表页必须复用 `CommonPullRefresh`、`CommonList` 和 `usePagination`，禁止页面直接使用 `van-pull-refresh` 或自行重复实现分页。
