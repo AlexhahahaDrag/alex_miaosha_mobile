@@ -290,6 +290,7 @@
 <script setup lang="ts">
 import { showConfirmDialog, showFailToast, showSuccessToast } from 'vant';
 import { useNavBar } from '@/composables/useNavBar';
+import { useTabBar } from '@/composables/useTabBar';
 import { usePermission } from '@/composables/usePermission';
 import { useGiftRelationOptions } from '@/composables/useGiftRelationOptions';
 import { formatTime, dataTimeFormat } from '@/utils/dayjs';
@@ -394,6 +395,10 @@ const { setNavBar } = useNavBar({
 	title: navTitle.value,
 	leftPath: listPath.value,
 	visible: true,
+});
+
+useTabBar({
+	visible: false,
 });
 
 watch([navTitle, listPath], ([title, leftPath]) => {

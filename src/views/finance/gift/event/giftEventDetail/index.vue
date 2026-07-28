@@ -119,6 +119,7 @@ import dayjs from 'dayjs';
 import { showConfirmDialog, showFailToast, showSuccessToast } from 'vant';
 import { useGiftEventTypeOptions } from '@/composables/useGiftEventTypeOptions';
 import { useNavBar } from '@/composables/useNavBar';
+import { useTabBar } from '@/composables/useTabBar';
 import { usePermission } from '@/composables/usePermission';
 import { dataTimeFormat, datePickerFormatter, formatTime } from '@/utils/dayjs';
 import { getRoutePathByName } from '@/utils/router';
@@ -199,6 +200,10 @@ const { setNavBar } = useNavBar({
 	title: navTitle.value,
 	leftPath: listPath.value,
 	visible: true,
+});
+
+useTabBar({
+	visible: false,
 });
 
 watch([navTitle, listPath], ([title, leftPath]) => {
