@@ -49,11 +49,40 @@ interface LoginAdminLike {
 const uniq = (codes: Array<string | undefined | null>) =>
 	Array.from(new Set(codes.filter((code): code is string => !!code)));
 
+interface PermissionLike {
+	permissionCode?: string;
+	[key: string]: unknown;
+}
+
+interface RoleLike extends RoleInfoData {
+	permissionList?: PermissionLike[];
+}
+
+const mergePermissionList = (roles: RoleInfoData[]): PermissionLike[] => {
+	const permissionMap = new Map<string, PermissionLike>();
+	roles.forEach((role) => {
+		const permissionList = (role as RoleLike).permissionList;
+		if (!Array.isArray(permissionList)) return;
+		permissionList.forEach((permission) => {
+			const permissionCode = permission.permissionCode;
+			if (!permissionCode || permissionMap.has(permissionCode)) return;
+			permissionMap.set(permissionCode, permission);
+		});
+	});
+	return Array.from(permissionMap.values());
+};
+
 const pickPrimaryRole = (admin: LoginAdminLike): RoleInfoData | null => {
-	if (admin.permissionContext?.roleInfoVoList?.length)
-		return admin.permissionContext.roleInfoVoList[0] || null;
+	const roleInfoVoList = admin.permissionContext?.roleInfoVoList?.length
+		? admin.permissionContext.roleInfoVoList
+		: admin.roleInfoVoList;
+	if (roleInfoVoList?.length) {
+		return {
+			...(roleInfoVoList[0] || {}),
+			permissionList: mergePermissionList(roleInfoVoList),
+		};
+	}
 	if (admin.permissionContext?.roleInfoVo) return admin.permissionContext.roleInfoVo;
-	if (admin.roleInfoVoList?.length) return admin.roleInfoVoList[0] || null;
 	return admin.roleInfoVo || null;
 };
 

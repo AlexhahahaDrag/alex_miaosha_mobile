@@ -281,10 +281,10 @@ const deleteTargetId = ref<string | undefined>(undefined);
 type TimePreset = 'today' | '7d' | 'month' | 'all' | 'custom';
 
 const timeFilterOptions: { label: string; value: TimePreset }[] = [
+	{ label: '全部', value: 'all' },
 	{ label: '今天', value: 'today' },
 	{ label: '近7天', value: '7d' },
 	{ label: '当月', value: 'month' },
-	{ label: '全部', value: 'all' },
 	{ label: '自定义', value: 'custom' },
 ];
 
