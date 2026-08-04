@@ -102,14 +102,23 @@
 			position="bottom"
 			round
 		>
-			<van-date-picker
-				v-model="datePickerValue"
+			<van-picker-group
 				title="选择事由时间"
-				:columns-type="dateColumnsType"
-				:formatter="datePickerFormatter"
+				:tabs="['选择日期', '选择时间']"
+				next-step-text="下一步"
+				data-testid="gift-event-time-picker"
 				@confirm="onDateConfirm"
 				@cancel="showDatePicker = false"
-			/>
+			>
+				<van-date-picker
+					v-model="datePickerValue"
+					:formatter="datePickerFormatter"
+				/>
+				<van-time-picker
+					v-model="timePickerValue"
+					:formatter="datePickerFormatter"
+				/>
+			</van-picker-group>
 		</van-popup>
 	</div>
 </template>
@@ -143,8 +152,10 @@ const deleting = ref(false);
 const showTypeSheet = ref(false);
 const showDatePicker = ref(false);
 const formState = ref<GiftEventFormState>({});
+// van-date-picker 只出日期列、van-time-picker 只出时分列，
+// 由 van-picker-group 分两步组合成完整的"日期 + 时间"选择
 const datePickerValue = ref<string[]>([]);
-const dateColumnsType = ['year', 'month', 'day', 'hour', 'minute'] as const;
+const timePickerValue = ref<string[]>([]);
 
 const eventId = computed(() => {
 	const id = route.query.id;
@@ -234,18 +245,15 @@ const toSavePayload = (): GiftEventInfo => {
 
 const openDatePicker = () => {
 	const current = formState.value.eventTime ? dayjs(formState.value.eventTime) : dayjs();
-	datePickerValue.value = [
-		current.format('YYYY'),
-		current.format('MM'),
-		current.format('DD'),
-		current.format('HH'),
-		current.format('mm'),
-	];
+	datePickerValue.value = [current.format('YYYY'), current.format('MM'), current.format('DD')];
+	timePickerValue.value = [current.format('HH'), current.format('mm')];
 	showDatePicker.value = true;
 };
 
-const onDateConfirm = ({ selectedValues }: { selectedValues: string[] }) => {
-	const [year, month, day, hour = '00', minute = '00'] = selectedValues;
+const onDateConfirm = () => {
+	// picker-group 的 confirm 不带载荷，日期与时间分别从两个 v-model 取
+	const [year, month, day] = datePickerValue.value;
+	const [hour = '00', minute = '00'] = timePickerValue.value;
 	formState.value.eventTime = dayjs(`${year}-${month}-${day} ${hour}:${minute}:00`).format('YYYY-MM-DDTHH:mm:ss');
 	showDatePicker.value = false;
 };

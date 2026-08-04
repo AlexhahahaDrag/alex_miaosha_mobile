@@ -32,7 +32,7 @@
 import { showFailToast } from 'vant';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
-import { getGiftRecordPage } from '@/views/finance/gift/record/api';
+import { getGiftAnalysisOverview } from '@/views/finance/gift/analysis/api';
 import { GIFT_TAB_BAR, directionText, formatMoney } from '@/views/finance/gift/config';
 
 useNavBar({ title: '统计报表', visible: true });
@@ -45,28 +45,35 @@ useTabBar({
 const report = reactive({ receive: 0, give: 0, net: 0 });
 const rows = ref<{ label: string; count: number; amount: number }[]>([]);
 
+// 统计口径改为后端 /gift-analysis/overview 全量聚合，
+// 替代旧实现"拉取前 200 条记录本地计算"（数据多时会截断失真）
 const load = async () => {
-	const { code, data, message } = await getGiftRecordPage({}, 1, 200);
-	if (code !== '200') {
+	const { code, data, message } = await getGiftAnalysisOverview();
+	if (code !== '200' || !data) {
 		showFailToast(message || '统计加载失败');
 		return;
 	}
-	const records = data?.records || [];
-	report.receive = records
-		.filter((item) => item.direction === 'RECEIVE')
-		.reduce((sum, item) => sum + Number(item.amount || 0), 0);
-	report.give = records
-		.filter((item) => item.direction !== 'RECEIVE')
-		.reduce((sum, item) => sum + Number(item.amount || 0), 0);
-	report.net = report.receive - report.give;
-	rows.value = ['RECEIVE', 'GIVE', 'RETURN'].map((direction) => {
-		const list = records.filter((item) => item.direction === direction);
-		return {
-			label: directionText(direction),
-			count: list.length,
-			amount: list.reduce((sum, item) => sum + Number(item.amount || 0), 0),
-		};
-	});
+	report.receive = Number(data.receiveAmount || 0);
+	// 随礼/回礼支出 = 送礼 + 回礼
+	report.give = Number(data.giveAmount || 0) + Number(data.returnAmount || 0);
+	report.net = Number(data.netAmount ?? report.receive - report.give);
+	rows.value = [
+		{
+			label: directionText('RECEIVE'),
+			count: Number(data.receiveCount || 0),
+			amount: Number(data.receiveAmount || 0),
+		},
+		{
+			label: directionText('GIVE'),
+			count: Number(data.giveCount || 0),
+			amount: Number(data.giveAmount || 0),
+		},
+		{
+			label: directionText('RETURN'),
+			count: Number(data.returnCount || 0),
+			amount: Number(data.returnAmount || 0),
+		},
+	];
 };
 
 void load();

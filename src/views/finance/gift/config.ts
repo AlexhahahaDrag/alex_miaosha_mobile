@@ -135,6 +135,11 @@ export interface GiftRecordInfo {
 	returnedFlag?: number;
 	remark?: string;
 	createTime?: string;
+	/** 以下为后端 VO 联表带出的只读展示字段，前端不回传 */
+	eventName?: string;
+	personName?: string;
+	giverPersonName?: string;
+	receiverPersonName?: string;
 }
 
 export interface GiftRecordQuery {
@@ -149,7 +154,19 @@ export interface GiftRecordQuery {
 	amountMax?: number;
 }
 
-export const directionOptions = [
+/** 统计总览（后端 /gift-analysis/overview 返回，金额已在服务端按全量数据聚合） */
+export interface GiftAnalysisOverview {
+	receiveAmount?: number;
+	giveAmount?: number;
+	returnAmount?: number;
+	netAmount?: number;
+	recordCount?: number;
+	receiveCount?: number;
+	giveCount?: number;
+	returnCount?: number;
+}
+
+export const directionOptions: { text: string; value: GiftDirection }[] = [
 	{ text: '随礼', value: 'GIVE' },
 	{ text: '收礼', value: 'RECEIVE' },
 	{ text: '回礼', value: 'RETURN' },

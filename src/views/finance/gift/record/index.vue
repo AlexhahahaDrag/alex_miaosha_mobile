@@ -64,6 +64,7 @@
 			icon="plus"
 			axis="xy"
 			magnetic="x"
+			data-testid="gift-record-fab"
 			@click="openQuickRecord"
 		/>
 
@@ -72,7 +73,10 @@
 			position="bottom"
 			round
 		>
-			<div class="quick-panel">
+			<div
+				class="quick-panel"
+				data-testid="gift-record-quick-panel"
+			>
 				<div class="quick-panel__title">快速记礼</div>
 				<van-form @submit="saveRecord">
 					<van-field
@@ -90,11 +94,15 @@
 							</van-radio-group>
 						</template>
 					</van-field>
-					<div class="quick-amounts">
+					<div
+						class="quick-amounts"
+						data-testid="gift-record-quick-amounts"
+					>
 						<button
 							v-for="amount in quickAmounts"
 							:key="amount"
 							type="button"
+							data-testid="gift-record-quick-amount"
 							:class="{ active: formInfo.amount === amount }"
 							@click="formInfo.amount = amount"
 						>
@@ -110,23 +118,43 @@
 						:rules="[{ required: true, message: '请输入金额' }]"
 					/>
 					<van-field
-						v-model="formInfo.eventId"
-						label="事由ID"
-						placeholder="可后续替换为选择器"
+						:model-value="selectedEventName"
+						label="事由"
+						placeholder="选择关联事由（可不选）"
+						readonly
+						is-link
+						data-testid="gift-record-event-picker"
+						@click="openPicker('event')"
 					/>
 					<van-field
-						v-model="formInfo.giverPersonId"
-						label="送礼人ID"
+						:model-value="selectedGiverName"
+						label="送礼人"
+						placeholder="选择送礼人"
+						readonly
+						is-link
+						data-testid="gift-record-giver-picker"
+						@click="openPicker('giver')"
 					/>
 					<van-field
-						v-model="formInfo.receiverPersonId"
-						label="收礼人ID"
+						:model-value="selectedReceiverName"
+						label="收礼人"
+						placeholder="选择收礼人"
+						readonly
+						is-link
+						data-testid="gift-record-receiver-picker"
+						@click="openPicker('receiver')"
 					/>
 					<van-field
 						v-if="formInfo.direction === 'RETURN'"
-						v-model="formInfo.relatedRecordId"
-						label="原收礼ID"
-						placeholder="回礼必须填写"
+						:model-value="selectedRelatedName"
+						name="relatedRecordId"
+						label="原收礼记录"
+						placeholder="回礼必须选择原收礼记录"
+						readonly
+						is-link
+						data-testid="gift-record-related-picker"
+						:rules="[{ required: true, message: '请选择原收礼记录' }]"
+						@click="openPicker('related')"
 					/>
 					<van-field
 						v-model="formInfo.remark"
@@ -147,6 +175,20 @@
 				</van-form>
 			</div>
 		</van-popup>
+
+		<van-popup
+			v-model:show="pickerVisible"
+			position="bottom"
+			round
+		>
+			<van-picker
+				:title="pickerTitle"
+				:columns="pickerColumns"
+				data-testid="gift-record-picker"
+				@confirm="onPickerConfirm"
+				@cancel="pickerVisible = false"
+			/>
+		</van-popup>
 	</div>
 </template>
 
@@ -165,6 +207,8 @@ import {
 	getPendingReturnAmount,
 	markGiftReturned,
 } from '@/views/finance/gift/record/api';
+import { getGiftPersonList } from '@/views/finance/gift/person/api';
+import { getGiftEventList } from '@/views/finance/gift/event/api';
 import type { GiftDirection, GiftRecordInfo, GiftRecordQuery } from '@/views/finance/gift/config';
 import { GIFT_TAB_BAR, directionOptions, formatMoney, quickAmounts } from '@/views/finance/gift/config';
 import type { PageInfo } from '@/views/common/config';
@@ -191,7 +235,52 @@ const searchInfo = ref<GiftRecordQuery>({});
 const formInfo = ref<GiftRecordInfo>({ direction: 'GIVE' });
 const { pagination, resetPagination, setTotal, nextPage } = usePagination();
 
+// ── 快记 picker：事由/送礼人/收礼人 由手输 ID 改为选择器，选项打开快记面板时懒加载一次
+interface PickerOption {
+	text: string;
+	value: string;
+}
+
+type PickerType = 'event' | 'giver' | 'receiver' | 'related';
+
+const PICKER_TITLES: Record<PickerType, string> = {
+	event: '选择事由',
+	giver: '选择送礼人',
+	receiver: '选择收礼人',
+	related: '选择原收礼记录',
+};
+
+/** 回礼可关联的原收礼记录一次最多取这么多条（按分页接口默认倒序，够覆盖近期待回礼） */
+const RELATED_OPTION_LIMIT = 50;
+
+/** 空值选项：Vant picker 的 value 不接受 undefined，用空串表示"不关联"，落库前转 undefined */
+const NONE_OPTION: PickerOption = { text: '不关联', value: '' };
+
+const pickerVisible = ref(false);
+const pickerType = ref<PickerType>('event');
+const pickerLoaded = ref(false);
+const relatedLoaded = ref(false);
+const personOptions = ref<PickerOption[]>([NONE_OPTION]);
+const eventOptions = ref<PickerOption[]>([NONE_OPTION]);
+// 回礼关联的原收礼记录：必填，故不给"不关联"选项
+const relatedOptions = ref<PickerOption[]>([]);
+
 const filterOptions = computed(() => [{ text: '全部', value: undefined }, ...directionOptions]);
+
+const pickerTitle = computed(() => PICKER_TITLES[pickerType.value]);
+const pickerColumns = computed(() => {
+	if (pickerType.value === 'event') return eventOptions.value;
+	if (pickerType.value === 'related') return relatedOptions.value;
+	return personOptions.value;
+});
+
+const optionText = (options: PickerOption[], id?: string | null) =>
+	options.find((option) => option.value && option.value === String(id ?? ''))?.text || '';
+
+const selectedEventName = computed(() => optionText(eventOptions.value, formInfo.value.eventId));
+const selectedGiverName = computed(() => optionText(personOptions.value, formInfo.value.giverPersonId));
+const selectedReceiverName = computed(() => optionText(personOptions.value, formInfo.value.receiverPersonId));
+const selectedRelatedName = computed(() => optionText(relatedOptions.value, formInfo.value.relatedRecordId));
 
 const haptic = () => navigator.vibrate?.(50);
 
@@ -232,10 +321,90 @@ const selectDirection = (direction?: GiftDirection) => {
 	refresh();
 };
 
+/** 懒加载 picker 选项（成功后缓存，失败下次打开重试） */
+const loadPickerOptions = async () => {
+	if (pickerLoaded.value) return;
+	const [personRes, eventRes] = await Promise.all([getGiftPersonList({}), getGiftEventList({})]);
+	if (personRes.code === '200') {
+		personOptions.value = [
+			NONE_OPTION,
+			...(personRes.data || [])
+				.filter((person) => person.id != null)
+				.map((person) => ({
+					text: person.personName || `#${person.id}`,
+					value: String(person.id),
+				})),
+		];
+	}
+	if (eventRes.code === '200') {
+		eventOptions.value = [
+			NONE_OPTION,
+			...(eventRes.data || [])
+				.filter((event) => event.id != null)
+				.map((event) => ({
+					text: event.eventName || `#${event.id}`,
+					value: String(event.id),
+				})),
+		];
+	}
+	pickerLoaded.value = personRes.code === '200' && eventRes.code === '200';
+};
+
+/**
+ * 懒加载"原收礼记录"选项：只取待回礼（returnedFlag !== 1）的收礼流水，
+ * 已回礼的不再作为回礼目标出现，避免用户重复关联。
+ */
+const loadRelatedOptions = async () => {
+	if (relatedLoaded.value) return;
+	const { code, data, message } = await getGiftRecordPage({ direction: 'RECEIVE' }, 1, RELATED_OPTION_LIMIT);
+	if (code !== '200') {
+		showFailToast(message || '收礼记录加载失败');
+		return;
+	}
+	relatedOptions.value = (data?.records || [])
+		.filter((record) => record.id != null && record.returnedFlag !== 1)
+		.map((record) => ({
+			text: [
+				record.personName || record.giverPersonName || '未知亲友',
+				formatMoney(record.amount),
+				record.payTime?.slice(0, 10) || '',
+			]
+				.filter(Boolean)
+				.join(' · '),
+			value: String(record.id),
+		}));
+	relatedLoaded.value = true;
+};
+
+const openPicker = (type: PickerType) => {
+	haptic();
+	pickerType.value = type;
+	if (type === 'related') {
+		void loadRelatedOptions();
+	}
+	pickerVisible.value = true;
+};
+
+const onPickerConfirm = ({ selectedOptions }: { selectedOptions: Array<PickerOption | undefined> }) => {
+	// 空串（"不关联"）转 undefined，避免把 '' 传给后端
+	const value = selectedOptions[0]?.value || undefined;
+	if (pickerType.value === 'event') {
+		formInfo.value.eventId = value;
+	} else if (pickerType.value === 'giver') {
+		formInfo.value.giverPersonId = value;
+	} else if (pickerType.value === 'related') {
+		formInfo.value.relatedRecordId = value;
+	} else {
+		formInfo.value.receiverPersonId = value;
+	}
+	pickerVisible.value = false;
+};
+
 const openQuickRecord = () => {
 	haptic();
 	formInfo.value = { direction: 'GIVE' };
 	quickRecordVisible.value = true;
+	void loadPickerOptions();
 };
 
 const saveRecord = async () => {
@@ -246,6 +415,8 @@ const saveRecord = async () => {
 	if (code === '200') {
 		showSuccessToast('保存成功');
 		quickRecordVisible.value = false;
+		// 回礼会改变原收礼记录的待回礼状态，缓存的选项需失效重取
+		relatedLoaded.value = false;
 		refresh();
 	} else {
 		showFailToast(message || '保存失败');
@@ -269,6 +440,8 @@ const markReturned = async (item: GiftRecordInfo) => {
 	const { code, message } = await markGiftReturned(item.id || '');
 	if (code === '200') {
 		showSuccessToast('已标记回礼');
+		// 该记录不再是待回礼目标，缓存的选项需失效重取
+		relatedLoaded.value = false;
 		refresh();
 	} else {
 		showFailToast(message || '标记失败');

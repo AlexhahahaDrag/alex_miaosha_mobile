@@ -129,6 +129,13 @@ async function cleanupGiftEvent(page, runtime, eventId) {
 	await page.request.delete(url, { headers }).catch(() => undefined);
 }
 
+async function cleanupGiftPerson(page, runtime, personId) {
+	if (!personId) return;
+	const headers = await readAuthHeaders(page);
+	const url = `${runtime.baseUrl}/api/am-finance/api/v1/gift-person-info-t?ids=${encodeURIComponent(personId)}`;
+	await page.request.delete(url, { headers }).catch(() => undefined);
+}
+
 async function assertVisibleTestIds(page, testIds) {
 	for (const testId of testIds) {
 		await page.getByTestId(testId).waitFor({ state: 'visible', timeout: 15000 });
@@ -171,10 +178,11 @@ async function runCase(testCase, runtime, page, agent) {
 		case 'GIFT-MOBILE-002':
 			await gotoRoute(page, runtime, testCase.route);
 			await assertGiftPage(agent, 'record');
-			await page.locator('.gift-record-fab').click();
+			await page.getByTestId('gift-record-fab').click();
+			await page.getByTestId('gift-record-quick-panel').waitFor({ state: 'visible', timeout: 10000 });
 			await agent.aiAssert('快速记礼弹窗已经打开，并且可见礼金方向、金额、事由、送礼人或收礼人字段');
 			await agent.aiAssert('快速记礼弹窗中可见常用金额快捷选项');
-			await page.locator('.quick-amount').first().click();
+			await page.getByTestId('gift-record-quick-amount').first().click();
 			await agent.aiAssert('金额输入框已经填入一个常用金额');
 			await page
 				.locator('.van-popup')
@@ -199,6 +207,52 @@ async function runCase(testCase, runtime, page, agent) {
 			await gotoRoute(page, runtime, testCase.route);
 			await personApi;
 			await assertVisibleTestIds(page, ['gift-person-summary', 'gift-person-list']);
+			break;
+		}
+		case 'GIFT-MOBILE-PERSON-002': {
+			let createdPersonId = null;
+			try {
+				// 新增：无 id 进入详情页即表单模式
+				await gotoRoute(page, runtime, '/finance/gift/person/giftPersonDetail');
+				await page.getByTestId('gift-person-form').waitFor({ state: 'visible', timeout: 15000 });
+				const personName = `MidscenePsn${Date.now()}`;
+				const form = page.getByTestId('gift-person-form');
+				await form.locator('input').first().fill(personName);
+				// 关系为必填：打开 picker 选默认项确认
+				await form.locator('.van-field--is-link').first().click();
+				await page.locator('.van-picker__confirm').click();
+				const saveResponsePromise = page.waitForResponse(
+					(response) =>
+						response.request().method() === 'POST' &&
+						response.url().includes('/gift-person-info-t') &&
+						!response.url().includes('business-page') &&
+						!response.url().includes('/page'),
+				);
+				await page.getByTestId('gift-person-save').click();
+				const saveResponse = await saveResponsePromise;
+				const saveBody = await saveResponse.json().catch(() => ({}));
+				if (saveBody?.data?.id != null) {
+					createdPersonId = String(saveBody.data.id);
+				}
+				if (!createdPersonId) {
+					throw new Error('新增亲友未返回 id，无法继续详情/编辑断言');
+				}
+				// 详情：带 id 进入 profile 模式
+				await gotoRoute(page, runtime, `/finance/gift/person/giftPersonDetail?id=${createdPersonId}`);
+				await page.getByTestId('gift-person-edit').waitFor({ state: 'visible', timeout: 15000 });
+				// 编辑：改名保存，等待 PUT 响应
+				await page.getByTestId('gift-person-edit').click();
+				await page.getByTestId('gift-person-form').waitFor({ state: 'visible', timeout: 15000 });
+				await page.getByTestId('gift-person-form').locator('input').first().fill(`${personName}X`);
+				const updateResponsePromise = page.waitForResponse(
+					(response) =>
+						response.request().method() === 'PUT' && response.url().includes('/gift-person-info-t'),
+				);
+				await page.getByTestId('gift-person-save').click();
+				await updateResponsePromise;
+			} finally {
+				await cleanupGiftPerson(page, runtime, createdPersonId);
+			}
 			break;
 		}
 		case 'GIFT-MOBILE-EVENT-001': {
