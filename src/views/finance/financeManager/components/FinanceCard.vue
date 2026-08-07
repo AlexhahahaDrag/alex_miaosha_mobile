@@ -87,7 +87,7 @@ const sourceIcon = computed<FromSourceTransferItem | null>(() => {
 	if (!props.item.fromSource) {
 		return null;
 	}
-	return fromSourceTransferList.find((source) => props.item.fromSource?.includes(source.value)) || null;
+	return fromSourceTransferList.find((source) => props.item.fromSource === source.value) || null;
 });
 
 const sourceName = computed(() => props.item.fromSourceName || sourceIcon.value?.name || '未知来源');

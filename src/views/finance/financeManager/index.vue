@@ -205,6 +205,7 @@ const router = useRouter();
 const route = useRoute();
 const dashboardStore = useDashboardStore();
 
+const payWayList = ref<DictInfo[]>([]);
 const categoryList = ref<DictInfo[]>([]);
 const userList = ref<UserManagerData[]>([]);
 const loading = ref(true);
@@ -224,13 +225,25 @@ const customDateRange = ref<[Date, Date] | null>(null);
 
 const { pagination, resetPagination, setTotal, nextPage } = usePagination();
 
-const sourceFilterOptions = computed<FilterOption[]>(() => [
-	{ text: '全部', value: '' },
-	...fromSourceTransferList.map((item) => ({
-		text: item.name || '',
-		value: String(item.value || ''),
-	})),
-]);
+const sourceFilterOptions = computed<FilterOption[]>(() => {
+	const options: FilterOption[] = [{ text: '全部', value: '' }];
+	if (payWayList.value.length > 0) {
+		options.push(
+			...payWayList.value.map((item) => ({
+				text: item.typeName || '',
+				value: String(item.typeCode || ''),
+			})),
+		);
+	} else {
+		options.push(
+			...fromSourceTransferList.map((item) => ({
+				text: item.name || '',
+				value: String(item.value || ''),
+			})),
+		);
+	}
+	return options;
+});
 
 const categoryFilterOptions = computed<FilterOption[]>(() => [
 	{ text: '全部', value: '' },
@@ -361,6 +374,13 @@ const groupedDataSource = computed<GroupedFinanceRecords[]>(() => {
 
 	return Array.from(groups.values());
 });
+
+const fetchPayWays = async () => {
+	const { code, data } = await getDictList('pay_way');
+	if (code === '200' && Array.isArray(data)) {
+		payWayList.value = data;
+	}
+};
 
 const fetchCategories = async () => {
 	const { code, data } = await getDictList('income_expense_type');
@@ -607,6 +627,7 @@ const getWeekdayLabel = (date: string) => dayjs(date).format('ddd').replace('.',
 onMounted(() => {
 	resetData();
 	fetchCategories();
+	fetchPayWays();
 	fetchUsers();
 
 	if (route.query.fromSource) {
@@ -615,6 +636,10 @@ onMounted(() => {
 
 	if (route.query.incomeAndExpenses) {
 		searchInfo.value.incomeAndExpenses = route.query.incomeAndExpenses as string;
+	}
+
+	if (route.query.bigTypeCode) {
+		searchInfo.value.bigTypeCode = route.query.bigTypeCode as string;
 	}
 
 	if (route.query.belongTo) {

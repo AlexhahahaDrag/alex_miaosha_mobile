@@ -34,12 +34,8 @@ export const fromSourceTransferList: FromSourceTransferItem[] = [
 	{ value: 'mt', label: 'meituan', name: '美团' },
 	{ value: 'hb', label: 'huabei', name: '花呗' },
 	{ value: 'bt', label: 'whiteBar', name: '白条' },
-	{ value: 'hf', label: 'telCharge', name: '话费充值' },
-	{ value: 'rqf', label: 'gasCharge', name: '燃气充值' },
-	{ value: 'sf', label: 'waterCharge', name: '水电费' },
-	{ value: 'df', label: 'electricCharge', name: '电费' },
 	{ value: 'jd', label: 'jingdong', name: '京东' },
-	{ value: 'other', label: '', name: '其他' },
+	{ value: 'other', label: 'other', name: '其他' },
 ];
 
 export const rulesRef = reactive({

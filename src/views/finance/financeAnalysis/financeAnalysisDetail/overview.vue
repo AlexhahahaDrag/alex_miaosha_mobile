@@ -150,6 +150,7 @@ import { showNotify } from 'vant';
 import * as math from 'mathjs';
 import type { FinanceDetail } from './common';
 import { getBalance } from '@/views/finance/financeAnalysis/api';
+import { fromSourceTransferList } from '@/views/finance/financeManager/config';
 
 interface Props {
 	activeTab: number | string;
@@ -274,10 +275,17 @@ const init = (dateStr: string, belongTo: number | string | null) => {
 };
 
 const goToFinanceManager = (item: FinanceDetail) => {
-	// 映射 typeName 到 fromSource 代码
-	// 如果 item.typeCode 已经是 yhk, wx 等，则可以直接使用
-	// 根据用户提示，这里使用 typeCode 或者是手动映射
-	const query: Record<string, string | number> = { fromSource: item.typeCode || '' };
+	const query: Record<string, string | number> = {};
+	const matchedSource = fromSourceTransferList.find((s) => s.value === item.typeCode || s.name === item.typeName);
+
+	if (matchedSource) {
+		query.fromSource = matchedSource.value;
+	} else if (item.typeCode) {
+		query.incomeAndExpenses = item.typeCode;
+	} else if (item.typeName) {
+		query.bigTypeCode = item.typeName;
+	}
+
 	if (props.belongTo && props.belongTo !== '0') {
 		query.belongTo = props.belongTo;
 	}
