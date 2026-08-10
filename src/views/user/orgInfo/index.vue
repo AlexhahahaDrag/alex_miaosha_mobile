@@ -8,6 +8,7 @@
 		<form action="/">
 			<van-search
 				v-model="searchInfo.orgName"
+				data-testid="rbac-org-search"
 				show-action
 				placeholder="请输入机构名称"
 				@search="onSearch"
@@ -39,6 +40,7 @@
 					:key="index"
 				>
 					<van-cell
+						data-testid="rbac-org-row"
 						:title-class="item.status == '1' ? 'validClass' : 'notValidClass'"
 						:title="item.orgName"
 						:key="index"
@@ -70,6 +72,7 @@
 					</van-cell>
 					<template #right>
 						<van-button
+							data-testid="rbac-org-row-delete"
 							class="right_info"
 							@click="delOrgInfo(item.id)"
 							square

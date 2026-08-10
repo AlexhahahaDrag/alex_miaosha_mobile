@@ -5,7 +5,10 @@
 		@refresh="refresh"
 		ref="pullRefresh"
 	>
-		<form action="/">
+		<form
+			action="/"
+			data-testid="rbac-relation-search"
+		>
 			<!--
     <van-search
         v-model='searchInfo.typeCode'
@@ -40,6 +43,7 @@
 					:key="index"
 				>
 					<van-cell
+						data-testid="rbac-relation-row"
 						:title="item.id"
 						:key="index"
 						is-link
@@ -71,6 +75,7 @@
 					</van-cell>
 					<template #right>
 						<van-button
+							data-testid="rbac-relation-row-delete"
 							class="right_info"
 							@click="delOrgUserInfo(item.id)"
 							square

@@ -13,6 +13,7 @@
 					<van-icon
 						name="setting-o"
 						class="settings-icon"
+						data-testid="rbac-user-btn-theme"
 						@click="openTheme"
 					/>
 				</div>
@@ -38,7 +39,10 @@
 						</div>
 						<div class="user-text">
 							<div class="name-row">
-								<span class="username">{{ displayName }}</span>
+								<span
+									class="username"
+									data-testid="rbac-user-name"
+								>{{ displayName }}</span>
 								<div class="role-tag">
 									<svg-icon
 										name="shield-check"
@@ -95,6 +99,7 @@
 						is-link
 						to="/myself/info"
 						center
+						data-testid="rbac-user-entry-profile"
 						@click="handleInteraction"
 					>
 						<template #icon>
@@ -108,6 +113,7 @@
 					<van-cell
 						is-link
 						center
+						data-testid="rbac-user-entry-security"
 						@click="goSecurity"
 					>
 						<template #icon>
@@ -203,6 +209,7 @@
 					<van-cell
 						is-link
 						center
+						data-testid="rbac-user-entry-about"
 						@click="handleInteraction"
 					>
 						<template #icon>
@@ -216,6 +223,7 @@
 					<van-cell
 						is-link
 						center
+						data-testid="rbac-user-entry-feedback"
 						@click="handleInteraction"
 					>
 						<template #icon>
@@ -249,6 +257,7 @@
 				<van-button
 					block
 					class="logout-btn-premium"
+					data-testid="rbac-user-btn-logout"
 					@click="showLogout"
 				>
 					<template #icon>

@@ -6,6 +6,7 @@
 	"scripts": {
 		"dev": "vite",
 		"test": "vite --mode test",
+		"test:unit": "vitest run",
 		"prod": "vite --mode production",
 		"build": "vite build",
 		"build:test": "vite build --mode test",
@@ -75,6 +76,7 @@
 		"vite-plugin-compression": "^0.5.1",
 		"vite-plugin-qrcode": "^0.4.1",
 		"vite-plugin-svg-icons-ng": "^1.7.0",
+		"vitest": "^4.1.10",
 		"vue-eslint-parser": "^10.4.0"
 	},
 	"lint-staged": {

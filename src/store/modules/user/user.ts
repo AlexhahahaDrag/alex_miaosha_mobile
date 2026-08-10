@@ -18,6 +18,8 @@ const createDefaultState = (): UserState => ({
 	hasMenu: false,
 	orgInfo: null,
 	roleInfo: null,
+	permissionCodes: [],
+	superAdmin: false,
 });
 
 export const useUserStore = defineStore('app-user', {
@@ -48,6 +50,12 @@ export const useUserStore = defineStore('app-user', {
 		getOrgInfo(state): UserState['orgInfo'] {
 			return state.orgInfo;
 		},
+		getPermissionCodes(state): string[] {
+			return state.permissionCodes;
+		},
+		getSuperAdmin(state): boolean {
+			return state.superAdmin;
+		},
 	},
 	actions: {
 		setToken(info: string | undefined) {
@@ -67,6 +75,12 @@ export const useUserStore = defineStore('app-user', {
 		},
 		setOrgInfo(orgInfo: UserState['orgInfo']) {
 			this.orgInfo = orgInfo;
+		},
+		setPermissionCodes(codes: string[] | undefined) {
+			this.permissionCodes = codes || [];
+		},
+		setSuperAdmin(flag: boolean) {
+			this.superAdmin = !!flag;
 		},
 		resetState() {
 			Object.assign(this, createDefaultState());
@@ -88,6 +102,9 @@ export const useUserStore = defineStore('app-user', {
 					this.setMenuInfo(permissionContext.menuInfo || null);
 					this.setRoleInfo(permissionContext.roleInfo || null);
 					this.setOrgInfo(permissionContext.orgInfo || null);
+					this.roleList = (permissionContext.roleList || []) as UserState['roleList'];
+					this.setPermissionCodes(permissionContext.permissionCodes);
+					this.setSuperAdmin(permissionContext.superAdmin);
 					this.changeRouteStatus(false);
 					refreshRouter();
 					return admin;

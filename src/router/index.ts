@@ -3,6 +3,7 @@ import { createRouter, createWebHashHistory } from 'vue-router';
 import type { MenuDataItem } from './typing';
 import Layout from '@/layouts/index.vue';
 import { useUserStore } from '@/store/modules/user/user';
+import { canAccessRoutePermission, type RouteAccessOptions } from '@/utils/permission';
 import type { MenuInfoData } from '@/views/user/menuInfo/config';
 
 const modules = import.meta.glob([
@@ -146,19 +147,33 @@ router.beforeEach((to, _from) => {
 	return { name: 'login' };
 });
 
+const buildRouteAccess = (userStore: ReturnType<typeof useUserStore>): RouteAccessOptions => {
+	const roleInfo = userStore.getRoleInfo;
+	return {
+		superAdmin: userStore.getSuperAdmin,
+		permissionCodes: userStore.getPermissionCodes,
+		roleCode: getRoleCode(roleInfo),
+		permissionList: getPermissionList(roleInfo),
+	};
+};
+
+const hasAnyRouteAccess = (access: RouteAccessOptions): boolean =>
+	access.superAdmin ||
+	access.roleCode === 'super_super' ||
+	!!access.permissionCodes.length ||
+	!!access.permissionList?.length;
+
 const addRouter = () => {
 	const userStore = useUserStore();
 	if (userStore.getMenuInfo?.length) {
-		const roleInfo = userStore.getRoleInfo;
-		const roleCode = getRoleCode(roleInfo);
-		const permissionList = getPermissionList(roleInfo);
-		if (roleCode !== 'super_super' && !permissionList.length) {
+		const access = buildRouteAccess(userStore);
+		if (!hasAnyRouteAccess(access)) {
 			userStore.changeRouteStatus(true);
 			return;
 		}
 		userStore.getMenuInfo.forEach((item: MenuInfoData) => {
-			if (judgePermission(permissionList, getStringField(item, 'permissionCode'), roleCode)) {
-				const newRouter = getChildren(item, permissionList, roleCode);
+			if (judgePermission(getStringField(item, 'permissionCode'), access)) {
+				const newRouter = getChildren(item, access);
 				if (newRouter.name && !router.hasRoute(newRouter.name)) {
 					router.addRoute(newRouter);
 					dynamicRouter.push(newRouter);
@@ -195,11 +210,7 @@ const getPermissionList = (roleInfo: unknown): PermissionItem[] => {
 	return Array.isArray(list) ? (list as PermissionItem[]) : [];
 };
 
-const getChildren = (
-	item: MenuInfoData,
-	permissionList: PermissionItem[] | undefined,
-	roleCode?: string,
-): MenuDataItem => {
+const getChildren = (item: MenuInfoData, access: RouteAccessOptions): MenuDataItem => {
 	const path = getStringField(item, 'path');
 	const component = getStringField(item, 'component');
 	const redirect = getStringField(item, 'redirect');
@@ -227,8 +238,8 @@ const getChildren = (
 	const children = getChildrenField(item);
 	if (children.length) {
 		children.forEach((childItem: MenuInfoData) => {
-			if (judgePermission(permissionList, getStringField(childItem, 'permissionCode'), roleCode)) {
-				const cur = getChildren(childItem, permissionList, roleCode);
+			if (judgePermission(getStringField(childItem, 'permissionCode'), access)) {
+				const cur = getChildren(childItem, access);
 				if (cur.name && !router.hasRoute(cur.name)) {
 					routeInfo.children?.push(cur);
 				}
@@ -240,27 +251,8 @@ const getChildren = (
 
 router.afterEach(() => {});
 
-const judgePermission = (
-	permissionList: PermissionItem[] | undefined,
-	permissionCode?: string,
-	roleCode?: string,
-) => {
-	if (!permissionCode) {
-		return true;
-	}
-	if (roleCode === 'super_super') {
-		return true;
-	}
-	if (!permissionList?.length) {
-		return false;
-	}
-	for (const item of permissionList) {
-		if (item?.permissionCode === permissionCode) {
-			return true;
-		}
-	}
-	return false;
-};
+const judgePermission = (permissionCode: string | undefined, access: RouteAccessOptions) =>
+	canAccessRoutePermission(permissionCode, access);
 
 export const refreshRouter = () => {
 	dynamicRouter.forEach((route) => {

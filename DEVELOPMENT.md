@@ -146,7 +146,11 @@
 
 ---
 
-## 8. 开发/架构层面同步协议 (Sync Protocol)
+## 8. 权限上下文装配（RBAC）
+
+登录后通过 `src/utils/permission` 的 `buildPermissionContext` / `normalizePermissionContext` 装配上下文：多角色 `permissionList` **去重并集**写入 `permissionCodes`，`roleCode === 'super_super'` 时 `superAdmin === true`；`roleInfo`/`menuInfo` 仍保留以兼容旧 store。
+
+## 9. 开发/架构层面同步协议 (Sync Protocol)
 
 > [!IMPORTANT]
 > **凡涉及全局交互体系、基础设施、或 `src/views/components` 的结构性更改，Antigravity 必须自觉检查并更新本 `DEVELOPMENT.md` 文件。**

@@ -5,7 +5,10 @@
 		@refresh="refresh"
 		ref="pullRefresh"
 	>
-		<form action="/">
+		<form
+			action="/"
+			data-testid="rbac-perm-search"
+		>
 			<!--
     <van-search
         v-model='searchInfo.typeCode'
@@ -41,6 +44,7 @@
 					:key="index"
 				>
 					<van-cell
+						data-testid="rbac-perm-row"
 						:title="item.id"
 						:key="index"
 						is-link
@@ -72,6 +76,7 @@
 					</van-cell>
 					<template #right>
 						<van-button
+							data-testid="rbac-perm-row-delete"
 							class="right_info"
 							@click="delPermissionInfo(item.id)"
 							square

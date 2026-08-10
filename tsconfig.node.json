@@ -7,5 +7,5 @@
 		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true
 	},
-	"include": ["vite.config.ts", "types/vite-plugin-qrcode.d.ts"]
+	"include": ["vite.config.ts", "vitest.config.ts", "types/vite-plugin-qrcode.d.ts"]
 }

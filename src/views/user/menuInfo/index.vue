@@ -5,7 +5,10 @@
 		@refresh="refresh"
 		ref="pullRefresh"
 	>
-		<form action="/">
+		<form
+			action="/"
+			data-testid="rbac-menu-search"
+		>
 			<!--
     <van-search
         v-model='searchInfo.typeCode'
@@ -40,6 +43,7 @@
 					:key="index"
 				>
 					<van-cell
+						data-testid="rbac-menu-row"
 						:title="item.id"
 						:key="index"
 						is-link
@@ -73,6 +77,7 @@
 					</van-cell>
 					<template #right>
 						<van-button
+							data-testid="rbac-menu-row-delete"
 							class="right_info"
 							@click="delMenuInfo(item.id)"
 							square
