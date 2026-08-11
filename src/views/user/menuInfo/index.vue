@@ -1,24 +1,5 @@
 ﻿<template>
-	<common-pull-refresh
-		:style="{ height: 'calc(100% - 44px)' }"
-		v-model="isRefresh"
-		@refresh="refresh"
-		ref="pullRefresh"
-	>
-		<form
-			action="/"
-			data-testid="rbac-menu-search"
-		>
-			<!--
-    <van-search
-        v-model='searchInfo.typeCode'
-        show-action
-        placeholder='璇疯緭鍏ユ悳绱㈠叧閿瘝'
-        @search='onSearch'
-        @cancel='onCancel'
-        action-text="娓呯┖"/>
-    -->
-		</form>
+	<div class="menu-page">
 		<van-divider
 			:style="{
 				color: '#1989fa',
@@ -26,85 +7,33 @@
 			}"
 		></van-divider>
 		<van-empty
-			v-if="dataSource.length == 0"
-			description="鏆傛棤鏁版嵁"
+			v-if="!loading && treeData.length == 0"
+			description="暂无数据"
 		></van-empty>
-		<van-list
+		<van-cell-group
 			v-else
-			v-model:loading="loading"
-			:finished="finished"
-			finished-text="没有更多了"
-			@load="onRefresh"
+			data-testid="rbac-menu-tree"
 		>
-			<van-cell-group>
-				<van-swipe-cell
-					v-for="(item, index) in dataSource"
-					:before-close="beforeClose"
-					:key="index"
-				>
-					<van-cell
-						data-testid="rbac-menu-row"
-						:title="item.id"
-						:key="index"
-						is-link
-						:to="{
-							path: '/user/menuInfo/menuInfoDetail',
-							query: { id: item.id },
-						}"
-					>
-						<template #label>
-							<div class="iconClass">
-								<div
-									class="icon"
-									style="background-color: #ffcc00"
-								>
-									{{ item.name }}
-								</div>
-							</div>
-						</template>
-						<template #right-icon>
-							<div class="text-right">
-								<div style="display: flex">
-									<div class="van-ellipsis">
-										{{ item.path }}
-									</div>
-								</div>
-								<div :class="true ? 'rightDiv' : 'rightRedDiv'">
-									item.component+item.redirect+item.icon+item.hideInMenu+item.parentId+item.summary+item.status+item.orderBy+;
-								</div>
-							</div>
-						</template>
-					</van-cell>
-					<template #right>
-						<van-button
-							data-testid="rbac-menu-row-delete"
-							class="right_info"
-							@click="delMenuInfo(item.id)"
-							square
-							type="danger"
-							text="鍒犻櫎"
-						/>
-					</template>
-					<van-divider class="dividerClass"></van-divider>
-				</van-swipe-cell>
-			</van-cell-group>
-		</van-list>
-	</common-pull-refresh>
+			<menu-tree-item
+				v-for="node in treeData"
+				:key="node.id"
+				:node="node"
+				@changed="refresh"
+			/>
+		</van-cell-group>
+	</div>
 	<van-back-top></van-back-top>
 </template>
 <script lang="ts" setup>
-import { showSuccessToast, showFailToast } from 'vant';
-import type { SearchInfo } from './menuInfoTs';
+import { showFailToast } from 'vant';
 import { useNavBar } from '@/composables/useNavBar';
-import { usePagination } from '@/composables/usePagination';
-import { getMenuInfoPage, deleteMenuInfo } from '@/views/user/menuInfo/api';
-import { getUserManagerList } from '@/views/user/userManager/api';
-import type { PageInfo } from '@/views/common/config/index';
+import { getMenuInfoTree } from '@/views/user/menuInfo/api';
+import type { MenuInfoData } from '@/views/user/menuInfo/config';
 
 const router = useRouter();
 const route = useRoute();
 useNavBar({
-	title: route?.meta?.title || '璐㈠姟绠＄悊11',
+	title: (route?.meta?.title as string) || '菜单管理',
 	rightIcon: 'plus',
 	leftPath: '/',
 	visible: true,
@@ -112,128 +41,30 @@ useNavBar({
 		router.push({ path: '/user/menuInfo/menuInfoDetail' });
 	},
 });
+
 const loading = ref<boolean>(false);
-const dataSource = ref<Params[]>([]);
-const searchInfo = ref<SearchInfo>({});
+const treeData = ref<MenuInfoData[]>([]);
 
-const finished = ref<boolean>(false); //鍔犺浇鏄惁宸茬粡娌℃湁鏇村鏁版嵁
-const isRefresh = ref<boolean>(false); //鏄惁涓嬫媺鍒锋柊
-const { pagination, resetPagination, setTotal, nextPage } = usePagination();
-
-// const onSearch = () => {
-//  pagination.value.current = 1;
-//  dataSource.value = []
-//  onRefresh();
-// };
-// const onCancel = () => {
-//   searchInfo.value.typeCode = '';
-//   pagination.value.current = 0;
-//   dataSource.value = [];
-//   getFinancePage(searchInfo.value, pagination.value);
-// };
-
-async function query(param: SearchInfo, cur: PageInfo) {
+// RBAC-MB-MENU-001：消费后端 /menu-info/tree 做层级展示/下钻，与登录态 menu_all_tree 隔离
+async function refresh() {
 	loading.value = true;
-	getMenuInfoPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10)
-		.then((res) => {
-			if (res?.code == '200') {
-				dataSource.value = [...dataSource.value, ...res.data.records];
-				setTotal(res.data.total);
-				nextPage();
-				if ((pagination.total || 0) <= dataSource.value.length) {
-					finished.value = true;
-				}
-			} else {
-				showFailToast((res && res.message) || '查询列表失败，请联系管理员！');
-			}
-		})
-		.finally(() => {
-			isRefresh.value = false;
-			loading.value = false;
-		});
-}
-
-const userMap = {};
-function getUserInfoList() {
-	getUserManagerList({}).then((res) => {
-		if (res.code == '200') {
-			if (res?.data) {
-				res.data.forEach((user: { id: string | number; nickName: string }) => {
-					userMap[user.id] = user.nickName;
-				});
-			}
+	try {
+		const { code, data, message } = await getMenuInfoTree();
+		if (code === '200') {
+			treeData.value = data || [];
 		} else {
-			showFailToast((res && res.message) || '查询列表失败，请联系管理员！');
+			showFailToast(message || '查询菜单层级失败，请联系管理员！');
 		}
-	});
+	} finally {
+		loading.value = false;
+	}
 }
 
-const refresh = () => {
-	resetPagination();
-	dataSource.value = [];
-	query(searchInfo.value, pagination);
-};
-
-const onRefresh = () => {
-	query(searchInfo.value, pagination);
-};
-
-const beforeClose = (_e: unknown): void => {
-	// console.log(e);
-};
-
-const delMenuInfo = (id: string) => {
-	deleteMenuInfo(`${id}`).then((res) => {
-		if (res?.code == '200') {
-			refresh();
-			showSuccessToast((res && res.message) || '删除成功！');
-		} else {
-			showFailToast((res && res.message) || '鍒犻櫎澶辫触锛岃鑱旂郴绠＄悊鍛橈紒');
-		}
-	});
-};
-
-function init() {
-	dataSource.value = [];
-	resetPagination();
-	query(searchInfo.value, pagination);
-	//鑾峰彇鐢ㄦ埛淇℃伅
-	getUserInfoList();
-}
-
-void init();
+void refresh();
 </script>
 
-<style lang="less">
-.right_info {
-	height: 100%;
-}
-
-.rightDiv {
-	margin-top: 10px;
-	text-align: right;
-}
-
-.rightRedDiv {
-	margin-top: 10px;
-	text-align: right;
-	color: red;
-}
-
-.iconClass {
-	margin-top: 10px;
-	display: flex;
-}
-.van-ellipsis {
-	width: 130px;
-	text-align: right;
-}
-
-.dividerClass {
-	color: #1989fa;
-	border-color: grey;
-	padding: 0 16px;
-	margin-top: 0px;
-	margin-bottom: 0px;
+<style lang="less" scoped>
+.menu-page {
+	padding-bottom: 24px;
 }
 </style>

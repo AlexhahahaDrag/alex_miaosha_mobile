@@ -1,6 +1,6 @@
 export const label = reactive({
-	roleId: '角色id',
-	userId: '用户id',
+	roleId: '所属角色',
+	userId: '所属用户',
 	summary: '描述',
 	status: '状态',
 });

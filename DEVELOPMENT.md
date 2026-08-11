@@ -150,6 +150,10 @@
 
 登录后通过 `src/utils/permission` 的 `buildPermissionContext` / `normalizePermissionContext` 装配上下文：多角色 `permissionList` **去重并集**写入 `permissionCodes`，`roleCode === 'super_super'` 时 `superAdmin === true`；`roleInfo`/`menuInfo` 仍保留以兼容旧 store。
 
+## 8.1 层级数据展示约定
+
+机构/菜单等具备父子层级的数据，前端一律消费后端 `/xxx/tree` 接口获取已组装好的 `children` 树（如 `org-info/tree`、`menu-info/tree`），禁止用 `page(1, 1000)` 在前端拼树；展示统一封装为业务目录下的递归 `xxxTreeItem.vue` 组件（参考 `src/views/user/orgInfo/orgTreeItem.vue`、`src/views/user/menuInfo/menuTreeItem.vue`）。
+
 ## 9. 开发/架构层面同步协议 (Sync Protocol)
 
 > [!IMPORTANT]

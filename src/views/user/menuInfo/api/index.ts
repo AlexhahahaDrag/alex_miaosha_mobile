@@ -6,6 +6,7 @@ const baseMenuInfo = '/menu-info';
 
 const MenuInfoUrl = {
 	page: '/page',
+	tree: '/tree',
 	url: '',
 };
 
@@ -19,6 +20,11 @@ export function getMenuInfoPage(
 		pageNum: pageNum ?? 1,
 		pageSize: pageSize ?? 10,
 	});
+}
+
+// 获取菜单树（后端按 parentId 组装 children，复用数据权限过滤，与登录态 menu_all_tree 隔离）
+export function getMenuInfoTree(params?: MenuInfoData): Promise<ResponseBody<MenuInfoData[]>> {
+	return postData(baseService.user + baseMenuInfo + MenuInfoUrl.tree, params || {});
 }
 
 export function getMenuInfoDetail(id: string): Promise<ResponseBody<MenuInfoData>> {

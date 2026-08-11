@@ -5,85 +5,120 @@
 		@refresh="refresh"
 		ref="pullRefresh"
 	>
-		<form action="/">
-			<van-search
-				v-model="searchInfo.orgName"
-				data-testid="rbac-org-search"
-				show-action
-				placeholder="请输入机构名称"
-				@search="onSearch"
-				@cancel="onCancel"
-				action-text="清空"
-			/>
-		</form>
-		<van-divider
-			:style="{
-				color: '#1989fa',
-				borderColor: 'grey',
-			}"
-		></van-divider>
-		<van-empty
-			v-if="dataSource.length == 0"
-			description="暂无数据"
-		></van-empty>
-		<van-list
-			v-else
-			v-model:loading="loading"
-			:finished="finished"
-			finished-text="没有更多了"
-			@load="onRefresh"
+		<van-tabs
+			v-model:active="activeTab"
+			data-testid="rbac-org-view-tabs"
 		>
-			<van-cell-group>
-				<van-swipe-cell
-					v-for="(item, index) in dataSource"
-					:before-close="beforeClose"
-					:key="index"
+			<van-tab
+				title="列表"
+				name="list"
+			>
+				<form action="/">
+					<van-search
+						v-model="searchInfo.orgName"
+						data-testid="rbac-org-search"
+						show-action
+						placeholder="请输入机构名称"
+						@search="onSearch"
+						@cancel="onCancel"
+						action-text="清空"
+					/>
+				</form>
+				<van-divider
+					:style="{
+						color: '#1989fa',
+						borderColor: 'grey',
+					}"
+				></van-divider>
+				<van-empty
+					v-if="dataSource.length == 0"
+					description="暂无数据"
+				></van-empty>
+				<van-list
+					v-else
+					v-model:loading="loading"
+					:finished="finished"
+					finished-text="没有更多了"
+					@load="onRefresh"
 				>
-					<van-cell
-						data-testid="rbac-org-row"
-						:title-class="item.status == '1' ? 'validClass' : 'notValidClass'"
-						:title="item.orgName"
-						:key="index"
-						is-link
-						:to="{
-							path: '/user/orgInfo/orgInfoDetail',
-							query: { id: item.id },
-						}"
-					>
-						<template #label>
-							<div class="iconClass">
-								<div class="icon">
-									{{ item.parentOrgName }}
-								</div>
-							</div>
-						</template>
-						<template #right-icon>
-							<div class="text-right">
-								<div style="display: flex">
-									<div class="van-ellipsis">
-										{{ item.orgCode }}
+					<van-cell-group>
+						<van-swipe-cell
+							v-for="(item, index) in dataSource"
+							:before-close="beforeClose"
+							:key="index"
+						>
+							<van-cell
+								data-testid="rbac-org-row"
+								:title-class="item.status == '1' ? 'validClass' : 'notValidClass'"
+								:title="item.orgName"
+								:key="index"
+								is-link
+								:to="{
+									path: '/user/orgInfo/orgInfoDetail',
+									query: { id: item.id },
+								}"
+							>
+								<template #label>
+									<div class="iconClass">
+										<div class="icon">
+											{{ item.parentOrgName }}
+										</div>
 									</div>
-								</div>
-								<div :class="true ? 'rightDiv' : 'rightRedDiv'">
-									{{ item.status == '1' ? '有效' : '无效' }}
-								</div>
-							</div>
-						</template>
-					</van-cell>
-					<template #right>
-						<van-button
-							data-testid="rbac-org-row-delete"
-							class="right_info"
-							@click="delOrgInfo(item.id)"
-							square
-							type="danger"
-							text="删除"
-						/>
-					</template>
-					<van-divider class="dividerClass"></van-divider>
-				</van-swipe-cell>
-			</van-cell-group>
-		</van-list>
+								</template>
+								<template #right-icon>
+									<div class="text-right">
+										<div style="display: flex">
+											<div class="van-ellipsis">
+												{{ item.orgCode }}
+											</div>
+										</div>
+										<van-switch
+											:model-value="item.status == '1'"
+											size="18"
+											class="rightDiv"
+											:data-testid="`rbac-org-row-switch-${item.id}`"
+											@click.stop
+											@update:model-value="(checked) => toggleStatus(item, checked)"
+										/>
+									</div>
+								</template>
+							</van-cell>
+							<template #right>
+								<van-button
+									data-testid="rbac-org-row-delete"
+									class="right_info"
+									@click="delOrgInfo(item.id)"
+									square
+									type="danger"
+									text="删除"
+								/>
+							</template>
+							<van-divider class="dividerClass"></van-divider>
+						</van-swipe-cell>
+					</van-cell-group>
+				</van-list>
+			</van-tab>
+			<van-tab
+				title="层级"
+				name="tree"
+			>
+				<van-empty
+					v-if="treeData.length == 0"
+					description="暂无数据"
+				></van-empty>
+				<van-cell-group
+					v-else
+					data-testid="rbac-org-tree"
+				>
+					<org-tree-item
+						v-for="node in treeData"
+						:key="node.id"
+						:node="node"
+						@changed="handleTreeChanged"
+					/>
+				</van-cell-group>
+			</van-tab>
+		</van-tabs>
 	</common-pull-refresh>
 	<van-back-top></van-back-top>
 </template>
@@ -93,7 +128,7 @@ import type { OrgInfoData } from './config';
 import type { SearchInfo } from './orgInfoTs';
 import { useNavBar } from '@/composables/useNavBar';
 import { usePagination } from '@/composables/usePagination';
-import { getOrgInfoPage, deleteOrgInfo } from '@/views/user/orgInfo/api';
+import { getOrgInfoPage, getOrgInfoTree, deleteOrgInfo, updateOrgInfo } from '@/views/user/orgInfo/api';
 import { getUserManagerList } from '@/views/user/userManager/api';
 import type { PageInfo } from '@/views/common/config';
 import type { UserManagerData } from '@/views/user/userManager/config';
@@ -109,8 +144,10 @@ useNavBar({
 		router.push({ path: '/user/orgInfo/orgInfoDetail' });
 	},
 });
+const activeTab = ref<'list' | 'tree'>('list');
 const loading = ref<boolean>(false);
 const dataSource = ref<OrgInfoData[]>([]);
+const treeData = ref<OrgInfoData[]>([]);
 const searchInfo = ref<SearchInfo>({});
 
 const finished = ref<boolean>(false); //加载是否已经没有更多数据
@@ -149,6 +186,16 @@ async function query(param: SearchInfo, cur: PageInfo) {
 	}
 }
 
+// RBAC-MB-ORG-001：消费后端 /org-info/tree 展示机构层级，禁止前端再用 page(1,1000) 拼树
+async function loadTreeData() {
+	const { code, data, message } = await getOrgInfoTree();
+	if (code === '200') {
+		treeData.value = data || [];
+	} else {
+		showFailToast(message || '加载机构层级失败！');
+	}
+}
+
 const userMap: Record<string | number, string> = {};
 async function getUserInfoList() {
 	const { code, data, message } = await getUserManagerList({});
@@ -167,7 +214,7 @@ const refresh = async () => {
 	resetPagination();
 	finished.value = false;
 	dataSource.value = [];
-	await query(searchInfo.value, pagination);
+	await Promise.all([query(searchInfo.value, pagination), loadTreeData()]);
 };
 
 const onRefresh = async () => {
@@ -194,12 +241,27 @@ const delOrgInfo = async (id: string | undefined) => {
 	}
 };
 
+// RBAC-MB-ORG-001：机构暂无专用启停接口，走现有 update 仅提交切换后的 status
+const toggleStatus = async (item: OrgInfoData, checked: boolean) => {
+	const nextStatus = checked ? '1' : '0';
+	const { code, message } = await updateOrgInfo({ ...item, status: nextStatus });
+	if (code === '200') {
+		item.status = nextStatus;
+		showSuccessToast('状态已更新');
+		await loadTreeData();
+	} else {
+		showFailToast(message || '状态更新失败，请联系管理员！');
+	}
+};
+
+const handleTreeChanged = async () => {
+	await Promise.all([loadTreeData(), refresh()]);
+};
+
 async function init() {
 	dataSource.value = [];
 	resetPagination();
-	await query(searchInfo.value, pagination);
-	// 获取用户信息
-	await getUserInfoList();
+	await Promise.all([query(searchInfo.value, pagination), loadTreeData(), getUserInfoList()]);
 }
 
 void init();
@@ -212,13 +274,6 @@ void init();
 
 .rightDiv {
 	margin-top: 10px;
-	text-align: right;
-}
-
-.rightRedDiv {
-	margin-top: 10px;
-	text-align: right;
-	color: red;
 }
 
 .iconClass {
