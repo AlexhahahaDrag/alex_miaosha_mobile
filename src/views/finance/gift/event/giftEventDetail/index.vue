@@ -52,6 +52,15 @@
 							@click="openDatePicker"
 						/>
 						<van-field
+							v-model="hostPersonDisplay"
+							label="关联人员"
+							placeholder="请选择关联人员（选填）"
+							readonly
+							is-link
+							data-testid="gift-event-host-person"
+							@click="openPersonPicker"
+						/>
+						<van-field
 							v-model="formState.remark"
 							label="备注"
 							type="textarea"
@@ -120,6 +129,20 @@
 				/>
 			</van-picker-group>
 		</van-popup>
+
+		<van-popup
+			v-model:show="showPersonPicker"
+			position="bottom"
+			round
+		>
+			<van-picker
+				title="选择关联人员"
+				:columns="personPickerColumns"
+				data-testid="gift-event-person-picker"
+				@confirm="onPersonConfirm"
+				@cancel="showPersonPicker = false"
+			/>
+		</van-popup>
 	</div>
 </template>
 
@@ -133,7 +156,8 @@ import { usePermission } from '@/composables/usePermission';
 import { dataTimeFormat, datePickerFormatter, formatTime } from '@/utils/dayjs';
 import { getRoutePathByName } from '@/utils/router';
 import { addGiftEvent, deleteGiftEvent, getGiftEventDetail, updateGiftEvent } from '@/views/finance/gift/event/api';
-import type { GiftEventFormState, GiftEventInfo } from '@/views/finance/gift/config';
+import { getGiftPersonList } from '@/views/finance/gift/person/api';
+import type { GiftEventFormState, GiftEventInfo, GiftPersonInfo } from '@/views/finance/gift/config';
 import { EVENT_TYPE_CUSTOM, buildEventTypeForSave, canSaveGiftEvent } from '@/views/finance/gift/config';
 
 interface TypeSheetAction {
@@ -151,6 +175,8 @@ const saving = ref(false);
 const deleting = ref(false);
 const showTypeSheet = ref(false);
 const showDatePicker = ref(false);
+const showPersonPicker = ref(false);
+const personList = ref<GiftPersonInfo[]>([]);
 const formState = ref<GiftEventFormState>({});
 // van-date-picker 只出日期列、van-time-picker 只出时分列，
 // 由 van-picker-group 分两步组合成完整的"日期 + 时间"选择
@@ -172,6 +198,23 @@ const eventTimeDisplay = computed(() => {
 	if (!formState.value.eventTime) return '';
 	return formatTime(formState.value.eventTime, dataTimeFormat) || '';
 });
+
+const hostPersonDisplay = computed(() => {
+	if (formState.value.hostPersonName) return formState.value.hostPersonName;
+	if (formState.value.hostPersonId) {
+		const hit = personList.value.find((p) => String(p.id) === String(formState.value.hostPersonId));
+		if (hit) return hit.personName || '';
+	}
+	return '';
+});
+
+const personPickerColumns = computed(() => [
+	{ text: '不关联人员', value: '' },
+	...personList.value.map((p) => ({
+		text: p.personName || '-',
+		value: String(p.id),
+	})),
+]);
 
 const eventTypeDisplay = computed(() => {
 	if (formState.value.eventTypeMode === EVENT_TYPE_CUSTOM) {
@@ -266,8 +309,34 @@ const onTypeSheetSelect = (action: TypeSheetAction) => {
 	showTypeSheet.value = false;
 };
 
+const loadPersonList = async () => {
+	if (personList.value.length > 0) return;
+	const { code, data } = await getGiftPersonList({ personScope: 'CONTACT' });
+	if (code === '200' && data) {
+		personList.value = data;
+	}
+};
+
+const openPersonPicker = async () => {
+	await loadPersonList();
+	showPersonPicker.value = true;
+};
+
+const onPersonConfirm = ({ selectedOptions }: { selectedOptions: Array<{ text?: string; value?: string }> }) => {
+	const opt = selectedOptions[0];
+	if (opt?.value) {
+		formState.value.hostPersonId = String(opt.value);
+		formState.value.hostPersonName = opt.text;
+	} else {
+		formState.value.hostPersonId = undefined;
+		formState.value.hostPersonName = undefined;
+	}
+	showPersonPicker.value = false;
+};
+
 const loadForm = async () => {
 	await loadEventTypeOptions();
+	void loadPersonList();
 	const id = eventId.value;
 	if (!id) {
 		formState.value = {};

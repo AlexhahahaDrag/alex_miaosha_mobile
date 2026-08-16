@@ -148,7 +148,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
 							// 工具库
 							if (
 								normalizedId.includes('/dayjs') ||
-								normalizedId.includes('/crypto-js') ||
+								normalizedId.includes('/crypto-es') ||
 								normalizedId.includes('/mathjs')
 							) {
 								return 'utils-vendor';

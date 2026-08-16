@@ -111,7 +111,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Package as PackageIcon } from 'lucide-vue-next';
+import { Package as PackageIcon } from '@lucide/vue';
 import { showSuccessToast, showFailToast } from 'vant';
 import type { ShopStockAttrsData } from './config';
 import type { UserManagerData } from '@/views/user/userManager/config';

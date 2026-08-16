@@ -202,7 +202,7 @@ import {
 	CheckCircle as CheckCircleIcon,
 	MessageSquare as MessageSquareIcon,
 	Save as SaveIcon,
-} from 'lucide-vue-next';
+} from '@lucide/vue';
 import { showFailToast, showSuccessToast } from 'vant';
 import { label, rulesRef } from '@/views/finance/shopStockAttrs/config';
 import type { ShopStockAttrsData } from '@/views/finance/shopStockAttrs/config';
