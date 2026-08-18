@@ -1,0 +1,149 @@
+.gift-list-page {
+	height: 100%;
+	background: #f8fbff;
+}
+
+.search-shell {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px 12px 6px;
+	background: #fff;
+	box-shadow: 0 6px 18px rgba(32, 152, 238, 0.06);
+}
+
+.search-shell :deep(.van-search) {
+	flex: 1;
+	padding: 0;
+}
+
+.gift-refresh {
+	height: calc(100% - 62px);
+}
+
+.gift-refresh--person {
+	height: calc(100% - 168px);
+}
+
+.relation-tags {
+	display: flex;
+	gap: 8px;
+	padding: 0 16px 8px;
+	overflow-x: auto;
+}
+
+.relation-tags__item {
+	flex: 0 0 auto;
+	padding: 6px 12px;
+	border: 0;
+	border-radius: 999px;
+	background: #eef5fb;
+	color: #5b6b7c;
+	font-size: 12px;
+}
+
+.relation-tags__item.active {
+	background: #2098ee;
+	color: #fff;
+}
+
+.person-summary {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 8px;
+	padding: 0 16px 10px;
+}
+
+.person-summary__item {
+	padding: 12px;
+	background: #fff;
+	border-radius: 16px;
+	box-shadow: 0 6px 18px rgba(32, 152, 238, 0.06);
+}
+
+.person-summary__item span {
+	display: block;
+	color: #8a94a6;
+	font-size: 12px;
+}
+
+.person-summary__item strong {
+	display: block;
+	margin-top: 6px;
+	color: #1f2937;
+	font-size: 16px;
+}
+
+.person-summary__pending {
+	grid-column: 1 / -1;
+	padding: 10px 12px;
+	border-radius: 12px;
+	background: #eaf6ff;
+	color: #1478d4;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.person-card {
+	display: flex;
+	align-items: center;
+	padding: 14px;
+	margin-bottom: 12px;
+	background: #fff;
+	border-radius: 16px;
+	box-shadow: 0 6px 18px rgba(32, 152, 238, 0.08);
+	transition:
+		transform 0.12s ease,
+		background-color 0.12s ease;
+}
+
+.person-card:active {
+	transform: scale(0.98);
+	background: #f8fbff;
+}
+
+.avatar {
+	width: 44px;
+	height: 44px;
+	flex: 0 0 44px;
+	border-radius: 14px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-right: 12px;
+	color: #2098ee;
+	background: #eaf6ff;
+	font-weight: 800;
+}
+
+.person-card__main {
+	min-width: 0;
+	flex: 1;
+}
+
+.person-card__main strong {
+	display: block;
+	color: #1f2937;
+	font-size: 16px;
+}
+
+.person-card__main span,
+.person-card__main p {
+	display: block;
+	margin: 5px 0 0;
+	color: #8a94a6;
+	font-size: 12px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.form-panel {
+	padding: 18px 16px 24px;
+}
+
+.form-panel h3 {
+	margin: 0 0 12px;
+	font-size: 18px;
+	color: #1f2937;
+}

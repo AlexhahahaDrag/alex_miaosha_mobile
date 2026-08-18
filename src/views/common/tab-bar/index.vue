@@ -5,12 +5,14 @@
 		active-color="#1989fa"
 		inactive-color="#969799"
 		class="custom-tab-bar"
+		data-testid="app-tabbar"
 	>
 		<van-tabbar-item
 			v-for="(item, index) in tabBarData"
 			:to="item.to"
 			:name="item?.name || ''"
 			:key="index"
+			:data-testid="`tab-${item.name}`"
 		>
 			<template #icon="props">
 				<van-icon

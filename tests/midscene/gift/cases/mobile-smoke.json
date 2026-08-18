@@ -1,0 +1,48 @@
+[
+	{
+		"caseId": "GIFT-MOBILE-001",
+		"title": "礼尚往来移动端页面加载与顺序",
+		"route": "/finance/gift/dashboard",
+		"level": "smoke"
+	},
+	{
+		"caseId": "GIFT-MOBILE-002",
+		"title": "移动端快速记礼弹窗与 Haptic",
+		"route": "/finance/gift/record",
+		"level": "smoke"
+	},
+	{
+		"caseId": "GIFT-MOBILE-003",
+		"title": "移动端列表、空状态与刷新加载",
+		"route": "/finance/gift/person",
+		"level": "smoke"
+	},
+	{
+		"caseId": "GIFT-MOBILE-PERSON-001",
+		"title": "亲友管理列表加载 business-page",
+		"route": "/finance/gift/person",
+		"level": "smoke",
+		"waitFor": "/gift-person-info-t/business-page"
+	},
+	{
+		"caseId": "GIFT-MOBILE-PERSON-002",
+		"title": "亲友新增-详情-编辑流程",
+		"route": "/finance/gift/person",
+		"level": "flow",
+		"persona": "gift_admin"
+	},
+	{
+		"caseId": "GIFT-MOBILE-EVENT-001",
+		"title": "事由管理列表 summary 与 business-page",
+		"route": "/finance/gift/event",
+		"level": "smoke",
+		"waitFor": "/gift-event-info-t/business-page"
+	},
+	{
+		"caseId": "GIFT-MOBILE-EVENT-002",
+		"title": "事由新增保存并回列表",
+		"route": "/finance/gift/event?open=create",
+		"level": "flow",
+		"persona": "gift_admin"
+	}
+]

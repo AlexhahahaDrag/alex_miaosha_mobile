@@ -149,3 +149,25 @@ alex_miaosha_mobile
 - [ ] 增加线上演示地址
 - [ ] 输出接口文档与业务流程说明
 - [ ] 补充单元测试与 E2E 冒烟测试
+
+---
+
+## 礼尚往来管理
+
+移动端已新增礼尚往来管理页面，统一放在 `src/views/finance/gift/` 下，页面顺序与管理端一致：
+
+1. 数据概览 - 礼尚往来管理：`dashboard`
+2. 亲友管理 - 礼尚往来管理：`person`
+3. 事由管理 - 礼尚往来管理：`event`
+4. 礼金记录 - 礼尚往来管理：`record`
+5. 统计报表 - 礼尚往来管理：`analysis`
+
+移动端重点优化快速记礼流程，保留最近联系人、最近事由、常用金额快捷选择、下拉刷新、无限滚动、Skeleton、Empty 状态和 Haptic 触发。礼金记录与回礼标记不拆页面，通过卡片状态、方向标签和待回金额展示。
+
+常用验证：
+
+```bash
+npm run build
+```
+
+Midscene 礼尚往来移动端用例位于 `tests/midscene/gift/cases/mobile-smoke.json`，脚本入口为 `npm run test:midscene:gift:local`。

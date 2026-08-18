@@ -1,9 +1,9 @@
 import type { OrgInfoData } from '@/views/user/orgInfo/config';
 import type { RoleInfoData } from '@/views/user/roleInfo/config';
 import type { MenuInfoData } from '@/views/user/menuInfo/config';
-import type { UserInfo } from '@/types/store';
+import type { UserManagerData } from '@/views/user/userManager/config';
 
-export interface LoginAdminData extends UserInfo {
+export interface LoginAdminData extends UserManagerData {
 	menuInfoVoList?: MenuInfoData[];
 	roleInfoVo?: RoleInfoData | null;
 	roleInfoVoList?: RoleInfoData[];

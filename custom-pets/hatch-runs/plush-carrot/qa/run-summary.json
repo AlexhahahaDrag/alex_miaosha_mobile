@@ -1,0 +1,10 @@
+{
+  "ok": true,
+  "run_dir": "D:\\project\\alex_miaosha_mobile\\custom-pets\\hatch-runs\\plush-carrot",
+  "spritesheet": "D:\\project\\alex_miaosha_mobile\\custom-pets\\hatch-runs\\plush-carrot\\final\\spritesheet.webp",
+  "validation": "D:\\project\\alex_miaosha_mobile\\custom-pets\\hatch-runs\\plush-carrot\\final\\validation.json",
+  "contact_sheet": "D:\\project\\alex_miaosha_mobile\\custom-pets\\hatch-runs\\plush-carrot\\qa\\contact-sheet.png",
+  "review": "D:\\project\\alex_miaosha_mobile\\custom-pets\\hatch-runs\\plush-carrot\\qa\\review.json",
+  "package": "C:\\Users\\majf\\.codex\\pets\\plush-carrot",
+  "workspace_package": "D:\\project\\alex_miaosha_mobile\\custom-pets\\plush-carrot-hatch"
+}

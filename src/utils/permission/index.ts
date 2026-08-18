@@ -132,3 +132,29 @@ export const canAccessRoutePermission = (
 	}
 	return false;
 };
+
+export const buildPermissionSet = (context?: Partial<PermissionContext> | null) =>
+	new Set<string>([...(context?.permissionCodes || []), ...(context?.buttonPermissionCodes || [])]);
+
+export const isSuperAdmin = (
+	contextOrRole?: Partial<PermissionContext> | PermissionRole | null,
+) => {
+	if (!contextOrRole) return false;
+	if ('superAdmin' in contextOrRole && contextOrRole.superAdmin === true) return true;
+	if ('roleList' in contextOrRole) {
+		return !!contextOrRole.roleList?.some((role) => role?.roleCode === 'super_super');
+	}
+	if ('roleCode' in contextOrRole) return contextOrRole.roleCode === 'super_super';
+	return false;
+};
+
+export const canAccessPermission = (
+	permissionSet: Set<string>,
+	permissionCode?: string,
+	superAdmin = false,
+) => {
+	if (superAdmin) return true;
+	if (!permissionCode) return false;
+	return permissionSet.has(permissionCode);
+};
+

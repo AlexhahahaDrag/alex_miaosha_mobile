@@ -21,6 +21,8 @@
   - 加载占位符首推骨架屏（Skeleton Screen，如 `<van-skeleton>`）而非空洞的 Loading 文本组件，以缓和首屏/列表下发时的加载焦虑。
   - 空状态应统一使用插画友好提示补充，替换原本默认的“暂无数据”。
 
+- **页面根节点高度**：挂在 layout `.content-container` 下的页面根节点若同时使用 `min-height: 100%` 与垂直 `padding`，必须设置 `box-sizing: border-box`，避免 content-box 下 padding 把总高度撑出无意义 Y 轴滚动条。不要改 layout 的 `overflow-y: auto` 契约。
+
 ---
 
 ## 2. 公共基础组件目录 (Common Components)
@@ -148,7 +150,7 @@
 
 ## 8. 权限上下文装配（RBAC）
 
-登录后通过 `src/utils/permission` 的 `buildPermissionContext` / `normalizePermissionContext` 装配上下文：多角色 `permissionList` **去重并集**写入 `permissionCodes`，`roleCode === 'super_super'` 时 `superAdmin === true`；`roleInfo`/`menuInfo` 仍保留以兼容旧 store。
+登录后通过 `src/utils/permission` 的 `buildPermissionContext` / `normalizePermissionContext` 装配上下文：多角色 `permissionList` **去重并集**写入 `permissionCodes`，`roleCode === 'super_super'` 时 `superAdmin === true`；`roleInfo`/`menuInfo` 仍保留以兼容旧 store。礼尚往来 `usePermission` 使用同文件的 `buildPermissionSet` / `isSuperAdmin` / `canAccessPermission`，角色判定必须精确匹配 `super_super`。
 
 ## 8.1 层级数据展示约定
 
@@ -159,3 +161,38 @@
 > [!IMPORTANT]
 > **凡涉及全局交互体系、基础设施、或 `src/views/components` 的结构性更改，Antigravity 必须自觉检查并更新本 `DEVELOPMENT.md` 文件。**
 > _业务逻辑、接口映射和变量挂载的变动则维持此前对 `FEATURE.md` 的检查协议。_
+
+---
+
+## 9. 礼尚往来移动端页面规范
+
+礼尚往来移动端页面统一放在 `src/views/finance/gift/`，页面顺序必须与管理端和菜单顺序一致：
+
+```text
+dashboard -> person -> event -> record -> analysis
+```
+
+### 交互规范
+
+- 礼金子模块四主页（亲友/事由/记账/分析）通过 `useTabBar` + `GIFT_TAB_BAR` 替换底栏；详情页 `visible: false`。
+- 移动端页面以卡片化布局为主，背景颜色保持浅色、低饱和，避免深色大面积铺底。
+- 快速记礼是核心流程，应尽量减少输入步骤，优先提供最近联系人、最近事由和常用金额快捷选择。
+- 列表页必须复用 `CommonPullRefresh`、`CommonList` 和 `usePagination`，禁止页面直接使用 `van-pull-refresh` 或自行重复实现分页。
+- 加载态使用 Skeleton，空状态使用 Empty，禁止只展示 Loading 文字。
+- 新增、保存、标记已回礼等高频操作需要触发 Haptic 反馈。
+- 礼金记录与回礼管理不拆页面，通过方向标签、回礼状态、待回金额展示。
+
+### 代码规范
+
+- 共享类型、枚举、配置放在 `src/views/finance/gift/config.ts`（或 `config/`）。
+- API 按子域放在 `person/api`、`event/api`、`record/api`（无聚合 barrel）；ID 靠前端 `GiftId=string` + 后端 `Long2StringSerializer`。
+- 业务卡片组件放在 `src/views/finance/gift/components/`。
+- 页面样式优先复用 `src/views/finance/gift/shared.less`。
+- 接口调用统一使用响应解构：`const { code, data, message } = await api()`。
+- 按钮权限用 `usePermission().hasPermission`；关系选项用 `useGiftRelationOptions`。
+
+### 亲友管理
+
+- 列表：`/finance/gift/person` → `person/index.vue`（`getGiftPersonBusinessPage` + `getGiftPersonSummary`）。
+- 详情：`t_menu_info.name=giftPersonDetail`，path `/finance/gift/person/giftPersonDetail`，组件 `person/giftPersonDetail/index.vue`（档案 / 表单同页）。
+- 跳转详情用 `getRoutePathByName(router, 'giftPersonDetail')`，禁止散落硬编码 path。

@@ -3,6 +3,7 @@
 本项目（alex_miaosha_mobile）是一个结构完整的移动端/后台管理综合前端项目，主要涵盖了用户权限、系统设置、财务管理、门店进销存、商品管理以及营销等核心模块。以下为具体功能模块划分及组件、API流转细节：
 
 ## 1. 基础服务与系统管理 (System & User Management)
+
 **该模块主要提供系统底层的 RBAC（基于角色的访问控制）权限流转、组织架构管理以及用户认证等核心能力，为上层业务提供支撑。**
 
 - **鉴权中心 (`login`)**：
@@ -48,6 +49,7 @@
   - **关联表/API**：`src/api/user/userManager/`
 
 ## 2. 财务管理 (Finance Management)
+
 **该模块主要处理系统级别的账务流转与资金对账，支持大盘财务数据的统计和监控。**
 
 - **财务数据看板 (`financeAnalysis`)**：
@@ -62,8 +64,6 @@
   - **状态字段**：`flowType`: `1`-收入, `2`-支出; `status`: `0`-待核对, `1`-已入账
   - **关联表/API**：`src/api/finance/`
 
-
-
 - **个人礼金业务 (`personalGift`)**：
   - **业务逻辑**：管理平台用户互相交互或平台下发的人情礼金、红包沉淀独立财务。
   - **代码路径**：`src/views/finance/personalGift/`
@@ -71,6 +71,7 @@
   - **关联表/API**：`src/api/finance/`
 
 ## 3. 门店进销存管理 (Shop Inventory Management)
+
 **该模块主要负责门店货物的入库、库存盘点以及进货批次的生命周期管理。**
 
 - **门店库存记录 (`shopStock`)**：
@@ -86,6 +87,7 @@
   - **关联表/API**：`src/views/finance/shopStockBatch/api/` (包含 `getShopStockBatchList` 获取动态批次列表)
 
 ## 4. 商品与产品体系 (Goods & Cart)
+
 **统一的平台标准库，为 C端交易与后台进销存提供规范的 SPU 模型。**
 
 - **商品库及参数模型 (`goods`, `pmsAttr`)**：
@@ -94,9 +96,8 @@
   - **状态字段**：`goodsStatus`: `0`-下架草稿, `1`-上架; `attrType`: `0`-规格, `1`-参数
   - **关联表/API**：`src/api/goods/`, `src/api/product/`
 
-
-
 ## 5. 营销与促销中心 (Marketing)
+
 **核心促销玩法支撑，依托各类优惠券驱动用户转化。**
 
 - **核心券资产库 (`cpn-coupon-info`)**：
@@ -112,6 +113,7 @@
   - **关联表/API**：`src/api/promotion/` 领用与核销相关 API
 
 ## 6. 其他基础增值服务体系
+
 **补充配套的资金前置与全局消息/调度面板。**
 
 - **预付充值储值模块 (`prepaidCardInfoT`)**：
@@ -131,3 +133,21 @@
   - **代码路径**：`src/views/home/index.vue`
   - **状态字段**：无特定状态字段
   - **关联表/API**：汇聚各类 DataSum API
+
+---
+
+## 礼尚往来管理 (`gift`)
+
+- **业务逻辑**：管理个人、家庭或企业账本中的随礼、收礼、回礼和人情统计。
+- **代码路径**：`src/views/finance/gift/`
+- **页面顺序**：数据概览、亲友管理、事由管理、礼金记录、统计报表。
+- **底栏导航**：移动端礼金模块底栏可在亲友/事由/记账/分析间切换（`GIFT_TAB_BAR` + `useTabBar`）。
+- **核心流程**：快速记礼、最近联系人、最近事由、常用金额、待回礼标记。
+- **状态字段**：`direction`: `GIVE`-随礼, `RECEIVE`-收礼, `RETURN`-回礼; `returnedFlag`: 是否已回礼。
+- **关联 API**：`src/views/finance/gift/{person,event,record}/api/`
+- **权限标识**：页面权限 `gift:dashboard`、`gift:person`、`gift:event`、`gift:record`、`gift:analysis`; 按钮权限 `gift:view`、`gift:add`、`gift:edit`、`gift:delete`、`gift:export`。
+- **亲友管理**：列表走 `business-page`（汇总 + 关系筛选 + 收支摘要）；详情菜单 `giftPersonDetail`（`/finance/gift/person/giftPersonDetail`）同页切换档案/表单；按钮权限 `gift:view/add/edit/delete`。
+- **事由管理**：摘要三卡、类型/时间筛选、business 列表；独立表单页支持类型 preset/自定义、事由时间、吸底保存与删除（对齐 PC）。
+- 联系人详情（profile）：头部展示关系与脱敏手机号（默认隐藏中间四位，可显隐）；支持拨号与复制；基本信息仅保留备注（超 60 字折叠）；往来历史时间格式为 `YYYY-MM-DD HH:mm`。
+- 联系人详情 profile 视觉：Hero 头图区、胶囊操作栏、Bento 收送礼金额、流水式往来历史；编辑为渐变主按钮，删除为弱文字按钮（二次确认保留）。
+- 联系人新增/编辑：表单分组、手机号 3-4-4、备注 0/50、吸底保存；支持 OSS 头像（`avatar` fileId + 只读 `fileInfoVo`），详情与列表优先展示缩略图/原图。

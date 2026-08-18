@@ -1,0 +1,25 @@
+{
+  "id": "plush-carrot",
+  "name": "Plush Carrot",
+  "version": "1.0.0",
+  "description": "A cute healing plush carrot Codex pet.",
+  "author": "majf",
+  "states": {
+    "idle": {
+      "images": ["idle.png"],
+      "interval": 1000
+    },
+    "coding": {
+      "images": ["working.png"],
+      "interval": 200
+    },
+    "success": {
+      "images": ["success.png"],
+      "interval": 1000
+    },
+    "error": {
+      "images": ["failure.png"],
+      "interval": 1000
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "ok": true,
+  "chroma_key": {
+    "hex": "#FF00FF",
+    "rgb": [
+      255,
+      0,
+      255
+    ],
+    "threshold": 145.0
+  },
+  "rows": [
+    {
+      "state": "running",
+      "frames": [
+        "D:\\project\\alex_miaosha_mobile\\custom-pets\\hatch-runs\\plush-carrot\\frames-music\\running\\00.png",
+        "D:\\project\\alex_miaosha_mobile\\custom-pets\\hatch-runs\\plush-carrot\\frames-music\\running\\01.png",
+        "D:\\project\\alex_miaosha_mobile\\custom-pets\\hatch-runs\\plush-carrot\\frames-music\\running\\02.png",
+        "D:\\project\\alex_miaosha_mobile\\custom-pets\\hatch-runs\\plush-carrot\\frames-music\\running\\03.png",
+        "D:\\project\\alex_miaosha_mobile\\custom-pets\\hatch-runs\\plush-carrot\\frames-music\\running\\04.png",
+        "D:\\project\\alex_miaosha_mobile\\custom-pets\\hatch-runs\\plush-carrot\\frames-music\\running\\05.png"
+      ],
+      "method": "components"
+    }
+  ]
+}

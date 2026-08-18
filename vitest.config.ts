@@ -12,8 +12,7 @@ export default defineConfig({
 		},
 	},
 	test: {
-		// 纯函数测试, 不需要 DOM。后续若要 mount 组件, 再单独引入 jsdom 与 @vue/test-utils
 		environment: 'node',
-		include: ['tests/**/*.test.ts'],
+		include: ['tests/**/*.test.ts', 'src/**/*.spec.ts'],
 	},
 });
