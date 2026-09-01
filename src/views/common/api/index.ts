@@ -42,4 +42,5 @@ export const baseService = {
 	mission: '/api/am-mission',
 	file: '/api/am-oss',
 	product: '/api/am-product',
+	ai: '/api/am-ai',
 };

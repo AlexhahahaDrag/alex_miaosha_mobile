@@ -186,10 +186,13 @@ dashboard -> person -> event -> record -> analysis
 
 - 共享类型、枚举、配置放在 `src/views/finance/gift/config.ts`（或 `config/`）。
 - API 按子域放在 `person/api`、`event/api`、`record/api`（无聚合 barrel）；ID 靠前端 `GiftId=string` + 后端 `Long2StringSerializer`。
+- Gift AI 客户端在 `src/views/finance/gift/ai/`（`chatGiftAi` / `chatGiftAiStream` / `buildGiftAnalysisAiRequest`）；网关前缀走 `baseService.ai = '/api/am-ai'`（`src/views/common/api/index.ts`）；流式请求 Authorization 与 axios 拦截器同源，读 `useUserStore().getToken`。
+- `buildAnalysisContext` 进模型前：`*Id`/`id` 统一 string，剔除 `phone`/`mobile*` 字段。
 - 业务卡片组件放在 `src/views/finance/gift/components/`。
 - 页面样式优先复用 `src/views/finance/gift/shared.less`。
 - 接口调用统一使用响应解构：`const { code, data, message } = await api()`。
 - 按钮权限用 `usePermission().hasPermission`；关系选项用 `useGiftRelationOptions`。
+- 单测：`vitest.config.ts` 已 `include: ['tests/**/*.test.ts', 'src/**/*.spec.ts']`；跑 Gift AI 用 `npm run test:unit -- --run src/views/finance/gift/ai`（注意 `npm run test` 是 Vite test mode，不是 Vitest）。
 
 ### 亲友管理
 
