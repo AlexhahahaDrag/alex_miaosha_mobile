@@ -25,6 +25,12 @@
 				<strong>{{ item.count }} 笔 · {{ formatMoney(item.amount) }}</strong>
 			</div>
 		</section>
+		<section
+			class="ai-insight-mount"
+			data-testid="gift-analysis-ai-insight"
+		>
+			<gift-ai-insight-card />
+		</section>
 	</div>
 </template>
 
@@ -125,5 +131,9 @@ void load();
 	justify-content: space-between;
 	padding: 12px 0;
 	border-top: 1px solid #f1f5f9;
+}
+
+.ai-insight-mount {
+	margin: 0 -14px;
 }
 </style>
