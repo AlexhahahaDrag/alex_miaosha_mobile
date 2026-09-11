@@ -68,9 +68,7 @@ const resolveMenuList = (admin?: LoginAdminLike | null): MenuInfoData[] => {
  * 对齐 PC normalizePermissionContext：
  * 多角色 permissionList 去重并集 → permissionCodes；super_super → superAdmin。
  */
-export const normalizePermissionContext = (
-	admin?: LoginAdminLike | null,
-): PermissionContext => {
+export const normalizePermissionContext = (admin?: LoginAdminLike | null): PermissionContext => {
 	const pc = admin?.permissionContext || {};
 	const roleList = resolveRoleList(admin);
 	const menuList = resolveMenuList(admin);
@@ -95,9 +93,7 @@ export const normalizePermissionContext = (
 		buttonPermissionCodes,
 		menuList,
 		menuInfo: menuList,
-		superAdmin:
-			pc.superAdmin === true ||
-			roleList.some((role) => role?.roleCode === 'super_super'),
+		superAdmin: pc.superAdmin === true || roleList.some((role) => role?.roleCode === 'super_super'),
 	};
 };
 
@@ -157,4 +153,3 @@ export const canAccessPermission = (
 	if (!permissionCode) return false;
 	return permissionSet.has(permissionCode);
 };
-

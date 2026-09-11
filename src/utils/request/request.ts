@@ -5,7 +5,7 @@ import router from '@/router';
 import { decrypt } from '@/utils/crypto';
 
 const request = axios.create({
-	timeout: 10000,
+	timeout: 30000,
 });
 
 const requestFile = axios.create({
