@@ -1,9 +1,11 @@
 import type { RouteRecordRaw } from 'vue-router';
 import { createRouter, createWebHashHistory } from 'vue-router';
+import { showFailToast } from 'vant';
 import type { MenuDataItem } from './typing';
 import Layout from '@/layouts/index.vue';
 import { useUserStore } from '@/store/modules/user/user';
 import { canAccessRoutePermission, type RouteAccessOptions } from '@/utils/permission';
+import { getUserMenusApi } from '@/views/login/api';
 import type { MenuInfoData } from '@/views/user/menuInfo/config';
 
 const modules = import.meta.glob([
@@ -118,27 +120,43 @@ export const routes: MenuDataItem[] = [
 	},
 ];
 
+const BASE_ROUTE_COUNT = routes.length;
+
 const router = createRouter({
 	history: createWebHashHistory(),
 	routes,
 });
 
 let dynamicRouter = [] as RouteRecordRaw[];
-let isAdded = false;
 
-router.beforeEach((to, _from) => {
+router.beforeEach(async (to) => {
 	const userStore = useUserStore();
 	if (to.path == '/login') {
-		isAdded = false;
 		return true;
 	}
 
 	if (userStore.getToken) {
-		if (!userStore.getRouteStatus || !isAdded) {
+		if (!userStore.getRouteStatus || routes.length <= BASE_ROUTE_COUNT) {
 			dynamicRouter = [];
+			if (!userStore.getMenuInfo?.length) {
+				try {
+					const { code, data, message: messageInfo } = await getUserMenusApi();
+					if (code == '200' && data?.length) {
+						userStore.setMenuInfo(data);
+					} else {
+						showFailToast(messageInfo || '加载菜单失败');
+						userStore.resetState();
+						return { name: 'login' };
+					}
+				} catch (error: unknown) {
+					console.error('加载用户菜单失败：', error);
+					showFailToast('加载菜单失败，请重新登录');
+					userStore.resetState();
+					return { name: 'login' };
+				}
+			}
 			addRouter();
-			isAdded = true;
-			if (routes.length > 5) {
+			if (routes.length > BASE_ROUTE_COUNT) {
 				return { ...to, replace: true };
 			}
 		}
@@ -258,13 +276,11 @@ export const refreshRouter = () => {
 	dynamicRouter.forEach((route) => {
 		if (route.name) {
 			router.removeRoute(route.name);
-			const index = routes.findIndex((item) => item.name === route.name);
-			if (index > -1) {
-				routes.splice(index, 1);
-			}
 		}
 	});
 	dynamicRouter = [];
+	routes.splice(BASE_ROUTE_COUNT);
+	useUserStore().changeRouteStatus(false);
 };
 
 export default router;

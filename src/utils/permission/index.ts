@@ -1,4 +1,3 @@
-import type { MenuInfoData } from '@/views/user/menuInfo/config';
 import type { OrgInfoData } from '@/views/user/orgInfo/config';
 import type { RoleInfoData } from '@/views/user/roleInfo/config';
 
@@ -15,22 +14,16 @@ export interface PermissionContext {
 	roleInfo: RoleInfoData | null;
 	permissionCodes: string[];
 	buttonPermissionCodes: string[];
-	menuList: MenuInfoData[];
-	/** 与 menuList 同义，兼容旧 store */
-	menuInfo: MenuInfoData[];
 	superAdmin: boolean;
 }
 
 interface LoginAdminLike {
-	menuInfoVoList?: MenuInfoData[];
 	roleInfoVo?: RoleInfoData | null;
 	roleInfoVoList?: RoleInfoData[];
 	orgInfoVo?: OrgInfoData | null;
 	permissionCodes?: string[];
 	buttonPermissionCodes?: string[];
 	permissionContext?: {
-		menuList?: MenuInfoData[];
-		menuInfoVoList?: MenuInfoData[];
 		roleList?: PermissionRole[];
 		roleInfoVo?: RoleInfoData | null;
 		roleInfoVoList?: RoleInfoData[];
@@ -57,13 +50,6 @@ const resolveRoleList = (admin?: LoginAdminLike | null): PermissionRole[] => {
 	return [];
 };
 
-const resolveMenuList = (admin?: LoginAdminLike | null): MenuInfoData[] => {
-	const pc = admin?.permissionContext;
-	if (pc?.menuList?.length) return pc.menuList;
-	if (pc?.menuInfoVoList?.length) return pc.menuInfoVoList;
-	return admin?.menuInfoVoList || [];
-};
-
 /**
  * 对齐 PC normalizePermissionContext：
  * 多角色 permissionList 去重并集 → permissionCodes；super_super → superAdmin。
@@ -71,7 +57,6 @@ const resolveMenuList = (admin?: LoginAdminLike | null): MenuInfoData[] => {
 export const normalizePermissionContext = (admin?: LoginAdminLike | null): PermissionContext => {
 	const pc = admin?.permissionContext || {};
 	const roleList = resolveRoleList(admin);
-	const menuList = resolveMenuList(admin);
 	const permissionCodes = uniq([
 		...(pc.permissionCodes || []),
 		...(admin?.permissionCodes || []),
@@ -91,8 +76,6 @@ export const normalizePermissionContext = (admin?: LoginAdminLike | null): Permi
 		roleInfo,
 		permissionCodes,
 		buttonPermissionCodes,
-		menuList,
-		menuInfo: menuList,
 		superAdmin: pc.superAdmin === true || roleList.some((role) => role?.roleCode === 'super_super'),
 	};
 };

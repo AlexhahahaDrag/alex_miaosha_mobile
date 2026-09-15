@@ -65,7 +65,7 @@ export const useUserStore = defineStore('app-user', {
 			this.userInfo = admin;
 		},
 		setMenuInfo(info: MenuInfoData[] | null | undefined) {
-			this.menuInfo = info || null;
+			this.menuInfo = info ?? null;
 		},
 		changeRouteStatus(state: boolean) {
 			this.hasMenu = state;
@@ -99,7 +99,8 @@ export const useUserStore = defineStore('app-user', {
 					const permissionContext = buildPermissionContext(admin);
 					this.setUserInfo(admin);
 					this.setToken(token);
-					this.setMenuInfo(permissionContext.menuInfo || null);
+					// Menus loaded on enter via GET /user/menus (login slim)
+					this.setMenuInfo([]);
 					this.setRoleInfo(permissionContext.roleInfo || null);
 					this.setOrgInfo(permissionContext.orgInfo || null);
 					this.roleList = (permissionContext.roleList || []) as UserState['roleList'];

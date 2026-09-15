@@ -6,15 +6,15 @@ import { buildPermissionContext } from '@/utils/permission';
  * 对齐 PC normalizePermissionContext：多角色 permissionCodes 去重并集 + superAdmin。
  */
 describe('buildPermissionContext', () => {
-	it('装配菜单、角色与机构三部分上下文', () => {
+	it('装配角色与机构上下文（不含菜单字段）', () => {
 		const context = buildPermissionContext({
 			menuInfoVoList: [{ id: '1', name: '用户管理' }],
 			roleInfoVo: { roleCode: 'admin', roleName: '管理员' },
 			orgInfoVo: { id: '10', orgName: '总公司' },
 		} as never);
 
-		expect(context.menuInfo).toEqual([{ id: '1', name: '用户管理' }]);
-		expect(context.menuList).toEqual([{ id: '1', name: '用户管理' }]);
+		expect(context).not.toHaveProperty('menuInfo');
+		expect(context).not.toHaveProperty('menuList');
 		expect(context.roleInfo).toMatchObject({ roleCode: 'admin' });
 		expect(context.orgInfo).toMatchObject({ id: '10', orgName: '总公司' });
 	});
@@ -22,8 +22,8 @@ describe('buildPermissionContext', () => {
 	it('入参缺失时不抛异常, 返回可安全消费的空上下文', () => {
 		expect(() => buildPermissionContext({} as never)).not.toThrow();
 		const context = buildPermissionContext({} as never);
-		expect(context.menuInfo).toEqual([]);
-		expect(context.menuList).toEqual([]);
+		expect(context).not.toHaveProperty('menuInfo');
+		expect(context).not.toHaveProperty('menuList');
 		expect(context.roleInfo).toBeNull();
 		expect(context.roleList).toEqual([]);
 		expect(context.orgInfo).toBeNull();
@@ -55,25 +55,17 @@ describe('buildPermissionContext', () => {
 			roleInfoVoList: [
 				{
 					roleCode: 'role_a',
-					permissionList: [
-						{ permissionCode: 'p1' },
-						{ permissionCode: 'shared' },
-					],
+					permissionList: [{ permissionCode: 'p1' }, { permissionCode: 'shared' }],
 				},
 				{
 					roleCode: 'role_b',
-					permissionList: [
-						{ permissionCode: 'p2' },
-						{ permissionCode: 'shared' },
-					],
+					permissionList: [{ permissionCode: 'p2' }, { permissionCode: 'shared' }],
 				},
 			],
 			buttonPermissionCodes: ['btn_edit'],
 		} as never);
 
-		expect(context.permissionCodes).toEqual(
-			expect.arrayContaining(['p1', 'p2', 'shared']),
-		);
+		expect(context.permissionCodes).toEqual(expect.arrayContaining(['p1', 'p2', 'shared']));
 		expect(context.permissionCodes).toHaveLength(3);
 		expect(context.buttonPermissionCodes).toContain('btn_edit');
 	});
