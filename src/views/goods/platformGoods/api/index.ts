@@ -8,7 +8,7 @@ const platformGoodsUrl = {
 };
 
 export function getPlatformList(params: PlatformGoodsData): Promise<ResponseBody<boolean>> {
-	return getData(baseService.mission + baseGoods + platformGoodsUrl.list, params);
+	return getData(baseService.product + baseGoods + platformGoodsUrl.list, params);
 }
 
 export function deleteBlogById(id: string) {

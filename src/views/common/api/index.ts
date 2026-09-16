@@ -39,7 +39,6 @@ export function postFileData<T = unknown>(url: string, params: unknown): Promise
 export const baseService = {
 	finance: '/api/am-finance',
 	user: '/api/am-user',
-	mission: '/api/am-mission',
 	file: '/api/am-oss',
 	product: '/api/am-product',
 };
