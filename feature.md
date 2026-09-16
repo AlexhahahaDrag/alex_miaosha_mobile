@@ -146,7 +146,9 @@
 - **状态字段**：`direction`: `GIVE`-随礼, `RECEIVE`-收礼, `RETURN`-回礼; `returnedFlag`: 是否已回礼。
 - **关联 API**：`src/views/finance/gift/{person,event,record}/api/`
 - **权限标识**：页面权限 `gift:dashboard`、`gift:person`、`gift:event`、`gift:record`、`gift:analysis`; 按钮权限 `gift:view`、`gift:add`、`gift:edit`、`gift:delete`、`gift:export`。
+- **AI 解读（P1）**：数据概览与统计页在具备 `gift:view` 时展示 `GiftAiInsightCard`（流式只读洞察）；overview 无有效数据时禁用「AI 解读」；不写 gift CRUD。
 - **亲友管理**：列表走 `business-page`（汇总 + 关系筛选 + 收支摘要）；详情菜单 `giftPersonDetail`（`/finance/gift/person/giftPersonDetail`）同页切换档案/表单；按钮权限 `gift:view/add/edit/delete`。
+- 亲友列表：往来时间格式化，展示事由名与人情余额。
 - **事由管理**：摘要三卡、类型/时间筛选、business 列表；独立表单页支持类型 preset/自定义、事由时间、吸底保存与删除（对齐 PC）。
 - 联系人详情（profile）：头部展示关系与脱敏手机号（默认隐藏中间四位，可显隐）；支持拨号与复制；基本信息仅保留备注（超 60 字折叠）；往来历史时间格式为 `YYYY-MM-DD HH:mm`。
 - 联系人详情 profile 视觉：Hero 头图区、胶囊操作栏、Bento 收送礼金额、流水式往来历史；编辑为渐变主按钮，删除为弱文字按钮（二次确认保留）。

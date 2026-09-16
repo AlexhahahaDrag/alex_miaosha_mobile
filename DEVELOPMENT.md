@@ -148,7 +148,19 @@
 
 ---
 
-## 8. 开发/架构层面同步协议 (Sync Protocol)
+## 8. 权限上下文装配（RBAC）
+
+登录后通过 `src/utils/permission` 的 `buildPermissionContext` / `normalizePermissionContext` 装配上下文：多角色 `permissionList` **去重并集**写入 `permissionCodes`，`roleCode === 'super_super'` 时 `superAdmin === true`；`roleInfo`/`menuInfo` 仍保留以兼容旧 store。礼尚往来 `usePermission` 使用同文件的 `buildPermissionSet` / `isSuperAdmin` / `canAccessPermission`，角色判定必须精确匹配 `super_super`。
+
+- **登录与菜单契约**：登录响应不含菜单树；进入系统时由路由守卫调用 `GET /user/menus`（`getUserMenusApi`）再 `setMenuInfo` + `addRouter`。失败 toast 并 `resetState` 回登录。
+- **PermissionContext**：仅 org / roles / permissionCodes / superAdmin；**不含**菜单。菜单仅路由守卫 `GET /user/menus` → `setMenuInfo`。
+- **动态路由就绪**：`hasMenu` + `routes.length > BASE_ROUTE_COUNT`（无模块级 isAdded）。
+
+## 8.1 层级数据展示约定
+
+机构/菜单等具备父子层级的数据，前端一律消费后端 `/xxx/tree` 接口获取已组装好的 `children` 树（如 `org-info/tree`、`menu-info/tree`），禁止用 `page(1, 1000)` 在前端拼树；展示统一封装为业务目录下的递归 `xxxTreeItem.vue` 组件（参考 `src/views/user/orgInfo/orgTreeItem.vue`、`src/views/user/menuInfo/menuTreeItem.vue`）。
+
+## 9. 开发/架构层面同步协议 (Sync Protocol)
 
 > [!IMPORTANT]
 > **凡涉及全局交互体系、基础设施、或 `src/views/components` 的结构性更改，Antigravity 必须自觉检查并更新本 `DEVELOPMENT.md` 文件。**
@@ -178,10 +190,13 @@ dashboard -> person -> event -> record -> analysis
 
 - 共享类型、枚举、配置放在 `src/views/finance/gift/config.ts`（或 `config/`）。
 - API 按子域放在 `person/api`、`event/api`、`record/api`（无聚合 barrel）；ID 靠前端 `GiftId=string` + 后端 `Long2StringSerializer`。
+- Gift AI 客户端在 `src/views/finance/gift/ai/`（`chatGiftAi` / `chatGiftAiStream` / `buildGiftAnalysisAiRequest`）；网关前缀走 `baseService.ai = '/api/am-ai'`（`src/views/common/api/index.ts`）；流式请求 Authorization 与 axios 拦截器同源，读 `useUserStore().getToken`。
+- `buildAnalysisContext` 进模型前：`*Id`/`id` 统一 string，剔除 `phone`/`mobile*` 字段。
 - 业务卡片组件放在 `src/views/finance/gift/components/`。
 - 页面样式优先复用 `src/views/finance/gift/shared.less`。
 - 接口调用统一使用响应解构：`const { code, data, message } = await api()`。
 - 按钮权限用 `usePermission().hasPermission`；关系选项用 `useGiftRelationOptions`。
+- 单测：`vitest.config.ts` 已 `include: ['tests/**/*.test.ts', 'src/**/*.spec.ts']`；跑 Gift AI 用 `npm run test:unit -- --run src/views/finance/gift/ai`（注意 `npm run test` 是 Vite test mode，不是 Vitest）。
 
 ### 亲友管理
 

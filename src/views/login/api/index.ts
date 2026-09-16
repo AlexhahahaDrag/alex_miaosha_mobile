@@ -1,15 +1,15 @@
 import type { LoginResultData } from '../config';
 import request from '@/utils/request/request';
 import type { ResponseBody } from '@/types/api';
-import { baseService } from '@/views/common/api';
+import { baseService, getData } from '@/views/common/api';
+import type { MenuInfoData } from '@/views/user/menuInfo/config';
 
-// 将请求数据转换为form-data格式
-// 这里不用qs，用FormData也可以，不赘述
 const baseUrl = '/api/v1';
 
 enum Api {
 	login = '/user/login',
 	logout = '/user/logout',
+	menus = '/user/menus',
 }
 
 export interface LoginParams {
@@ -35,4 +35,8 @@ export function loginApi(params: LoginParams): Promise<ResponseBody<LoginResultD
 
 export function logoutApi(): Promise<ResponseBody<boolean>> {
 	return request.post(baseService.user + baseUrl + Api.logout);
+}
+
+export function getUserMenusApi(): Promise<ResponseBody<MenuInfoData[]>> {
+	return getData(baseService.user + Api.menus);
 }

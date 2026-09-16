@@ -167,6 +167,26 @@ export interface GiftAnalysisOverview {
 	returnCount?: number;
 }
 
+/** 收支趋势（后端 /gift-analysis/trend） */
+export interface GiftAmountTrend {
+	label?: string;
+	giveAmount?: number;
+	receiveAmount?: number;
+}
+
+/** 排行项（事由/联系人） */
+export interface GiftRankingItem {
+	name?: string;
+	amount?: number;
+	count?: number;
+}
+
+/** 关系分布 */
+export interface GiftRelationDistribution {
+	relationType?: string;
+	count?: number;
+}
+
 export const directionOptions: { text: string; value: GiftDirection }[] = [
 	{ text: '随礼', value: 'GIVE' },
 	{ text: '收礼', value: 'RECEIVE' },

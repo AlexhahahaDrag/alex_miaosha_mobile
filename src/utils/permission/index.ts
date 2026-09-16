@@ -1,47 +1,37 @@
-import type { MenuInfoData } from '@/views/user/menuInfo/config';
 import type { OrgInfoData } from '@/views/user/orgInfo/config';
 import type { RoleInfoData } from '@/views/user/roleInfo/config';
 
 export interface PermissionRole {
 	roleCode?: string;
 	permissionList?: Array<{ permissionCode?: string }>;
-}
-
-export interface PermissionContext {
-	orgInfo?: OrgInfoData | null;
-	roleList: PermissionRole[];
-	permissionCodes: string[];
-	buttonPermissionCodes: string[];
-	menuList: MenuInfoData[];
-	superAdmin: boolean;
-}
-
-export interface LoginAdminWithPermissionContext {
-	permissionContext?: Partial<PermissionContext> & {
-		menuInfoVoList?: MenuInfoData[];
-		roleInfoVo?: RoleInfoData | null;
-		roleInfoVoList?: RoleInfoData[];
-		orgInfoVo?: OrgInfoData | null;
-	};
-	menuInfoVoList?: MenuInfoData[];
-	roleInfoVo?: PermissionRole | RoleInfoData | null;
-	roleInfoVoList?: Array<PermissionRole | RoleInfoData>;
-	orgInfoVo?: OrgInfoData | null;
-	permissionCodes?: string[];
-	buttonPermissionCodes?: string[];
 	[key: string]: unknown;
 }
 
+export interface PermissionContext {
+	orgInfo: OrgInfoData | null;
+	roleList: PermissionRole[];
+	/** 首个角色，兼容旧 store 的 roleInfo 读取 */
+	roleInfo: RoleInfoData | null;
+	permissionCodes: string[];
+	buttonPermissionCodes: string[];
+	superAdmin: boolean;
+}
+
 interface LoginAdminLike {
-	menuInfoVoList?: MenuInfoData[];
 	roleInfoVo?: RoleInfoData | null;
 	roleInfoVoList?: RoleInfoData[];
 	orgInfoVo?: OrgInfoData | null;
+	permissionCodes?: string[];
+	buttonPermissionCodes?: string[];
 	permissionContext?: {
-		menuInfoVoList?: MenuInfoData[];
+		roleList?: PermissionRole[];
 		roleInfoVo?: RoleInfoData | null;
 		roleInfoVoList?: RoleInfoData[];
+		orgInfo?: OrgInfoData | null;
 		orgInfoVo?: OrgInfoData | null;
+		permissionCodes?: string[];
+		buttonPermissionCodes?: string[];
+		superAdmin?: boolean;
 	};
 	[key: string]: unknown;
 }
@@ -49,96 +39,77 @@ interface LoginAdminLike {
 const uniq = (codes: Array<string | undefined | null>) =>
 	Array.from(new Set(codes.filter((code): code is string => !!code)));
 
-interface PermissionLike {
-	permissionCode?: string;
-	[key: string]: unknown;
-}
-
-interface RoleLike extends RoleInfoData {
-	permissionList?: PermissionLike[];
-}
-
-const mergePermissionList = (roles: RoleInfoData[]): PermissionLike[] => {
-	const permissionMap = new Map<string, PermissionLike>();
-	roles.forEach((role) => {
-		const permissionList = (role as RoleLike).permissionList;
-		if (!Array.isArray(permissionList)) return;
-		permissionList.forEach((permission) => {
-			const permissionCode = permission.permissionCode;
-			if (!permissionCode || permissionMap.has(permissionCode)) return;
-			permissionMap.set(permissionCode, permission);
-		});
-	});
-	return Array.from(permissionMap.values());
+/** 解析角色列表：优先 permissionContext，再回落顶层字段 */
+const resolveRoleList = (admin?: LoginAdminLike | null): PermissionRole[] => {
+	const pc = admin?.permissionContext;
+	if (pc?.roleList?.length) return pc.roleList;
+	if (pc?.roleInfoVoList?.length) return pc.roleInfoVoList;
+	if (pc?.roleInfoVo) return [pc.roleInfoVo];
+	if (admin?.roleInfoVoList?.length) return admin.roleInfoVoList;
+	if (admin?.roleInfoVo) return [admin.roleInfoVo];
+	return [];
 };
 
-const pickPrimaryRole = (admin: LoginAdminLike): RoleInfoData | null => {
-	const roleInfoVoList = admin.permissionContext?.roleInfoVoList?.length
-		? admin.permissionContext.roleInfoVoList
-		: admin.roleInfoVoList;
-	if (roleInfoVoList?.length) {
-		return {
-			...(roleInfoVoList[0] || {}),
-			permissionList: mergePermissionList(roleInfoVoList),
-		};
-	}
-	if (admin.permissionContext?.roleInfoVo) return admin.permissionContext.roleInfoVo;
-	return admin.roleInfoVo || null;
-};
-
-/** 登录后组装菜单/角色/机构（现有路由逻辑依赖） */
-export const buildPermissionContext = (admin: LoginAdminLike) => {
-	const menuInfo = admin.permissionContext?.menuInfoVoList?.length
-		? admin.permissionContext.menuInfoVoList
-		: admin.menuInfoVoList || [];
-	const roleInfo = pickPrimaryRole(admin);
-	const orgInfo = admin.permissionContext?.orgInfoVo || admin.orgInfoVo || null;
-	return {
-		menuInfo,
-		roleInfo,
-		orgInfo,
-	};
-};
-
-/** 归一化按钮/页面权限码上下文（对齐 PC） */
-export const normalizePermissionContext = (
-	admin?: LoginAdminWithPermissionContext | null,
-): PermissionContext => {
-	const permissionContext = admin?.permissionContext || {};
-	const legacyRoleList = admin?.roleInfoVoList?.length
-		? admin.roleInfoVoList
-		: admin?.roleInfoVo
-			? [admin.roleInfoVo]
-			: [];
-
-	const roleList = (
-		permissionContext.roleList?.length ? permissionContext.roleList : legacyRoleList
-	) as PermissionRole[];
-
+/**
+ * 对齐 PC normalizePermissionContext：
+ * 多角色 permissionList 去重并集 → permissionCodes；super_super → superAdmin。
+ */
+export const normalizePermissionContext = (admin?: LoginAdminLike | null): PermissionContext => {
+	const pc = admin?.permissionContext || {};
+	const roleList = resolveRoleList(admin);
 	const permissionCodes = uniq([
-		...(permissionContext.permissionCodes || []),
+		...(pc.permissionCodes || []),
 		...(admin?.permissionCodes || []),
 		...roleList.flatMap((role) =>
 			(role.permissionList || []).map((permission) => permission.permissionCode),
 		),
 	]);
 	const buttonPermissionCodes = uniq([
-		...(permissionContext.buttonPermissionCodes || []),
+		...(pc.buttonPermissionCodes || []),
 		...(admin?.buttonPermissionCodes || []),
 	]);
+	const roleInfo = (roleList[0] as RoleInfoData | undefined) || null;
 
 	return {
-		orgInfo: permissionContext.orgInfo || admin?.orgInfoVo || null,
+		orgInfo: pc.orgInfo || pc.orgInfoVo || admin?.orgInfoVo || null,
 		roleList,
+		roleInfo,
 		permissionCodes,
 		buttonPermissionCodes,
-		menuList: permissionContext.menuList?.length
-			? permissionContext.menuList
-			: admin?.menuInfoVoList || [],
-		superAdmin:
-			permissionContext.superAdmin === true ||
-			roleList.some((role) => role?.roleCode === 'super_super'),
+		superAdmin: pc.superAdmin === true || roleList.some((role) => role?.roleCode === 'super_super'),
 	};
+};
+
+/** store / 业务入口：与 normalizePermissionContext 同形 */
+export const buildPermissionContext = (admin: LoginAdminLike): PermissionContext =>
+	normalizePermissionContext(admin);
+
+export interface RouteAccessOptions {
+	superAdmin: boolean;
+	permissionCodes: string[];
+	roleCode?: string;
+	permissionList?: Array<{ permissionCode?: string }>;
+}
+
+/** 动态路由注册：store 的 superAdmin / permissionCodes 优先，回落首个 role 的 permissionList */
+export const canAccessRoutePermission = (
+	permissionCode: string | undefined,
+	options: RouteAccessOptions,
+): boolean => {
+	if (!permissionCode) {
+		return true;
+	}
+	if (options.superAdmin || options.roleCode === 'super_super') {
+		return true;
+	}
+	if (options.permissionCodes.length) {
+		return options.permissionCodes.includes(permissionCode);
+	}
+	const list = options.permissionList;
+	if (list?.length) {
+		return list.some((item) => item?.permissionCode === permissionCode);
+	}
+	return false;
 };
 
 export const buildPermissionSet = (context?: Partial<PermissionContext> | null) =>

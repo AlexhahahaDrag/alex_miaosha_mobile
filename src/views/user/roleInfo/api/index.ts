@@ -21,6 +21,11 @@ export function getRoleInfoPage(
 	});
 }
 
+// 角色信息表无独立 /list 接口，沿用分页接口取较大页容量作为下拉/picker 选项来源
+export function getRoleInfoList(params?: RoleInfoData): Promise<ResponseBody<CommonPageResult<RoleInfoData>>> {
+	return getRoleInfoPage(params || {}, 1, 1000);
+}
+
 export function getRoleInfoDetail(id: string): Promise<ResponseBody<RoleInfoData>> {
 	return getData(`${baseService.user + baseRoleInfo + RoleInfoUrl.url}`, { id });
 }

@@ -9,4 +9,5 @@ export interface OrgInfoData {
 	parentOrgName?: string;
 	summary?: string;
 	status?: string | number;
+	children?: OrgInfoData[];
 }

@@ -1,29 +1,18 @@
-import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
-import vue from '@vitejs/plugin-vue';
-import AutoImport from 'unplugin-auto-import/vite';
 
-const rootDir = fileURLToPath(new URL('.', import.meta.url));
-
+/**
+ * 单测独立配置：不加载 vite.config.ts 的 Rolldown/插件链，
+ * 避免 vitest 4 与 Vite 8 运行时冲突。
+ */
 export default defineConfig({
-	plugins: [
-		vue(),
-		AutoImport({
-			imports: ['vue', 'vue-router', 'pinia'],
-		}),
-	],
 	resolve: {
 		alias: {
-			'@': resolve(rootDir, 'src'),
-			'#': resolve(rootDir, 'types'),
+			'@': fileURLToPath(new URL('./src', import.meta.url)),
 		},
 	},
 	test: {
-		environment: 'happy-dom',
-		include: ['tests/unit/**/*.{test,spec}.ts'],
-		setupFiles: ['./tests/setup.ts'],
-		clearMocks: true,
-		restoreMocks: true,
+		environment: 'node',
+		include: ['tests/**/*.test.ts', 'src/**/*.spec.ts'],
 	},
 });

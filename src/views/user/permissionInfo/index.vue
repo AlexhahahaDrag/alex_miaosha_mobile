@@ -5,7 +5,10 @@
 		@refresh="refresh"
 		ref="pullRefresh"
 	>
-		<form action="/">
+		<form
+			action="/"
+			data-testid="rbac-perm-search"
+		>
 			<!--
     <van-search
         v-model='searchInfo.typeCode'
@@ -41,6 +44,7 @@
 					:key="index"
 				>
 					<van-cell
+						data-testid="rbac-perm-row"
 						:title="item.id"
 						:key="index"
 						is-link
@@ -66,12 +70,20 @@
 										{{ item.permissionName }}
 									</div>
 								</div>
-								<div class="rightDiv">{{ item.status }} {{ item.options }}</div>
+								<van-switch
+									:model-value="item.status == '1'"
+									size="18"
+									class="rightDiv"
+									:data-testid="`rbac-perm-row-switch-${item.id}`"
+									@click.stop
+									@update:model-value="(checked) => toggleStatus(item, checked)"
+								/>
 							</div>
 						</template>
 					</van-cell>
 					<template #right>
 						<van-button
+							data-testid="rbac-perm-row-delete"
 							class="right_info"
 							@click="delPermissionInfo(item.id)"
 							square
@@ -91,7 +103,7 @@ import { showSuccessToast, showFailToast } from 'vant';
 import type { SearchInfo } from './permissionInfoTs';
 import { useNavBar } from '@/composables/useNavBar';
 import { usePagination } from '@/composables/usePagination';
-import { getPermissionInfoPage, deletePermissionInfo } from '@/views/user/permissionInfo/api';
+import { getPermissionInfoPage, deletePermissionInfo, updatePermissionInfo } from '@/views/user/permissionInfo/api';
 import { getUserManagerList } from '@/views/user/userManager/api';
 import type { PageInfo } from '@/views/common/config';
 import type { PermissionInfoData } from '@/views/user/permissionInfo/config';
@@ -180,6 +192,18 @@ const onLoadingChange = (value: boolean) => {
 
 const beforeClose = (_e: unknown): void => {
 	// console.log(e);
+};
+
+// RBAC-MB-PERM-001：权限暂无专用启停接口，走现有 update 仅提交切换后的 status
+const toggleStatus = async (item: PermissionListItem, checked: boolean) => {
+	const nextStatus = checked ? '1' : '0';
+	const { code, message } = await updatePermissionInfo({ ...item, status: nextStatus });
+	if (code === '200') {
+		item.status = nextStatus;
+		showSuccessToast('状态已更新');
+	} else {
+		showFailToast(message || '状态更新失败，请联系管理员');
+	}
 };
 
 const delPermissionInfo = async (id: string | undefined) => {

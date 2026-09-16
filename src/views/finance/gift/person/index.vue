@@ -93,10 +93,15 @@
 						<p>
 							出 {{ formatMoney(item.totalGiveAmount) }} / 入
 							{{ formatMoney(item.totalReceiveAmount) }}
+							<template v-if="item.netAmount != null"> / 净 {{ formatMoney(item.netAmount) }} </template>
 						</p>
 						<p>
-							{{ item.latestRecordTime || '暂无往来' }}
+							<template v-if="item.latestRecordTime">
+								{{ formatTime(item.latestRecordTime, dataTimeFormat) || item.latestRecordTime }}
+							</template>
+							<template v-else>暂无往来</template>
 							<template v-if="item.latestDirection"> · {{ directionText(item.latestDirection) }} </template>
+							<template v-if="item.latestEventName"> · {{ item.latestEventName }} </template>
 						</p>
 					</div>
 				</div>
@@ -112,6 +117,7 @@ import { useTabBar } from '@/composables/useTabBar';
 import { usePagination } from '@/composables/usePagination';
 import { usePermission } from '@/composables/usePermission';
 import { useGiftRelationOptions } from '@/composables/useGiftRelationOptions';
+import { formatTime, dataTimeFormat } from '@/utils/dayjs';
 import { getRoutePathByName } from '@/utils/router';
 import { getGiftPersonBusinessPage, getGiftPersonSummary } from '@/views/finance/gift/person/api';
 import type { GiftPersonBusinessInfo, GiftPersonQuery, GiftPersonSummary } from '@/views/finance/gift/config';

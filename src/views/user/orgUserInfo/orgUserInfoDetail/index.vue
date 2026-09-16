@@ -6,20 +6,24 @@
 	>
 		<van-cell-group>
 			<van-field
-				v-model="formInfo.orgId"
+				v-model="orgName"
 				name="orgId"
 				:label="label.orgId + '：'"
-				:placeholder="'请输入' + label.orgId"
+				:placeholder="'请选择' + label.orgId"
 				:rules="rulesRef.orgId"
-				:maxlength="128"
+				@click="choose('org')"
+				data-testid="rbac-org-user-field-org"
+				readonly
 			/>
 			<van-field
-				v-model="formInfo.userId"
+				v-model="userName"
 				name="userId"
 				:label="label.userId + '：'"
-				:placeholder="'请输入' + label.userId"
+				:placeholder="'请选择' + label.userId"
 				:rules="rulesRef.userId"
-				:maxlength="128"
+				@click="choose('user')"
+				data-testid="rbac-org-user-field-user"
+				readonly
 			/>
 			<van-field
 				v-model="formInfo.summary"
@@ -65,6 +69,10 @@ import { getListName } from '@/views/common/config';
 import { addOrgUserInfo, updateOrgUserInfo, getOrgUserInfoDetail } from '@/views/user/orgUserInfo/api';
 import type { Info } from '@/views/common/pop/selectPop.vue';
 import { getDictList } from '@/views/finance/dict/api';
+import { getOrgInfoTree } from '@/views/user/orgInfo/api';
+import { flattenOrgTree, type OrgTreeOption } from '@/views/user/orgInfo/orgInfoTs';
+import { getUserManagerList } from '@/views/user/userManager/api';
+import type { UserManagerData } from '@/views/user/userManager/config';
 
 const route = useRoute();
 const router = useRouter();
@@ -85,7 +93,31 @@ const formInfo = ref<OrgUserInfoForm>({});
 
 const popInfo = ref<Info>({ showFlag: false });
 
+const orgName = ref<string>('');
+const userName = ref<string>('');
 const statusName = ref<string>('');
+
+const orgInfo = ref<Info>({
+	label: 'org',
+	labelName: label.orgId,
+	rule: rulesRef.orgId,
+	customFieldName: {
+		text: 'orgName',
+		value: 'id',
+	},
+	selectValue: formInfo.value.orgId,
+});
+
+const userInfo = ref<Info>({
+	label: 'user',
+	labelName: label.userId,
+	rule: rulesRef.userId,
+	customFieldName: {
+		text: 'nickName',
+		value: 'id',
+	},
+	selectValue: formInfo.value.userId,
+});
 
 const statusInfo = ref<Info>({
 	label: 'status',
@@ -100,6 +132,14 @@ const statusInfo = ref<Info>({
 
 const choose = (type: string) => {
 	switch (type) {
+		case 'org':
+			orgInfo.value.selectValue = formInfo.value.orgId;
+			popInfo.value = orgInfo.value;
+			break;
+		case 'user':
+			userInfo.value.selectValue = formInfo.value.userId;
+			popInfo.value = userInfo.value;
+			break;
 		case 'status':
 			popInfo.value = statusInfo.value;
 			break;
@@ -110,6 +150,16 @@ const choose = (type: string) => {
 const selectInfo = (type: string, value: string, name: string) => {
 	popInfo.value.showFlag = false;
 	switch (type) {
+		case 'org': {
+			formInfo.value.orgId = value;
+			const matched = (orgInfo.value.list as OrgTreeOption[] | undefined)?.find((item) => item.id === value);
+			orgName.value = matched?.rawName || name;
+			break;
+		}
+		case 'user':
+			formInfo.value.userId = value;
+			userName.value = name;
+			break;
 		case 'status':
 			formInfo.value.status = value;
 			statusName.value = name;
@@ -121,16 +171,45 @@ const cancelInfo = () => {
 	popInfo.value.showFlag = false;
 };
 
-function getDictInfoList(res) {
+function getDictInfoList(res: { code?: string; data?: Array<{ belongTo: string }>; message?: string }) {
 	if (res?.code == '200') {
-		statusInfo.value.list = res.data.filter((item: { belongTo: string }) => item.belongTo == 'is_valid');
+		statusInfo.value.list = (res.data || []).filter((item: { belongTo: string }) => item.belongTo == 'is_valid');
 		statusName.value = getListName(statusInfo.value.list || [], formInfo.value.status, 'typeCode', 'typeName');
 	} else {
 		showFailToast(res?.message || '查询失败，请联系管理员');
 	}
 }
 
+async function loadOrgOptions() {
+	const { code, data, message } = await getOrgInfoTree();
+	if (code === '200') {
+		orgInfo.value.list = flattenOrgTree(data);
+		orgName.value = getListName<OrgTreeOption>(
+			(orgInfo.value.list as OrgTreeOption[]) || [],
+			formInfo.value.orgId,
+			'id',
+			'rawName',
+		);
+	} else {
+		showFailToast(message || '加载机构列表失败，请联系管理员');
+	}
+}
+
+async function loadUserOptions() {
+	const { code, data, message } = await getUserManagerList({});
+	if (code === '200') {
+		userInfo.value.list = data || [];
+		userName.value = getListName<UserManagerData>(userInfo.value.list || [], formInfo.value.userId, 'id', 'nickName');
+	} else {
+		showFailToast(message || '加载用户列表失败，请联系管理员');
+	}
+}
+
 const onSubmit = () => {
+	if (!formInfo.value.orgId || !formInfo.value.userId) {
+		showFailToast('请先选择机构和用户');
+		return;
+	}
 	let method = 'post';
 	if (formInfo.value.id) {
 		method = 'put';
@@ -147,22 +226,36 @@ const onSubmit = () => {
 
 function init() {
 	const id = route?.query?.id as string | undefined;
+	const tasks: Promise<unknown>[] = [getDictList('is_valid'), loadOrgOptions(), loadUserOptions()];
 	if (id) {
-		Promise.all([getOrgUserInfoDetail(id || '-1'), getDictList('is_valid')])
+		Promise.all([getOrgUserInfoDetail(id || '-1'), ...tasks])
 			.then((res) => {
-				if (res[0].code == '200') {
-					formInfo.value = res[0].data;
+				const detailRes = res[0] as { code?: string; data?: OrgUserInfoForm; message?: string };
+				if (detailRes.code == '200') {
+					formInfo.value = detailRes.data || {};
+					orgName.value = getListName<OrgTreeOption>(
+						(orgInfo.value.list as OrgTreeOption[]) || [],
+						formInfo.value.orgId,
+						'id',
+						'rawName',
+					);
+					userName.value = getListName<UserManagerData>(
+						userInfo.value.list || [],
+						formInfo.value.userId,
+						'id',
+						'nickName',
+					);
 				} else {
-					showFailToast(res?.message || '查询详情失败，请联系管理员');
+					showFailToast(detailRes?.message || '查询详情失败，请联系管理员');
 				}
-				getDictInfoList(res[1]);
+				getDictInfoList(res[1] as { code?: string; data?: Array<{ belongTo: string }>; message?: string });
 			})
 			.catch(() => {
 				showFailToast('系统异常，请联系管理员');
 			});
 	} else {
-		getDictList('is_valid').then((res) => {
-			getDictInfoList(res);
+		Promise.all(tasks).then((res) => {
+			getDictInfoList(res[0] as { code?: string; data?: Array<{ belongTo: string }>; message?: string });
 		});
 		formInfo.value = {};
 	}

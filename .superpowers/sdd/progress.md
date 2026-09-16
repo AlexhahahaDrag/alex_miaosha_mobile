@@ -1,12 +1,12 @@
-﻿# SDD Progress — short-content Y-scrollbar fix
-Branch: codex/gift-management-module
-Plan: docs/superpowers/plans/2026-07-24-gift-person-detail-scroll.md
-Started: 2026-07-24
+﻿# SDD Progress — mobile menu on enter
+Branch: develop-1.0-feature-org-manage
+Plan: docs/superpowers/plans/2026-09-15-mobile-menu-on-enter.md
+Started: 2026-09-15
+Repo: alex_miaosha_mobile
 
-
-Task 1: complete (commits 2d47610..bb0c4fe, review clean; Co-authored-by env limitation noted)
-
-Task 2: complete (commits bb0c4fe..e5eaea9, review clean)
-
-Task 3: complete (commits e5eaea9..c3a6fa0, review clean; graphify via Python3.14)
+Task 1: complete (working tree, review clean; no commit per plan)
+Task 2: complete (working tree, review clean; no commit per plan)
+Task 3: complete (working tree, review clean; no commit per plan)
+Task 4: complete (docs + checklist + graphify; smoke M1–M4 left for human)
+Final review: complete (controller self-review of working tree)
 

@@ -41,4 +41,5 @@ export const baseService = {
 	user: '/api/am-user',
 	file: '/api/am-oss',
 	product: '/api/am-product',
+	ai: '/api/am-ai',
 };

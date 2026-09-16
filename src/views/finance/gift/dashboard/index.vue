@@ -14,6 +14,10 @@
 				<strong>{{ summary.pendingCount }}</strong>
 			</div>
 		</section>
+		<!-- AI context 由卡片自行拉取 getGiftAnalysisOverview，禁止用上方 record-page 截断汇总 -->
+		<section data-testid="gift-dashboard-ai-insight">
+			<gift-ai-insight-card />
+		</section>
 		<common-pull-refresh
 			v-model="refreshing"
 			class="gift-refresh"
@@ -128,6 +132,6 @@ refresh();
 }
 
 .gift-refresh {
-	height: calc(100% - 112px);
+	height: calc(100% - 220px);
 }
 </style>

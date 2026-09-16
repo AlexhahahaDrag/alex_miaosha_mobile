@@ -1,314 +1,212 @@
 <template>
-	<div class="org-page">
-		<section class="org-filter-panel">
-			<van-search
-				v-model="searchInfo.orgName"
-				placeholder="搜索机构名称/编码"
-				shape="round"
-				@search="handleSearch"
-			/>
-			<div class="filter-row">
-				<van-field
-					v-model="searchInfo.orgCode"
-					label="编码"
-					placeholder="全部编码"
-				/>
-				<van-field
-					v-model="searchInfo.status"
-					label="状态"
-					placeholder="全部状态"
-				/>
-			</div>
-			<div class="action-row">
-				<van-button
-					data-testid="org-search-button"
-					type="primary"
-					size="small"
-					@click="handleSearch"
-				>
-					查询
-				</van-button>
-				<van-button
-					data-testid="org-reset-button"
-					size="small"
-					@click="handleReset"
-				>
-					重置
-				</van-button>
-				<van-button
-					data-testid="org-add-button"
-					type="primary"
-					plain
-					size="small"
-					@click="handleAddOrg"
-				>
-					新增机构
-				</van-button>
-				<van-button
-					data-testid="org-batch-enable-button"
-					size="small"
-					@click="handleBatchEnable"
-				>
-					批量启用
-				</van-button>
-				<van-button
-					data-testid="org-batch-disable-button"
-					type="danger"
-					plain
-					size="small"
-					@click="handleBatchDisable"
-				>
-					批量禁用
-				</van-button>
-				<van-button
-					data-testid="org-drag-sort-button"
-					size="small"
-					@click="handleDragSort"
-				>
-					层级排序
-				</van-button>
-				<van-button
-					data-testid="org-expand-all-button"
-					size="small"
-					@click="handleToggleExpandAll"
-				>
-					{{ isAllExpanded ? '收起全部' : '展开全部' }}
-				</van-button>
-			</div>
-		</section>
-
-		<section class="org-summary-card">
-			<div>
-				<div class="summary-title">机构树</div>
-				<div class="summary-path">{{ summaryText }}</div>
-			</div>
-			<van-tag type="primary">{{ dataSource.length }} 个节点</van-tag>
-		</section>
-
-		<section class="cache-hint">
-			<div>
-				<div class="summary-title">缓存状态</div>
-				<div class="summary-path">建议后端按 org:tree:{tenantId} 缓存机构树，变更后主动失效。</div>
-			</div>
-			<van-tag :type="sortMode ? 'warning' : 'success'">
-				{{ sortMode ? '排序中' : 'Redis Ready' }}
-			</van-tag>
-		</section>
-
-		<common-pull-refresh
-			v-model="isRefresh"
-			class="org-refresh"
-			@refresh="refresh"
+	<common-pull-refresh
+		:style="{ height: 'calc(100% - 44px)' }"
+		v-model="isRefresh"
+		@refresh="refresh"
+		ref="pullRefresh"
+	>
+		<van-tabs
+			v-model:active="activeTab"
+			data-testid="rbac-org-view-tabs"
 		>
-			<common-list
-				v-model="loading"
-				:loading="loading"
-				:refreshing="isRefresh"
-				:finished="finished"
-				:is-empty="dataSource.length === 0"
-				empty-text="暂无机构数据"
-				@load="onLoad"
+			<van-tab
+				title="列表"
+				name="list"
 			>
-				<template #skeleton>
-					<div
-						v-for="item in 3"
-						:key="item"
-						class="org-card skeleton-card"
-					>
-						<van-skeleton
-							title
-							:row="3"
-						/>
-					</div>
-				</template>
-
-				<div
-					v-for="item in visibleOrgList"
-					:key="item.id"
-					class="org-card"
-					:style="{ marginLeft: `${Math.min(item.level, 3) * 12}px` }"
+				<form action="/">
+					<van-search
+						v-model="searchInfo.orgName"
+						data-testid="rbac-org-search"
+						show-action
+						placeholder="请输入机构名称"
+						@search="onSearch"
+						@cancel="onCancel"
+						action-text="清空"
+					/>
+				</form>
+				<van-divider
+					:style="{
+						color: '#1989fa',
+						borderColor: 'grey',
+					}"
+				></van-divider>
+				<van-empty
+					v-if="dataSource.length == 0"
+					description="暂无数据"
+				></van-empty>
+				<van-list
+					v-else
+					v-model:loading="loading"
+					:finished="finished"
+					finished-text="没有更多了"
+					@load="onRefresh"
 				>
-					<div class="org-main">
-						<van-checkbox
-							:data-testid="`org-row-select-${item.id}`"
-							:model-value="selectedOrgIds.includes(item.id)"
-							@update:model-value="toggleOrgSelection(item.id, $event)"
-						/>
-						<van-button
-							:data-testid="`org-row-expand-${item.id}`"
-							class="expand-button"
-							size="mini"
-							plain
-							:disabled="item.children.length === 0"
-							@click="toggleExpanded(item.id)"
+					<van-cell-group>
+						<van-swipe-cell
+							v-for="(item, index) in dataSource"
+							:before-close="beforeClose"
+							:key="index"
 						>
-							{{ item.children.length === 0 ? '-' : expandedIds.includes(item.id) ? '收起' : '展开' }}
-						</van-button>
-						<div class="org-info">
-							<div class="org-name">
-								{{ item.orgName || '-' }}
-								<van-tag
-									:type="isEnabled(item.status) ? 'success' : 'danger'"
-									class="status-tag"
-								>
-									{{ isEnabled(item.status) ? '启用' : '禁用' }}
-								</van-tag>
-							</div>
-							<div class="org-meta">{{ item.orgCode || '-' }} · {{ item.parentOrgName || item.parentName || '顶级机构' }}</div>
-							<div class="org-summary">{{ item.summary || '暂无简介' }}</div>
-						</div>
-					</div>
-					<div class="org-actions">
-						<van-button
-							:data-testid="`org-row-add-child-${item.id}`"
-							size="mini"
-							type="primary"
-							plain
-							@click="handleAddChild(item)"
-						>
-							添加下级
-						</van-button>
-						<van-button
-							:data-testid="`org-row-edit-${item.id}`"
-							size="mini"
-							@click="handleEditOrg(item)"
-						>
-							编辑
-						</van-button>
-						<van-button
-							:data-testid="`org-row-delete-${item.id}`"
-							size="mini"
-							type="danger"
-							plain
-							@click="handleDeleteOrg(item)"
-						>
-							删除
-						</van-button>
-					</div>
-				</div>
-			</common-list>
-		</common-pull-refresh>
-	</div>
+							<van-cell
+								data-testid="rbac-org-row"
+								:title-class="item.status == '1' ? 'validClass' : 'notValidClass'"
+								:title="item.orgName"
+								:key="index"
+								is-link
+								:to="{
+									path: '/user/orgInfo/orgInfoDetail',
+									query: { id: item.id },
+								}"
+							>
+								<template #label>
+									<div class="iconClass">
+										<div class="icon">
+											{{ item.parentOrgName }}
+										</div>
+									</div>
+								</template>
+								<template #right-icon>
+									<div class="text-right">
+										<div style="display: flex">
+											<div class="van-ellipsis">
+												{{ item.orgCode }}
+											</div>
+										</div>
+										<van-switch
+											:model-value="item.status == '1'"
+											size="18"
+											class="rightDiv"
+											:data-testid="`rbac-org-row-switch-${item.id}`"
+											@click.stop
+											@update:model-value="(checked) => toggleStatus(item, checked)"
+										/>
+									</div>
+								</template>
+							</van-cell>
+							<template #right>
+								<van-button
+									data-testid="rbac-org-row-delete"
+									class="right_info"
+									@click="delOrgInfo(item.id)"
+									square
+									type="danger"
+									text="删除"
+								/>
+							</template>
+							<van-divider class="dividerClass"></van-divider>
+						</van-swipe-cell>
+					</van-cell-group>
+				</van-list>
+			</van-tab>
+			<van-tab
+				title="层级"
+				name="tree"
+			>
+				<van-empty
+					v-if="treeData.length == 0"
+					description="暂无数据"
+				></van-empty>
+				<van-cell-group
+					v-else
+					data-testid="rbac-org-tree"
+				>
+					<org-tree-item
+						v-for="node in treeData"
+						:key="node.id"
+						:node="node"
+						@changed="handleTreeChanged"
+					/>
+				</van-cell-group>
+			</van-tab>
+		</van-tabs>
+	</common-pull-refresh>
+	<van-back-top></van-back-top>
 </template>
-
-<script setup lang="ts">
-import { showFailToast, showSuccessToast } from 'vant';
+<script lang="ts" setup>
+import { showSuccessToast, showFailToast } from 'vant';
+import type { OrgInfoData } from './config';
 import type { SearchInfo } from './orgInfoTs';
-import type { PageInfo } from '@/views/common/config';
 import { useNavBar } from '@/composables/useNavBar';
 import { usePagination } from '@/composables/usePagination';
-import { deleteOrgInfo, getOrgInfoPage } from '@/views/user/orgInfo/api';
-import type { OrgInfoData } from '@/views/user/orgInfo/config';
-
-interface OrgTreeItem extends OrgInfoData {
-	id: string;
-	level: number;
-	children: OrgTreeItem[];
-}
+import { getOrgInfoPage, getOrgInfoTree, deleteOrgInfo, updateOrgInfo } from '@/views/user/orgInfo/api';
+import { getUserManagerList } from '@/views/user/userManager/api';
+import type { PageInfo } from '@/views/common/config';
+import type { UserManagerData } from '@/views/user/userManager/config';
 
 const router = useRouter();
 const route = useRoute();
-
 useNavBar({
 	title: (route?.meta?.title as string) || '机构管理',
 	rightButton: '新增',
 	leftPath: '/',
 	visible: true,
-	onRightClick: () => handleAddOrg(),
+	onRightClick: () => {
+		router.push({ path: '/user/orgInfo/orgInfoDetail' });
+	},
 });
-
-const loading = ref(false);
-const finished = ref(false);
-const isRefresh = ref(false);
-const sortMode = ref(false);
+const activeTab = ref<'list' | 'tree'>('list');
+const loading = ref<boolean>(false);
 const dataSource = ref<OrgInfoData[]>([]);
-const selectedOrgIds = ref<string[]>([]);
-const expandedIds = ref<string[]>([]);
+const treeData = ref<OrgInfoData[]>([]);
 const searchInfo = ref<SearchInfo>({});
+
+const finished = ref<boolean>(false); //加载是否已经没有更多数据
+const isRefresh = ref<boolean>(false); //是否下拉刷新
 const { pagination, resetPagination, setTotal, nextPage } = usePagination();
 
-const treeList = computed(() => buildOrgTree(dataSource.value));
-const allExpandableIds = computed(() => treeList.value.filter((item) => item.children.length > 0).map((item) => item.id));
-const isAllExpanded = computed(() => allExpandableIds.value.length > 0 && allExpandableIds.value.every((id) => expandedIds.value.includes(id)));
-const visibleOrgList = computed(() => {
-	const result: OrgTreeItem[] = [];
-	const walk = (items: OrgTreeItem[]) => {
-		items.forEach((item) => {
-			result.push(item);
-			if (expandedIds.value.includes(item.id)) {
-				walk(item.children);
-			}
-		});
-	};
-	walk(treeList.value.filter((item) => item.level === 0));
-	return result;
-});
-const summaryText = computed(() => {
-	if (selectedOrgIds.value.length > 0) return `已选择 ${selectedOrgIds.value.length} 个机构`;
-	return `当前展示 ${visibleOrgList.value.length} / ${dataSource.value.length} 个机构节点`;
-});
-
-const triggerHaptic = () => {
-	navigator.vibrate?.(50);
+const onSearch = () => {
+	resetPagination();
+	dataSource.value = [];
+	onRefresh();
 };
-
-const isEnabled = (status: OrgInfoData['status']) => {
-	return status === '0' || status === 0 || status === '1' || status === 1 || status === undefined;
-};
-
-const buildOrgTree = (records: OrgInfoData[]) => {
-	const map = new Map<string, OrgTreeItem>();
-	records.forEach((record) => {
-		if (!record.id) return;
-		map.set(String(record.id), {
-			...record,
-			id: String(record.id),
-			level: 0,
-			children: [],
-		});
-	});
-
-	const roots: OrgTreeItem[] = [];
-	map.forEach((item) => {
-		const parentId = item.parentId ? String(item.parentId) : '';
-		const parent = map.get(parentId);
-		if (parent && parent.id !== item.id) {
-			parent.children.push(item);
-		} else {
-			roots.push(item);
-		}
-	});
-
-	const setLevel = (items: OrgTreeItem[], level: number) => {
-		items.forEach((item) => {
-			item.level = level;
-			setLevel(item.children, level + 1);
-		});
-	};
-	setLevel(roots, 0);
-
-	return Array.from(map.values());
+const onCancel = () => {
+	searchInfo.value.orgName = '';
+	resetPagination();
+	finished.value = false;
+	dataSource.value = [];
+	void query(searchInfo.value, pagination);
 };
 
 async function query(param: SearchInfo, cur: PageInfo) {
 	loading.value = true;
 	try {
-		const { code, data, message } = await getOrgInfoPage(param, cur.current || 1, cur.pageSize || 10);
+		const { code, data, message } = await getOrgInfoPage(param, cur?.current ? cur.current : 1, cur?.pageSize || 10);
 		if (code === '200') {
-			const records = data?.records || [];
-			dataSource.value = cur.current === 1 ? records : [...dataSource.value, ...records];
+			const records = (data?.records || []) as OrgInfoData[];
+			dataSource.value = [...dataSource.value, ...records];
 			setTotal(data?.total ?? 0);
 			nextPage();
 			finished.value = (pagination.total || 0) <= dataSource.value.length;
-			if (expandedIds.value.length === 0) {
-				expandedIds.value = allExpandableIds.value.slice(0, 1);
-			}
 		} else {
-			showFailToast(message || '查询机构失败');
+			showFailToast(message || '查询列表失败！');
 		}
 	} finally {
-		loading.value = false;
 		isRefresh.value = false;
+		loading.value = false;
+	}
+}
+
+// RBAC-MB-ORG-001：消费后端 /org-info/tree 展示机构层级，禁止前端再用 page(1,1000) 拼树
+async function loadTreeData() {
+	const { code, data, message } = await getOrgInfoTree();
+	if (code === '200') {
+		treeData.value = data || [];
+	} else {
+		showFailToast(message || '加载机构层级失败！');
+	}
+}
+
+const userMap: Record<string | number, string> = {};
+async function getUserInfoList() {
+	const { code, data, message } = await getUserManagerList({});
+	if (code === '200') {
+		(data || []).forEach((user: UserManagerData) => {
+			if (user.id !== undefined) {
+				userMap[user.id] = user.nickName || '';
+			}
+		});
+	} else {
+		showFailToast(message || '查询用户列表失败！');
 	}
 }
 
@@ -316,234 +214,90 @@ const refresh = async () => {
 	resetPagination();
 	finished.value = false;
 	dataSource.value = [];
-	await query(searchInfo.value, pagination);
+	await Promise.all([query(searchInfo.value, pagination), loadTreeData()]);
 };
 
-const onLoad = async () => {
-	if (!finished.value && !loading.value) {
+const onRefresh = async () => {
+	if (!finished.value) {
 		await query(searchInfo.value, pagination);
 	}
 };
 
-const handleSearch = async () => {
-	triggerHaptic();
-	resetPagination();
-	finished.value = false;
-	dataSource.value = [];
-	await query(searchInfo.value, pagination);
+const beforeClose = (_e: unknown): void => {
+	// console.log(e);
 };
 
-const handleReset = async () => {
-	triggerHaptic();
-	searchInfo.value = {};
-	selectedOrgIds.value = [];
-	sortMode.value = false;
-	await handleSearch();
-};
-
-const handleAddOrg = () => {
-	triggerHaptic();
-	router.push({ path: '/user/orgInfo/orgInfoDetail' });
-};
-
-const handleAddChild = (item: OrgTreeItem) => {
-	triggerHaptic();
-	router.push({
-		path: '/user/orgInfo/orgInfoDetail',
-		query: {
-			parentId: item.id,
-			parentName: item.orgName,
-		},
-	});
-};
-
-const handleEditOrg = (item: OrgTreeItem) => {
-	triggerHaptic();
-	router.push({ path: '/user/orgInfo/orgInfoDetail', query: { id: item.id } });
-};
-
-const handleDeleteOrg = async (item: OrgTreeItem) => {
-	triggerHaptic();
-	const { code, message } = await deleteOrgInfo(item.id);
+const delOrgInfo = async (id: string | undefined) => {
+	if (!id) {
+		showFailToast('删除失败，缺少机构 ID！');
+		return;
+	}
+	const { code, message } = await deleteOrgInfo(`${id}`);
 	if (code === '200') {
-		showSuccessToast(message || '删除成功');
 		await refresh();
+		showSuccessToast(message || '删除成功！');
 	} else {
-		showFailToast(message || '删除失败');
+		showFailToast(message || '删除失败，请联系管理员！');
 	}
 };
 
-const handleBatchEnable = () => {
-	triggerHaptic();
-	showSuccessToast(`已选择 ${selectedOrgIds.value.length} 个机构，待接入批量启用接口`);
-};
-
-const handleBatchDisable = () => {
-	triggerHaptic();
-	showSuccessToast(`已选择 ${selectedOrgIds.value.length} 个机构，待接入批量禁用接口`);
-};
-
-const handleDragSort = () => {
-	triggerHaptic();
-	sortMode.value = !sortMode.value;
-	showSuccessToast(sortMode.value ? '已进入层级排序模式' : '已退出层级排序模式');
-};
-
-const handleToggleExpandAll = () => {
-	triggerHaptic();
-	expandedIds.value = isAllExpanded.value ? [] : allExpandableIds.value;
-};
-
-const toggleExpanded = (id: string) => {
-	triggerHaptic();
-	if (expandedIds.value.includes(id)) {
-		expandedIds.value = expandedIds.value.filter((item) => item !== id);
-		return;
+// RBAC-MB-ORG-001：机构暂无专用启停接口，走现有 update 仅提交切换后的 status
+const toggleStatus = async (item: OrgInfoData, checked: boolean) => {
+	const nextStatus = checked ? '1' : '0';
+	const { code, message } = await updateOrgInfo({ ...item, status: nextStatus });
+	if (code === '200') {
+		item.status = nextStatus;
+		showSuccessToast('状态已更新');
+		await loadTreeData();
+	} else {
+		showFailToast(message || '状态更新失败，请联系管理员！');
 	}
-	expandedIds.value = [...expandedIds.value, id];
 };
 
-const toggleOrgSelection = (id: string, checked: boolean) => {
-	if (checked) {
-		selectedOrgIds.value = Array.from(new Set([...selectedOrgIds.value, id]));
-		return;
-	}
-	selectedOrgIds.value = selectedOrgIds.value.filter((item) => item !== id);
+const handleTreeChanged = async () => {
+	await Promise.all([loadTreeData(), refresh()]);
 };
 
-void refresh();
+async function init() {
+	dataSource.value = [];
+	resetPagination();
+	await Promise.all([query(searchInfo.value, pagination), loadTreeData(), getUserInfoList()]);
+}
+
+void init();
 </script>
 
 <style lang="less" scoped>
-.org-page {
-	min-height: 100%;
-	background: #f6f8fb;
-	padding: 12px;
-	box-sizing: border-box;
+.right_info {
+	height: 100%;
 }
 
-.org-filter-panel,
-.org-summary-card,
-.cache-hint,
-.org-card {
-	background: #fff;
-	border: 1px solid #e5e7eb;
-	border-radius: 16px;
+.rightDiv {
+	margin-top: 10px;
 }
 
-.org-filter-panel {
-	padding: 12px;
-}
-
-.filter-row {
-	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: 8px;
-	margin-top: 8px;
-}
-
-.action-row {
+.iconClass {
+	margin-top: 10px;
 	display: flex;
-	flex-wrap: wrap;
-	gap: 8px;
-	margin-top: 12px;
+}
+.van-ellipsis {
+	width: 130px;
+	text-align: right;
 }
 
-.org-summary-card,
-.cache-hint {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	gap: 12px;
-	margin-top: 12px;
-	padding: 12px 14px;
+.dividerClass {
+	color: #1989fa;
+	border-color: grey;
+	padding: 0 16px;
+	margin-top: 0;
+	margin-bottom: 0;
 }
 
-.summary-title {
-	color: #111827;
-	font-size: 13px;
-	font-weight: 600;
+.validClass {
+	font-weight: bolder;
 }
 
-.summary-path,
-.org-meta,
-.org-summary {
-	margin-top: 4px;
-	color: #6b7280;
-	font-size: 12px;
-	line-height: 1.45;
-}
-
-.org-refresh {
-	margin-top: 12px;
-}
-
-.org-card {
-	padding: 12px;
-	margin-bottom: 12px;
-	transition:
-		transform 0.16s ease,
-		box-shadow 0.16s ease;
-}
-
-.org-card:active {
-	transform: scale(0.98);
-}
-
-.skeleton-card {
-	min-height: 100px;
-}
-
-.org-main {
-	display: flex;
-	gap: 8px;
-	align-items: flex-start;
-}
-
-.expand-button {
-	flex: 0 0 auto;
-	min-width: 44px;
-}
-
-.org-info {
-	min-width: 0;
-	flex: 1;
-}
-
-.org-name {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	color: #111827;
-	font-size: 15px;
-	font-weight: 600;
-}
-
-.status-tag {
-	flex: 0 0 auto;
-}
-
-.org-actions {
-	display: flex;
-	justify-content: flex-end;
-	flex-wrap: wrap;
-	gap: 8px;
-	margin-top: 12px;
-}
-
-@media (max-width: 560px) {
-	.filter-row {
-		grid-template-columns: 1fr;
-	}
-
-	.org-summary-card,
-	.cache-hint {
-		align-items: flex-start;
-		flex-direction: column;
-	}
-
-	.org-actions {
-		justify-content: flex-start;
-	}
+.notValidClass {
+	color: gray;
 }
 </style>

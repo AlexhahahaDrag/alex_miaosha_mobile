@@ -6,11 +6,7 @@ import { loginApi } from '@/views/login/api';
 import type { LoginParams } from '@/views/login/api';
 import { piniaPersistConfig } from '@/config/piniaPersist';
 import { refreshRouter } from '@/router';
-import {
-	buildPermissionContext,
-	normalizePermissionContext,
-	type PermissionContext,
-} from '@/utils/permission';
+import { buildPermissionContext } from '@/utils/permission';
 
 const createDefaultState = (): UserState => ({
 	userInfo: null,
@@ -22,6 +18,8 @@ const createDefaultState = (): UserState => ({
 	hasMenu: false,
 	orgInfo: null,
 	roleInfo: null,
+	permissionCodes: [],
+	superAdmin: false,
 });
 
 export const useUserStore = defineStore('app-user', {
@@ -52,16 +50,11 @@ export const useUserStore = defineStore('app-user', {
 		getOrgInfo(state): UserState['orgInfo'] {
 			return state.orgInfo;
 		},
-		getPermissionContext(): PermissionContext | null {
-			const admin = this.userInfo;
-			if (!admin) return null;
-			return normalizePermissionContext({
-				...(admin as Record<string, unknown>),
-				roleInfoVo: this.roleInfo || undefined,
-				roleInfoVoList: this.roleInfo ? [this.roleInfo] : [],
-				menuInfoVoList: this.menuInfo || [],
-				orgInfoVo: this.orgInfo,
-			});
+		getPermissionCodes(state): string[] {
+			return state.permissionCodes;
+		},
+		getSuperAdmin(state): boolean {
+			return state.superAdmin;
 		},
 	},
 	actions: {
@@ -72,7 +65,7 @@ export const useUserStore = defineStore('app-user', {
 			this.userInfo = admin;
 		},
 		setMenuInfo(info: MenuInfoData[] | null | undefined) {
-			this.menuInfo = info || null;
+			this.menuInfo = info ?? null;
 		},
 		changeRouteStatus(state: boolean) {
 			this.hasMenu = state;
@@ -82,6 +75,12 @@ export const useUserStore = defineStore('app-user', {
 		},
 		setOrgInfo(orgInfo: UserState['orgInfo']) {
 			this.orgInfo = orgInfo;
+		},
+		setPermissionCodes(codes: string[] | undefined) {
+			this.permissionCodes = codes || [];
+		},
+		setSuperAdmin(flag: boolean) {
+			this.superAdmin = !!flag;
 		},
 		resetState() {
 			Object.assign(this, createDefaultState());
@@ -100,9 +99,13 @@ export const useUserStore = defineStore('app-user', {
 					const permissionContext = buildPermissionContext(admin);
 					this.setUserInfo(admin);
 					this.setToken(token);
-					this.setMenuInfo(permissionContext.menuInfo || null);
+					// Menus loaded on enter via GET /user/menus (login slim)
+					this.setMenuInfo([]);
 					this.setRoleInfo(permissionContext.roleInfo || null);
 					this.setOrgInfo(permissionContext.orgInfo || null);
+					this.roleList = (permissionContext.roleList || []) as UserState['roleList'];
+					this.setPermissionCodes(permissionContext.permissionCodes);
+					this.setSuperAdmin(permissionContext.superAdmin);
 					this.changeRouteStatus(false);
 					refreshRouter();
 					return admin;

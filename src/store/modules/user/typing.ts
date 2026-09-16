@@ -15,4 +15,7 @@ export interface UserState {
 	hasMenu: boolean;
 	orgInfo: OrgInfoData | null;
 	roleInfo: RoleInfoData | null;
+	/** 多角色 permissionList 去重并集，供按钮级鉴权 */
+	permissionCodes: string[];
+	superAdmin: boolean;
 }
