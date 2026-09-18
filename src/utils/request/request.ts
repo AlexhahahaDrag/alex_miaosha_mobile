@@ -2,7 +2,7 @@ import type { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axio
 import axios from 'axios';
 import { useUserStore } from '@/store/modules/user/user';
 import router from '@/router';
-import { decrypt } from '@/utils/crypto';
+import { decrypt, decryptGcm } from '@/utils/crypto';
 
 const request = axios.create({
 	timeout: 30000,
@@ -20,11 +20,11 @@ const redirectToLogin = () => {
 	}
 };
 
-const errorHandler = (error: AxiosError): Promise<unknown> => {
+const errorHandler = async (error: AxiosError): Promise<unknown> => {
 	let response: unknown = null;
 
 	if (error.response) {
-		const { status } = error.response;
+		const { status, headers } = error.response;
 		if (status === 403) {
 			redirectToLogin();
 			return Promise.reject(error);
@@ -32,7 +32,12 @@ const errorHandler = (error: AxiosError): Promise<unknown> => {
 
 		const { data } = error.response as AxiosResponse;
 		if (data) {
-			response = decrypt(data);
+			const version = headers ? (headers['x-crypto-version'] || headers['X-Crypto-Version']) : null;
+			if (version === '2.0' && typeof data === 'string') {
+				response = await decryptGcm(data);
+			} else {
+				response = decrypt(data as string);
+			}
 		}
 	}
 
@@ -42,6 +47,9 @@ const errorHandler = (error: AxiosError): Promise<unknown> => {
 const requestHandler = (
 	config: InternalAxiosRequestConfig,
 ): InternalAxiosRequestConfig | Promise<InternalAxiosRequestConfig> => {
+	if (config.headers) {
+		config.headers['X-Crypto-Version'] = '2.0';
+	}
 	const userStore = useUserStore();
 	const token = userStore.getToken;
 
@@ -57,6 +65,9 @@ const requestHandler = (
 const requestHandlerFile = (
 	config: InternalAxiosRequestConfig,
 ): InternalAxiosRequestConfig | Promise<InternalAxiosRequestConfig> => {
+	if (config.headers) {
+		config.headers['X-Crypto-Version'] = '2.0';
+	}
 	const userStore = useUserStore();
 	const token = userStore.getToken;
 
@@ -69,11 +80,17 @@ const requestHandlerFile = (
 	return config;
 };
 
-const responseHandler = (response: AxiosResponse<unknown>) => {
-	const { data } = response;
-	const resData = decrypt(data);
+const responseHandler = async (response: AxiosResponse<unknown>) => {
+	const { data, headers } = response;
+	const version = headers ? (headers['x-crypto-version'] || headers['X-Crypto-Version']) : null;
+	let resData: any;
+	if (version === '2.0' && typeof data === 'string') {
+		resData = await decryptGcm(data);
+	} else {
+		resData = decrypt(data as string);
+	}
 
-	if (resData.code == 403) {
+	if (resData?.code == 403) {
 		redirectToLogin();
 		return Promise.reject(resData);
 	}
