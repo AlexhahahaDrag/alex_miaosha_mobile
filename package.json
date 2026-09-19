@@ -2,6 +2,7 @@
 	"name": "alex_miaosha_mobile",
 	"version": "0.0.0",
 	"private": true,
+	"packageManager": "pnpm@12.4.2",
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
