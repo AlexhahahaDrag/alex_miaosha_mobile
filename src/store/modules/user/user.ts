@@ -100,7 +100,7 @@ export const useUserStore = defineStore('app-user', {
 					this.setUserInfo(admin);
 					this.setToken(token);
 					// Menus loaded on enter via GET /user/menus (login slim)
-					this.setMenuInfo([]);
+					this.setMenuInfo(null);
 					this.setRoleInfo(permissionContext.roleInfo || null);
 					this.setOrgInfo(permissionContext.orgInfo || null);
 					this.roleList = (permissionContext.roleList || []) as UserState['roleList'];
@@ -117,5 +117,14 @@ export const useUserStore = defineStore('app-user', {
 			}
 		},
 	},
-	persist: piniaPersistConfig('app-user'),
+	persist: piniaPersistConfig('app-user', [
+		'userInfo',
+		'token',
+		'roleList',
+		'menuInfo',
+		'orgInfo',
+		'roleInfo',
+		'permissionCodes',
+		'superAdmin',
+	]),
 });

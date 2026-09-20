@@ -1,3 +1,4 @@
+import { markRaw } from 'vue';
 import type { RouteRecordRaw } from 'vue-router';
 import { createRouter, createWebHashHistory } from 'vue-router';
 import { showFailToast } from 'vant';
@@ -27,21 +28,22 @@ const fallbackView = modules[pageInfo['404']];
 
 const resolveViewComponent = (componentPath?: string | null) => {
 	if (!componentPath) {
-		return fallbackView;
+		return markRaw(fallbackView);
 	}
 
 	if (componentPath === 'Layout') {
-		return Layout;
+		return markRaw(Layout);
 	}
 
-	return modules[componentPath] ?? fallbackView;
+	const comp = modules[componentPath] ?? fallbackView;
+	return typeof comp === 'object' && comp !== null ? markRaw(comp) : comp;
 };
 
 export const routes: MenuDataItem[] = [
 	{
 		name: 'home',
 		path: '/',
-		component: Layout,
+		component: markRaw(Layout),
 		redirect: '/dashboard',
 		meta: {
 			title: '首页',
@@ -182,6 +184,7 @@ const hasAnyRouteAccess = (access: RouteAccessOptions): boolean =>
 	!!access.permissionList?.length;
 
 const addRouter = () => {
+	routes.splice(BASE_ROUTE_COUNT);
 	const userStore = useUserStore();
 	if (userStore.getMenuInfo?.length) {
 		const access = buildRouteAccess(userStore);
