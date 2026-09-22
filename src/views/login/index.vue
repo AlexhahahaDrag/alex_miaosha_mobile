@@ -1,11 +1,5 @@
 <template>
 	<div class="login-container">
-		<vue-particles
-			id="tsparticles"
-			class="login-particles"
-			:options="particlesOptions"
-		/>
-
 		<div class="login-content">
 			<header class="login-header">
 				<div class="logo-box">
@@ -98,45 +92,6 @@ import type { LoginParams } from '@/views/login/api';
 import { useUserStore } from '@/store/modules/user/user';
 import { useNavBar } from '@/composables/useNavBar';
 
-const particlesOptions = {
-	background: { color: { value: 'transparent' } },
-	fpsLimit: 120,
-	interactivity: {
-		events: {
-			onClick: { enable: true, mode: 'push' },
-			onHover: { enable: true, mode: 'grab' },
-			resize: true,
-		},
-		modes: {
-			grab: { distance: 140, links: { opacity: 0.2 } },
-			push: { quantity: 4 },
-		},
-	},
-	particles: {
-		color: { value: '#2563eb' },
-		links: {
-			color: '#2563eb',
-			distance: 150,
-			enable: true,
-			opacity: 0.1,
-			width: 1,
-		},
-		move: {
-			direction: 'none',
-			enable: true,
-			outMode: 'out',
-			random: true,
-			speed: 0.8,
-			straight: false,
-		},
-		number: { density: { enable: true, area: 800 }, value: 40 },
-		opacity: { value: 0.2 },
-		shape: { type: 'circle' },
-		size: { random: true, value: { min: 1, max: 4 } },
-	},
-	detectRetina: true,
-};
-
 const router = useRouter();
 const userStore = useUserStore();
 useNavBar({ visible: false });
@@ -193,12 +148,6 @@ const onSubmit = async () => {
 	flex-direction: column;
 	align-items: center;
 	overflow: hidden;
-
-	.login-particles {
-		position: absolute;
-		inset: 0;
-		z-index: 1;
-	}
 }
 
 .login-content {

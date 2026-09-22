@@ -147,7 +147,6 @@
 
 <script lang="ts" setup>
 import { showNotify } from 'vant';
-import * as math from 'mathjs';
 import type { FinanceDetail } from './common';
 import { getBalance } from '@/views/finance/financeAnalysis/api';
 
@@ -161,7 +160,7 @@ const props = defineProps<Props>();
 
 const router = useRouter();
 const balanceList = ref<FinanceDetail[]>([]);
-const sum = ref<math.BigNumber>(math.bignumber(0));
+const sum = ref<number>(0);
 
 // Type-to-UI Config Mapping
 interface TypeConfig {
@@ -221,8 +220,7 @@ const totalYoy = ref<string>('');
 const totalMom = ref<string>('');
 
 const formattedSum = computed(() => {
-	const str = math.format(sum.value, { notation: 'fixed', precision: 2 });
-	const [int, dec] = str.split('.');
+	const [int, dec] = sum.value.toFixed(2).split('.');
 	return { int: Number(int).toLocaleString(), dec };
 });
 
@@ -261,8 +259,8 @@ const getBalanceInfo = async (userId: string | null, dateStr: string) => {
 		}
 
 		sum.value = (balanceList.value || []).reduce(
-			(acc: math.BigNumber, item: FinanceDetail) => math.add(acc, math.bignumber(item.amount ?? 0)),
-			math.bignumber(0),
+			(acc: number, item: FinanceDetail) => acc + (Number(item.amount) || 0),
+			0,
 		);
 	} else {
 		showNotify({ type: 'danger', message: message || '查询列表失败！' });

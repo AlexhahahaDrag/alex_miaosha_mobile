@@ -1,6 +1,4 @@
 import { createApp } from 'vue';
-import Particles from '@tsparticles/vue3';
-import { loadSlim } from '@tsparticles/slim';
 import 'vant/es/toast/style';
 import 'vant/lib/index.css';
 import 'virtual:svg-icons-register';
@@ -12,12 +10,6 @@ import '@/assets/styles/variables.css';
 const app = createApp(App);
 
 setupStore(app);
-
-app.use(Particles, {
-	init: async (engine) => {
-		await loadSlim(engine);
-	},
-});
 
 app.use(router);
 

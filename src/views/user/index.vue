@@ -275,12 +275,15 @@
 			:visible="showLogoutFlag"
 			@select="logoutInfo"
 		/>
+
+		<theme-popup v-model:show="showThemePopup" />
 	</div>
 </template>
 
 <script lang="ts" setup>
 import { showToast } from 'vant';
 import logout from './logout/index.vue';
+import ThemePopup from './components/ThemePopup.vue';
 import type { UserManagerData } from './userManager/config';
 import { useUserStore } from '@/store/modules/user/user';
 import { useNavBar } from '@/composables/useNavBar';
@@ -321,13 +324,15 @@ const logoutInfo = (v: boolean) => {
 	showLogoutFlag.value = v;
 };
 
+const showThemePopup = ref<boolean>(false);
+
 const goSecurity = () => {
 	handleInteraction();
 	showToast('功能即将上线');
 };
 const openTheme = () => {
 	handleInteraction();
-	showToast('功能即将上线');
+	showThemePopup.value = true;
 };
 
 const handleInteraction = () => {
@@ -339,7 +344,7 @@ const handleInteraction = () => {
 
 <style lang="less" scoped>
 .user-page-container {
-	background-color: #f7f9fc;
+	background-color: var(--bg-color, #f7f9fc);
 	min-height: 100vh;
 	padding-bottom: 80px;
 }

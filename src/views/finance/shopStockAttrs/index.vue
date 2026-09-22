@@ -41,9 +41,9 @@
 						>
 							<div class="attr-card__header">
 								<div class="attr-card__icon-box">
-									<component
-										:is="PackageIcon"
-										:size="20"
+									<van-icon
+										name="bag-o"
+										size="20"
 										class="attr-card__icon"
 									/>
 								</div>
@@ -111,7 +111,6 @@
 </template>
 
 <script lang="ts" setup>
-import { Package as PackageIcon } from '@lucide/vue';
 import { showSuccessToast, showFailToast } from 'vant';
 import type { ShopStockAttrsData } from './config';
 import type { UserManagerData } from '@/views/user/userManager/config';

@@ -227,8 +227,8 @@
 <script lang="ts" setup>
 import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
-import { debounce } from 'lodash';
 import type { CpnCouponInfoData } from './config';
+import { debounce } from '@/utils/common';
 import { usePagination } from '@/composables/usePagination';
 import type { PageInfo } from '@/views/common/config';
 import { getRoutePathByName } from '@/utils/router';

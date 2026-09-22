@@ -6,9 +6,6 @@ declare module '*.vue' {
   export default component;
 }
 
-declare module '@tsparticles/vue3';
-declare module '@tsparticles/slim';
-
 interface ImportMetaEnv {
 	readonly VITE_APP_BASE_API: string;
 	readonly VITE_APP_TITLE: string;

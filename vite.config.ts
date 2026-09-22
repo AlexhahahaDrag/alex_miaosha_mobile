@@ -31,13 +31,11 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
 	const isProd = mode === 'production';
 
 	return {
-		// 抑制 Node.js 全局变（global → globalThis）并根据环境移除调试语句
+		// 抑制 Node.js 全局变量（global → globalThis）
 		define: {
 			global: 'globalThis',
-			...(isProd
-				? { 'console.log': '(() => {})', 'console.debug': '(() => {})', debugger: '(() => {})' }
-				: {}),
 		},
+		esbuild: isProd ? { drop: ['console', 'debugger'] } : undefined,
 		optimizeDeps: {
 			// 强制预构建常用依赖，避免冷启动时动态发现导致页面刷新
 			include: ['vue', 'vue-router', 'pinia', 'axios', 'dayjs', 'vant'],
@@ -114,7 +112,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
 
 		build: {
 			outDir: env.VITE_OUTPUT_DIR || 'dist',
-			chunkSizeWarningLimit: 800,
+			chunkSizeWarningLimit: 500,
 			// Vite 8 中 rollupOptions 已废弃，改用 rolldownOptions
 			rolldownOptions: {
 				checks: {
@@ -129,49 +127,31 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
 						// 兼容 Windows 路径分隔符（将 \ 统一转为 /）
 						const normalizedId = id.replace(/\\/g, '/');
 						if (normalizedId.includes('node_modules')) {
-							// Vue 生态
-							if (normalizedId.includes('/vue') || normalizedId.includes('/@vue')) {
+							// 基础框架核心（Vue / Pinia / Vue-Router）
+							if (
+								normalizedId.includes('/vue') ||
+								normalizedId.includes('/@vue') ||
+								normalizedId.includes('/pinia') ||
+								normalizedId.includes('/vue-router')
+							) {
 								return 'vue-vendor';
 							}
 							// Vant UI
 							if (normalizedId.includes('/vant')) {
 								return 'vant-vendor';
 							}
-							// ECharts
-							if (normalizedId.includes('/echarts')) {
+							// 图表库（合并 echarts 与底层 zrender）
+							if (normalizedId.includes('/echarts') || normalizedId.includes('/zrender')) {
 								return 'echarts-vendor';
 							}
-							// Axios
-							if (normalizedId.includes('/axios')) {
-								return 'axios-vendor';
-							}
-							// 工具库
+							// 常用通用工具库（网络与加密、日期等）
 							if (
+								normalizedId.includes('/axios') ||
 								normalizedId.includes('/dayjs') ||
-								normalizedId.includes('/crypto-es') ||
-								normalizedId.includes('/mathjs')
+								normalizedId.includes('/crypto-es')
 							) {
 								return 'utils-vendor';
 							}
-							// 小型工具库合并，避免生成空 chunk
-							if (
-								normalizedId.includes('/javascript-natural-sort') ||
-								normalizedId.includes('/tiny-emitter') ||
-								normalizedId.includes('/lodash') ||
-								normalizedId.includes('/classnames') ||
-								normalizedId.includes('/normalize-wheel') ||
-								normalizedId.includes('/resize-observer-polyfill')
-							) {
-								return 'common-utils';
-							}
-							// 其余较大的运行时库单独打包
-							const packageName = normalizedId.split('node_modules/')[1].split('/')[0];
-							const largePackages = ['pinia', 'vue-router', '@tsparticles'];
-							if (largePackages.some((pkg) => packageName.includes(pkg))) {
-								return packageName;
-							}
-							// 其他小型库归入 misc-vendor
-							return 'misc-vendor';
 						}
 					},
 				},

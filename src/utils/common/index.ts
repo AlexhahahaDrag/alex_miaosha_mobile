@@ -65,6 +65,32 @@ const formatAmount = (amount: number | Decimal, digit: number, unit: string) => 
 };
 
 /**
+ * 极简防抖工具函数（支持 cancel）
+ * @param fn 执行函数
+ * @param delay 延迟毫秒数，默认 300ms
+ */
+export const debounce = <T extends (...args: any[]) => any>(fn: T, delay = 300) => {
+	let timer: ReturnType<typeof setTimeout> | undefined;
+
+	const debounced = (...args: Parameters<T>) => {
+		if (timer) clearTimeout(timer);
+		timer = setTimeout(() => {
+			timer = undefined;
+			fn(...args);
+		}, delay);
+	};
+
+	debounced.cancel = () => {
+		if (timer) {
+			clearTimeout(timer);
+			timer = undefined;
+		}
+	};
+
+	return debounced;
+};
+
+/**
  * 日期选择器信息接口定义
  * @template T - 选择值的类型（通常是 Dayjs）
  */
@@ -84,4 +110,5 @@ export default {
 	minus,
 	multiply,
 	divide,
+	debounce,
 };

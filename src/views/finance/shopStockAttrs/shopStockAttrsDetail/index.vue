@@ -10,9 +10,9 @@
 				<div class="form-section">
 					<div class="section-header">
 						<div class="section-icon-box">
-							<component
-								:is="BoxIcon"
-								:size="20"
+							<van-icon
+								name="bag-o"
+								size="20"
 								class="section-icon"
 							/>
 						</div>
@@ -36,9 +36,9 @@
 							:maxlength="19"
 						>
 							<template #left-icon>
-								<component
-									:is="CodeIcon"
-									:size="16"
+								<van-icon
+									name="label-o"
+									size="16"
 									class="field-icon"
 								/>
 							</template>
@@ -54,9 +54,9 @@
 							:maxlength="255"
 						>
 							<template #left-icon>
-								<component
-									:is="FileEditIcon"
-									:size="16"
+								<van-icon
+									name="edit"
+									size="16"
 									class="field-icon"
 								/>
 							</template>
@@ -72,9 +72,9 @@
 							:maxlength="255"
 						>
 							<template #left-icon>
-								<component
-									:is="TypeIcon"
-									:size="16"
+								<van-icon
+									name="font-o"
+									size="16"
 									class="field-icon"
 								/>
 							</template>
@@ -90,9 +90,9 @@
 							:maxlength="255"
 						>
 							<template #left-icon>
-								<component
-									:is="MessageSquareIcon"
-									:size="16"
+								<van-icon
+									name="chat-o"
+									size="16"
 									class="field-icon"
 								/>
 							</template>
@@ -103,9 +103,9 @@
 				<div class="form-section">
 					<div class="section-header">
 						<div class="section-icon-box secondary">
-							<component
-								:is="CheckCircleIcon"
-								:size="20"
+							<van-icon
+								name="passed"
+								size="20"
 								class="section-icon"
 							/>
 						</div>
@@ -131,9 +131,9 @@
 							@click="choose('isValid')"
 						>
 							<template #left-icon>
-								<component
-									:is="CheckCircleIcon"
-									:size="16"
+								<van-icon
+									name="passed"
+									size="16"
 									class="field-icon"
 								/>
 							</template>
@@ -153,9 +153,9 @@
 							show-word-limit
 						>
 							<template #left-icon>
-								<component
-									:is="FileEditIcon"
-									:size="16"
+								<van-icon
+									name="notes-o"
+									size="16"
 									class="field-icon"
 								/>
 							</template>
@@ -174,9 +174,9 @@
 						loading-text="正在保存..."
 					>
 						<template #icon>
-							<component
-								:is="SaveIcon"
-								:size="18"
+							<van-icon
+								name="success"
+								size="18"
 							/>
 						</template>
 						提交保存
@@ -194,15 +194,6 @@
 </template>
 
 <script setup lang="ts">
-import {
-	Box as BoxIcon,
-	Code as CodeIcon,
-	Type as TypeIcon,
-	FileEdit as FileEditIcon,
-	CheckCircle as CheckCircleIcon,
-	MessageSquare as MessageSquareIcon,
-	Save as SaveIcon,
-} from '@lucide/vue';
 import { showFailToast, showSuccessToast } from 'vant';
 import { label, rulesRef } from '@/views/finance/shopStockAttrs/config';
 import type { ShopStockAttrsData } from '@/views/finance/shopStockAttrs/config';
