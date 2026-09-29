@@ -38,8 +38,6 @@ components.d.ts
 !.agents/workflows/
 .agents/rules/*
 .agents/workflows/*
-!.agents/rules/graphify.md
-!.agents/workflows/graphify.md
 .skills-lock.json
 *.tsbuildinfo
 .gemini/
