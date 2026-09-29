@@ -96,6 +96,16 @@
 						<template #button>
 							<van-button
 								size="small"
+								:type="isListening ? 'danger' : 'default'"
+								round
+								style="margin-right: 6px"
+								data-testid="gift-record-ai-speech-btn"
+								@click="toggleSpeechInput"
+							>
+								{{ isListening ? '🔴 识别中' : '🎙️ 语音' }}
+							</van-button>
+							<van-button
+								size="small"
 								type="primary"
 								round
 								:loading="aiParsing"
@@ -309,6 +319,8 @@ const { pagination, resetPagination, setTotal, nextPage } = usePagination();
 // ── AI 自然语言快捷录入与推荐
 const aiText = ref('');
 const aiParsing = ref(false);
+const isListening = ref(false);
+let speechRecognitionInstance: any = null;
 const recommendInfo = ref<GiftRecordRecommendAmount>({});
 const recommendLoading = ref(false);
 
@@ -590,6 +602,58 @@ const copyGreeting = async (tip?: string) => {
 		showSuccessToast('贺词已复制');
 	} catch {
 		showToast(tip);
+	}
+};
+
+const toggleSpeechInput = () => {
+	if (isListening.value) {
+		speechRecognitionInstance?.stop();
+		isListening.value = false;
+		return;
+	}
+
+	const SpeechRecognitionClass = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+	if (!SpeechRecognitionClass) {
+		showToast('当前浏览器环境暂未支持语音识别，请直接打字输入');
+		return;
+	}
+
+	try {
+		speechRecognitionInstance = new SpeechRecognitionClass();
+		speechRecognitionInstance.lang = 'zh-CN';
+		speechRecognitionInstance.continuous = false;
+		speechRecognitionInstance.interimResults = false;
+
+		speechRecognitionInstance.onstart = () => {
+			isListening.value = true;
+			haptic();
+			showToast('请说出记账内容...');
+		};
+
+		speechRecognitionInstance.onresult = (event: any) => {
+			const transcript = event.results?.[0]?.[0]?.transcript;
+			if (transcript) {
+				aiText.value = transcript;
+				showSuccessToast('语音识别完成');
+				haptic();
+				void handleAiParse();
+			}
+		};
+
+		speechRecognitionInstance.onerror = () => {
+			isListening.value = false;
+			showToast('语音识别未完成，请重试');
+		};
+
+		speechRecognitionInstance.onend = () => {
+			isListening.value = false;
+		};
+
+		speechRecognitionInstance.start();
+	} catch {
+		isListening.value = false;
+		showToast('无法启动语音识别');
 	}
 };
 
