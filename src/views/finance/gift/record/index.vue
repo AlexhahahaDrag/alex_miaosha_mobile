@@ -78,6 +78,36 @@
 				data-testid="gift-record-quick-panel"
 			>
 				<div class="quick-panel__title">快速记礼</div>
+
+				<!-- AI 自然语言快捷解析面板 -->
+				<div
+					class="quick-ai-parse-box"
+					data-testid="gift-record-quick-ai"
+				>
+					<van-field
+						v-model="aiText"
+						rows="1"
+						autosize
+						type="textarea"
+						placeholder="✨ 输入一句话智能记礼，如：收到张三满月红包1000元"
+						data-testid="gift-record-ai-input"
+						clearable
+					>
+						<template #button>
+							<van-button
+								size="small"
+								type="primary"
+								round
+								:loading="aiParsing"
+								data-testid="gift-record-ai-parse-btn"
+								@click="handleAiParse"
+							>
+								智能解析
+							</van-button>
+						</template>
+					</van-field>
+				</div>
+
 				<van-form @submit="saveRecord">
 					<van-field
 						name="direction"
@@ -87,6 +117,7 @@
 							<van-radio-group
 								v-model="formInfo.direction"
 								direction="horizontal"
+								@change="onDirectionChange"
 							>
 								<van-radio name="GIVE">随礼</van-radio>
 								<van-radio name="RECEIVE">收礼</van-radio>
@@ -108,6 +139,39 @@
 						>
 							{{ amount }}
 						</button>
+					</div>
+
+					<!-- AI 推荐考量与贺词助手 -->
+					<div
+						v-if="recommendInfo?.aiReasoning || recommendInfo?.aiGreetingTip"
+						class="ai-recommend-card"
+						data-testid="gift-record-ai-recommend-card"
+					>
+						<div
+							v-if="recommendInfo.aiReasoning"
+							class="ai-recommend-row"
+						>
+							<span class="ai-tag">💡 礼金考量</span>
+							<span class="ai-text">{{ recommendInfo.aiReasoning }}</span>
+						</div>
+						<div
+							v-if="recommendInfo.aiGreetingTip"
+							class="ai-recommend-row greeting-row"
+						>
+							<span class="ai-tag">🎉 场景贺词</span>
+							<span class="ai-text">{{ recommendInfo.aiGreetingTip }}</span>
+							<van-button
+								size="mini"
+								plain
+								type="primary"
+								round
+								class="copy-btn"
+								data-testid="gift-record-copy-greeting"
+								@click="copyGreeting(recommendInfo.aiGreetingTip)"
+							>
+								复制
+							</van-button>
+						</div>
 					</div>
 					<van-field
 						v-model.number="formInfo.amount"
@@ -202,14 +266,21 @@ import CommonList from '@/views/components/CommonList.vue';
 import GiftRecordCard from '@/views/finance/gift/components/GiftRecordCard.vue';
 import {
 	addGiftRecord,
+	aiParseGiftRecord,
 	deleteGiftRecord,
 	getGiftRecordPage,
+	getGiftRecordRecommendAmount,
 	getPendingReturnAmount,
 	markGiftReturned,
 } from '@/views/finance/gift/record/api';
 import { getGiftPersonList } from '@/views/finance/gift/person/api';
 import { getGiftEventList } from '@/views/finance/gift/event/api';
-import type { GiftDirection, GiftRecordInfo, GiftRecordQuery } from '@/views/finance/gift/config';
+import type {
+	GiftDirection,
+	GiftRecordInfo,
+	GiftRecordQuery,
+	GiftRecordRecommendAmount,
+} from '@/views/finance/gift/config';
 import { GIFT_TAB_BAR, directionOptions, formatMoney, quickAmounts } from '@/views/finance/gift/config';
 import type { PageInfo } from '@/views/common/config';
 
@@ -234,6 +305,12 @@ const dataSource = ref<GiftRecordInfo[]>([]);
 const searchInfo = ref<GiftRecordQuery>({});
 const formInfo = ref<GiftRecordInfo>({ direction: 'GIVE' });
 const { pagination, resetPagination, setTotal, nextPage } = usePagination();
+
+// ── AI 自然语言快捷录入与推荐
+const aiText = ref('');
+const aiParsing = ref(false);
+const recommendInfo = ref<GiftRecordRecommendAmount>({});
+const recommendLoading = ref(false);
 
 // ── 快记 picker：事由/送礼人/收礼人 由手输 ID 改为选择器，选项打开快记面板时懒加载一次
 interface PickerOption {
@@ -376,6 +453,146 @@ const loadRelatedOptions = async () => {
 	relatedLoaded.value = true;
 };
 
+const fetchRecommendAmount = async () => {
+	const personId =
+		formInfo.value.direction === 'RECEIVE' ? formInfo.value.giverPersonId : formInfo.value.receiverPersonId;
+	const eventOption = eventOptions.value.find((e) => e.value === formInfo.value.eventId);
+	const eventType = eventOption?.text && eventOption.text !== '不关联' ? eventOption.text : undefined;
+	if (!eventType && !personId) {
+		recommendInfo.value = {};
+		return;
+	}
+	recommendLoading.value = true;
+	try {
+		const { code, data } = await getGiftRecordRecommendAmount({
+			personId: personId || undefined,
+			eventType: eventType || undefined,
+			direction: formInfo.value.direction,
+		});
+		if (code === '200' && data) {
+			recommendInfo.value = data;
+			if (!formInfo.value.amount) {
+				const autoAmount = data.latestAmount || data.averageAmount || data.defaultAmount;
+				if (autoAmount && autoAmount > 0) {
+					formInfo.value.amount = autoAmount;
+				}
+			}
+		}
+	} catch (e) {
+		console.error(e);
+	} finally {
+		recommendLoading.value = false;
+	}
+};
+
+const onDirectionChange = () => {
+	haptic();
+	void fetchRecommendAmount();
+};
+
+const handleAiParse = async () => {
+	const text = aiText.value.trim();
+	if (!text) {
+		showToast('请输入记账描述内容');
+		return;
+	}
+	aiParsing.value = true;
+	try {
+		await loadPickerOptions();
+		const { code, data, message } = await aiParseGiftRecord({
+			content: text,
+			defaultDirection: formInfo.value.direction,
+		});
+		if (code === '200' && data) {
+			haptic();
+			if (data.direction) {
+				formInfo.value.direction = data.direction;
+			}
+			if (data.amount != null && data.amount > 0) {
+				formInfo.value.amount = Number(data.amount);
+			}
+			if (data.payTime) {
+				formInfo.value.payTime = data.payTime.slice(0, 10);
+			}
+			if (data.remark) {
+				formInfo.value.remark = data.remark;
+			}
+			// 人员匹配
+			if (data.personId) {
+				const pid = String(data.personId);
+				if (!personOptions.value.some((p) => p.value === pid)) {
+					personOptions.value.push({
+						text: data.personName || `#${pid}`,
+						value: pid,
+					});
+				}
+				if (formInfo.value.direction === 'RECEIVE') {
+					formInfo.value.giverPersonId = pid;
+				} else {
+					formInfo.value.receiverPersonId = pid;
+				}
+			} else if (data.personName) {
+				const matched = personOptions.value.find((p) => p.text === data.personName);
+				if (matched && matched.value) {
+					if (formInfo.value.direction === 'RECEIVE') {
+						formInfo.value.giverPersonId = matched.value;
+					} else {
+						formInfo.value.receiverPersonId = matched.value;
+					}
+				}
+			}
+			// 事件匹配
+			if (data.eventId) {
+				const eid = String(data.eventId);
+				if (!eventOptions.value.some((e) => e.value === eid)) {
+					eventOptions.value.push({
+						text: data.eventTypeName || `#${eid}`,
+						value: eid,
+					});
+				}
+				formInfo.value.eventId = eid;
+			} else if (data.eventTypeName || data.eventType) {
+				const label = data.eventTypeName || data.eventType;
+				const matched = eventOptions.value.find((e) => e.text === label);
+				if (matched && matched.value) {
+					formInfo.value.eventId = matched.value;
+				}
+			}
+			showSuccessToast('智能解析成功');
+			void fetchRecommendAmount();
+		} else {
+			showFailToast(message || '智能解析失败');
+		}
+	} catch (e) {
+		console.error(e);
+		showFailToast('智能解析异常');
+	} finally {
+		aiParsing.value = false;
+	}
+};
+
+const copyGreeting = async (tip?: string) => {
+	if (!tip) return;
+	haptic();
+	try {
+		if (navigator.clipboard?.writeText) {
+			await navigator.clipboard.writeText(tip);
+		} else {
+			const textarea = document.createElement('textarea');
+			textarea.value = tip;
+			textarea.style.position = 'fixed';
+			textarea.style.opacity = '0';
+			document.body.appendChild(textarea);
+			textarea.select();
+			document.execCommand('copy');
+			document.body.removeChild(textarea);
+		}
+		showSuccessToast('贺词已复制');
+	} catch {
+		showToast(tip);
+	}
+};
+
 const openPicker = (type: PickerType) => {
 	haptic();
 	pickerType.value = type;
@@ -398,11 +615,14 @@ const onPickerConfirm = ({ selectedOptions }: { selectedOptions: Array<PickerOpt
 		formInfo.value.receiverPersonId = value;
 	}
 	pickerVisible.value = false;
+	void fetchRecommendAmount();
 };
 
 const openQuickRecord = () => {
 	haptic();
 	formInfo.value = { direction: 'GIVE' };
+	aiText.value = '';
+	recommendInfo.value = {};
 	quickRecordVisible.value = true;
 	void loadPickerOptions();
 };
@@ -535,5 +755,66 @@ refresh();
 
 .quick-panel__actions {
 	margin-top: 16px;
+}
+
+.quick-ai-parse-box {
+	margin-bottom: 12px;
+	border-radius: 12px;
+	background: #f0f7ff;
+	padding: 4px;
+	border: 1px dashed #b9dcfa;
+
+	:deep(.van-cell) {
+		background: transparent;
+		padding: 4px 8px;
+	}
+
+	:deep(.van-field__control) {
+		font-size: 13px;
+		color: #1e293b;
+	}
+}
+
+.ai-recommend-card {
+	margin: 8px 0 10px;
+	padding: 10px 12px;
+	border-radius: 12px;
+	background: #f4f9ff;
+	border: 1px solid #d4e8fc;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+
+	.ai-recommend-row {
+		display: flex;
+		align-items: flex-start;
+		gap: 6px;
+		font-size: 12px;
+		line-height: 1.5;
+
+		.ai-tag {
+			flex-shrink: 0;
+			font-weight: 600;
+			color: #1d4ed8;
+		}
+
+		.ai-text {
+			flex: 1;
+			color: #334155;
+		}
+
+		&.greeting-row {
+			align-items: center;
+			background: #ffffff;
+			padding: 6px 8px;
+			border-radius: 8px;
+			border: 1px solid #e0edfb;
+
+			.copy-btn {
+				flex-shrink: 0;
+				margin-left: 4px;
+			}
+		}
+	}
 }
 </style>

@@ -155,6 +155,58 @@ export interface GiftRecordQuery {
 	amountMax?: number;
 }
 
+/** AI 记账自然语言解析请求 */
+export interface GiftRecordAiParseReq {
+	content: string;
+	defaultDirection?: GiftDirection;
+}
+
+/** AI 记账自然语言解析响应结果 */
+export interface GiftRecordAiParseVo {
+	personName?: string;
+	personId?: GiftId;
+	isNewPerson?: boolean;
+	relationType?: string;
+	relationName?: string;
+	eventType?: string;
+	eventTypeName?: string;
+	eventId?: GiftId;
+	amount?: number;
+	direction?: GiftDirection;
+	payTime?: string;
+	location?: string;
+	remark?: string;
+}
+
+/** 智能礼金推荐与情景贺词 */
+export interface GiftRecordRecommendAmount {
+	recommendedAmount?: number;
+	minAmount?: number;
+	maxAmount?: number;
+	averageAmount?: number;
+	defaultAmount?: number;
+	latestAmount?: number;
+	recommendations?: number[];
+	reason?: string;
+	aiReasoning?: string;
+	aiGreetingTip?: string;
+}
+
+/** 规范化 AI 解析结果中的 ID 字段，杜绝 JS number 精度丢失 */
+export function normalizeGiftAiParseVo(raw: unknown): GiftRecordAiParseVo {
+	if (!raw || typeof raw !== 'object') {
+		return {};
+	}
+	const item = { ...(raw as Record<string, unknown>) };
+	if (item.personId != null) {
+		item.personId = String(item.personId);
+	}
+	if (item.eventId != null) {
+		item.eventId = String(item.eventId);
+	}
+	return item as GiftRecordAiParseVo;
+}
+
 /** 统计总览（后端 /gift-analysis/overview 返回，金额已在服务端按全量数据聚合） */
 export interface GiftAnalysisOverview {
 	receiveAmount?: number;
