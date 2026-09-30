@@ -193,6 +193,24 @@ async function runCase(testCase, runtime, page, agent) {
 				throw new Error('Expected navigator.vibrate to be triggered by quick record interaction.');
 			}
 			break;
+		case 'GIFT-MOBILE-AI-001': {
+			await gotoRoute(page, runtime, testCase.route);
+			await assertGiftPage(agent, 'record');
+			await page.getByTestId('gift-record-fab').click();
+			await page.getByTestId('gift-record-quick-panel').waitFor({ state: 'visible', timeout: 10000 });
+			// 断言移动端 AI 智能解析输入框、解析按钮与语音输入按钮存在
+			const aiInput = page.getByTestId('gift-record-ai-input');
+			await aiInput.waitFor({ state: 'visible', timeout: 5000 });
+			const parseBtn = page.getByTestId('gift-record-ai-parse-btn');
+			await parseBtn.waitFor({ state: 'visible', timeout: 5000 });
+			const speechBtn = page.getByTestId('gift-record-ai-speech-btn');
+			await speechBtn.waitFor({ state: 'visible', timeout: 5000 });
+			// 填入自然语言并点击解析
+			await aiInput.locator('input, textarea').first().fill('表哥结婚送礼800元');
+			await parseBtn.click();
+			await page.waitForTimeout(500);
+			break;
+		}
 		case 'GIFT-MOBILE-003':
 			await gotoRoute(page, runtime, testCase.route);
 			await assertGiftPage(agent, 'person');

@@ -1,0 +1,16 @@
+[
+	{
+		"caseId": "GIFT-AI-MOBILE-001",
+		"title": "移动端自然语言快速记礼与智能要素抽取",
+		"route": "/finance/gift/record",
+		"level": "flow",
+		"persona": "gift_admin"
+	},
+	{
+		"caseId": "GIFT-AI-MOBILE-002",
+		"title": "移动端场景贺词一键复制与触觉振动探针断言",
+		"route": "/finance/gift/record",
+		"level": "flow",
+		"persona": "gift_admin"
+	}
+]

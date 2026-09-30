@@ -15,6 +15,8 @@
 		"preview": "vite preview",
 		"test:midscene:gift:local": "node scripts/midscene/run-gift-smoke.mjs",
 		"test:midscene:gift:ci": "node scripts/midscene/run-gift-smoke.mjs",
+		"test:ai:smoke": "node scripts/playwright/run-mobile-ai-smoke.mjs",
+		"test:ai:smoke:ci": "node scripts/playwright/run-mobile-ai-smoke.mjs",
 		"format": "prettier --write .",
 		"format:check": "prettier --check .",
 		"format:vue": "prettier --write **/*.vue && eslint **/*.vue --fix",

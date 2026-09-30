@@ -12,6 +12,13 @@
 		"level": "smoke"
 	},
 	{
+		"caseId": "GIFT-MOBILE-AI-001",
+		"title": "移动端自然语言智能记礼与一键解析回填",
+		"route": "/finance/gift/record",
+		"level": "flow",
+		"persona": "gift_admin"
+	},
+	{
 		"caseId": "GIFT-MOBILE-003",
 		"title": "移动端列表、空状态与刷新加载",
 		"route": "/finance/gift/person",

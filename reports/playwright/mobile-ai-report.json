@@ -1,0 +1,20 @@
+{
+  "total": 2,
+  "passed": 0,
+  "failed": 2,
+  "generatedAt": "2026-09-30T06:04:28.492Z",
+  "cases": [
+    {
+      "caseId": "GIFT-AI-MOBILE-001",
+      "title": "移动端自然语言快速记礼与智能要素抽取",
+      "status": "fail",
+      "error": "locator.waitFor: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"gift-record-ai-recommend-card\"]').first() to be visible\u001b[22m\n"
+    },
+    {
+      "caseId": "GIFT-AI-MOBILE-002",
+      "title": "移动端场景贺词一键复制与触觉振动探针断言",
+      "status": "fail",
+      "error": "locator.waitFor: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"gift-record-copy-greeting\"]').first() to be visible\u001b[22m\n"
+    }
+  ]
+}
