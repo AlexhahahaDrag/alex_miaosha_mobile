@@ -38,7 +38,19 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
 		esbuild: isProd ? { drop: ['console', 'debugger'] } : undefined,
 		optimizeDeps: {
 			// 强制预构建常用依赖，避免冷启动时动态发现导致页面刷新
-			include: ['vue', 'vue-router', 'pinia', 'axios', 'dayjs', 'vant'],
+			include: [
+				'vue',
+				'vue-router',
+				'pinia',
+				'axios',
+				'dayjs',
+				'dayjs/locale/zh-cn',
+				'dayjs/plugin/timezone',
+				'dayjs/plugin/utc',
+				'vant',
+				'decimal.js',
+				'nanoid',
+			],
 			// 自定义预构建阶段 Rolldown 打包器的行为
 			rolldownOptions: {
 				// 配置模块解析条件，确保 CJS 包被正确处理
@@ -148,7 +160,9 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
 							if (
 								normalizedId.includes('/axios') ||
 								normalizedId.includes('/dayjs') ||
-								normalizedId.includes('/crypto-es')
+								normalizedId.includes('/crypto-es') ||
+								normalizedId.includes('/decimal.js') ||
+								normalizedId.includes('/nanoid')
 							) {
 								return 'utils-vendor';
 							}

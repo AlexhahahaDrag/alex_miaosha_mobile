@@ -25,6 +25,28 @@
 				/>
 			</div>
 
+			<div class="quick-time-bar">
+				<div class="quick-time-bar__list">
+					<button
+						v-for="item in quickTimeOptions"
+						:key="item.value"
+						type="button"
+						:class="['quick-time-chip', { 'quick-time-chip--active': activeTimePreset === item.value }]"
+						@click="onSelectQuickTime(item.value)"
+					>
+						{{ item.label }}
+					</button>
+					<button
+						v-if="activeTimePreset === 'custom'"
+						type="button"
+						class="quick-time-chip quick-time-chip--active"
+						@click="onSelectQuickTime('custom')"
+					>
+						{{ getTimePresetLabel('custom') }}
+					</button>
+				</div>
+			</div>
+
 			<div
 				v-if="activeFilterTags.length"
 				class="active-tags"
@@ -174,7 +196,7 @@ import { formatHeaderDate } from '@/utils/dayjs';
 import { getRoutePathByName } from '@/utils/router';
 import { useDashboardStore } from '@/store/modules/dashboard/dashboard';
 
-type TimePreset = 'today' | '7d' | 'month' | 'all' | 'custom';
+type TimePreset = 'today' | '7d' | 'month' | 'year' | 'all' | 'custom';
 
 interface FilterOption {
 	text: string;
@@ -195,10 +217,18 @@ interface ActiveFilterTag {
 
 const timeFilterOptions: { label: string; value: TimePreset }[] = [
 	{ label: '全部', value: 'all' },
-	{ label: '今天', value: 'today' },
 	{ label: '近7天', value: '7d' },
-	{ label: '当月', value: 'month' },
+	{ label: '本月', value: 'month' },
+	{ label: '今年', value: 'year' },
+	{ label: '今天', value: 'today' },
 	{ label: '自定义', value: 'custom' },
+];
+
+const quickTimeOptions: { label: string; value: TimePreset }[] = [
+	{ label: '全部', value: 'all' },
+	{ label: '近7天', value: '7d' },
+	{ label: '本月', value: 'month' },
+	{ label: '今年', value: 'year' },
 ];
 
 const router = useRouter();
@@ -218,7 +248,7 @@ const searchInfo = ref<FinanceManagerData>({
 const finished = ref<boolean>(false);
 const isRefresh = ref<boolean>(false);
 const manualFilterPanelOpen = ref<boolean>(false);
-const activeTimePreset = ref<TimePreset>('month');
+const activeTimePreset = ref<TimePreset>('all');
 const showCustomDatePicker = ref<boolean>(false);
 const customDateRange = ref<[Date, Date] | null>(null);
 
@@ -298,11 +328,6 @@ const activeFilterTags = computed<ActiveFilterTag[]>(() => {
 	if (userText && searchInfo.value.belongTo) {
 		tags.push({ key: 'user', label: userText });
 	}
-
-	if (activeTimePreset.value !== 'all') {
-		tags.push({ key: 'time', label: getTimePresetLabel(activeTimePreset.value) });
-	}
-
 	return tags;
 });
 
@@ -533,6 +558,14 @@ const onSelectTimePreset = (value: TimePreset) => {
 	customDateRange.value = null;
 };
 
+const onSelectQuickTime = (value: TimePreset) => {
+	if (value === activeTimePreset.value && value !== 'custom') {
+		return;
+	}
+	onSelectTimePreset(value);
+	onSearch();
+};
+
 const onConfirmCustomDate = (value: Date[]) => {
 	if (Array.isArray(value) && value.length === 2) {
 		customDateRange.value = [value[0], value[1]];
@@ -566,7 +599,9 @@ const getTimePresetLabel = (value: TimePreset) => {
 		case '7d':
 			return '近7天';
 		case 'month':
-			return '当月';
+			return '本月';
+		case 'year':
+			return '今年';
 		case 'custom':
 			if (customDateRange.value) {
 				return `${dayjs(customDateRange.value[0]).format('MM/DD')} - ${dayjs(customDateRange.value[1]).format('MM/DD')}`;
@@ -587,6 +622,8 @@ const getTimeBoundary = (): { start: Dayjs; end: Dayjs } | null => {
 			return { start: now.subtract(6, 'day').startOf('day'), end: now.endOf('day') };
 		case 'month':
 			return { start: now.startOf('month'), end: now.endOf('month') };
+		case 'year':
+			return { start: now.startOf('year'), end: now.endOf('year') };
 		case 'custom':
 			if (!customDateRange.value) {
 				return null;
@@ -666,6 +703,39 @@ onMounted(() => {
 	:deep(.van-search__content) {
 		border-radius: 14px;
 		padding-left: 12px;
+	}
+}
+
+.quick-time-bar {
+	display: flex;
+	align-items: center;
+	padding-top: 10px;
+
+	&__list {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		flex-wrap: wrap;
+	}
+}
+
+.quick-time-chip {
+	border: 1px solid #e2e8f0;
+	background: #f8fafc;
+	color: #64748b;
+	font-size: 12px;
+	font-weight: 500;
+	padding: 4px 12px;
+	border-radius: 9999px;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	line-height: 18px;
+
+	&--active {
+		border-color: #1677ff;
+		background: #e6f4ff;
+		color: #1677ff;
+		font-weight: 600;
 	}
 }
 
