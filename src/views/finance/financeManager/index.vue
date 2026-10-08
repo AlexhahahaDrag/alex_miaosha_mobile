@@ -81,6 +81,98 @@
 			@submit="onApplyFilters"
 		/>
 
+		<!-- 本月零花钱预算卡片 -->
+		<section
+			class="pocket-money-card"
+			data-testid="pocket-money-card"
+		>
+			<div class="pocket-money-header">
+				<div class="pocket-money-title">
+					<van-icon
+						name="balance-o"
+						class="title-icon"
+					/>
+					<span>本月零花钱 ({{ currentMonthStr }})</span>
+					<van-tag
+						v-if="budgetStatus?.isInherited"
+						type="primary"
+						plain
+						round
+						size="small"
+						class="inherited-tag"
+					>
+						继承上月
+					</van-tag>
+				</div>
+				<van-button
+					size="mini"
+					plain
+					round
+					type="primary"
+					icon="setting-o"
+					data-testid="btn-edit-budget"
+					@click="onOpenBudgetDialog"
+				>
+					调整
+				</van-button>
+			</div>
+
+			<div class="pocket-money-body">
+				<div class="amount-main">
+					<div class="amount-item">
+						<div class="amount-label">月度预算</div>
+						<div class="amount-value budget"> ¥{{ Number(budgetStatus?.budgetAmount || 0).toFixed(2) }} </div>
+					</div>
+					<div class="amount-item">
+						<div class="amount-label">已用金额</div>
+						<div class="amount-value expense"> ¥{{ Number(budgetStatus?.actualExpense || 0).toFixed(2) }} </div>
+					</div>
+					<div class="amount-item">
+						<div class="amount-label">剩余额度</div>
+						<div :class="['amount-value', (budgetStatus?.remainingAmount ?? 0) < 0 ? 'over' : 'remain']">
+							¥{{ Number(budgetStatus?.remainingAmount || 0).toFixed(2) }}
+						</div>
+					</div>
+				</div>
+
+				<van-progress
+					:percentage="Math.min(100, Number(budgetStatus?.usagePercent || 0))"
+					:color="
+						(budgetStatus?.remainingAmount ?? 0) < 0
+							? '#ee0a24'
+							: (budgetStatus?.usagePercent ?? 0) > 85
+								? '#ff976a'
+								: '#1989fa'
+					"
+					:pivot-text="`${budgetStatus?.usagePercent || 0}%`"
+					class="pocket-money-progress"
+					stroke-width="6"
+				/>
+
+				<div class="pocket-money-tags">
+					<span class="tag-desc">统计分类:</span>
+					<template v-if="budgetStatus?.categoryCodes?.length">
+						<van-tag
+							v-for="cat in budgetStatus?.categoryNames || budgetStatus?.categoryCodes"
+							:key="cat"
+							plain
+							round
+							size="small"
+							class="category-tag"
+						>
+							{{ cat }}
+						</van-tag>
+					</template>
+					<span
+						v-else
+						class="tag-all"
+					>
+						全部非转账支出
+					</span>
+				</div>
+			</div>
+		</section>
+
 		<common-pull-refresh
 			ref="pullRefresh"
 			v-model="isRefresh"
@@ -169,6 +261,45 @@
 			@confirm="onConfirmCustomDate"
 		/>
 
+		<!-- 调整本月零花钱预算弹窗 -->
+		<van-dialog
+			v-model:show="showBudgetDialog"
+			title="调整本月零花钱预算"
+			show-cancel-button
+			data-testid="budget-dialog"
+			@confirm="onSaveBudget"
+		>
+			<div class="budget-dialog-content">
+				<van-field
+					v-model.number="budgetForm.budgetAmount"
+					type="number"
+					label="预算金额(元)"
+					placeholder="请输入预算金额"
+					input-align="right"
+					data-testid="input-budget-amount"
+				/>
+				<div class="dialog-category-section">
+					<div class="section-label">纳入统计分类 (可多选，不选则统计全部支出):</div>
+					<van-checkbox-group
+						v-model="budgetForm.categoryCodes"
+						direction="horizontal"
+						class="category-checkboxes"
+					>
+						<van-checkbox
+							v-for="cat in categoryList"
+							:key="cat.typeCode"
+							:name="cat.typeCode"
+							shape="square"
+							class="category-checkbox-item"
+						>
+							{{ cat.typeName }}
+						</van-checkbox>
+					</van-checkbox-group>
+				</div>
+				<div class="dialog-hint"> * 调整后下月将默认沿用此金额与分类配置，您可随时在各月份独立调整。 </div>
+			</div>
+		</van-dialog>
+
 		<van-back-top
 			target="#finance-manager-list"
 			:bottom="100"
@@ -182,13 +313,18 @@ import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
 import { useRoute, useRouter } from 'vue-router';
 import FinanceCard from './components/FinanceCard.vue';
-import { fromSourceTransferList, type FinanceManagerData } from './config';
+import { fromSourceTransferList, type FinanceManagerData, type FinanceBudgetStatusVo } from './config';
 import { usePagination } from '@/composables/usePagination';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
 import type { PageInfo, DictInfo } from '@/views/common/config';
 import { getDictList } from '@/views/finance/dict/api';
-import { deleteFinanceManager, getFinanceMangerPage } from '@/views/finance/financeManager/api';
+import {
+	deleteFinanceManager,
+	getFinanceMangerPage,
+	getBudgetStatus,
+	saveMonthlyBudget,
+} from '@/views/finance/financeManager/api';
 import { getUserManagerList } from '@/views/user/userManager/api';
 import type { UserManagerData } from '@/views/user/userManager/config';
 import type { ResponseBody } from '@/types/api';
@@ -251,6 +387,57 @@ const manualFilterPanelOpen = ref<boolean>(false);
 const activeTimePreset = ref<TimePreset>('all');
 const showCustomDatePicker = ref<boolean>(false);
 const customDateRange = ref<[Date, Date] | null>(null);
+
+const currentMonthStr = computed(() => dayjs().format('YYYY-MM'));
+const budgetStatus = ref<FinanceBudgetStatusVo | null>(null);
+const showBudgetDialog = ref<boolean>(false);
+const budgetForm = reactive({
+	budgetAmount: 0,
+	categoryCodes: [] as string[],
+});
+
+const loadBudgetStatus = async () => {
+	try {
+		const { code, data } = await getBudgetStatus(currentMonthStr.value, searchInfo.value.belongTo);
+		if (code === '200' && data) {
+			budgetStatus.value = data;
+		}
+	} catch (e) {
+		console.error('获取零花钱预算状态失败:', e);
+	}
+};
+
+const onOpenBudgetDialog = () => {
+	if (navigator.vibrate) navigator.vibrate(40);
+	budgetForm.budgetAmount = Number(budgetStatus.value?.budgetAmount || 0);
+	budgetForm.categoryCodes = [...(budgetStatus.value?.categoryCodes || [])];
+	showBudgetDialog.value = true;
+};
+
+const onSaveBudget = async () => {
+	if (budgetForm.budgetAmount < 0) {
+		showFailToast('预算金额不能为负数！');
+		return;
+	}
+	try {
+		const { code, message } = await saveMonthlyBudget({
+			yearMonth: currentMonthStr.value,
+			belongTo: searchInfo.value.belongTo,
+			budgetAmount: budgetForm.budgetAmount,
+			categoryCodes: budgetForm.categoryCodes,
+		});
+		if (code === '200') {
+			showSuccessToast('零花钱预算已更新');
+			if (navigator.vibrate) navigator.vibrate(50);
+			showBudgetDialog.value = false;
+			await loadBudgetStatus();
+		} else {
+			showFailToast(message || '保存失败');
+		}
+	} catch (err: any) {
+		showFailToast(err?.message || '保存失败');
+	}
+};
 
 const { pagination, resetPagination, setTotal, nextPage } = usePagination();
 
@@ -500,6 +687,7 @@ const onCancel = () => {
 const onRefreshData = () => {
 	resetPagination();
 	getFinancePage(searchInfo.value, pagination);
+	loadBudgetStatus();
 };
 
 const onLoadMore = () => {
@@ -658,8 +846,16 @@ onMounted(() => {
 		searchInfo.value.belongTo = Number(route.query.belongTo);
 	}
 
+	loadBudgetStatus();
 	getFinancePage(searchInfo.value, pagination);
 });
+
+watch(
+	() => searchInfo.value.belongTo,
+	() => {
+		loadBudgetStatus();
+	},
+);
 </script>
 
 <style lang="less" scoped>
@@ -889,6 +1085,136 @@ onMounted(() => {
 			width: 100%;
 			margin-left: auto;
 		}
+	}
+}
+
+.pocket-money-card {
+	margin: 10px 14px 6px;
+	padding: 14px 16px;
+	background: #ffffff;
+	border-radius: 14px;
+	box-shadow: 0 4px 16px rgba(22, 119, 255, 0.06);
+	border: 1px solid rgba(22, 119, 255, 0.08);
+
+	.pocket-money-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 12px;
+
+		.pocket-money-title {
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			font-size: 15px;
+			font-weight: 600;
+			color: #323233;
+
+			.title-icon {
+				font-size: 18px;
+				color: #1677ff;
+			}
+
+			.inherited-tag {
+				font-size: 10px;
+			}
+		}
+	}
+
+	.pocket-money-body {
+		.amount-main {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 8px;
+			text-align: center;
+			margin-bottom: 12px;
+
+			.amount-item {
+				.amount-label {
+					font-size: 12px;
+					color: #8c8c8c;
+					margin-bottom: 4px;
+				}
+
+				.amount-value {
+					font-size: 15px;
+					font-weight: 700;
+
+					&.budget {
+						color: #262626;
+					}
+
+					&.expense {
+						color: #fa8c16;
+					}
+
+					&.remain {
+						color: #52c41a;
+					}
+
+					&.over {
+						color: #f5222d;
+					}
+				}
+			}
+		}
+
+		.pocket-money-progress {
+			margin-bottom: 10px;
+		}
+
+		.pocket-money-tags {
+			display: flex;
+			align-items: center;
+			flex-wrap: wrap;
+			gap: 6px;
+			font-size: 12px;
+			color: #8c8c8c;
+
+			.category-tag {
+				font-size: 11px;
+				color: #1677ff;
+				background: #f0f7ff;
+				border-color: #d6e4ff;
+			}
+
+			.tag-all {
+				color: #595959;
+			}
+		}
+	}
+}
+
+.budget-dialog-content {
+	padding: 16px 14px 8px;
+
+	.dialog-category-section {
+		margin-top: 14px;
+
+		.section-label {
+			font-size: 13px;
+			color: #595959;
+			margin-bottom: 8px;
+		}
+
+		.category-checkboxes {
+			max-height: 140px;
+			overflow-y: auto;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 8px 12px;
+		}
+
+		.category-checkbox-item {
+			font-size: 13px;
+		}
+	}
+
+	.dialog-hint {
+		font-size: 11px;
+		color: #8c8c8c;
+		margin-top: 12px;
+		line-height: 1.4;
 	}
 }
 </style>

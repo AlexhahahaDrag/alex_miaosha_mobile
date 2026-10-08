@@ -1,4 +1,4 @@
-﻿import type { FinanceManagerData } from '../config';
+import type { FinanceManagerData } from '../config';
 import { getData, postData, putData, deleteData, baseService } from '@/views/common/api';
 import type { ResponseBody, CommonPageResult } from '@/types/api';
 
@@ -40,4 +40,21 @@ export function addFinanceManger(params: FinanceManagerData): Promise<ResponseBo
 // 编辑财务记录
 export function editFinanceManger(params: FinanceManagerData): Promise<ResponseBody<boolean>> {
 	return putData(baseService.finance + baseFinanceManager + financeMangerUrl.url, params);
+}
+
+const baseFinanceBudget = '/finance-budget';
+
+// 获取月度零花钱预算与消费状态
+export function getBudgetStatus(
+	yearMonth?: string,
+	belongTo?: string | number,
+): Promise<ResponseBody<import('../config').FinanceBudgetStatusVo>> {
+	return getData(`${baseService.finance + baseFinanceBudget}/status`, { yearMonth, belongTo });
+}
+
+// 保存月度零花钱预算与分类配置
+export function saveMonthlyBudget(
+	params: import('../config').FinanceBudgetSaveReq,
+): Promise<ResponseBody<boolean>> {
+	return postData(`${baseService.finance + baseFinanceBudget}/save`, params);
 }

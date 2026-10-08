@@ -26,6 +26,27 @@ export interface FinanceManagerData {
 	description?: string;
 }
 
+export interface FinanceBudgetStatusVo {
+	id?: string;
+	belongTo?: string;
+	yearMonth?: string;
+	budgetAmount?: number;
+	categoryCodes?: string[];
+	categoryNames?: string[];
+	actualExpense?: number;
+	remainingAmount?: number;
+	usagePercent?: number;
+	isOverBudget?: boolean;
+	isInherited?: boolean;
+}
+
+export interface FinanceBudgetSaveReq {
+	belongTo?: string | number;
+	yearMonth: string;
+	budgetAmount: number;
+	categoryCodes?: string[];
+}
+
 export const fromSourceTransferList: FromSourceTransferItem[] = [
 	{ value: 'xj', label: 'cash', name: '现金' },
 	{ value: 'yhk', label: 'card', name: '银行卡' },
