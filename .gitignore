@@ -46,3 +46,5 @@ package-lock.json
 stitch_ui.html
 graphify-out/
 .superpowers
+screenshots/
+reports/
