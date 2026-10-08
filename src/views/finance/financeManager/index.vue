@@ -261,7 +261,7 @@
 			@confirm="onConfirmCustomDate"
 		/>
 
-		<!-- 调整本月零花钱预算弹窗 -->
+		<!-- 调整本月零花钱预算弹窗 (移动端触控胶囊Chip风格) -->
 		<van-dialog
 			v-model:show="showBudgetDialog"
 			title="调整本月零花钱预算"
@@ -270,6 +270,12 @@
 			@confirm="onSaveBudget"
 		>
 			<div class="budget-dialog-content">
+				<div class="budget-month-banner">
+					<span class="month-label">预算月份:</span>
+					<span class="month-val">{{ currentMonthStr }}</span>
+					<span class="month-tip">每月独立保存，次月自动继承</span>
+				</div>
+
 				<van-field
 					v-model.number="budgetForm.budgetAmount"
 					type="number"
@@ -277,26 +283,80 @@
 					placeholder="请输入预算金额"
 					input-align="right"
 					data-testid="input-budget-amount"
+					class="budget-amount-field"
 				/>
+
 				<div class="dialog-category-section">
-					<div class="section-label">纳入统计分类 (可多选，不选则统计全部支出):</div>
-					<van-checkbox-group
-						v-model="budgetForm.categoryCodes"
-						direction="horizontal"
-						class="category-checkboxes"
-					>
-						<van-checkbox
-							v-for="cat in categoryList"
-							:key="cat.typeCode"
-							:name="cat.typeCode"
-							shape="square"
-							class="category-checkbox-item"
+					<div class="section-header">
+						<div class="section-title">
+							<span>纳入统计分类</span>
+							<span class="selected-count">(已选 {{ budgetForm.categoryCodes.length }} 项)</span>
+						</div>
+						<div class="header-actions">
+							<span
+								class="action-btn"
+								@click="selectAllCategories"
+							>全选</span>
+							<span class="action-sep">|</span>
+							<span
+								class="action-btn"
+								@click="clearAllCategories"
+							>清空</span>
+						</div>
+					</div>
+
+					<div class="section-sub-label">收支类型</div>
+					<div class="chip-group">
+						<div
+							v-for="item in incomeExpenseTypes"
+							:key="item.value"
+							:class="['chip-item', isCategorySelected(item.value) && 'active']"
+							@click="toggleCategory(item.value)"
 						>
-							{{ cat.typeName }}
-						</van-checkbox>
-					</van-checkbox-group>
+							<van-icon
+								v-if="isCategorySelected(item.value)"
+								name="success"
+								class="chip-check"
+							/>
+							<span>{{ item.label }}</span>
+						</div>
+					</div>
+
+					<div class="section-sub-label category-sub-label">
+						<span>账目类别 (提取自上月及本月)</span>
+						<span
+							v-if="categoriesLoading"
+							class="loading-hint"
+						>加载中...</span>
+					</div>
+
+					<div
+						v-if="recentCategories.length"
+						class="chip-group category-chips"
+					>
+						<div
+							v-for="cat in recentCategories"
+							:key="cat"
+							:class="['chip-item', isCategorySelected(cat) && 'active']"
+							@click="toggleCategory(cat)"
+						>
+							<van-icon
+								v-if="isCategorySelected(cat)"
+								name="success"
+								class="chip-check"
+							/>
+							<span>{{ cat }}</span>
+						</div>
+					</div>
+					<div
+						v-else-if="!categoriesLoading"
+						class="empty-category-hint"
+					>
+						近两个月暂无具体记账类别，默认统计全部支出
+					</div>
 				</div>
-				<div class="dialog-hint"> * 调整后下月将默认沿用此金额与分类配置，您可随时在各月份独立调整。 </div>
+
+				<div class="dialog-hint"> * 仅勾选的类别支出会计入预算，不勾选则默认统计全部支出（不含转账）。 </div>
 			</div>
 		</van-dialog>
 
@@ -324,6 +384,7 @@ import {
 	getFinanceMangerPage,
 	getBudgetStatus,
 	saveMonthlyBudget,
+	getBudgetCategories,
 } from '@/views/finance/financeManager/api';
 import { getUserManagerList } from '@/views/user/userManager/api';
 import type { UserManagerData } from '@/views/user/userManager/config';
@@ -396,6 +457,53 @@ const budgetForm = reactive({
 	categoryCodes: [] as string[],
 });
 
+const incomeExpenseTypes = [
+	{ label: '支出', value: '支出' },
+	{ label: '收入', value: '收入' },
+];
+const recentCategories = ref<string[]>([]);
+const categoriesLoading = ref(false);
+
+const isCategorySelected = (val: string) => {
+	return budgetForm.categoryCodes.includes(val);
+};
+
+const toggleCategory = (val: string) => {
+	if (navigator.vibrate) navigator.vibrate(20);
+	const idx = budgetForm.categoryCodes.indexOf(val);
+	if (idx > -1) {
+		budgetForm.categoryCodes.splice(idx, 1);
+	} else {
+		budgetForm.categoryCodes.push(val);
+	}
+};
+
+const selectAllCategories = () => {
+	if (navigator.vibrate) navigator.vibrate(25);
+	const all = Array.from(new Set([...incomeExpenseTypes.map((t) => t.value), ...recentCategories.value]));
+	budgetForm.categoryCodes = all;
+};
+
+const clearAllCategories = () => {
+	if (navigator.vibrate) navigator.vibrate(25);
+	budgetForm.categoryCodes = [];
+};
+
+const fetchRecentCategories = async () => {
+	categoriesLoading.value = true;
+	try {
+		const { code, data } = await getBudgetCategories(currentMonthStr.value, searchInfo.value.belongTo);
+		if (code === '200' && Array.isArray(data)) {
+			const existingSelected = budgetForm.categoryCodes.filter((c) => c !== '支出' && c !== '收入');
+			recentCategories.value = Array.from(new Set([...data, ...existingSelected])).sort();
+		}
+	} catch (e) {
+		console.error('获取近两月记账类别失败:', e);
+	} finally {
+		categoriesLoading.value = false;
+	}
+};
+
 const loadBudgetStatus = async () => {
 	try {
 		const { code, data } = await getBudgetStatus(currentMonthStr.value, searchInfo.value.belongTo);
@@ -407,11 +515,12 @@ const loadBudgetStatus = async () => {
 	}
 };
 
-const onOpenBudgetDialog = () => {
+const onOpenBudgetDialog = async () => {
 	if (navigator.vibrate) navigator.vibrate(40);
 	budgetForm.budgetAmount = Number(budgetStatus.value?.budgetAmount || 0);
 	budgetForm.categoryCodes = [...(budgetStatus.value?.categoryCodes || [])];
 	showBudgetDialog.value = true;
+	await fetchRecentCategories();
 };
 
 const onSaveBudget = async () => {
@@ -1186,35 +1295,172 @@ watch(
 }
 
 .budget-dialog-content {
-	padding: 16px 14px 8px;
+	padding: 14px 16px 8px;
+	max-height: 70vh;
+	overflow-y: auto;
+	box-sizing: border-box;
+
+	.budget-month-banner {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 6px;
+		padding: 8px 12px;
+		background: #f0f7ff;
+		border: 1px solid #d6e4ff;
+		border-radius: 8px;
+		margin-bottom: 12px;
+		font-size: 12px;
+
+		.month-label {
+			color: #595959;
+		}
+
+		.month-val {
+			font-weight: 600;
+			color: #1677ff;
+		}
+
+		.month-tip {
+			font-size: 11px;
+			color: #8c8c8c;
+			margin-left: auto;
+		}
+	}
+
+	.budget-amount-field {
+		background: #f8fafc;
+		border-radius: 8px;
+		margin-bottom: 12px;
+		padding: 8px 12px;
+		border: 1px solid #f0f0f0;
+	}
 
 	.dialog-category-section {
-		margin-top: 14px;
+		margin-top: 12px;
 
-		.section-label {
-			font-size: 13px;
-			color: #595959;
+		.section-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
 			margin-bottom: 8px;
+
+			.section-title {
+				font-size: 13px;
+				font-weight: 600;
+				color: #323233;
+				display: flex;
+				align-items: center;
+				gap: 4px;
+
+				.selected-count {
+					font-size: 11px;
+					color: #1677ff;
+					font-weight: normal;
+				}
+			}
+
+			.header-actions {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				font-size: 12px;
+				color: #1677ff;
+
+				.action-btn {
+					cursor: pointer;
+					padding: 2px 4px;
+
+					&:active {
+						opacity: 0.6;
+					}
+				}
+
+				.action-sep {
+					color: #d9d9d9;
+				}
+			}
 		}
 
-		.category-checkboxes {
-			max-height: 140px;
-			overflow-y: auto;
+		.section-sub-label {
+			font-size: 11px;
+			color: #8c8c8c;
+			margin: 8px 0 6px;
+
+			&.category-sub-label {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-top: 10px;
+
+				.loading-hint {
+					font-size: 10px;
+					color: #bfbfbf;
+				}
+			}
+		}
+
+		.chip-group {
 			display: flex;
 			flex-wrap: wrap;
-			gap: 8px 12px;
+			gap: 8px;
+
+			&.category-chips {
+				max-height: 125px;
+				overflow-y: auto;
+				padding: 2px 0;
+			}
 		}
 
-		.category-checkbox-item {
-			font-size: 13px;
+		.chip-item {
+			display: inline-flex;
+			align-items: center;
+			gap: 4px;
+			padding: 5px 12px;
+			font-size: 12px;
+			line-height: 1.2;
+			border-radius: 16px;
+			background: #f5f5f5;
+			color: #595959;
+			border: 1px solid #f0f0f0;
+			cursor: pointer;
+			user-select: none;
+			transition: all 0.15s ease;
+
+			&:active {
+				transform: scale(0.96);
+			}
+
+			&.active {
+				background: #e6f4ff;
+				color: #1677ff;
+				border-color: #91caff;
+				font-weight: 500;
+			}
+
+			.chip-check {
+				font-size: 12px;
+				color: #1677ff;
+			}
+		}
+
+		.empty-category-hint {
+			font-size: 12px;
+			color: #bfbfbf;
+			text-align: center;
+			padding: 12px 0;
 		}
 	}
 
 	.dialog-hint {
 		font-size: 11px;
 		color: #8c8c8c;
-		margin-top: 12px;
-		line-height: 1.4;
+		margin-top: 14px;
+		line-height: 1.5;
+		background: #fafafa;
+		padding: 8px 10px;
+		border-radius: 6px;
+		border-left: 3px solid #1677ff;
 	}
 }
 </style>

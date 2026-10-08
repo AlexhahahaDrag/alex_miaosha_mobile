@@ -58,3 +58,11 @@ export function saveMonthlyBudget(
 ): Promise<ResponseBody<boolean>> {
 	return postData(`${baseService.finance + baseFinanceBudget}/save`, params);
 }
+
+// 获取上月及本月已有记账分类
+export function getBudgetCategories(
+	yearMonth?: string,
+	belongTo?: string | number,
+): Promise<ResponseBody<string[]>> {
+	return getData(`${baseService.finance + baseFinanceBudget}/categories`, { yearMonth, belongTo });
+}
