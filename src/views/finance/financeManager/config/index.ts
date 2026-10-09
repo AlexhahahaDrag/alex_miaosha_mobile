@@ -29,7 +29,9 @@ export interface FinanceManagerData {
 export interface FinanceBudgetStatusVo {
 	id?: string;
 	belongTo?: string;
+	budgetMonth?: string;
 	yearMonth?: string;
+	incomeAndExpenses?: string;
 	budgetAmount?: number;
 	categoryCodes?: string[];
 	categoryNames?: string[];
@@ -42,7 +44,9 @@ export interface FinanceBudgetStatusVo {
 
 export interface FinanceBudgetSaveReq {
 	belongTo?: string | number;
-	yearMonth: string;
+	budgetMonth?: string;
+	yearMonth?: string;
+	incomeAndExpenses?: string;
 	budgetAmount: number;
 	categoryCodes?: string[];
 }

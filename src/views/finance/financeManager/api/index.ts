@@ -46,23 +46,36 @@ const baseFinanceBudget = '/finance-budget';
 
 // 获取月度零花钱预算与消费状态
 export function getBudgetStatus(
-	yearMonth?: string,
+	budgetMonth?: string,
 	belongTo?: string | number,
 ): Promise<ResponseBody<import('../config').FinanceBudgetStatusVo>> {
-	return getData(`${baseService.finance + baseFinanceBudget}/status`, { yearMonth, belongTo });
+	return getData(`${baseService.finance + baseFinanceBudget}/status`, {
+		budgetMonth,
+		yearMonth: budgetMonth,
+		belongTo,
+	});
 }
 
 // 保存月度零花钱预算与分类配置
 export function saveMonthlyBudget(
 	params: import('../config').FinanceBudgetSaveReq,
 ): Promise<ResponseBody<boolean>> {
-	return postData(`${baseService.finance + baseFinanceBudget}/save`, params);
+	const req = {
+		...params,
+		budgetMonth: params.budgetMonth || params.yearMonth,
+		yearMonth: params.budgetMonth || params.yearMonth,
+	};
+	return postData(`${baseService.finance + baseFinanceBudget}/save`, req);
 }
 
 // 获取上月及本月已有记账分类
 export function getBudgetCategories(
-	yearMonth?: string,
+	budgetMonth?: string,
 	belongTo?: string | number,
 ): Promise<ResponseBody<string[]>> {
-	return getData(`${baseService.finance + baseFinanceBudget}/categories`, { yearMonth, belongTo });
+	return getData(`${baseService.finance + baseFinanceBudget}/categories`, {
+		budgetMonth,
+		yearMonth: budgetMonth,
+		belongTo,
+	});
 }

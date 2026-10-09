@@ -124,7 +124,7 @@
 						<div class="amount-value budget"> ¥{{ Number(budgetStatus?.budgetAmount || 0).toFixed(2) }} </div>
 					</div>
 					<div class="amount-item">
-						<div class="amount-label">已用金额</div>
+						<div class="amount-label">{{ mobileSpentLabel }}</div>
 						<div class="amount-value expense"> ¥{{ Number(budgetStatus?.actualExpense || 0).toFixed(2) }} </div>
 					</div>
 					<div class="amount-item">
@@ -167,7 +167,7 @@
 						v-else
 						class="tag-all"
 					>
-						全部非转账支出
+						{{ mobileDirectionLabel }}
 					</span>
 				</div>
 			</div>
@@ -305,20 +305,29 @@
 						</div>
 					</div>
 
-					<div class="section-sub-label">收支类型</div>
+					<div class="section-sub-label">收支类型 (支持单选或同时勾选)</div>
 					<div class="chip-group">
 						<div
-							v-for="item in incomeExpenseTypes"
-							:key="item.value"
-							:class="['chip-item', isCategorySelected(item.value) && 'active']"
-							@click="toggleCategory(item.value)"
+							:class="['chip-item', isDirectionSelected('expense') && 'active']"
+							@click="toggleDirection('expense')"
 						>
 							<van-icon
-								v-if="isCategorySelected(item.value)"
+								v-if="isDirectionSelected('expense')"
 								name="success"
 								class="chip-check"
 							/>
-							<span>{{ item.label }}</span>
+							<span>支出 (消费)</span>
+						</div>
+						<div
+							:class="['chip-item', isDirectionSelected('income') && 'active']"
+							@click="toggleDirection('income')"
+						>
+							<van-icon
+								v-if="isDirectionSelected('income')"
+								name="success"
+								class="chip-check"
+							/>
+							<span>收入</span>
 						</div>
 					</div>
 
@@ -352,11 +361,11 @@
 						v-else-if="!categoriesLoading"
 						class="empty-category-hint"
 					>
-						近两个月暂无具体记账类别，默认统计全部支出
+						近两个月暂无具体记账类别，默认统计当前所选收支方向的全部记录
 					</div>
 				</div>
 
-				<div class="dialog-hint"> * 仅勾选的类别支出会计入预算，不勾选则默认统计全部支出（不含转账）。 </div>
+				<div class="dialog-hint"> * 仅勾选的类别会计入预算，不勾选则默认统计当前所选收支方向的全部记录（不含转账）。 </div>
 			</div>
 		</van-dialog>
 
@@ -454,13 +463,50 @@ const budgetStatus = ref<FinanceBudgetStatusVo | null>(null);
 const showBudgetDialog = ref<boolean>(false);
 const budgetForm = reactive({
 	budgetAmount: 0,
+	incomeAndExpenses: 'expense',
+	selectedDirections: ['expense'] as string[],
 	categoryCodes: [] as string[],
 });
 
-const incomeExpenseTypes = [
-	{ label: '支出', value: '支出' },
-	{ label: '收入', value: '收入' },
-];
+const isDirectionSelected = (dir: string) => {
+	return budgetForm.selectedDirections.includes(dir);
+};
+
+const toggleDirection = (dir: string) => {
+	if (navigator.vibrate) navigator.vibrate(20);
+	const current = [...budgetForm.selectedDirections];
+	const idx = current.indexOf(dir);
+	if (idx > -1) {
+		if (current.length === 1) {
+			showFailToast('收支类型至少保留一项');
+			return;
+		}
+		current.splice(idx, 1);
+	} else {
+		current.push(dir);
+	}
+	budgetForm.selectedDirections = current;
+	budgetForm.incomeAndExpenses = current.join(',');
+};
+
+const mobileDirectionLabel = computed(() => {
+	const dir = budgetStatus.value?.incomeAndExpenses || 'expense';
+	const hasExp = dir.includes('expense');
+	const hasInc = dir.includes('income');
+	if (hasExp && hasInc) return '全部非转账收支';
+	if (hasInc) return '全部非转账收入';
+	return '全部非转账支出';
+});
+
+const mobileSpentLabel = computed(() => {
+	const dir = budgetStatus.value?.incomeAndExpenses || 'expense';
+	const hasExp = dir.includes('expense');
+	const hasInc = dir.includes('income');
+	if (hasExp && hasInc) return '已计金额';
+	if (hasInc) return '已入金额';
+	return '已用金额';
+});
+
 const recentCategories = ref<string[]>([]);
 const categoriesLoading = ref(false);
 
@@ -480,8 +526,7 @@ const toggleCategory = (val: string) => {
 
 const selectAllCategories = () => {
 	if (navigator.vibrate) navigator.vibrate(25);
-	const all = Array.from(new Set([...incomeExpenseTypes.map((t) => t.value), ...recentCategories.value]));
-	budgetForm.categoryCodes = all;
+	budgetForm.categoryCodes = [...recentCategories.value];
 };
 
 const clearAllCategories = () => {
@@ -494,8 +539,11 @@ const fetchRecentCategories = async () => {
 	try {
 		const { code, data } = await getBudgetCategories(currentMonthStr.value, searchInfo.value.belongTo);
 		if (code === '200' && Array.isArray(data)) {
-			const existingSelected = budgetForm.categoryCodes.filter((c) => c !== '支出' && c !== '收入');
-			recentCategories.value = Array.from(new Set([...data, ...existingSelected])).sort();
+			const cleanData = data.filter((c) => c !== '支出' && c !== '收入' && c !== 'expense' && c !== 'income');
+			const existingSelected = budgetForm.categoryCodes.filter(
+				(c) => c !== '支出' && c !== '收入' && c !== 'expense' && c !== 'income',
+			);
+			recentCategories.value = Array.from(new Set([...cleanData, ...existingSelected])).sort();
 		}
 	} catch (e) {
 		console.error('获取近两月记账类别失败:', e);
@@ -518,7 +566,16 @@ const loadBudgetStatus = async () => {
 const onOpenBudgetDialog = async () => {
 	if (navigator.vibrate) navigator.vibrate(40);
 	budgetForm.budgetAmount = Number(budgetStatus.value?.budgetAmount || 0);
-	budgetForm.categoryCodes = [...(budgetStatus.value?.categoryCodes || [])];
+	const rawDir = budgetStatus.value?.incomeAndExpenses || 'expense';
+	const parsed = rawDir
+		.split(',')
+		.map((s) => s.trim().toLowerCase())
+		.filter((s) => s === 'expense' || s === 'income');
+	budgetForm.selectedDirections = parsed.length ? parsed : ['expense'];
+	budgetForm.incomeAndExpenses = budgetForm.selectedDirections.join(',');
+	budgetForm.categoryCodes = [...(budgetStatus.value?.categoryCodes || [])].filter(
+		(c) => c !== '支出' && c !== '收入' && c !== 'expense' && c !== 'income',
+	);
 	showBudgetDialog.value = true;
 	await fetchRecentCategories();
 };
@@ -528,12 +585,20 @@ const onSaveBudget = async () => {
 		showFailToast('预算金额不能为负数！');
 		return;
 	}
+	if (!budgetForm.selectedDirections.length) {
+		showFailToast('收支类型至少保留一项！');
+		return;
+	}
 	try {
 		const { code, message } = await saveMonthlyBudget({
+			budgetMonth: currentMonthStr.value,
 			yearMonth: currentMonthStr.value,
 			belongTo: searchInfo.value.belongTo,
+			incomeAndExpenses: budgetForm.selectedDirections.join(','),
 			budgetAmount: budgetForm.budgetAmount,
-			categoryCodes: budgetForm.categoryCodes,
+			categoryCodes: budgetForm.categoryCodes.filter(
+				(c) => c !== '支出' && c !== '收入' && c !== 'expense' && c !== 'income',
+			),
 		});
 		if (code === '200') {
 			showSuccessToast('零花钱预算已更新');
