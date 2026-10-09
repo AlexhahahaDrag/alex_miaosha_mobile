@@ -8,6 +8,7 @@ export interface FromSourceTransferItem {
 
 export interface FinanceManagerData {
 	id?: string;
+	orgId?: string;
 	name?: string;
 	typeCode?: string;
 	typeName?: string;
@@ -28,6 +29,7 @@ export interface FinanceManagerData {
 
 export interface FinanceBudgetStatusVo {
 	id?: string;
+	orgId?: string;
 	belongTo?: string;
 	budgetMonth?: string;
 	yearMonth?: string;
@@ -43,6 +45,8 @@ export interface FinanceBudgetStatusVo {
 }
 
 export interface FinanceBudgetSaveReq {
+	id?: string;
+	orgId?: string;
 	belongTo?: string | number;
 	budgetMonth?: string;
 	yearMonth?: string;
