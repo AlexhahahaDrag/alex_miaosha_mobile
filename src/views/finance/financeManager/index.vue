@@ -136,14 +136,8 @@
 				</div>
 
 				<van-progress
-					:percentage="Math.min(100, Number(budgetStatus?.usagePercent || 0))"
-					:color="
-						(budgetStatus?.remainingAmount ?? 0) < 0
-							? '#ee0a24'
-							: (budgetStatus?.usagePercent ?? 0) > 85
-								? '#ff976a'
-								: '#1989fa'
-					"
+					:percentage="Math.max(0, Math.min(100, Number(budgetStatus?.usagePercent || 0)))"
+					:color="progressColor"
 					:pivot-text="`${budgetStatus?.usagePercent || 0}%`"
 					class="pocket-money-progress"
 					stroke-width="6"
@@ -505,6 +499,28 @@ const mobileSpentLabel = computed(() => {
 	if (hasExp && hasInc) return '已计金额';
 	if (hasInc) return '已入金额';
 	return '已用金额';
+});
+
+/**
+ * 根据预算使用率返回语义色阶 (Taste-Skill 财务风控色板)
+ * - < 0%: 净结余充裕 (翡翠绿 #07c160)
+ * - [0%, 75%): 常规安全 (品牌蓝 #1989fa)
+ * - [75%, 90%): 适度关注 (琥珀黄 #ff976a)
+ * - [90%, 100%): 临界高压 (火山橙 #fa541c)
+ * - [100%, 150%): 超支破线 (警示红 #ee0a24)
+ * - >= 150%: 严重爆表 (深绛红 #cf1322)
+ */
+const getBudgetProgressColor = (percent: number): string => {
+	if (percent < 0) return '#07c160';
+	if (percent >= 150) return '#cf1322';
+	if (percent >= 100) return '#ee0a24';
+	if (percent >= 90) return '#fa541c';
+	if (percent >= 75) return '#ff976a';
+	return '#1989fa';
+};
+
+const progressColor = computed(() => {
+	return getBudgetProgressColor(Number(budgetStatus.value?.usagePercent || 0));
 });
 
 const recentCategories = ref<string[]>([]);
