@@ -42,6 +42,21 @@ export function editFinanceManger(params: FinanceManagerData): Promise<ResponseB
 	return putData(baseService.finance + baseFinanceManager + financeMangerUrl.url, params);
 }
 
+export interface FinanceSummaryData {
+	totalExpense?: number;
+	totalIncome?: number;
+	totalBalance?: number;
+	totalCount?: number;
+}
+
+// 获取账单收支汇总
+export function getFinanceSummary(
+	params: FinanceManagerData,
+): Promise<ResponseBody<FinanceSummaryData>> {
+	const url = `${baseService.finance + baseFinanceManager}/summary`;
+	return postData(url, params);
+}
+
 const baseFinanceBudget = '/finance-budget';
 
 // 获取月度零花钱预算与消费状态

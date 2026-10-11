@@ -24,6 +24,7 @@ export interface FinanceManagerData {
 	infoDate?: string | Dayjs | null;
 	infoDateStart?: string;
 	infoDateEnd?: string;
+	typeCodes?: string[];
 	description?: string;
 }
 
