@@ -253,7 +253,6 @@
 </template>
 
 <script setup lang="ts">
-import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
 import { type ShopStockData, label, rulesRef } from '../config';
 import type { ShopStockBatchData } from '../../shopStockBatch/config';
@@ -266,7 +265,7 @@ import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
 import { getRoutePathByName } from '@/utils/router';
 import { useShopStockStore } from '@/store/modules/finance/shopStock';
-import { datePickerFormatter } from '@/utils/dayjs';
+import { datePickerFormatter, formatDayjs, nowDayjs, type Dayjs } from '@/utils/dayjs';
 import type { DatePickerInfo } from '@/utils/common';
 import type { DictInfo } from '@/views/finance/dict/api';
 
@@ -364,7 +363,7 @@ const chooseDateInfo = ref<DatePickerInfo<Dayjs>>({
 	label: 'saleDate',
 	labelName: '进货日期',
 	rule: rulesRef.saleDate,
-	selectValue: dayjs(),
+	selectValue: nowDayjs(),
 	showFlag: false,
 	formatter: datePickerFormatter,
 });
@@ -464,7 +463,7 @@ const init = async () => {
 		if (id) {
 			if (detailRes.code === '200') {
 				formInfo.value = detailRes.data || {};
-				formInfo.value.saleDate = dayjs(formInfo.value.saleDate);
+				formInfo.value.saleDate = formatDayjs(formInfo.value.saleDate);
 				// 如果是复制，则删除id
 				if (type === 'copy') {
 					formInfo.value.id = null;
@@ -479,7 +478,7 @@ const init = async () => {
 				lastBatch && batches.some((b: ShopStockBatchData) => b.batchCode === lastBatch) ? lastBatch : batches[0]?.batchCode;
 
 			formInfo.value = {
-				saleDate: dayjs(),
+				saleDate: nowDayjs(),
 				isValid: '1',
 				purchasePlace: 'sz',
 				stockBatch: defaultBatch,
@@ -499,7 +498,7 @@ const init = async () => {
 			);
 		}
 
-		initInfoDate((formInfo.value.saleDate as Dayjs) || dayjs());
+		initInfoDate((formInfo.value.saleDate as Dayjs) || nowDayjs());
 	} catch (error) {
 		// eslint-disable-next-line no-console
 		console.error('init error:', error);

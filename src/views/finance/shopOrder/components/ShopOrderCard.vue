@@ -5,7 +5,7 @@
 	>
 		<div class="card-header">
 			<span class="order-code">{{ item.saleOrderCode }}</span>
-			<span class="order-date">{{ item.saleDate ? dayjs(item.saleDate).format('YYYY-MM-DD') : '--' }}</span>
+			<span class="order-date">{{ item.saleDate ? formatDate(item.saleDate) : '--' }}</span>
 		</div>
 
 		<div class="card-body">
@@ -23,8 +23,8 @@
 
 <script lang="ts" setup>
 import { type PropType } from 'vue';
-import dayjs from 'dayjs';
 import type { DataItem } from '../shopOrderTs';
+import { formatDate } from '@/utils/dayjs';
 import commonUtils from '@/utils/common/index';
 
 const props = defineProps({

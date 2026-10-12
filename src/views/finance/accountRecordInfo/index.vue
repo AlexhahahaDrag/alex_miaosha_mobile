@@ -94,7 +94,6 @@ import { showSuccessToast, showFailToast } from 'vant';
 import { useNavBar } from '@/composables/useNavBar';
 import type { PageInfo } from '@/views/common/config';
 import type { AccountRecordInfoData } from '@/views/finance/accountRecordInfo/config';
-import { usePagination } from '@/composables/usePagination';
 import { deleteAccountRecordInfo, getAccountRecordInfoPage } from '@/views/finance/accountRecordInfo/api';
 import { getUserManagerList } from '@/views/user/userManager/api';
 

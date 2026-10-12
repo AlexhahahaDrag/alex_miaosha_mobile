@@ -96,7 +96,6 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue';
 import { showNotify } from 'vant';
 import type { FinanceDetail } from './common';
 import { getIncomeAndExpense } from '@/views/finance/financeAnalysis/api';

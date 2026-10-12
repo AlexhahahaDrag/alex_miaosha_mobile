@@ -1,4 +1,4 @@
-import dayjs, { type Dayjs } from 'dayjs';
+import { formatDayjs, type Dayjs } from '@/utils/dayjs';
 
 export interface FieldRule {
 	required?: boolean;
@@ -20,7 +20,7 @@ export interface DictFieldConfig<T = Record<string, unknown>> {
 export const formatTime = (timeStr: string | Dayjs | undefined): string => {
 	if (!timeStr) return '';
 
-	const date = dayjs.isDayjs(timeStr) ? timeStr.toDate() : new Date(timeStr);
+	const date = formatDayjs(timeStr).toDate();
 
 	if (Number.isNaN(date.getTime())) {
 		return '';

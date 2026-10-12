@@ -114,7 +114,6 @@
 import { showFailToast } from 'vant';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
-import { usePagination } from '@/composables/usePagination';
 import { usePermission } from '@/composables/usePermission';
 import { useGiftRelationOptions } from '@/composables/useGiftRelationOptions';
 import { formatTime, dataTimeFormat } from '@/utils/dayjs';
@@ -133,9 +132,9 @@ const router = useRouter();
 const { hasPermission } = usePermission();
 const { quickRelations, loadRelationOptions, relationLabel, resolveFilterRelationType } = useGiftRelationOptions();
 
-const loading = ref(false);
-const refreshing = ref(false);
-const finished = ref(false);
+const loading = ref<boolean>(false);
+const refreshing = ref<boolean>(false);
+const finished = ref<boolean>(false);
 const dataSource = ref<GiftPersonBusinessInfo[]>([]);
 const searchInfo = ref<GiftPersonQuery>({});
 const summary = ref<GiftPersonSummary>({});

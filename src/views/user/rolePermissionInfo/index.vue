@@ -185,7 +185,6 @@ import { showFailToast, showSuccessToast } from 'vant';
 import type { SearchInfo } from './rolePermissionInfoTs';
 import type { PageInfo } from '@/views/common/config';
 import { useNavBar } from '@/composables/useNavBar';
-import { usePagination } from '@/composables/usePagination';
 import {
 	addRolePermissionInfo,
 	deleteRolePermissionInfo,
@@ -221,10 +220,10 @@ useNavBar({
 	onRightClick: () => handleAdd(),
 });
 
-const loading = ref(false);
-const finished = ref(false);
-const isRefresh = ref(false);
-const cacheDirty = ref(false);
+const loading = ref<boolean>(false);
+const finished = ref<boolean>(false);
+const isRefresh = ref<boolean>(false);
+const cacheDirty = ref<boolean>(false);
 const selectedIds = ref<string[]>([]);
 const dataSource = ref<RolePermissionItem[]>([]);
 const searchInfo = ref<RolePermissionSearchInfo>({});

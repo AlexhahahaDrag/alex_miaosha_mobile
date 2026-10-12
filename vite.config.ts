@@ -66,6 +66,8 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
 				resolvers: [VantResolver()],
 				// 指定需要自动导入的库
 				imports: ['vue', 'vue-router', 'pinia'],
+				// 自动扫描并导入组合式函数
+				dirs: ['src/composables'],
 				dts: 'src/auto-imports.d.ts', // 生成自动导入类型声明文件
 			}),
 			Components({

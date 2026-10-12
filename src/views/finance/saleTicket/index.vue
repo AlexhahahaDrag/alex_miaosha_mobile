@@ -131,8 +131,8 @@
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-import dayjs from 'dayjs';
 import type { ShopCartData } from '../shopCart/config';
+import { nowDayjs } from '@/utils/dayjs';
 import commonUtils from '@/utils/common/index';
 import { getShopList } from '@/views/finance/shopStock/api';
 import { submitOrder } from '@/views/finance/shopOrder/api';
@@ -245,7 +245,7 @@ const getShopListInfo = async (ids: string) => {
 				shopCode: item.shopCode,
 				oldShopCode: item.oldShopCode,
 				saleAmount: item.saleAmount,
-				saleDate: dayjs(),
+				saleDate: nowDayjs(),
 				saleNum: 1,
 				shopStockId: item.id,
 			}));
@@ -266,7 +266,7 @@ const getShopCartListInfo = async (ids: string) => {
 				shopCode: item.shopCode,
 				oldShopCode: item.oldShopCode,
 				saleAmount: item.saleAmount,
-				saleDate: dayjs(),
+				saleDate: nowDayjs(),
 				saleNum: item.saleNum,
 				shopStockId: item.shopId,
 				shopCartId: item.id,

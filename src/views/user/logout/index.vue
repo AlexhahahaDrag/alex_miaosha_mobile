@@ -36,7 +36,7 @@ const logout = async () => {
 };
 const emit = defineEmits(['select']);
 const props = defineProps<Props>();
-const show = ref(false);
+const show = ref<boolean>(false);
 const actions = [{ name: '退出登录' }];
 const onSelect = (item: { name: string | ToastOptions | undefined }) => {
 	show.value = false;

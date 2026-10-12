@@ -1,4 +1,3 @@
-import { reactive } from 'vue';
 import type { PageInfo } from '@/views/common/config';
 
 export const usePagination = (initialConfig?: Partial<PageInfo>) => {

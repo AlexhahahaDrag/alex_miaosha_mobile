@@ -78,12 +78,10 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { showSuccessToast, showFailToast } from 'vant';
 import ShopStockCard from './components/ShopStockCard.vue';
 import type { ShopStockData } from './config';
-import { usePagination } from '@/composables/usePagination';
 import { getShopStockPage, deleteShopStock } from '@/views/finance/shopStock/api';
 import { useNavBar } from '@/composables/useNavBar';
 import type { PageInfo } from '@/views/common/config';

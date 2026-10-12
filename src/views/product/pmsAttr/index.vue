@@ -91,7 +91,6 @@
 import { showSuccessToast, showFailToast } from 'vant';
 import type { SearchInfo } from './pmsAttrTs';
 import { useNavBar } from '@/composables/useNavBar';
-import { usePagination } from '@/composables/usePagination';
 import { getPmsAttrPage, deletePmsAttr } from '@/views/product/pmsAttr/api';
 import { getUserManagerList } from '@/views/user/userManager/api';
 import type { PageInfo } from '@/views/common/config/index';

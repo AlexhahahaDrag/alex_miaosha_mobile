@@ -94,7 +94,6 @@
 import { showSuccessToast, showFailToast } from 'vant';
 import type { SearchInfo } from './roleInfoTs';
 import { useNavBar } from '@/composables/useNavBar';
-import { usePagination } from '@/composables/usePagination';
 import { getRoleInfoPage, deleteRoleInfo } from '@/views/user/roleInfo/api';
 import { getUserManagerList } from '@/views/user/userManager/api';
 import type { PageInfo } from '@/views/common/config/index';

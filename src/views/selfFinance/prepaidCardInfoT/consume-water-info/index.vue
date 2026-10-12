@@ -190,7 +190,6 @@ import { showFailToast } from 'vant';
 import { typeIconMap } from '../config/index';
 import { getPrepaidCardInfoList } from '../api';
 import { useNavBar } from '@/composables/useNavBar';
-import { usePagination } from '@/composables/usePagination';
 import { getFormatTimeInfo } from '@/utils/dayjs';
 import {
 	getConsumeCardRecordPage,
@@ -216,7 +215,7 @@ const refreshing = ref<boolean>(false); // 是否下拉刷新
 const transactionList = ref<TransactionRecord[]>([]);
 const { pagination, resetPagination, setTotal, nextPage } = usePagination();
 const hasMore = ref<boolean>(true);
-const finished = ref(false); // List 组件完成状态
+const finished = ref<boolean>(false); // List 组件完成状态
 
 // 筛选参数
 const filterParams = reactive<TransactionQueryParams>({
@@ -271,9 +270,9 @@ function getCategoryIcon(type: string): string {
 }
 
 // ========== 筛选弹窗（卡片与日期范围） ==========
-const filterVisible = ref(false);
-const cardPickerVisible = ref(false);
-const calendarVisible = ref(false);
+const filterVisible = ref<boolean>(false);
+const cardPickerVisible = ref<boolean>(false);
+const calendarVisible = ref<boolean>(false);
 
 const cardColumns = ref<Array<{ text: string; value: string | number }>>([{ text: '全部卡片', value: '' }]);
 const selectedCardId = ref<string | number | ''>('');

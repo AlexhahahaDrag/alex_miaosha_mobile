@@ -1,4 +1,3 @@
-import { onActivated, onMounted } from 'vue';
 import { useTabBarStore } from '@/store/modules/tabbar';
 
 export interface TabBarItem {

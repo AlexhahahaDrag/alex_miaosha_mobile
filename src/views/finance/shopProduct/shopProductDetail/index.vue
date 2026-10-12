@@ -137,8 +137,8 @@
 </template>
 
 <script setup lang="ts">
-import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
+import { formatDate, nowDayjs, type Dayjs } from '@/utils/dayjs';
 import { type ShopStockData } from '@/views/finance/shopStock/config';
 import type { DictInfo } from '@/views/common/config';
 import { getListName } from '@/views/common/config';
@@ -208,7 +208,7 @@ const getDictInfoList = (data: DictInfo[]) => {
 
 const initInfoDate = (infoDate: string | Dayjs | undefined) => {
 	if (infoDate) {
-		saleDateName.value = dayjs(infoDate).format('YYYY年MM月DD');
+		saleDateName.value = formatDate(infoDate, 'YYYY年MM月DD');
 	}
 };
 
@@ -229,7 +229,7 @@ const init = async () => {
 			}
 		} else {
 			formInfo.value = {
-				saleDate: dayjs(),
+				saleDate: nowDayjs(),
 				purchasePlace: 'sz',
 			};
 			initInfoDate(formInfo.value.saleDate);

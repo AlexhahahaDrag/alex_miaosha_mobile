@@ -23,12 +23,10 @@
 
 <script lang="ts" setup>
 import { showNotify } from 'vant';
-import dayjs from 'dayjs';
+import { getMonthRange } from '@/utils/dayjs';
 import { getChainAndYear, getBenefit } from '@/views/finance/shopFinanceAnalysis/api';
 import commonUtils from '@/utils/common/index';
 import type { Info } from '@/views/common/boardData/config';
-
-const YYYYMMDD = 'YYYY-MM-DD';
 
 interface Props {
 	activeTab: number | string;
@@ -85,9 +83,10 @@ const getChainAndYearInfo = async (dateStr: string) => {
 const benefitList = ref<Info[]>([]);
 
 const getBenefitInfo = async (dateStr: string) => {
+	const [startDate, endDate] = getMonthRange(dateStr);
 	const params = {
-		startDate: `${dateStr}-01`,
-		endDate: dayjs(`${dateStr}-01`).endOf('month').format(YYYYMMDD),
+		startDate,
+		endDate,
 		searchType: searchType.value,
 	};
 	const { code, data, message } = await getBenefit(params);

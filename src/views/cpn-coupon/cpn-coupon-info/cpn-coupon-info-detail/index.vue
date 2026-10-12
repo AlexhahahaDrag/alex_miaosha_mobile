@@ -242,11 +242,10 @@
 </template>
 
 <script setup lang="ts">
-import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
 import type { CpnCouponInfoData } from '@/views/cpn-coupon/cpn-coupon-info/config';
 import { rulesRef } from '@/views/cpn-coupon/cpn-coupon-info/config';
-import { formatDate, datePickerFormatter } from '@/utils/dayjs';
+import { formatDate, datePickerFormatter, formatDayjs, nowDayjs, type Dayjs } from '@/utils/dayjs';
 import { getCpnCouponInfoDetail, addCpnCouponInfo, editCpnCouponInfo } from '@/views/cpn-coupon/cpn-coupon-info/api';
 import { getRoutePathByName } from '@/utils/router';
 import { useNavBar } from '@/composables/useNavBar';
@@ -272,7 +271,7 @@ const getLeftPath = computed(() => {
 const chooseDateInfo = ref<DatePickerInfo<Dayjs>>({
 	label: 'endDate',
 	labelName: '有效期至',
-	selectValue: dayjs(),
+	selectValue: nowDayjs(),
 	showFlag: false,
 	formatter: datePickerFormatter,
 });
@@ -372,7 +371,7 @@ const init = async () => {
 		if (code == '200') {
 			formInfo.value = data || {};
 			if (formInfo.value.endDate) {
-				formInfo.value.endDate = dayjs(formInfo.value.endDate);
+				formInfo.value.endDate = formatDayjs(formInfo.value.endDate);
 			}
 			if (formInfo.value.paymentStatus === undefined) {
 				formInfo.value.paymentStatus = 0;
@@ -382,11 +381,11 @@ const init = async () => {
 		}
 	} else {
 		formInfo.value = {
-			endDate: dayjs(),
+			endDate: nowDayjs(),
 			paymentStatus: 0,
 		};
 	}
-	initInfoDate((formInfo.value?.endDate as Dayjs) || dayjs());
+	initInfoDate(formatDayjs(formInfo.value?.endDate));
 };
 
 // 6. Lifecycle

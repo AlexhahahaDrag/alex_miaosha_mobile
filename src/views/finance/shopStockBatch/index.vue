@@ -116,7 +116,6 @@ import type { ShopStockBatchData } from './config';
 import { getShopStockBatchPage, deleteShopStockBatch } from '@/views/finance/shopStockBatch/api';
 import { getUserManagerList } from '@/views/user/userManager/api';
 import { useNavBar } from '@/composables/useNavBar';
-import { usePagination } from '@/composables/usePagination';
 import type { PageInfo } from '@/views/common/config';
 import type { UserManagerData } from '@/views/user/userManager/config';
 

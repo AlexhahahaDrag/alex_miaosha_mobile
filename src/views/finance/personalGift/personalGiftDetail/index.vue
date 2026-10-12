@@ -58,14 +58,13 @@
 </template>
 
 <script setup lang="ts">
-import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
 import { rulesRef, type PersonalGiftData, labelMap } from '../config';
 import { getPersonalGiftDetail, addPersonalGift, editPersonalGift } from '../api/personalGiftTs';
 import { getListName } from '@/views/common/config';
 import type { Info } from '@/views/common/pop/selectPop.vue';
 import { getRoutePathByName } from '@/utils/router';
-import { datePickerFormatter } from '@/utils/dayjs';
+import { datePickerFormatter, formatDayjs, nowDayjs, type Dayjs } from '@/utils/dayjs';
 import type { DatePickerInfo } from '@/utils/common';
 import type { DictInfo } from '@/views/finance/dict/api';
 import { getDictList } from '@/views/finance/dict/api';
@@ -178,7 +177,7 @@ const chooseDateInfo = ref<DatePickerInfo<Dayjs>>({
 	label: 'eventTime',
 	labelName: labelMap.eventTime,
 	rule: rulesRef.eventTime,
-	selectValue: dayjs(),
+	selectValue: nowDayjs(),
 	showFlag: false,
 	formatter: datePickerFormatter,
 });
@@ -253,17 +252,17 @@ const init = async () => {
 	if (id) {
 		if (detailRes.code == '200') {
 			formInfo.value = detailRes?.data || {};
-			formInfo.value.eventTime = dayjs(formInfo.value.eventTime);
+			formInfo.value.eventTime = formatDayjs(formInfo.value.eventTime);
 		} else {
 			showFailToast((detailRes as { message?: string })?.message || '查询详情失败，请联系管理员!');
 		}
 	} else {
 		formInfo.value = {
-			eventTime: dayjs(),
+			eventTime: nowDayjs(),
 		};
 	}
 	getDictInfoList(dictRes?.data || []);
-	initInfoDate((formInfo.value?.eventTime as Dayjs) || dayjs());
+	initInfoDate((formInfo.value?.eventTime as Dayjs) || nowDayjs());
 };
 
 init();

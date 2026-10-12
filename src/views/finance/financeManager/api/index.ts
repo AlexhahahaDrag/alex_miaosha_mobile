@@ -94,3 +94,17 @@ export function getBudgetCategories(
 		belongTo,
 	});
 }
+
+// AI 智能预算测算推荐
+export function recommendBudget(
+	params: import('../config').FinanceBudgetAiRecommendReq,
+): Promise<ResponseBody<import('../config').FinanceBudgetAiRecommendVo>> {
+	return postData(`${baseService.finance + baseFinanceBudget}/ai/recommend`, params);
+}
+
+// AI 自然语言一句话预算指令解析
+export function parseBudgetCommand(
+	params: import('../config').FinanceBudgetAiParseReq,
+): Promise<ResponseBody<import('../config').FinanceBudgetAiParseVo>> {
+	return postData(`${baseService.finance + baseFinanceBudget}/ai/parse`, params);
+}

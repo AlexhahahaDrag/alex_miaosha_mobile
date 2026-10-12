@@ -162,14 +162,12 @@
 </template>
 
 <script setup lang="ts">
-import dayjs from 'dayjs';
 import { showFailToast } from 'vant';
 import { useGiftEventTypeOptions } from '@/composables/useGiftEventTypeOptions';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
-import { usePagination } from '@/composables/usePagination';
 import { usePermission } from '@/composables/usePermission';
-import { formatTime } from '@/utils/dayjs';
+import { formatTime, formatDayjs } from '@/utils/dayjs';
 import { getRoutePathByName } from '@/utils/router';
 import { getGiftEventBusinessPage, getGiftEventSummary } from '@/views/finance/gift/event/api';
 import type { GiftEventBusinessInfo, GiftEventQuery, GiftEventSummary } from '@/views/finance/gift/config';
@@ -186,12 +184,12 @@ const { hasPermission } = usePermission();
 const { quickEvents, presetOptions, customOptions, loadEventTypeOptions, eventLabel, resolveFilterEventType } =
 	useGiftEventTypeOptions();
 
-const loading = ref(false);
-const refreshing = ref(false);
-const finished = ref(false);
-const filterExpanded = ref(false);
-const showTypeSheet = ref(false);
-const showCalendar = ref(false);
+const loading = ref<boolean>(false);
+const refreshing = ref<boolean>(false);
+const finished = ref<boolean>(false);
+const filterExpanded = ref<boolean>(false);
+const showTypeSheet = ref<boolean>(false);
+const showCalendar = ref<boolean>(false);
 const dataSource = ref<GiftEventBusinessInfo[]>([]);
 const searchInfo = ref<GiftEventQuery>({});
 const summary = ref<GiftEventSummary>({});
@@ -211,7 +209,7 @@ const eventTypeFilterLabel = computed(() => {
 const eventTimeRangeLabel = computed(() => {
 	const { eventTimeStart, eventTimeEnd } = searchInfo.value;
 	if (!eventTimeStart || !eventTimeEnd) return '全部时间';
-	return `${dayjs(eventTimeStart).format('MM-DD')} ~ ${dayjs(eventTimeEnd).format('MM-DD')}`;
+	return `${formatDayjs(eventTimeStart).format('MM-DD')} ~ ${formatDayjs(eventTimeEnd).format('MM-DD')}`;
 });
 
 const typeSheetActions = computed<TypeSheetAction[]>(() => [
@@ -313,8 +311,8 @@ const onConfirmCalendar = (values: Date[]) => {
 		return;
 	}
 	const [start, end] = values;
-	searchInfo.value.eventTimeStart = dayjs(start).startOf('day').format('YYYY-MM-DDTHH:mm:ss');
-	searchInfo.value.eventTimeEnd = dayjs(end).endOf('day').format('YYYY-MM-DDTHH:mm:ss');
+	searchInfo.value.eventTimeStart = formatDayjs(start).startOf('day').format('YYYY-MM-DDTHH:mm:ss');
+	searchInfo.value.eventTimeEnd = formatDayjs(end).endOf('day').format('YYYY-MM-DDTHH:mm:ss');
 	showCalendar.value = false;
 	navigator.vibrate?.(50);
 	refresh();

@@ -23,9 +23,7 @@
 						<span class="amount">{{ couponInfo?.unitValue || '0.00' }}</span>
 					</div>
 				</div>
-				<div class="validity-tag">
-					有效期至 {{ couponInfo?.endDate ? dayjs(couponInfo.endDate).format('YYYY-MM-DD') : '----' }}
-				</div>
+				<div class="validity-tag"> 有效期至 {{ couponInfo?.endDate ? formatDate(couponInfo.endDate) : '----' }} </div>
 			</div>
 
 			<div class="hero-divider"></div>
@@ -183,7 +181,7 @@
 							<span>领取时间</span>
 						</div>
 						<div class="item-right">
-							{{ couponInfo?.createTime ? dayjs(couponInfo.createTime).format('YYYY-MM-DD HH:mm:ss') : '----' }}
+							{{ couponInfo?.createTime ? formatTime(couponInfo.createTime) : '----' }}
 						</div>
 					</div>
 				</div>
@@ -245,14 +243,13 @@
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-import dayjs from 'dayjs';
 import { getCpnCouponInfoDetail } from '@/views/cpn-coupon/cpn-coupon-info/api';
 import { redeemCpnUserCouponInfo } from '@/views/cpn-coupon/cpn-user-coupon-info/api';
 import { getUserManagerList } from '@/views/user/userManager/api';
 import type { Info } from '@/views/common/pop/selectPop.vue';
 import type { UserManagerData } from '@/views/user/userManager/config';
 import { getRoutePathByName } from '@/utils/router';
-import { datePickerFormatter } from '@/utils/dayjs';
+import { formatDate, formatTime, nowDayjs, datePickerFormatter, type Dayjs } from '@/utils/dayjs';
 import type { CpnCouponInfoData } from '@/views/cpn-coupon/cpn-coupon-info/config';
 import { useUserStore } from '@/store/modules/user/user';
 import { useNavBar } from '@/composables/useNavBar';
@@ -271,7 +268,7 @@ const getLeftPath = computed(() => {
 });
 
 const couponInfo = ref<CpnCouponInfoData | null>(null);
-const redeemTime = ref<dayjs.Dayjs>(dayjs());
+const redeemTime = ref<Dayjs>(nowDayjs());
 const redeemForm = ref<{
 	userId?: string;
 	couponId?: string;
@@ -309,7 +306,7 @@ const userInfo = ref<Info>({
 	list: [],
 });
 
-const chooseDateInfo = ref<DatePickerInfo<dayjs.Dayjs>>({
+const chooseDateInfo = ref<DatePickerInfo<Dayjs>>({
 	label: 'redeemTime',
 	labelName: '核销时间',
 	selectValue: redeemTime.value,
@@ -362,7 +359,7 @@ const chooseDate = () => {
 	chooseDateInfo.value.showFlag = true;
 };
 
-const onDateSelect = (date: dayjs.Dayjs) => {
+const onDateSelect = (date: Dayjs) => {
 	redeemTime.value = date;
 	chooseDateInfo.value.showFlag = false;
 };

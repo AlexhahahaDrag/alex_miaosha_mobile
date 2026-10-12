@@ -97,8 +97,8 @@ const props = withDefaults(
 const { hasPermission } = usePermission();
 
 const visible = computed(() => hasPermission('gift:view'));
-const loading = ref(false);
-const contextLoading = ref(false);
+const loading = ref<boolean>(false);
+const contextLoading = ref<boolean>(false);
 const error = ref('');
 const summary = ref('');
 const streamText = ref('');

@@ -45,8 +45,6 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue';
-
 // [Emits]
 const emit = defineEmits(['update:modelValue', 'load']);
 

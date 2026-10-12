@@ -1,5 +1,5 @@
-import type { Dayjs } from 'dayjs';
-import type { ShopStockData } from '../shopStock/config';
+﻿import type { ShopStockData } from '../shopStock/config';
+import type { Dayjs } from '@/utils/dayjs';
 
 export interface SaleOrderInfo {
 	id?: string;

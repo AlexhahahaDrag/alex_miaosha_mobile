@@ -123,7 +123,6 @@
 import { showSuccessToast, showFailToast } from 'vant';
 import type { RoleUserInfoData as RoleUserInfoSearch } from './roleUserInfoTs';
 import { useNavBar } from '@/composables/useNavBar';
-import { usePagination } from '@/composables/usePagination';
 import { getRoleUserInfoPage, deleteRoleUserInfo } from '@/views/user/roleUserInfo/api';
 import { getUserManagerList } from '@/views/user/userManager/api';
 import { getRoleInfoList } from '@/views/user/roleInfo/api';

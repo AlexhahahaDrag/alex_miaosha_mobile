@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import dayjs from 'dayjs';
+import { formatTime } from '@/utils/dayjs';
 import { piniaPersistConfig } from '@/config/piniaPersist';
 
 interface DashboardState {
@@ -19,7 +19,7 @@ export const useDashboardStore = defineStore('app-dashboard', {
 
 	actions: {
 		updateSaveTime(moduleTitle: string, time?: string) {
-			const timestamp = time || dayjs().format('YYYY-MM-DD HH:mm:ss');
+			const timestamp = time || formatTime();
 			this.lastSaveTimes[moduleTitle] = timestamp;
 		},
 

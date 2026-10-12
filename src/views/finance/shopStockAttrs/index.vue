@@ -116,7 +116,6 @@ import type { ShopStockAttrsData } from './config';
 import type { UserManagerData } from '@/views/user/userManager/config';
 import { getShopStockAttrsPage, deleteShopStockAttrs } from '@/views/finance/shopStockAttrs/api';
 import { getUserManagerList } from '@/views/user/userManager/api';
-import { usePagination } from '@/composables/usePagination';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
 import type { PageInfo } from '@/views/common/config/index';

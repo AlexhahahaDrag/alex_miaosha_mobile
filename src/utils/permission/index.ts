@@ -129,10 +129,13 @@ export const isSuperAdmin = (
 
 export const canAccessPermission = (
 	permissionSet: Set<string>,
-	permissionCode?: string,
+	permissionCode?: string | string[],
 	superAdmin = false,
 ) => {
 	if (superAdmin) return true;
 	if (!permissionCode) return false;
+	if (Array.isArray(permissionCode)) {
+		return permissionCode.some((code) => permissionSet.has(code));
+	}
 	return permissionSet.has(permissionCode);
 };

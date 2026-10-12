@@ -225,14 +225,12 @@
 	</div>
 </template>
 <script lang="ts" setup>
-import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
 import type { CpnCouponInfoData } from './config';
 import { debounce } from '@/utils/common';
-import { usePagination } from '@/composables/usePagination';
 import type { PageInfo } from '@/views/common/config';
 import { getRoutePathByName } from '@/utils/router';
-import { formatDate } from '@/utils/dayjs';
+import { formatDate, formatDayjs, nowDayjs, type Dayjs } from '@/utils/dayjs';
 import { getCpnCouponInfoPage, deleteCpnCouponInfo } from '@/views/cpn-coupon/cpn-coupon-info/api';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
@@ -372,7 +370,7 @@ const getTimePresetLabel = (value: TimePreset) => {
 			return '当月';
 		case 'custom':
 			if (customDateRange.value) {
-				return `${dayjs(customDateRange.value[0]).format('MM/DD')} - ${dayjs(customDateRange.value[1]).format('MM/DD')}`;
+				return `${formatDate(customDateRange.value[0], 'MM/DD')} - ${formatDate(customDateRange.value[1], 'MM/DD')}`;
 			}
 			return '自定义';
 		default:
@@ -381,7 +379,7 @@ const getTimePresetLabel = (value: TimePreset) => {
 };
 
 const getTimeBoundary = (): { start: Dayjs; end: Dayjs } | null => {
-	const now = dayjs();
+	const now = nowDayjs();
 
 	switch (activeTimePreset.value) {
 		case 'today':
@@ -395,8 +393,8 @@ const getTimeBoundary = (): { start: Dayjs; end: Dayjs } | null => {
 				return null;
 			}
 			return {
-				start: dayjs(customDateRange.value[0]).startOf('day'),
-				end: dayjs(customDateRange.value[1]).endOf('day'),
+				start: formatDayjs(customDateRange.value[0]).startOf('day'),
+				end: formatDayjs(customDateRange.value[1]).endOf('day'),
 			};
 		default:
 			return null;

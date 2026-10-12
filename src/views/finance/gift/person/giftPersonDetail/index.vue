@@ -334,14 +334,14 @@ const personId = computed(() => {
 
 const mode = ref<'profile' | 'form'>('form');
 const isProfileMode = computed(() => mode.value === 'profile');
-const saving = ref(false);
-const deleting = ref(false);
-const uploadingAvatar = ref(false);
-const showRelationPicker = ref(false);
+const saving = ref<boolean>(false);
+const deleting = ref<boolean>(false);
+const uploadingAvatar = ref<boolean>(false);
+const showRelationPicker = ref<boolean>(false);
 const formState = ref<GiftPersonFormState>({});
 const profile = ref<GiftPersonProfile>({});
-const phoneVisible = ref(false);
-const remarkExpanded = ref(false);
+const phoneVisible = ref<boolean>(false);
+const remarkExpanded = ref<boolean>(false);
 /** 本地头像预览（上传成功或详情回填） */
 const avatarPreviewUrl = ref('');
 

@@ -98,13 +98,10 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { showSuccessToast, showFailToast } from 'vant';
-import dayjs from 'dayjs';
 import type { ShopFinanceData } from './config';
-import { usePagination } from '@/composables/usePagination';
-import { formatHeaderDate } from '@/utils/dayjs';
+import { formatHeaderDate, formatDate } from '@/utils/dayjs';
 import { getShopFinancePage, deleteShopFinance } from '@/views/finance/shopFinance/api';
 import { useNavBar } from '@/composables/useNavBar';
 import type { PageInfo } from '@/views/common/config';
@@ -136,7 +133,7 @@ const groupedDataSource = computed(() => {
 	const groups: { date: string; items: ShopFinanceData[] }[] = [];
 	dataSource.value.forEach((item) => {
 		if (!item.saleDate) return;
-		const dateStr = dayjs(item.saleDate).format('YYYY-MM-DD');
+		const dateStr = formatDate(item.saleDate);
 		let group = groups.find((g) => g.date === dateStr);
 		if (!group) {
 			group = { date: dateStr, items: [] };

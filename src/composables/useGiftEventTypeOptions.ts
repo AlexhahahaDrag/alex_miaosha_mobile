@@ -1,4 +1,3 @@
-import { ref, computed } from 'vue';
 import { getGiftEventTypeOptions } from '@/views/finance/gift/event/api';
 import {
 	FALLBACK_GIFT_EVENT_OPTIONS,
@@ -17,8 +16,8 @@ import {
 
 const presetOptions = ref<GiftEventTypeOptionItem[]>([...FALLBACK_GIFT_EVENT_OPTIONS]);
 const customOptions = ref<GiftEventTypeOptionItem[]>([]);
-const loading = ref(false);
-const loaded = ref(false);
+const loading = ref<boolean>(false);
+const loaded = ref<boolean>(false);
 
 export function useGiftEventTypeOptions() {
 	const giftEventTypeOptions = computed(() => toSelectOptions(presetOptions.value));

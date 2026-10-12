@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<van-form required="auto">
 		<van-cell-group>
 			<van-field
@@ -63,10 +63,9 @@
 </template>
 
 <script setup lang="ts">
-import type { Dayjs } from 'dayjs';
-import dayjs from 'dayjs';
 import { showFailToast } from 'vant';
 import { label } from './shopOrderDetailTs';
+import { formatDate, formatDayjs, nowDayjs, type Dayjs } from '@/utils/dayjs';
 import { useNavBar } from '@/composables/useNavBar';
 import { getListName } from '@/views/common/config';
 import { getShopOrderDetail } from '@/views/finance/shopOrder/api';
@@ -107,7 +106,7 @@ const saleDateName = ref<string>('');
 const saleDateInfo = ref<DatePickerInfo<Dayjs>>({
 	label: 'saleDate',
 	labelName: label.saleDate,
-	selectValue: dayjs(),
+	selectValue: nowDayjs(),
 	showFlag: false,
 	formatter: (type: string, option: { text: string }) => {
 		if (type === 'year') {
@@ -136,8 +135,8 @@ function initInfoDate(infoDate: Dayjs | string | undefined, type: string): void 
 	if (infoDate) {
 		switch (type) {
 			case 'saleDate':
-				saleDateName.value = dayjs(infoDate).format('YYYY-MM-DD');
-				saleDateInfo.value.selectValue = dayjs(infoDate);
+				saleDateName.value = formatDate(infoDate);
+				saleDateInfo.value.selectValue = formatDayjs(infoDate);
 				break;
 		}
 	}
@@ -165,7 +164,7 @@ async function init(): Promise<void> {
 		const { code, data, message } = await getDictList('is_valid');
 		getDictInfoList(code, data as DictInfo[] | undefined, message);
 		formInfo.value = {
-			saleDate: dayjs(),
+			saleDate: nowDayjs(),
 		};
 		initInfoDate(formInfo.value.saleDate, 'saleDate');
 	}

@@ -1,4 +1,4 @@
-import type { Dayjs } from 'dayjs';
+﻿import type { Dayjs } from '@/utils/dayjs';
 
 export const label = reactive({
 	shopName: '商品名称',

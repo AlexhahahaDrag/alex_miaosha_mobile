@@ -1,4 +1,3 @@
-import { onMounted, onUnmounted } from 'vue';
 import { useNavBarStore } from '@/store/modules/navbar';
 
 export interface NavBarConfig {

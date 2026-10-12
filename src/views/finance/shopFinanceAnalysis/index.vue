@@ -46,11 +46,9 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive } from 'vue';
 import { useRoute } from 'vue-router';
-import dayjs, { type Dayjs } from 'dayjs';
 import { useNavBar } from '@/composables/useNavBar';
-import { datePickerFormatter } from '@/utils/dayjs';
+import { datePickerFormatter, formatMonth, nowDayjs, type Dayjs } from '@/utils/dayjs';
 import type { DatePickerInfo } from '@/utils/common';
 
 const route = useRoute();
@@ -63,7 +61,6 @@ useNavBar({
 });
 
 const DATE_FORMATTER = 'YYYY年MM月';
-const DATE_FORMAT_YYYYMM = 'YYYY-MM';
 
 const activeTab = ref<string>('2');
 
@@ -74,7 +71,7 @@ interface ShopFinanceAnalysisProps {
 
 const props = reactive<ShopFinanceAnalysisProps>({
 	activeTab: activeTab.value,
-	dateStr: dayjs().format(DATE_FORMAT_YYYYMM),
+	dateStr: formatMonth(),
 });
 
 const changeTab = (name: string) => {
@@ -82,7 +79,7 @@ const changeTab = (name: string) => {
 	activeTab.value = name;
 };
 
-const infoDateName = ref<string>(dayjs().format(DATE_FORMATTER));
+const infoDateName = ref<string>(nowDayjs().format(DATE_FORMATTER));
 
 const chooseDate = () => {
 	chooseDateInfo.value.showFlag = true;
@@ -91,7 +88,7 @@ const chooseDate = () => {
 const chooseDateInfo = ref<DatePickerInfo<Dayjs>>({
 	label: 'infoDate',
 	labelName: '月份选择',
-	selectValue: dayjs(),
+	selectValue: nowDayjs(),
 	showFlag: false,
 	columnsType: ['year', 'month'],
 	formatter: datePickerFormatter,
@@ -99,7 +96,7 @@ const chooseDateInfo = ref<DatePickerInfo<Dayjs>>({
 
 const selectDateInfo = (dateInfo: Dayjs, dateName: string) => {
 	chooseDateInfo.value.showFlag = false;
-	props.dateStr = dayjs(dateInfo).format(DATE_FORMAT_YYYYMM);
+	props.dateStr = formatMonth(dateInfo);
 	infoDateName.value = dateName;
 	chooseDateInfo.value.selectValue = dateInfo;
 };

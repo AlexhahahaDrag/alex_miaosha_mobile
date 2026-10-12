@@ -1,4 +1,3 @@
-import { computed } from 'vue';
 import { useUserStore } from '@/store/modules/user/user';
 import {
 	buildPermissionSet,
@@ -11,7 +10,7 @@ export const usePermission = () => {
 	const context = computed(() => userStore.getPermissionContext);
 	const permissionSet = computed(() => buildPermissionSet(context.value));
 
-	const hasPermission = (permissionCode?: string) =>
+	const hasPermission = (permissionCode?: string | string[]) =>
 		canAccessPermission(permissionSet.value, permissionCode, judgeSuperAdmin(context.value));
 
 	return {

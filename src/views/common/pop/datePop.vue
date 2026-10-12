@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import dayjs, { type Dayjs } from 'dayjs';
+import { formatDayjs, type Dayjs } from '@/utils/dayjs';
 import type { DatePickerInfo } from '@/utils/common';
 
 interface Props {
@@ -49,7 +49,7 @@ const onConfirm = ({ selectedValues }: { selectedValues: string[] }) => {
 		dateStr = '';
 		dateName = '';
 	}
-	emit('select-date-info', dayjs(dateStr), dateName, props.info.label);
+	emit('select-date-info', formatDayjs(dateStr), dateName, props.info.label);
 };
 
 /**
@@ -75,7 +75,7 @@ watch(
 	(newVal) => {
 		showFlag.value = !!newVal;
 		if (newVal && props.info.selectValue) {
-			const date = dayjs(props.info.selectValue);
+			const date = formatDayjs(props.info.selectValue);
 			const columnsType = (props.info.columnsType || ['year', 'month', 'day']) as string[];
 			const values: string[] = [];
 

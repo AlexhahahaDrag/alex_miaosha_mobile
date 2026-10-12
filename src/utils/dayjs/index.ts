@@ -18,23 +18,35 @@ dayjs.prototype.toISOString = function () {
 };
 
 /**
- * 格式化为 dayjs 对象
+ * 支持的日期/时间入参类型
  */
-const formatDayjs = (date: string | Dayjs | undefined | null): Dayjs | undefined => {
-	if (!date) {
-		return undefined;
-	}
+export type DateInput = string | number | Date | Dayjs | null | undefined;
 
-	return dayjs(date);
+/**
+ * 格式化为 dayjs 对象（不传参数时默认返回当前时间的 Dayjs 对象）
+ */
+const formatDayjs = (date?: DateInput): Dayjs => {
+	return date ? dayjs(date) : dayjs();
+};
+
+/**
+ * 获取当前时间的 Dayjs 实例
+ */
+const nowDayjs = (): Dayjs => dayjs();
+
+/**
+ * 按天数进行增减运算（默认基准为当前时间）
+ * @param days 增加的天数（负数代表减少）
+ * @param baseDate 基准时间（可选，默认当前时间）
+ */
+const addDays = (days: number, baseDate?: DateInput): Dayjs => {
+	return (baseDate ? dayjs(baseDate) : dayjs()).add(days, 'day');
 };
 
 /**
  * 格式化日期
  */
-const formatDate = (
-	date: string | Dayjs | undefined | null,
-	dateFormat: string = defaultDateFormat,
-): string => {
+const formatDate = (date?: DateInput, dateFormat: string = defaultDateFormat): string => {
 	if (!date) {
 		return '';
 	}
@@ -45,15 +57,16 @@ const formatDate = (
 /**
  * 格式化时间
  */
-const formatTime = (
-	date: string | Dayjs | undefined | null,
-	dateFormat: string = defaultTimeFormat,
-): string => {
-	if (!date) {
-		return '';
-	}
+const formatTime = (date?: DateInput, dateFormat: string = defaultTimeFormat): string => {
+	return formatDate(date, dateFormat);
+};
 
-	return dayjs(date).format(dateFormat);
+/**
+ * 格式化月份 (YYYY-MM)
+ * @param date 时间（可选，默认当前时间）
+ */
+const formatMonth = (date?: DateInput): string => {
+	return (date ? dayjs(date) : dayjs()).format(dateFormatYYYYMM);
 };
 
 /**
@@ -116,6 +129,31 @@ const formatHeaderDate = (date: string | Dayjs): string => {
 	return target.format('YYYY年MM月DD日');
 };
 
+/**
+ * 获取指定月份的起止日期字符串 [月初, 月末]
+ * @param dateOrOffset 支持月份偏移量（如 -1 上月, 0 本月, 1 下月）或指定日期/月份
+ * @returns [月初, 月末] 格式为 YYYY-MM-DD
+ */
+const getMonthRange = (dateOrOffset: number | string | Dayjs = 0) => {
+	const target =
+		typeof dateOrOffset === 'number' ? dayjs().add(dateOrOffset, 'month') : dayjs(dateOrOffset);
+	return [
+		target.startOf('month').format(defaultDateFormat),
+		target.endOf('month').format(defaultDateFormat),
+	] as const;
+};
+
+/**
+ * 获取指定月份的起止 Dayjs 对象 [月初, 月末]
+ * @param dateOrOffset 支持月份偏移量（如 -1 上月, 0 本月）或指定日期/月份
+ */
+const getMonthRangeDayjs = (dateOrOffset: number | string | Dayjs = 0): [Dayjs, Dayjs] => {
+	const target =
+		typeof dateOrOffset === 'number' ? dayjs().add(dateOrOffset, 'month') : dayjs(dateOrOffset);
+	return [target.startOf('month'), target.endOf('month')];
+};
+
+export type { Dayjs, DateInput };
 export {
 	defaultDateFormat,
 	defaultTimeFormat,
@@ -124,7 +162,12 @@ export {
 	formatDate,
 	formatDayjs,
 	formatTime,
+	formatMonth,
 	datePickerFormatter,
 	getFormatTimeInfo,
 	formatHeaderDate,
+	getMonthRange,
+	getMonthRangeDayjs,
+	nowDayjs,
+	addDays,
 };

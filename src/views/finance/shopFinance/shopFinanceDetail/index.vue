@@ -189,7 +189,6 @@
 </template>
 
 <script setup lang="ts">
-import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
 import { rulesRef, type ShopFinanceData } from '@/views/finance/shopFinance/config';
 import { getListName, type DictFieldConfig } from '@/views/common/config';
@@ -199,7 +198,7 @@ import { getDictList } from '@/views/finance/dict/api';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
 import { getRoutePathByName } from '@/utils/router';
-import { datePickerFormatter } from '@/utils/dayjs';
+import { datePickerFormatter, formatDayjs, nowDayjs, type Dayjs } from '@/utils/dayjs';
 import type { DatePickerInfo } from '@/utils/common';
 import type { DictInfo } from '@/views/finance/dict/api';
 
@@ -309,7 +308,7 @@ const chooseDateInfo = ref<DatePickerInfo<Dayjs>>({
 	label: 'saleDate',
 	labelName: '销售日期',
 	rule: rulesRef.saleDate,
-	selectValue: dayjs(),
+	selectValue: nowDayjs(),
 	showFlag: false,
 	formatter: datePickerFormatter,
 });
@@ -381,13 +380,13 @@ const init = async () => {
 		if (id) {
 			if (detailRes.code === '200') {
 				formInfo.value = detailRes.data || {};
-				formInfo.value.saleDate = dayjs(formInfo.value.saleDate);
+				formInfo.value.saleDate = formatDayjs(formInfo.value.saleDate);
 			} else {
 				showFailToast((detailRes as { message?: string })?.message || '查询详情失败，请联系管理员!');
 			}
 		} else {
 			formInfo.value = {
-				saleDate: dayjs(),
+				saleDate: nowDayjs(),
 				isValid: '1',
 				incomeAndExpenses: 'income',
 				payWay: 'wx',
@@ -396,7 +395,7 @@ const init = async () => {
 		}
 
 		getDictInfoList(dictRes?.data || []);
-		initSaleDate((formInfo.value.saleDate as Dayjs) || dayjs());
+		initSaleDate((formInfo.value.saleDate as Dayjs) || nowDayjs());
 	} catch (error) {
 		// eslint-disable-next-line no-console
 		console.error('init error:', error);

@@ -73,10 +73,8 @@
 - **使用样例**:
 
   ```ts
-  import { usePagination } from '@/composables/usePagination';
-
   const { pagination, resetPagination, setTotal, nextPage } = usePagination();
-  const finished = ref(false);
+  const finished = ref<boolean>(false);
 
   // 初始化或重新搜索时：
   resetPagination(); // 重置 current=1, total=0

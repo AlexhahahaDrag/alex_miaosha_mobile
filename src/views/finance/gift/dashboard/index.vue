@@ -46,7 +46,6 @@
 <script setup lang="ts">
 import { showFailToast } from 'vant';
 import { useNavBar } from '@/composables/useNavBar';
-import { usePagination } from '@/composables/usePagination';
 import CommonPullRefresh from '@/views/components/CommonPullRefresh.vue';
 import CommonList from '@/views/components/CommonList.vue';
 import GiftRecordCard from '@/views/finance/gift/components/GiftRecordCard.vue';
@@ -56,9 +55,9 @@ import { formatMoney } from '@/views/finance/gift/config';
 
 useNavBar({ title: '数据概览', visible: true });
 
-const loading = ref(false);
-const refreshing = ref(false);
-const finished = ref(false);
+const loading = ref<boolean>(false);
+const refreshing = ref<boolean>(false);
+const finished = ref<boolean>(false);
 const records = ref<GiftRecordInfo[]>([]);
 const summary = reactive({ receive: 0, give: 0, pendingCount: 0 });
 const { pagination, resetPagination, setTotal, nextPage } = usePagination();

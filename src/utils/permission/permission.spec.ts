@@ -25,5 +25,7 @@ describe('permission utils', () => {
 		const set = buildPermissionSet(ctx);
 		expect(canAccessPermission(set, 'gift:edit', false)).toBe(false);
 		expect(canAccessPermission(set, 'gift:view', false)).toBe(true);
+		expect(canAccessPermission(set, ['gift:edit', 'gift:view'], false)).toBe(true);
+		expect(canAccessPermission(set, ['gift:edit', 'gift:delete'], false)).toBe(false);
 	});
 });

@@ -167,7 +167,6 @@
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-import dayjs from 'dayjs';
 import { label, rulesRef } from '@/views/finance/shopStockBatch/config';
 import type { ShopStockBatchData } from '@/views/finance/shopStockBatch/config';
 import { getListName } from '@/views/common/config';
@@ -269,10 +268,9 @@ const init = async () => {
 		const [detailRes, dictRes] = await Promise.all([
 			id
 				? getShopStockBatchDetail(id)
-				: Promise.resolve({ code: '200', data: { isValid: '1', purchaseDate: formatDate(dayjs()) } }),
+				: Promise.resolve({ code: '200', data: { isValid: '1', purchaseDate: formatDate() } }),
 			getDictList('is_valid'),
 		]);
-		console.log('1111111111111111111111111', detailRes.data);
 		if (detailRes.code == '200') {
 			formInfo.value = detailRes.data || {};
 			if (!formInfo.value.id && !formInfo.value.isValid) {

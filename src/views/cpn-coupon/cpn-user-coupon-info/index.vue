@@ -110,7 +110,6 @@
 import { showSuccessToast, showFailToast, showConfirmDialog } from 'vant';
 import type { CpnUserCouponInfoData } from './config';
 import { statusOptions } from './config';
-import { usePagination } from '@/composables/usePagination';
 import type { PageInfo } from '@/views/common/config';
 import { getFormatTimeInfo } from '@/utils/dayjs';
 import { getCpnUserCouponInfoPage, cancelRedeemCpnUserCouponInfo } from '@/views/cpn-coupon/cpn-user-coupon-info/api';

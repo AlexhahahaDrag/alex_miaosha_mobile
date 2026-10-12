@@ -130,9 +130,7 @@
 								<span class="currency-symbol">{{ (budgetStatus?.remainingAmount ?? 0) < 0 ? '-¥' : '¥' }}</span>{{ formatAmount(Math.abs(budgetStatus?.remainingAmount || 0)) }}
 							</span>
 						</div>
-						<span class="percent-pill">
-							{{ budgetStatus?.usagePercent || 0 }}%
-						</span>
+						<span class="percent-pill"> {{ budgetStatus?.usagePercent || 0 }}% </span>
 						<div class="toggle-arrow-btn">
 							<van-icon
 								name="arrow-down"
@@ -180,7 +178,7 @@
 								<div
 									:class="[
 										'amount-value',
-										(budgetStatus?.actualExpense ?? 0) <= 0 ? 'surplus' : (budgetStatus?.isOverBudget ? 'over' : 'expense'),
+										(budgetStatus?.actualExpense ?? 0) <= 0 ? 'surplus' : budgetStatus?.isOverBudget ? 'over' : 'expense',
 									]"
 									title="点击联动查看当月已计明细"
 								>
@@ -235,6 +233,7 @@
 							</div>
 
 							<van-button
+								v-if="hasPermission(['finance:financeManager:budget:view', 'finance:financeManager:budget:edit'])"
 								size="small"
 								plain
 								round
@@ -242,9 +241,9 @@
 								icon="setting-o"
 								class="btn-edit-action"
 								data-testid="btn-edit-budget"
-								@click.stop="onOpenBudgetDialog"
+								@click.stop="onOpenBudgetManage"
 							>
-								预算设置
+								{{ canEditBudget ? '预算设置' : '预算详情' }}
 							</van-button>
 						</div>
 					</div>
@@ -332,178 +331,6 @@
 			@confirm="onConfirmCustomDate"
 		/>
 
-		<!-- 调整本月零花钱预算弹窗 (移动端触控胶囊Chip风格) -->
-		<van-dialog
-			v-model:show="showBudgetDialog"
-			title="调整本月零花钱预算"
-			show-cancel-button
-			data-testid="budget-dialog"
-			@confirm="onSaveBudget"
-		>
-			<div class="budget-dialog-content">
-				<div class="budget-month-banner">
-					<span class="month-label">预算月份:</span>
-					<span class="month-val">{{ currentMonthStr }}</span>
-					<span class="month-tip">每月独立保存，次月自动继承</span>
-				</div>
-
-				<van-field
-					v-model.number="budgetForm.budgetAmount"
-					type="number"
-					label="预算金额(元)"
-					placeholder="请输入预算金额"
-					input-align="right"
-					data-testid="input-budget-amount"
-					class="budget-amount-field"
-				/>
-
-				<div class="dialog-category-section">
-					<div class="section-header">
-						<div class="section-title">
-							<span>纳入统计分类</span>
-							<span class="selected-count">(已选 {{ budgetForm.categoryCodes.length }} 项)</span>
-						</div>
-						<div class="header-actions">
-							<span
-								class="action-btn"
-								@click="selectAllCategories"
-							>全选</span>
-							<span class="action-sep">|</span>
-							<span
-								class="action-btn"
-								@click="clearAllCategories"
-							>清空</span>
-						</div>
-					</div>
-
-					<div class="section-sub-label">收支类型 (支持单选或同时勾选)</div>
-					<div class="chip-group">
-						<div
-							:class="['chip-item', 'chip-item--expense', isDirectionSelected('expense') && 'active']"
-							@click="toggleDirection('expense')"
-						>
-							<van-icon
-								v-if="isDirectionSelected('expense')"
-								name="success"
-								class="chip-check"
-							/>
-							<span>支出 (消费)</span>
-						</div>
-						<div
-							:class="['chip-item', 'chip-item--income', isDirectionSelected('income') && 'active']"
-							@click="toggleDirection('income')"
-						>
-							<van-icon
-								v-if="isDirectionSelected('income')"
-								name="success"
-								class="chip-check"
-							/>
-							<span>收入</span>
-						</div>
-					</div>
-
-					<div class="section-sub-label category-sub-label">
-						<span>账目类别 (提取自上月及本月)</span>
-						<span
-							v-if="categoriesLoading"
-							class="loading-hint"
-						>加载中...</span>
-					</div>
-
-					<div
-						v-if="recentCategories.length"
-						class="chip-group category-chips"
-					>
-						<div
-							v-for="cat in recentCategories"
-							:key="cat"
-							:class="['chip-item', isCategorySelected(cat) && 'active']"
-							@click="toggleCategory(cat)"
-						>
-							<van-icon
-								v-if="isCategorySelected(cat)"
-								name="success"
-								class="chip-check"
-							/>
-							<span>{{ cat }}</span>
-						</div>
-					</div>
-					<div
-						v-else-if="!categoriesLoading"
-						class="empty-category-hint"
-					>
-						近两个月暂无具体记账类别，默认统计当前所选收支方向的全部记录
-					</div>
-				</div>
-
-				<!-- 实时试算与健康度模拟卡片 (对齐 PC 端) -->
-				<div class="dialog-simulation-card">
-					<div class="simulation-header">
-						<div class="simulation-title">
-							<van-icon
-								name="chart-trending-o"
-								class="simulation-icon"
-							/>
-							<span>实时试算与健康度模拟</span>
-						</div>
-						<span
-							v-if="previewStats.budget > 0"
-							:class="['simulation-status', previewStats.isOver ? 'simulation-status--over' : 'simulation-status--normal']"
-						>
-							{{ previewStats.isOver ? '预算已透支超额' : `已使用 ${previewStats.percent}%` }}
-						</span>
-						<span
-							v-else
-							class="simulation-status simulation-status--none"
-						>未设置限额</span>
-					</div>
-
-					<div class="simulation-grid">
-						<div class="simulation-cell">
-							<div class="cell-label">设定预算</div>
-							<div class="cell-val">
-								{{ previewStats.budget > 0 ? `¥${previewStats.budget.toFixed(2)}` : '无上限' }}
-							</div>
-						</div>
-						<div class="simulation-cell">
-							<div class="cell-label">本月已计</div>
-							<div class="cell-val">
-								<span
-									v-if="simulationLoading"
-									class="loading-text"
-								>计算中...</span>
-								<span v-else>{{ previewStats.actual < 0 ? '-' : '' }}¥{{ Math.abs(previewStats.actual).toFixed(2) }}</span>
-							</div>
-						</div>
-						<div class="simulation-cell">
-							<div class="cell-label">试算结余</div>
-							<div :class="['cell-val', previewStats.isOver ? 'cell-val--over' : 'cell-val--remain']">
-								<span
-									v-if="simulationLoading"
-									class="loading-text"
-								>计算中...</span>
-								<span v-else>{{ previewStats.remaining < 0 ? '-' : '' }}¥{{ Math.abs(previewStats.remaining).toFixed(2) }}</span>
-							</div>
-						</div>
-					</div>
-
-					<div
-						v-if="previewStats.budget > 0"
-						class="simulation-progress-wrap"
-					>
-						<van-progress
-							:percentage="Math.max(0, Math.min(previewStats.percent, 100))"
-							:color="previewStats.isOver ? '#e11d48' : '#1677ff'"
-							:show-pivot="false"
-							stroke-width="4"
-						/>
-					</div>
-				</div>
-
-				<div class="dialog-hint"> * 仅勾选的类别会计入预算，不勾选则默认统计当前所选收支方向的全部记录（不含转账）。 </div>
-			</div>
-		</van-dialog>
-
 		<van-back-top
 			target="#finance-manager-list"
 			:bottom="100"
@@ -512,29 +339,20 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
-import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
 import { useRoute, useRouter } from 'vue-router';
 import FinanceCard from './components/FinanceCard.vue';
 import { fromSourceTransferList, type FinanceManagerData, type FinanceBudgetStatusVo } from './config';
-import { usePagination } from '@/composables/usePagination';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
+import { usePermission } from '@/composables/usePermission';
 import type { PageInfo, DictInfo } from '@/views/common/config';
 import { getDictList } from '@/views/finance/dict/api';
-import {
-	deleteFinanceManager,
-	getFinanceMangerPage,
-	getBudgetStatus,
-	saveMonthlyBudget,
-	getBudgetCategories,
-	getFinanceSummary,
-} from '@/views/finance/financeManager/api';
+import { deleteFinanceManager, getFinanceMangerPage, getBudgetStatus } from '@/views/finance/financeManager/api';
 import { getUserManagerList } from '@/views/user/userManager/api';
 import type { UserManagerData } from '@/views/user/userManager/config';
 import type { ResponseBody } from '@/types/api';
-import { formatHeaderDate } from '@/utils/dayjs';
+import { formatHeaderDate, formatDate, formatMonth, formatDayjs, nowDayjs, type Dayjs } from '@/utils/dayjs';
 import { getRoutePathByName } from '@/utils/router';
 import { useDashboardStore } from '@/store/modules/dashboard/dashboard';
 
@@ -594,35 +412,16 @@ const activeTimePreset = ref<TimePreset>('all');
 const showCustomDatePicker = ref<boolean>(false);
 const customDateRange = ref<[Date, Date] | null>(null);
 
-const currentMonthStr = computed(() => dayjs().format('YYYY-MM'));
+const currentMonthStr = computed(() => formatMonth());
+const { hasPermission } = usePermission();
+const canEditBudget = computed(() => hasPermission('finance:financeManager:budget:edit'));
+const canAddFinance = computed(() => hasPermission('finance:financeManager:add'));
+
 const budgetStatus = ref<FinanceBudgetStatusVo | null>(null);
-const showBudgetDialog = ref<boolean>(false);
-const budgetForm = reactive({
-	budgetAmount: 0,
-	incomeAndExpenses: 'expense',
-	selectedDirections: ['expense'] as string[],
-	categoryCodes: [] as string[],
-});
 
-const isDirectionSelected = (dir: string) => {
-	return budgetForm.selectedDirections.includes(dir);
-};
-
-const toggleDirection = (dir: string) => {
-	if (navigator.vibrate) navigator.vibrate(20);
-	const current = [...budgetForm.selectedDirections];
-	const idx = current.indexOf(dir);
-	if (idx > -1) {
-		if (current.length === 1) {
-			showFailToast('收支类型至少保留一项');
-			return;
-		}
-		current.splice(idx, 1);
-	} else {
-		current.push(dir);
-	}
-	budgetForm.selectedDirections = current;
-	budgetForm.incomeAndExpenses = current.join(',');
+const onOpenBudgetManage = () => {
+	if (navigator.vibrate) navigator.vibrate(30);
+	router.push({ path: '/finance/financeManager/budgetManage' });
 };
 
 const mobileDirectionLabel = computed(() => {
@@ -700,7 +499,7 @@ const budgetHealthStatus = computed(() => {
 /**
  * 零花钱卡片常驻折叠机制 (平时极简42px展示余额与百分比，点击平滑展开全部信息)
  */
-const isBudgetCardExpanded = ref(false);
+const isBudgetCardExpanded = ref<boolean>(false);
 
 const toggleBudgetCardExpand = () => {
 	if (navigator.vibrate) navigator.vibrate(20);
@@ -710,7 +509,7 @@ const toggleBudgetCardExpand = () => {
 /**
  * 统计分类折叠机制 (Taste-Skill 空间减负 & 呼吸感重塑)
  */
-const isCategoriesExpanded = ref(false);
+const isCategoriesExpanded = ref<boolean>(false);
 
 const cleanedCategoryList = computed(() => {
 	const raw = budgetStatus.value?.categoryNames || budgetStatus.value?.categoryCodes || [];
@@ -738,51 +537,6 @@ const drillDownBudgetMonth = () => {
 	showSuccessToast('已联动筛选本月明细');
 };
 
-const recentCategories = ref<string[]>([]);
-const categoriesLoading = ref(false);
-
-const isCategorySelected = (val: string) => {
-	return budgetForm.categoryCodes.includes(val);
-};
-
-const toggleCategory = (val: string) => {
-	if (navigator.vibrate) navigator.vibrate(20);
-	const idx = budgetForm.categoryCodes.indexOf(val);
-	if (idx > -1) {
-		budgetForm.categoryCodes.splice(idx, 1);
-	} else {
-		budgetForm.categoryCodes.push(val);
-	}
-};
-
-const selectAllCategories = () => {
-	if (navigator.vibrate) navigator.vibrate(25);
-	budgetForm.categoryCodes = [...recentCategories.value];
-};
-
-const clearAllCategories = () => {
-	if (navigator.vibrate) navigator.vibrate(25);
-	budgetForm.categoryCodes = [];
-};
-
-const fetchRecentCategories = async () => {
-	categoriesLoading.value = true;
-	try {
-		const { code, data } = await getBudgetCategories(currentMonthStr.value, searchInfo.value.belongTo);
-		if (code === '200' && Array.isArray(data)) {
-			const cleanData = data.filter((c) => c !== '支出' && c !== '收入' && c !== 'expense' && c !== 'income');
-			const existingSelected = budgetForm.categoryCodes.filter(
-				(c) => c !== '支出' && c !== '收入' && c !== 'expense' && c !== 'income',
-			);
-			recentCategories.value = Array.from(new Set([...cleanData, ...existingSelected])).sort();
-		}
-	} catch (e) {
-		console.error('获取近两月记账类别失败:', e);
-	} finally {
-		categoriesLoading.value = false;
-	}
-};
-
 const loadBudgetStatus = async () => {
 	try {
 		const { code, data } = await getBudgetStatus(currentMonthStr.value, searchInfo.value.belongTo);
@@ -791,157 +545,6 @@ const loadBudgetStatus = async () => {
 		}
 	} catch (e) {
 		console.error('获取零花钱预算状态失败:', e);
-	}
-};
-
-const simulatedActualExpense = ref<number>(0);
-const simulationLoading = ref<boolean>(false);
-
-// 预算实时试算：根据当前弹窗选择的收支方向与自选分类动态调用汇总
-const fetchPreviewSimulation = async () => {
-	simulationLoading.value = true;
-	try {
-		const monthStart = dayjs().startOf('month').format('YYYY-MM-DD');
-		const monthEnd = dayjs().endOf('month').format('YYYY-MM-DD');
-		const effectiveCategoryCodes = budgetForm.categoryCodes.filter(
-			(c) => c !== '支出' && c !== '收入' && c !== 'expense' && c !== 'income',
-		);
-
-		const dirs = budgetForm.selectedDirections;
-		const hasExp = dirs.includes('expense');
-		const hasInc = dirs.includes('income');
-
-		const queryParams: FinanceManagerData = {
-			infoDateStart: monthStart,
-			infoDateEnd: monthEnd,
-			belongTo: searchInfo.value.belongTo,
-			isValid: '1',
-		};
-
-		if (effectiveCategoryCodes.length > 0) {
-			queryParams.typeCodes = effectiveCategoryCodes;
-		}
-
-		if (hasExp && hasInc) {
-			queryParams.incomeAndExpenses = undefined;
-		} else if (hasInc) {
-			queryParams.incomeAndExpenses = 'income';
-		} else {
-			queryParams.incomeAndExpenses = 'expense';
-		}
-
-		const { code, data } = await getFinanceSummary(queryParams);
-		if (code === '200' && data) {
-			const exp = Number(data.totalExpense || 0);
-			const inc = Number(data.totalIncome || 0);
-			if (hasExp && hasInc) {
-				// 双选净支出: 支出 - 收入
-				simulatedActualExpense.value = Number((exp - inc).toFixed(2));
-			} else if (hasInc) {
-				// 仅收入
-				simulatedActualExpense.value = Number(inc.toFixed(2));
-			} else {
-				// 仅支出
-				simulatedActualExpense.value = Number(exp.toFixed(2));
-			}
-		}
-	} catch (e) {
-		console.warn('预算动态试算失败:', e);
-	} finally {
-		simulationLoading.value = false;
-	}
-};
-
-let simulationTimer: ReturnType<typeof setTimeout> | null = null;
-const triggerSimulationDebounced = () => {
-	if (simulationTimer) {
-		clearTimeout(simulationTimer);
-	}
-	simulationTimer = setTimeout(() => {
-		fetchPreviewSimulation();
-	}, 150);
-};
-
-// 监听影响已计流水统计的维度：收支方向、具体分类列表
-watch(
-	[() => budgetForm.selectedDirections, () => budgetForm.categoryCodes],
-	() => {
-		if (showBudgetDialog.value) {
-			triggerSimulationDebounced();
-		}
-	},
-	{ deep: true },
-);
-
-// 弹窗内实时试算与健康度预警
-const previewStats = computed(() => {
-	const budget = Number(budgetForm.budgetAmount || 0);
-	const actual = simulatedActualExpense.value;
-	const remaining = budget > 0 ? Number((budget - actual).toFixed(2)) : 0;
-	const percent =
-		budget > 0
-			? actual > 0
-				? Math.min(Math.round((actual / budget) * 100), 100)
-				: 0
-			: 0;
-	const isOver = budget > 0 && actual > budget;
-	return {
-		budget,
-		actual,
-		remaining,
-		percent,
-		isOver,
-	};
-});
-
-const onOpenBudgetDialog = async () => {
-	if (navigator.vibrate) navigator.vibrate(40);
-	budgetForm.budgetAmount = Number(budgetStatus.value?.budgetAmount || 0);
-	const rawDir = budgetStatus.value?.incomeAndExpenses || 'expense';
-	const parsed = rawDir
-		.split(',')
-		.map((s) => s.trim().toLowerCase())
-		.filter((s) => s === 'expense' || s === 'income');
-	budgetForm.selectedDirections = parsed.length ? parsed : ['expense'];
-	budgetForm.incomeAndExpenses = budgetForm.selectedDirections.join(',');
-	budgetForm.categoryCodes = [...(budgetStatus.value?.categoryCodes || [])].filter(
-		(c) => c !== '支出' && c !== '收入' && c !== 'expense' && c !== 'income',
-	);
-	showBudgetDialog.value = true;
-	fetchPreviewSimulation();
-	await fetchRecentCategories();
-};
-
-const onSaveBudget = async () => {
-	if (budgetForm.budgetAmount < 0) {
-		showFailToast('预算金额不能为负数！');
-		return;
-	}
-	if (!budgetForm.selectedDirections.length) {
-		showFailToast('收支类型至少保留一项！');
-		return;
-	}
-	try {
-		const { code, message } = await saveMonthlyBudget({
-			budgetMonth: currentMonthStr.value,
-			yearMonth: currentMonthStr.value,
-			belongTo: searchInfo.value.belongTo,
-			incomeAndExpenses: budgetForm.selectedDirections.join(','),
-			budgetAmount: budgetForm.budgetAmount,
-			categoryCodes: budgetForm.categoryCodes.filter(
-				(c) => c !== '支出' && c !== '收入' && c !== 'expense' && c !== 'income',
-			),
-		});
-		if (code === '200') {
-			showSuccessToast('零花钱预算已更新');
-			if (navigator.vibrate) navigator.vibrate(50);
-			showBudgetDialog.value = false;
-			await loadBudgetStatus();
-		} else {
-			showFailToast(message || '保存失败');
-		}
-	} catch (err: any) {
-		showFailToast(err?.message || '保存失败');
 	}
 };
 
@@ -1055,7 +658,7 @@ const groupedDataSource = computed<GroupedFinanceRecords[]>(() => {
 			return;
 		}
 
-		const dateStr = dayjs(item.infoDate).format('YYYY-MM-DD');
+		const dateStr = formatDate(item.infoDate);
 		const currentGroup =
 			groups.get(dateStr) ||
 			({
@@ -1103,11 +706,13 @@ const getDetailRoute = (id?: string) => ({
 
 useNavBar({
 	title: (route?.meta?.title as string) || '财务信息',
-	rightIcon: 'plus',
+	rightIcon: canAddFinance.value ? 'plus' : '',
 	leftPath: '/',
 	visible: true,
 	onRightClick: () => {
-		router.push({ path: getDetailRoutePath() });
+		if (canAddFinance.value) {
+			router.push({ path: getDetailRoutePath() });
+		}
 	},
 });
 
@@ -1298,7 +903,7 @@ const getTimePresetLabel = (value: TimePreset) => {
 			return '今年';
 		case 'custom':
 			if (customDateRange.value) {
-				return `${dayjs(customDateRange.value[0]).format('MM/DD')} - ${dayjs(customDateRange.value[1]).format('MM/DD')}`;
+				return `${formatDayjs(customDateRange.value[0]).format('MM/DD')} - ${formatDayjs(customDateRange.value[1]).format('MM/DD')}`;
 			}
 			return '自定义';
 		default:
@@ -1307,7 +912,7 @@ const getTimePresetLabel = (value: TimePreset) => {
 };
 
 const getTimeBoundary = (): { start: Dayjs; end: Dayjs } | null => {
-	const now = dayjs();
+	const now = nowDayjs();
 
 	switch (activeTimePreset.value) {
 		case 'today':
@@ -1323,8 +928,8 @@ const getTimeBoundary = (): { start: Dayjs; end: Dayjs } | null => {
 				return null;
 			}
 			return {
-				start: dayjs(customDateRange.value[0]).startOf('day'),
-				end: dayjs(customDateRange.value[1]).endOf('day'),
+				start: formatDayjs(customDateRange.value[0]).startOf('day'),
+				end: formatDayjs(customDateRange.value[1]).endOf('day'),
 			};
 		default:
 			return null;
@@ -1333,7 +938,7 @@ const getTimeBoundary = (): { start: Dayjs; end: Dayjs } | null => {
 
 const formatCurrency = (value: number) => `¥${formatAmount(value)}`;
 
-const getWeekdayLabel = (date: string) => dayjs(date).format('ddd').replace('.', '');
+const getWeekdayLabel = (date: string) => formatDayjs(date).format('ddd').replace('.', '');
 
 onMounted(() => {
 	resetData();
@@ -1354,6 +959,10 @@ onMounted(() => {
 
 	loadBudgetStatus();
 	getFinancePage(searchInfo.value, pagination);
+});
+
+onActivated(() => {
+	loadBudgetStatus();
 });
 
 watch(
@@ -1600,7 +1209,9 @@ watch(
 	padding: 10px 14px;
 	background: linear-gradient(180deg, #ffffff 0%, #fafcff 100%);
 	border-radius: 16px;
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(22, 119, 255, 0.04);
+	box-shadow:
+		0 1px 3px rgba(0, 0, 0, 0.02),
+		0 4px 12px rgba(22, 119, 255, 0.04);
 	border: 1px solid rgba(226, 232, 240, 0.85);
 	overflow: hidden;
 	transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1921,291 +1532,5 @@ watch(
 .expand-leave-to {
 	opacity: 0;
 	transform: translateY(-6px);
-}
-
-.budget-dialog-content {
-	padding: 14px 16px 8px;
-	max-height: 70vh;
-	overflow-y: auto;
-	box-sizing: border-box;
-
-	.budget-month-banner {
-		display: flex;
-		align-items: center;
-		flex-wrap: wrap;
-		gap: 6px;
-		padding: 8px 12px;
-		background: #f0f7ff;
-		border: 1px solid #d6e4ff;
-		border-radius: 8px;
-		margin-bottom: 12px;
-		font-size: 12px;
-
-		.month-label {
-			color: #595959;
-		}
-
-		.month-val {
-			font-weight: 600;
-			color: #1677ff;
-		}
-
-		.month-tip {
-			font-size: 11px;
-			color: #8c8c8c;
-			margin-left: auto;
-		}
-	}
-
-	.budget-amount-field {
-		background: #f8fafc;
-		border-radius: 8px;
-		margin-bottom: 12px;
-		padding: 8px 12px;
-		border: 1px solid #f0f0f0;
-	}
-
-	.dialog-category-section {
-		margin-top: 12px;
-
-		.section-header {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			margin-bottom: 8px;
-
-			.section-title {
-				font-size: 13px;
-				font-weight: 600;
-				color: #323233;
-				display: flex;
-				align-items: center;
-				gap: 4px;
-
-				.selected-count {
-					font-size: 11px;
-					color: #1677ff;
-					font-weight: normal;
-				}
-			}
-
-			.header-actions {
-				display: flex;
-				align-items: center;
-				gap: 6px;
-				font-size: 12px;
-				color: #1677ff;
-
-				.action-btn {
-					cursor: pointer;
-					padding: 2px 4px;
-
-					&:active {
-						opacity: 0.6;
-					}
-				}
-
-				.action-sep {
-					color: #d9d9d9;
-				}
-			}
-		}
-
-		.section-sub-label {
-			font-size: 11px;
-			color: #8c8c8c;
-			margin: 8px 0 6px;
-
-			&.category-sub-label {
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-				margin-top: 10px;
-
-				.loading-hint {
-					font-size: 10px;
-					color: #bfbfbf;
-				}
-			}
-		}
-
-		.chip-group {
-			display: flex;
-			flex-wrap: wrap;
-			gap: 8px;
-
-			&.category-chips {
-				max-height: 125px;
-				overflow-y: auto;
-				padding: 2px 0;
-			}
-		}
-
-		.chip-item {
-			display: inline-flex;
-			align-items: center;
-			gap: 4px;
-			padding: 5px 12px;
-			font-size: 12px;
-			line-height: 1.2;
-			border-radius: 16px;
-			background: #f5f5f5;
-			color: #595959;
-			border: 1px solid #f0f0f0;
-			cursor: pointer;
-			user-select: none;
-			transition: all 0.15s ease;
-
-			&:active {
-				transform: scale(0.96);
-			}
-
-			&.active {
-				background: #e6f4ff;
-				color: #1677ff;
-				border-color: #91caff;
-				font-weight: 500;
-			}
-
-			&--expense.active {
-				background: #fff1f2;
-				color: #e11d48;
-				border-color: #fda4af;
-
-				.chip-check {
-					color: #e11d48;
-				}
-			}
-
-			&--income.active {
-				background: #ecfdf5;
-				color: #059669;
-				border-color: #6ee7b7;
-
-				.chip-check {
-					color: #059669;
-				}
-			}
-
-			.chip-check {
-				font-size: 12px;
-				color: #1677ff;
-			}
-		}
-
-		.empty-category-hint {
-			font-size: 12px;
-			color: #bfbfbf;
-			text-align: center;
-			padding: 12px 0;
-		}
-	}
-
-	.dialog-simulation-card {
-		margin-top: 14px;
-		padding: 12px;
-		background: #f8fafc;
-		border: 1px solid #e2e8f0;
-		border-radius: 10px;
-
-		.simulation-header {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			margin-bottom: 10px;
-
-			.simulation-title {
-				display: flex;
-				align-items: center;
-				gap: 5px;
-				font-size: 12px;
-				font-weight: 600;
-				color: #334155;
-
-				.simulation-icon {
-					font-size: 14px;
-					color: #1677ff;
-				}
-			}
-
-			.simulation-status {
-				font-size: 11px;
-				font-weight: 500;
-				padding: 2px 8px;
-				border-radius: 9999px;
-
-				&--normal {
-					background: #eff6ff;
-					color: #2563eb;
-				}
-
-				&--over {
-					background: #fff1f2;
-					color: #e11d48;
-				}
-
-				&--none {
-					background: #f1f5f9;
-					color: #64748b;
-				}
-			}
-		}
-
-		.simulation-grid {
-			display: grid;
-			grid-template-columns: repeat(3, 1fr);
-			gap: 8px;
-			background: #ffffff;
-			padding: 10px 8px;
-			border-radius: 8px;
-			border: 1px solid #f1f5f9;
-
-			.simulation-cell {
-				text-align: center;
-
-				.cell-label {
-					font-size: 11px;
-					color: #64748b;
-					margin-bottom: 4px;
-				}
-
-				.cell-val {
-					font-size: 13px;
-					font-weight: 600;
-					color: #0f172a;
-
-					&--remain {
-						color: #059669;
-					}
-
-					&--over {
-						color: #e11d48;
-					}
-
-					.loading-text {
-						font-size: 11px;
-						color: #94a3b8;
-						font-weight: normal;
-					}
-				}
-			}
-		}
-
-		.simulation-progress-wrap {
-			margin-top: 10px;
-			padding: 0 4px;
-		}
-	}
-
-	.dialog-hint {
-		font-size: 11px;
-		color: #8c8c8c;
-		margin-top: 14px;
-		line-height: 1.5;
-		background: #fafafa;
-		padding: 8px 10px;
-		border-radius: 6px;
-		border-left: 3px solid #1677ff;
-	}
 }
 </style>

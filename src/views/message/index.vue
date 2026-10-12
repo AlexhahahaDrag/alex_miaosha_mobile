@@ -20,9 +20,9 @@
 
 <script setup lang="ts">
 const list = ref<number[]>([]);
-const loading = ref(false);
-const finished = ref(false);
-const refreshing = ref(false);
+const loading = ref<boolean>(false);
+const finished = ref<boolean>(false);
+const refreshing = ref<boolean>(false);
 
 const onLoad = () => {
 	setTimeout(() => {

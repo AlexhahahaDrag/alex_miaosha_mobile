@@ -1,4 +1,4 @@
-import type { Dayjs } from 'dayjs';
+﻿import type { Dayjs } from '@/utils/dayjs';
 
 export interface ShopFinanceData {
 	id?: string;

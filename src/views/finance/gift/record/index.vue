@@ -270,7 +270,6 @@
 import { showConfirmDialog, showFailToast, showSuccessToast, showToast } from 'vant';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
-import { usePagination } from '@/composables/usePagination';
 import CommonPullRefresh from '@/views/components/CommonPullRefresh.vue';
 import CommonList from '@/views/components/CommonList.vue';
 import GiftRecordCard from '@/views/finance/gift/components/GiftRecordCard.vue';
@@ -306,11 +305,11 @@ useTabBar({
 	data: [...GIFT_TAB_BAR],
 });
 
-const loading = ref(false);
-const refreshing = ref(false);
-const finished = ref(false);
-const saving = ref(false);
-const quickRecordVisible = ref(false);
+const loading = ref<boolean>(false);
+const refreshing = ref<boolean>(false);
+const finished = ref<boolean>(false);
+const saving = ref<boolean>(false);
+const quickRecordVisible = ref<boolean>(false);
 const dataSource = ref<GiftRecordInfo[]>([]);
 const searchInfo = ref<GiftRecordQuery>({});
 const formInfo = ref<GiftRecordInfo>({ direction: 'GIVE' });
@@ -318,11 +317,11 @@ const { pagination, resetPagination, setTotal, nextPage } = usePagination();
 
 // ── AI 自然语言快捷录入与推荐
 const aiText = ref('');
-const aiParsing = ref(false);
-const isListening = ref(false);
+const aiParsing = ref<boolean>(false);
+const isListening = ref<boolean>(false);
 let speechRecognitionInstance: any = null;
 const recommendInfo = ref<GiftRecordRecommendAmount>({});
-const recommendLoading = ref(false);
+const recommendLoading = ref<boolean>(false);
 
 // ── 快记 picker：事由/送礼人/收礼人 由手输 ID 改为选择器，选项打开快记面板时懒加载一次
 interface PickerOption {
@@ -345,10 +344,10 @@ const RELATED_OPTION_LIMIT = 50;
 /** 空值选项：Vant picker 的 value 不接受 undefined，用空串表示"不关联"，落库前转 undefined */
 const NONE_OPTION: PickerOption = { text: '不关联', value: '' };
 
-const pickerVisible = ref(false);
+const pickerVisible = ref<boolean>(false);
 const pickerType = ref<PickerType>('event');
-const pickerLoaded = ref(false);
-const relatedLoaded = ref(false);
+const pickerLoaded = ref<boolean>(false);
+const relatedLoaded = ref<boolean>(false);
 const personOptions = ref<PickerOption[]>([NONE_OPTION]);
 const eventOptions = ref<PickerOption[]>([NONE_OPTION]);
 // 回礼关联的原收礼记录：必填，故不给"不关联"选项

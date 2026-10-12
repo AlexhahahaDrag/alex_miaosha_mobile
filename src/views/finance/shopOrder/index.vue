@@ -88,11 +88,9 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { showFailToast } from 'vant';
 import type { ShopOrderData } from './config';
-import { usePagination } from '@/composables/usePagination';
 import { getShopOrderPage } from '@/views/finance/shopOrder/api';
 import { useNavBar } from '@/composables/useNavBar';
 import type { PageInfo } from '@/views/common/config';

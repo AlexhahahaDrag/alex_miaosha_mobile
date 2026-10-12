@@ -60,13 +60,12 @@
 </template>
 
 <script lang="ts" setup>
-import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast } from 'vant';
+import { formatDate, formatMonth, nowDayjs, datePickerFormatter, type Dayjs } from '@/utils/dayjs';
 import type { Info } from '@/views/common/pop/selectPop.vue';
 import { getListName } from '@/views/common/config';
 import { useUserStore } from '@/store/modules/user/user';
 import { getUserManagerList } from '@/views/user/userManager/api';
-import { datePickerFormatter } from '@/utils/dayjs';
 import type { DatePickerInfo } from '@/utils/common';
 import type { UserManagerData } from '@/views/user/userManager/api';
 import { useNavBar } from '@/composables/useNavBar';
@@ -91,14 +90,13 @@ useTabBar({
 
 // 常量定义
 const DATE_FORMATTER = 'YYYY年MM月';
-const DATE_FORMAT_YYYYMM = 'YYYY-MM';
 const ALL_USER_OPTION = { id: '0', nickName: '所有人' };
 
 // 响应式数据
 const userInfo = useUserStore()?.getUserInfo;
 const belongTo = ref<string | null>(userInfo?.id ? userInfo.id.toString() : null);
 const activeTab = ref<string>('1');
-const infoDateName = ref<string>(dayjs().format(DATE_FORMATTER));
+const infoDateName = ref<string>(formatDate(undefined, DATE_FORMATTER));
 const belongToName = ref<string>();
 
 // Props 接口定义
@@ -110,14 +108,14 @@ interface FinanceAnalysisProps {
 
 const props = reactive<FinanceAnalysisProps>({
 	activeTab: activeTab.value,
-	dateStr: dayjs().format(DATE_FORMAT_YYYYMM),
+	dateStr: formatMonth(),
 	belongTo: belongTo.value,
 });
 
 const chooseDateInfo = ref<DatePickerInfo<Dayjs>>({
 	label: 'infoDate',
 	labelName: '月份选择',
-	selectValue: dayjs(),
+	selectValue: nowDayjs(),
 	showFlag: false,
 	columnsType: ['year', 'month'],
 	formatter: datePickerFormatter,
@@ -149,7 +147,7 @@ const chooseDate = () => {
 
 const selectDateInfo = (dateInfo: Dayjs, dateName: string) => {
 	chooseDateInfo.value.showFlag = false;
-	props.dateStr = dayjs(dateInfo).format(DATE_FORMAT_YYYYMM);
+	props.dateStr = formatMonth(dateInfo);
 	infoDateName.value = dateName;
 	chooseDateInfo.value.selectValue = dateInfo;
 };

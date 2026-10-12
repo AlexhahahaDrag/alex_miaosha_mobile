@@ -123,7 +123,6 @@ import { addShopCart } from '@/views/finance/shopCart/api';
 import commonUtils from '@/utils/common';
 import { useUserStore } from '@/store/modules/user/user';
 import { useNavBar } from '@/composables/useNavBar';
-import { usePagination } from '@/composables/usePagination';
 import type { PageInfo } from '@/views/common/config';
 
 const router = useRouter();

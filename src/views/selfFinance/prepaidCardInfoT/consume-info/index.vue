@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<div class="consume-page">
 		<!-- 消费金额输入区域 -->
 		<div class="amount-section">
@@ -90,8 +90,8 @@
 
 <script setup lang="ts">
 import { showToast, showSuccessToast, showFailToast } from 'vant';
-import dayjs, { type Dayjs } from 'dayjs';
 import { getPrepaidCardInfoDetail, prepaidCardConsumeAndRecharge } from '../api';
+import { formatDayjs, nowDayjs, type Dayjs } from '@/utils/dayjs';
 import type { DatePickerInfo } from '@/utils/common';
 import { useNavBar } from '@/composables/useNavBar';
 import { useUserStore } from '@/store/modules/user/user';
@@ -118,7 +118,7 @@ const formData = reactive<ConsumeFormData>({
 	amount: '',
 	cardName: '',
 	remark: '',
-	consumeTime: dayjs(),
+	consumeTime: nowDayjs(),
 	balance: 0,
 	cardId: '',
 });
@@ -133,7 +133,7 @@ useNavBar({
 const chooseDateInfo = ref<DatePickerInfo<Dayjs>>({
 	label: 'infoDate',
 	labelName: '消费时间',
-	selectValue: dayjs(),
+	selectValue: nowDayjs(),
 	showFlag: false,
 	formatter: (type: string, option: { text: string }) => {
 		if (type === 'year') {
@@ -165,11 +165,11 @@ const loading = ref<boolean>(false);
 
 // 格式化日期时间显示
 function formatDateTime(date: Dayjs | string) {
-	date = dayjs(date);
-	const now = dayjs().local();
-	const today = now.startOf('day').local();
-	const yesterday = today.subtract(1, 'day').local();
-	const targetDate = date.startOf('day').local();
+	const d = formatDayjs(date);
+	const now = nowDayjs();
+	const today = now.startOf('day');
+	const yesterday = today.subtract(1, 'day');
+	const targetDate = d.startOf('day');
 	// 今天
 	if (targetDate.isSame(today, 'day')) {
 		return '今天';
@@ -180,7 +180,7 @@ function formatDateTime(date: Dayjs | string) {
 	}
 	// 昨天之前
 	else {
-		return date.format('YYYY-MM-DD');
+		return d.format('YYYY-MM-DD');
 	}
 }
 
@@ -288,7 +288,7 @@ const init = async () => {
 	const { cardId, type } = route.query;
 	formData.id = cardId as string;
 	formData.type = (type as 'recharge' | 'consume') || 'consume';
-	formData.consumeTime = dayjs();
+	formData.consumeTime = nowDayjs();
 	// 获取预付卡信息
 	await getPrepaidCardInfoDetailInfo();
 };

@@ -127,7 +127,6 @@ import { showSuccessToast, showFailToast } from 'vant';
 import type { OrgInfoData } from './config';
 import type { SearchInfo } from './orgInfoTs';
 import { useNavBar } from '@/composables/useNavBar';
-import { usePagination } from '@/composables/usePagination';
 import { getOrgInfoPage, getOrgInfoTree, deleteOrgInfo, updateOrgInfo } from '@/views/user/orgInfo/api';
 import { getUserManagerList } from '@/views/user/userManager/api';
 import type { PageInfo } from '@/views/common/config';

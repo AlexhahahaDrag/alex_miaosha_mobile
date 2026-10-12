@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<van-form
 		@submit="onSubmit"
 		:rules="rulesRef"
@@ -62,8 +62,8 @@
 </template>
 
 <script setup lang="ts">
-import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
+import { formatDate, formatDayjs, nowDayjs, type Dayjs } from '@/utils/dayjs';
 import { useNavBar } from '@/composables/useNavBar';
 import { getListName } from '@/views/common/config';
 import type { DictInfo } from '@/views/common/config';
@@ -166,7 +166,7 @@ const avliDateInfo = ref<DatePickerInfo<Dayjs>>({
 	label: 'avliDate',
 	labelName: label.avliDate,
 	rule: rulesRef.avliDate,
-	selectValue: dayjs(),
+	selectValue: nowDayjs(),
 	showFlag: false,
 	formatter: (type: string, option: { text: string }) => {
 		if (type === 'year') {
@@ -213,8 +213,8 @@ function initInfoDate(infoDate: Dayjs | string | undefined, type: string) {
 	if (infoDate) {
 		switch (type) {
 			case 'avliDate':
-				avliDateName.value = dayjs(infoDate).format('YYYY-MM-DD');
-				avliDateInfo.value.selectValue = dayjs(infoDate);
+				avliDateName.value = formatDate(infoDate);
+				avliDateInfo.value.selectValue = formatDayjs(infoDate);
 				break;
 		}
 	}
@@ -266,7 +266,7 @@ async function init() {
 		const { code, data, message } = await getDictList('account_type');
 		getDictInfoList(code, data as DictInfo[] | undefined, message);
 		formInfo.value = {
-			avliDate: dayjs(),
+			avliDate: nowDayjs(),
 		};
 		initInfoDate(formInfo.value.avliDate, 'avliDate');
 	}

@@ -60,11 +60,12 @@ function base64ToUint8Array(base64Str: string): Uint8Array {
 		const binary = atob(base64Str);
 		const bytes = new Uint8Array(binary.length);
 		for (let i = 0; i < binary.length; i++) {
-			bytes[i] = binary.charCodeAt(i);
+			bytes[i] = binary.codePointAt(i) ?? 0;
 		}
 		return bytes;
 	}
-	const globalBuf = (globalThis as { Buffer?: { from: (str: string, enc: string) => Uint8Array } }).Buffer;
+	const globalBuf = (globalThis as { Buffer?: { from: (str: string, enc: string) => Uint8Array } })
+		.Buffer;
 	if (globalBuf) {
 		return new Uint8Array(globalBuf.from(base64Str, 'base64'));
 	}
@@ -75,11 +76,13 @@ function uint8ArrayToBase64(bytes: Uint8Array): string {
 	if (typeof btoa === 'function') {
 		let binary = '';
 		for (let i = 0; i < bytes.byteLength; i++) {
-			binary += String.fromCharCode(bytes[i]);
+			binary += String.fromCodePoint(bytes[i]);
 		}
 		return btoa(binary);
 	}
-	const globalBuf = (globalThis as { Buffer?: { from: (arr: Uint8Array) => { toString: (enc: string) => string } } }).Buffer;
+	const globalBuf = (
+		globalThis as { Buffer?: { from: (arr: Uint8Array) => { toString: (enc: string) => string } } }
+	).Buffer;
 	if (globalBuf) {
 		return globalBuf.from(bytes).toString('base64');
 	}
@@ -91,13 +94,10 @@ function getCryptoKey(rawKey: string): Promise<CryptoKey> {
 	if (!promise) {
 		const subtle = getSubtle();
 		const enc = new TextEncoder();
-		promise = subtle.importKey(
-			'raw',
-			enc.encode(rawKey),
-			{ name: 'AES-GCM' },
-			false,
-			['decrypt', 'encrypt'],
-		);
+		promise = subtle.importKey('raw', enc.encode(rawKey), { name: 'AES-GCM' }, false, [
+			'decrypt',
+			'encrypt',
+		]);
 		keyCache.set(rawKey, promise);
 	}
 	return promise;
@@ -137,10 +137,7 @@ export async function decryptGcm(
 /**
  * AES-GCM (v2.0) 加密
  */
-export async function encryptGcm(
-	payload: unknown,
-	rawKey: string = DEFAULT_KEY,
-): Promise<string> {
+export async function encryptGcm(payload: unknown, rawKey: string = DEFAULT_KEY): Promise<string> {
 	const subtle = getSubtle();
 	const cryptoObj = getCrypto();
 
@@ -165,4 +162,3 @@ export async function encryptGcm(
 
 	return uint8ArrayToBase64(combined);
 }
-

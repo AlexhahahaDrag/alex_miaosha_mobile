@@ -1,5 +1,16 @@
 <template>
 	<div class="finance-detail-container">
+		<div
+			v-if="formInfo.id && !canEditRecord"
+			class="detail-readonly-banner"
+		>
+			<van-icon
+				name="info-o"
+				class="banner-icon"
+			/>
+			<span>此账单由家庭成员记入，仅创建人与家庭管理员可修改</span>
+		</div>
+
 		<!-- 1. 顶部收支分段切换 (Segmented Tabs) -->
 		<div class="segment-wrapper">
 			<div class="segment-bar">
@@ -308,12 +319,21 @@
 					@click="pressKey('00')"
 				>00</button>
 				<button
+					v-if="canEditRecord"
 					type="button"
 					class="kp-btn func-btn submit-btn"
 					:disabled="loading"
 					@click="handleSaveAndFinish"
 				>
 					{{ loading ? '保存中' : formInfo.id ? '保存' : '完成' }}
+				</button>
+				<button
+					v-else
+					type="button"
+					class="kp-btn func-btn submit-btn readonly-btn"
+					disabled
+				>
+					仅查看
 				</button>
 			</div>
 		</div>
@@ -350,7 +370,6 @@
 </template>
 
 <script setup lang="ts">
-import dayjs, { type Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
 import { getListName, type DictFieldConfig } from '@/views/common/config';
 import { rulesRef, type FinanceManagerData } from '@/views/finance/financeManager/config';
@@ -358,7 +377,7 @@ import { getDictList } from '@/views/finance/dict/api';
 import { getUserManagerList } from '@/views/user/userManager/api';
 import { useUserStore } from '@/store/modules/user/user';
 import type { Info } from '@/views/common/pop/selectPop.vue';
-import { datePickerFormatter } from '@/utils/dayjs';
+import { datePickerFormatter, formatDayjs, formatDate, formatMonth, nowDayjs, type Dayjs } from '@/utils/dayjs';
 import type { DatePickerInfo } from '@/utils/common';
 import type { DictInfo } from '@/views/finance/dict/api';
 import type { UserManagerData } from '@/views/user/userManager/config';
@@ -369,18 +388,36 @@ import {
 	getBudgetCategories,
 } from '@/views/finance/financeManager/api';
 import { useNavBar } from '@/composables/useNavBar';
+import { usePermission } from '@/composables/usePermission';
 import { getRoutePathByName } from '@/utils/router';
 import { useTabBar } from '@/composables/useTabBar';
 import { useDashboardStore } from '@/store/modules/dashboard/dashboard';
 
 const route = useRoute();
 const router = useRouter();
-const userInfo = useUserStore()?.getUserInfo;
+const userStore = useUserStore();
+const userInfo = userStore?.getUserInfo;
 const dashboardStore = useDashboardStore();
+const { hasPermission, isSuperAdmin } = usePermission();
+
+const canEditRecord = computed(() => {
+	if (!formInfo.value.id) {
+		return hasPermission('finance:financeManager:add');
+	}
+	if (!hasPermission('finance:financeManager:edit')) {
+		return false;
+	}
+	const roleCode = userStore.getRoleInfo?.roleCode || '';
+	if (isSuperAdmin.value || roleCode === 'admin' || roleCode === 'family_admin') {
+		return true;
+	}
+	const myId = userInfo?.id;
+	return myId !== undefined && String(formInfo.value.belongTo) === String(myId);
+});
 
 // 导航栏配置
 useNavBar({
-	title: route?.query?.id ? '编辑账单' : '记一笔',
+	title: route?.query?.id ? (canEditRecord.value ? '编辑账单' : '账单详情') : '记一笔',
 	leftPath: getRoutePathByName(router, 'financeManager'),
 	visible: true,
 });
@@ -465,18 +502,18 @@ const activeCategoryList = computed<CategoryItem[]>(() => {
 });
 
 const isToday = computed(() => {
-	const cur = formInfo.value.infoDate ? dayjs(formInfo.value.infoDate) : dayjs();
-	return cur.isSame(dayjs(), 'day');
+	const cur = formatDayjs(formInfo.value.infoDate);
+	return cur.isSame(nowDayjs(), 'day');
 });
 
 const keypadDateShort = computed(() => {
-	const cur = formInfo.value.infoDate ? dayjs(formInfo.value.infoDate) : dayjs();
+	const cur = formatDayjs(formInfo.value.infoDate);
 	return cur.format('M/D');
 });
 
 const displayDateLabel = computed(() => {
 	if (isToday.value) return '今天';
-	return formInfo.value.infoDate ? dayjs(formInfo.value.infoDate).format('YYYY-MM-DD') : '今天';
+	return formInfo.value.infoDate ? formatDate(formInfo.value.infoDate) : '今天';
 });
 
 // 字典与弹窗配置
@@ -573,7 +610,7 @@ const chooseDateInfo = ref<DatePickerInfo<Dayjs>>({
 	label: 'infoDate',
 	labelName: '业务日期',
 	rule: rulesRef.infoDate,
-	selectValue: dayjs(),
+	selectValue: nowDayjs(),
 	showFlag: false,
 	formatter: datePickerFormatter,
 });
@@ -583,8 +620,8 @@ const chooseDate = () => {
 };
 
 const selectDateInfo = (date: Dayjs, dateName: string) => {
-	const now = dayjs();
-	const selected = dayjs(date).hour(now.hour()).minute(now.minute()).second(now.second());
+	const now = nowDayjs();
+	const selected = formatDayjs(date).hour(now.hour()).minute(now.minute()).second(now.second());
 	formInfo.value.infoDate = selected;
 	nameRefMap.infoDate.value = dateName;
 	chooseDateInfo.value.showFlag = false;
@@ -800,7 +837,7 @@ const initInfoDate = (infoDate: Dayjs) => {
 
 const init = async () => {
 	const id: string = route?.query?.id as string;
-	const currentMonth = dayjs().format('YYYY-MM');
+	const currentMonth = formatMonth();
 
 	const [detailRes, userRes, dictRes, catRes] = await Promise.all([
 		id ? getFinanceMangerDetail(id) : Promise.resolve({ code: '200', data: {} as FinanceManagerData }),
@@ -818,7 +855,7 @@ const init = async () => {
 
 	if (id && detailRes.code === '200' && detailRes.data) {
 		formInfo.value = { ...detailRes.data };
-		formInfo.value.infoDate = dayjs(detailRes.data.infoDate);
+		formInfo.value.infoDate = formatDayjs(detailRes.data.infoDate);
 		if (detailRes.data.amount) {
 			amountStr.value = String(detailRes.data.amount);
 		}
@@ -827,7 +864,7 @@ const init = async () => {
 		formInfo.value = {
 			isValid: '1',
 			incomeAndExpenses: 'expense',
-			infoDate: dayjs(),
+			infoDate: nowDayjs(),
 			belongTo: userInfo?.id !== undefined ? Number(userInfo.id) : 0,
 			fromSource: 'wx',
 			typeCode: '餐饮',
@@ -837,7 +874,7 @@ const init = async () => {
 
 	getUserInfoList(userRes?.data || []);
 	getDictInfoList(dictRes?.data || []);
-	initInfoDate((formInfo.value?.infoDate as Dayjs) || dayjs());
+	initInfoDate((formInfo.value?.infoDate as Dayjs) || nowDayjs());
 
 	// 确保支付方式与收支状态显示名称对齐
 	if (!nameRefMap.fromSource.value) {
@@ -1280,6 +1317,25 @@ init();
 	}
 	50% {
 		opacity: 0;
+	}
+}
+
+.detail-readonly-banner {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 10px 14px;
+	margin-bottom: 12px;
+	background-color: #fffbe6;
+	border: 1px solid #ffe58f;
+	border-radius: 8px;
+	color: #d46b08;
+	font-size: 13px;
+	line-height: 1.4;
+
+	.banner-icon {
+		font-size: 16px;
+		flex-shrink: 0;
 	}
 }
 </style>

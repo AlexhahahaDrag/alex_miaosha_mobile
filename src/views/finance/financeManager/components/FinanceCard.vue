@@ -1,5 +1,8 @@
 <template>
-	<van-swipe-cell class="finance-card-row">
+	<van-swipe-cell
+		class="finance-card-row"
+		:disabled="!canDelete"
+	>
 		<div
 			class="finance-card-row__content"
 			@click="handleClick"
@@ -46,7 +49,10 @@
 			</div>
 		</div>
 
-		<template #right>
+		<template
+			v-if="canDelete"
+			#right
+		>
 			<van-button
 				class="finance-card-row__delete"
 				square
@@ -60,7 +66,9 @@
 
 <script setup lang="ts">
 import { computed, type PropType } from 'vue';
-import dayjs from 'dayjs';
+import { useUserStore } from '@/store/modules/user/user';
+import { usePermission } from '@/composables/usePermission';
+import { formatTime } from '@/utils/dayjs';
 import {
 	fromSourceTransferList,
 	type FinanceManagerData,
@@ -110,7 +118,22 @@ const recordTime = computed(() => {
 	if (!props.item.infoDate) {
 		return '--:--';
 	}
-	return dayjs(props.item.infoDate).format('HH:mm');
+	return formatTime(props.item.infoDate, 'HH:mm');
+});
+
+const userStore = useUserStore();
+const { hasPermission, isSuperAdmin } = usePermission();
+
+const canDelete = computed(() => {
+	if (!hasPermission('finance:financeManager:delete')) {
+		return false;
+	}
+	const roleCode = userStore.getRoleInfo?.roleCode || '';
+	if (isSuperAdmin.value || roleCode === 'admin' || roleCode === 'family_admin') {
+		return true;
+	}
+	const myId = userStore.getUserInfo?.id;
+	return myId !== undefined && String(props.item.belongTo) === String(myId);
 });
 
 const handleClick = () => {

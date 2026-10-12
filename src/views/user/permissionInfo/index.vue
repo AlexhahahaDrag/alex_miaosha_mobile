@@ -102,7 +102,6 @@
 import { showSuccessToast, showFailToast } from 'vant';
 import type { SearchInfo } from './permissionInfoTs';
 import { useNavBar } from '@/composables/useNavBar';
-import { usePagination } from '@/composables/usePagination';
 import { getPermissionInfoPage, deletePermissionInfo, updatePermissionInfo } from '@/views/user/permissionInfo/api';
 import { getUserManagerList } from '@/views/user/userManager/api';
 import type { PageInfo } from '@/views/common/config';

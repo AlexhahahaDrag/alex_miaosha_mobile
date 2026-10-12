@@ -147,13 +147,12 @@
 </template>
 
 <script setup lang="ts">
-import dayjs from 'dayjs';
 import { showConfirmDialog, showFailToast, showSuccessToast } from 'vant';
 import { useGiftEventTypeOptions } from '@/composables/useGiftEventTypeOptions';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
 import { usePermission } from '@/composables/usePermission';
-import { dataTimeFormat, datePickerFormatter, formatTime } from '@/utils/dayjs';
+import { dataTimeFormat, datePickerFormatter, formatTime, formatDayjs } from '@/utils/dayjs';
 import { getRoutePathByName } from '@/utils/router';
 import { addGiftEvent, deleteGiftEvent, getGiftEventDetail, updateGiftEvent } from '@/views/finance/gift/event/api';
 import { getGiftPersonList } from '@/views/finance/gift/person/api';
@@ -171,11 +170,11 @@ const { hasPermission } = usePermission();
 const { presetOptions, eventTypeSelectOptions, loadEventTypeOptions, mapEventTypeToFormFields } =
 	useGiftEventTypeOptions();
 
-const saving = ref(false);
-const deleting = ref(false);
-const showTypeSheet = ref(false);
-const showDatePicker = ref(false);
-const showPersonPicker = ref(false);
+const saving = ref<boolean>(false);
+const deleting = ref<boolean>(false);
+const showTypeSheet = ref<boolean>(false);
+const showDatePicker = ref<boolean>(false);
+const showPersonPicker = ref<boolean>(false);
 const personList = ref<GiftPersonInfo[]>([]);
 const formState = ref<GiftEventFormState>({});
 // van-date-picker 只出日期列、van-time-picker 只出时分列，
@@ -287,7 +286,7 @@ const toSavePayload = (): GiftEventInfo => {
 };
 
 const openDatePicker = () => {
-	const current = formState.value.eventTime ? dayjs(formState.value.eventTime) : dayjs();
+	const current = formatDayjs(formState.value.eventTime);
 	datePickerValue.value = [current.format('YYYY'), current.format('MM'), current.format('DD')];
 	timePickerValue.value = [current.format('HH'), current.format('mm')];
 	showDatePicker.value = true;
@@ -297,7 +296,7 @@ const onDateConfirm = () => {
 	// picker-group 的 confirm 不带载荷，日期与时间分别从两个 v-model 取
 	const [year, month, day] = datePickerValue.value;
 	const [hour = '00', minute = '00'] = timePickerValue.value;
-	formState.value.eventTime = dayjs(`${year}-${month}-${day} ${hour}:${minute}:00`).format('YYYY-MM-DDTHH:mm:ss');
+	formState.value.eventTime = formatTime(`${year}-${month}-${day} ${hour}:${minute}:00`, 'YYYY-MM-DDTHH:mm:ss');
 	showDatePicker.value = false;
 };
 

@@ -1,4 +1,4 @@
-import type { Dayjs } from 'dayjs';
+﻿import type { Dayjs } from '@/utils/dayjs';
 
 // 操作记录项
 export interface OperationRecord {

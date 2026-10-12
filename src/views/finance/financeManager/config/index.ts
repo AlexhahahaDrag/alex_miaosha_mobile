@@ -1,4 +1,4 @@
-import type { Dayjs } from 'dayjs';
+import type { Dayjs } from '@/utils/dayjs';
 
 export interface FromSourceTransferItem {
 	value: string;
@@ -54,6 +54,39 @@ export interface FinanceBudgetSaveReq {
 	incomeAndExpenses?: string;
 	budgetAmount: number;
 	categoryCodes?: string[];
+}
+
+export interface FinanceBudgetAiRecommendReq {
+	budgetMonth?: string;
+	belongTo?: string | number;
+	targetMode?: string;
+}
+
+export interface FinanceBudgetAiRecommendVo {
+	budgetMonth?: string;
+	avgMonthlyExpense?: number;
+	recommendAmount?: number;
+	savingAmount?: number;
+	moderateAmount?: number;
+	relaxedAmount?: number;
+	recommendedCategories?: string[];
+	healthAdvice?: string;
+	dailyLimitSuggest?: number;
+	isFallback?: boolean;
+}
+
+export interface FinanceBudgetAiParseReq {
+	command: string;
+	budgetMonth?: string;
+}
+
+export interface FinanceBudgetAiParseVo {
+	hasBudget?: boolean;
+	amount?: number;
+	hasCategories?: boolean;
+	categories?: string[];
+	isFallback?: boolean;
+	reasoning?: string;
 }
 
 export const fromSourceTransferList: FromSourceTransferItem[] = [
