@@ -27,140 +27,200 @@
 
 			<!-- AI 智能测算与口语配置卡片 -->
 			<div class="ai-budget-card">
-				<div class="ai-header">
+				<!-- 顶部折叠微卡片 (高度约 40px，默认常驻展示核心 AI 摘要，0 视口压迫) -->
+				<div
+					class="ai-header"
+					@click="toggleAiExpanded"
+				>
 					<div class="ai-title-wrap">
 						<div class="ai-badge">AI</div>
-						<span class="ai-title">AI 智能测算与配置</span>
-						<span
-							v-if="aiRecommendData?.isFallback"
-							class="ai-mode-tag ai-mode-tag--fallback"
-						>智能规则</span>
-						<span
-							v-else-if="aiRecommendData"
-							class="ai-mode-tag ai-mode-tag--ai"
-						>大模型洞察</span>
+						<div class="ai-title-sub">
+							<span class="ai-title">AI 智能助手</span>
+							<template v-if="aiRecommending">
+								<span class="ai-brief-tip animate-pulse">测算中...</span>
+							</template>
+							<template v-else-if="aiRecommendData">
+								<span class="ai-brief-tag"> 适度 ¥{{ (aiRecommendData.moderateAmount || 0).toFixed(0) }} </span>
+							</template>
+							<template v-else>
+								<span class="ai-brief-tip">点击智能测算</span>
+							</template>
+						</div>
 					</div>
 					<div
-						class="ai-action-btn"
-						:class="{ 'is-loading': aiRecommending }"
-						@click="onFetchAiRecommend"
+						class="ai-header-right"
+						@click.stop
 					>
-						<van-icon
-							name="replay"
-							:class="{ 'spin-icon': aiRecommending }"
-						/>
-						<span>{{ aiRecommendData ? '重测' : '智能测算' }}</span>
+						<div
+							class="ai-action-btn"
+							:class="{ 'is-loading': aiRecommending }"
+							@click="onFetchAiRecommend"
+						>
+							<van-icon
+								name="replay"
+								:class="{ 'spin-icon': aiRecommending }"
+							/>
+							<span>{{ aiRecommendData ? '重测' : '测算' }}</span>
+						</div>
+						<span class="action-divider">|</span>
+						<div
+							class="ai-toggle-btn"
+							@click="toggleAiExpanded"
+						>
+							<span>{{ isAiExpanded ? '收起' : '口语配置' }}</span>
+							<van-icon
+								:name="isAiExpanded ? 'arrow-up' : 'arrow-down'"
+								class="toggle-icon"
+							/>
+						</div>
 					</div>
 				</div>
 
-				<!-- 口语化指令输入 -->
+				<!-- 展开区域 -->
 				<div
-					v-if="canEditBudget"
-					class="ai-command-wrap"
+					v-if="isAiExpanded"
+					class="ai-expanded-area"
 				>
-					<div class="ai-input-box">
-						<input
-							v-model="aiCommandInput"
-							class="ai-input"
-							type="text"
-							placeholder="如：“设2500预算，重点管餐饮”"
-							@keyup.enter="onAiParseCommand"
-						/>
-						<button
-							class="ai-parse-btn"
-							:disabled="aiParsing"
-							@click="onAiParseCommand"
-						>
-							{{ aiParsing ? '解析中' : '回填' }}
-						</button>
-					</div>
-					<div class="ai-sample-chips">
-						<span
-							v-for="sample in aiCommandSamples"
-							:key="sample"
-							class="sample-chip"
-							@click="applyAiSample(sample)"
-						>
-							{{ sample }}
-						</span>
-					</div>
-				</div>
-
-				<!-- 测算推荐详情 -->
-				<div
-					v-if="aiRecommendData"
-					class="ai-recommend-body"
-				>
-					<div class="ai-advice-text">
-						{{ aiRecommendData.healthAdvice }}
-					</div>
+					<!-- 口语化指令输入 -->
 					<div
-						v-if="aiRecommendData.dailyLimitSuggest"
-						class="ai-daily-suggest"
+						v-if="canEditBudget"
+						class="ai-command-wrap"
 					>
-						建议日均控制在
-						<span class="num">¥{{ aiRecommendData.dailyLimitSuggest.toFixed(2) }}</span>
-						以内
-					</div>
-
-					<!-- 三档推荐胶囊 -->
-					<div class="ai-tier-grid">
-						<div
-							class="ai-tier-cell"
-							:class="{
-								active: budgetForm.budgetAmount === aiRecommendData.savingAmount,
-							}"
-							@click="applyRecommendTier(aiRecommendData.savingAmount)"
-						>
-							<div class="tier-name">节约档 (85%)</div>
-							<div class="tier-val">¥{{ (aiRecommendData.savingAmount || 0).toFixed(0) }}</div>
-						</div>
-						<div
-							class="ai-tier-cell ai-tier-cell--recom"
-							:class="{
-								active: budgetForm.budgetAmount === aiRecommendData.moderateAmount,
-							}"
-							@click="applyRecommendTier(aiRecommendData.moderateAmount)"
-						>
-							<span class="recom-badge">推荐</span>
-							<div class="tier-name">适度档 (100%)</div>
-							<div class="tier-val">¥{{ (aiRecommendData.moderateAmount || 0).toFixed(0) }}</div>
-						</div>
-						<div
-							class="ai-tier-cell"
-							:class="{
-								active: budgetForm.budgetAmount === aiRecommendData.relaxedAmount,
-							}"
-							@click="applyRecommendTier(aiRecommendData.relaxedAmount)"
-						>
-							<div class="tier-name">宽松档 (115%)</div>
-							<div class="tier-val">¥{{ (aiRecommendData.relaxedAmount || 0).toFixed(0) }}</div>
-						</div>
-					</div>
-
-					<!-- 重点管控分类一键采纳 -->
-					<div
-						v-if="aiRecommendData.recommendedCategories?.length"
-						class="ai-recom-cats"
-					>
-						<div class="cats-label">建议管控:</div>
-						<div class="cats-tags">
-							<span
-								v-for="cat in aiRecommendData.recommendedCategories"
-								:key="cat"
-								class="cat-tag"
+						<div class="ai-input-box">
+							<input
+								v-model="aiCommandInput"
+								class="ai-input"
+								type="text"
+								placeholder="如：“设2500预算，重点管餐饮”"
+								@keyup.enter="onAiParseCommand"
+							/>
+							<van-icon
+								v-if="aiCommandInput"
+								name="clear"
+								class="ai-clear-icon"
+								@click="clearAiCommandInput"
+							/>
+							<button
+								class="ai-parse-btn"
+								:disabled="aiParsing"
+								@click="onAiParseCommand"
 							>
-								{{ cat }}
+								{{ aiParsing ? '解析中' : '回填' }}
+							</button>
+						</div>
+						<div class="ai-sample-chips">
+							<span
+								v-for="sample in aiCommandSamples"
+								:key="sample"
+								class="sample-chip"
+								@click="applyAiSample(sample)"
+							>
+								{{ sample }}
 							</span>
 						</div>
-						<span
-							v-if="canEditBudget"
-							class="apply-cat-btn"
-							@click="applyRecommendedCategories(aiRecommendData.recommendedCategories)"
-						>
-							采纳分类
-						</span>
 					</div>
+
+					<!-- 测算推荐详情 -->
+					<div
+						v-if="aiRecommendData"
+						class="ai-recommend-body"
+					>
+						<div class="ai-advice-header">
+							<div class="ai-advice-text">
+								{{ aiRecommendData.healthAdvice }}
+							</div>
+							<span
+								v-if="aiRecommendData.isFallback"
+								class="ai-mode-tag ai-mode-tag--fallback"
+							>智能规则</span>
+							<span
+								v-else
+								class="ai-mode-tag ai-mode-tag--ai"
+							>大模型洞察</span>
+						</div>
+						<div
+							v-if="aiRecommendData.dailyLimitSuggest"
+							class="ai-daily-suggest"
+						>
+							建议日均控制在
+							<span class="num">¥{{ aiRecommendData.dailyLimitSuggest.toFixed(2) }}</span>
+							以内
+						</div>
+
+						<!-- 三档推荐胶囊 -->
+						<div class="ai-tier-grid">
+							<div
+								class="ai-tier-cell"
+								:class="{
+									active: budgetForm.budgetAmount === aiRecommendData.savingAmount,
+								}"
+								@click="applyRecommendTier(aiRecommendData.savingAmount)"
+							>
+								<div class="tier-name">节约档 (85%)</div>
+								<div class="tier-val">¥{{ (aiRecommendData.savingAmount || 0).toFixed(0) }}</div>
+							</div>
+							<div
+								class="ai-tier-cell ai-tier-cell--recom"
+								:class="{
+									active: budgetForm.budgetAmount === aiRecommendData.moderateAmount,
+								}"
+								@click="applyRecommendTier(aiRecommendData.moderateAmount)"
+							>
+								<span class="recom-badge">推荐</span>
+								<div class="tier-name">适度档 (100%)</div>
+								<div class="tier-val">¥{{ (aiRecommendData.moderateAmount || 0).toFixed(0) }}</div>
+							</div>
+							<div
+								class="ai-tier-cell"
+								:class="{
+									active: budgetForm.budgetAmount === aiRecommendData.relaxedAmount,
+								}"
+								@click="applyRecommendTier(aiRecommendData.relaxedAmount)"
+							>
+								<div class="tier-name">宽松档 (115%)</div>
+								<div class="tier-val">¥{{ (aiRecommendData.relaxedAmount || 0).toFixed(0) }}</div>
+							</div>
+						</div>
+
+						<!-- 重点管控分类一键采纳 -->
+						<div
+							v-if="aiRecommendData.recommendedCategories?.length"
+							class="ai-recom-cats"
+						>
+							<div class="cats-label">建议管控:</div>
+							<div class="cats-tags">
+								<span
+									v-for="cat in aiRecommendData.recommendedCategories"
+									:key="cat"
+									class="cat-tag"
+								>
+									{{ cat }}
+								</span>
+							</div>
+							<span
+								v-if="canEditBudget"
+								class="apply-cat-btn"
+								@click="applyRecommendedCategories(aiRecommendData.recommendedCategories)"
+							>
+								采纳分类
+							</span>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- 快捷 AI 推荐条 (当有适度档推荐时轻量常驻展示) -->
+			<div
+				v-if="aiRecommendData?.moderateAmount"
+				class="quick-ai-recommend-bar"
+			>
+				<span class="bar-label">AI 建议预算:</span>
+				<div
+					:class="['ai-quick-pill', budgetForm.budgetAmount === aiRecommendData.moderateAmount && 'active']"
+					@click="applyRecommendTier(aiRecommendData.moderateAmount)"
+				>
+					<span class="pill-badge">推荐</span>
+					<span class="pill-amount">¥{{ (aiRecommendData.moderateAmount || 0).toFixed(0) }}</span>
 				</div>
 			</div>
 
@@ -173,11 +233,11 @@
 				input-align="right"
 				:readonly="!canEditBudget"
 				data-testid="input-budget-amount"
-				class="budget-amount-field"
+				:class="['budget-amount-field', isAmountHighlighted && 'field-highlight-pulse']"
 			/>
 
 			<!-- 纳入统计分类 -->
-			<div class="dialog-category-section">
+			<div :class="['dialog-category-section', isCategoriesHighlighted && 'category-highlight-pulse']">
 				<div class="section-header">
 					<div class="section-title">
 						<span>纳入统计分类</span>
@@ -590,10 +650,39 @@ const initData = async () => {
 };
 
 // AI 智能预算测算与指令解析
+const isAiExpanded = ref<boolean>(false);
+const isAmountHighlighted = ref<boolean>(false);
+const isCategoriesHighlighted = ref<boolean>(false);
 const aiRecommending = ref<boolean>(false);
 const aiParsing = ref<boolean>(false);
 const aiCommandInput = ref<string>('');
 const aiRecommendData = ref<FinanceBudgetAiRecommendVo | null>(null);
+
+const triggerAmountHighlight = () => {
+	isAmountHighlighted.value = true;
+	navigator.vibrate?.([15, 50, 15]);
+	setTimeout(() => {
+		isAmountHighlighted.value = false;
+	}, 1200);
+};
+
+const triggerCategoriesHighlight = () => {
+	isCategoriesHighlighted.value = true;
+	navigator.vibrate?.([15, 50, 15]);
+	setTimeout(() => {
+		isCategoriesHighlighted.value = false;
+	}, 1200);
+};
+
+const clearAiCommandInput = () => {
+	aiCommandInput.value = '';
+	navigator.vibrate?.(10);
+};
+
+const toggleAiExpanded = () => {
+	isAiExpanded.value = !isAiExpanded.value;
+	navigator.vibrate?.(10);
+};
 
 const aiCommandSamples = ['设2500预算管餐饮交通', '每月2000管餐饮', '不设上限'];
 
@@ -647,9 +736,11 @@ const onAiParseCommand = async () => {
 		if (code === '200' && data) {
 			if (data.hasBudget && data.amount !== undefined && data.amount !== null) {
 				budgetForm.budgetAmount = Number(data.amount);
+				triggerAmountHighlight();
 			}
 			if (data.hasCategories && data.categories && data.categories.length > 0) {
 				budgetForm.categoryCodes = [...data.categories];
+				triggerCategoriesHighlight();
 			}
 			showSuccessToast(data.reasoning || '已应用 AI 配置');
 			debouncedPreview();
@@ -665,15 +756,15 @@ const onAiParseCommand = async () => {
 
 const applyRecommendTier = (amount?: number) => {
 	if (!canEditBudget.value || amount === undefined || amount === null) return;
-	navigator.vibrate?.(10);
 	budgetForm.budgetAmount = Number(amount);
+	triggerAmountHighlight();
 	debouncedPreview();
 };
 
 const applyRecommendedCategories = (categories?: string[]) => {
 	if (!canEditBudget.value || !categories || !categories.length) return;
-	navigator.vibrate?.(10);
 	budgetForm.categoryCodes = [...categories];
+	triggerCategoriesHighlight();
 	showSuccessToast('已采纳推荐分类');
 	debouncedPreview();
 };
@@ -793,11 +884,14 @@ onMounted(() => {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+		cursor: pointer;
 
 		.ai-title-wrap {
 			display: flex;
 			align-items: center;
 			gap: 6px;
+			flex: 1;
+			min-width: 0;
 
 			.ai-badge {
 				background: #4f46e5;
@@ -807,28 +901,61 @@ onMounted(() => {
 				padding: 2px 6px;
 				border-radius: 6px;
 				line-height: 1;
+				flex-shrink: 0;
 			}
 
-			.ai-title {
-				font-size: 13px;
-				font-weight: 600;
-				color: #1e1b4b;
-			}
+			.ai-title-sub {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
 
-			.ai-mode-tag {
-				font-size: 10px;
-				padding: 1px 5px;
-				border-radius: 4px;
-				line-height: 1.2;
-
-				&--fallback {
-					background: #fef3c7;
-					color: #b45309;
+				.ai-title {
+					font-size: 13px;
+					font-weight: 600;
+					color: #1e1b4b;
+					flex-shrink: 0;
 				}
 
-				&--ai {
+				.ai-brief-tag {
+					font-size: 10px;
 					background: #e0e7ff;
 					color: #4338ca;
+					padding: 1px 5px;
+					border-radius: 4px;
+					font-weight: 500;
+				}
+
+				.ai-brief-tip {
+					font-size: 11px;
+					color: #818cf8;
+				}
+			}
+		}
+
+		.ai-header-right {
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			flex-shrink: 0;
+
+			.action-divider {
+				color: #c7d2fe;
+				font-size: 11px;
+			}
+
+			.ai-toggle-btn {
+				display: flex;
+				align-items: center;
+				gap: 2px;
+				font-size: 12px;
+				color: #4b5563;
+				cursor: pointer;
+
+				.toggle-icon {
+					font-size: 10px;
 				}
 			}
 		}
@@ -849,8 +976,14 @@ onMounted(() => {
 		}
 	}
 
-	.ai-command-wrap {
+	.ai-expanded-area {
 		margin-top: 10px;
+		padding-top: 10px;
+		border-top: 1px solid rgba(199, 210, 254, 0.4);
+	}
+
+	.ai-command-wrap {
+		margin-top: 4px;
 
 		.ai-input-box {
 			display: flex;
@@ -859,6 +992,13 @@ onMounted(() => {
 			border: 1px solid #c7d2fe;
 			border-radius: 8px;
 			padding: 4px 6px 4px 10px;
+
+			.ai-clear-icon {
+				font-size: 14px;
+				color: #9ca3af;
+				padding: 0 4px;
+				cursor: pointer;
+			}
 
 			.ai-input {
 				flex: 1;
@@ -1050,6 +1190,80 @@ onMounted(() => {
 	to {
 		transform: rotate(360deg);
 	}
+}
+
+.quick-ai-recommend-bar {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 12px;
+	background: #f8faff;
+	border: 1px dashed #c7d2fe;
+	border-radius: 8px;
+	margin-bottom: 12px;
+
+	.bar-label {
+		font-size: 11px;
+		color: #6b7280;
+	}
+
+	.ai-quick-pill {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		padding: 2px 8px;
+		background: #ffffff;
+		border: 1px solid #c7d2fe;
+		border-radius: 12px;
+		cursor: pointer;
+		transition: all 0.2s;
+
+		.pill-badge {
+			font-size: 9px;
+			color: #ffffff;
+			background: #4f46e5;
+			padding: 1px 4px;
+			border-radius: 3px;
+			line-height: 1.1;
+		}
+
+		.pill-amount {
+			font-size: 12px;
+			font-weight: 700;
+			color: #4f46e5;
+			font-family: monospace;
+		}
+
+		&.active {
+			background: #4f46e5;
+			border-color: #4f46e5;
+
+			.pill-badge {
+				background: #ffffff;
+				color: #4f46e5;
+			}
+
+			.pill-amount {
+				color: #ffffff;
+			}
+		}
+
+		&:active {
+			transform: scale(0.97);
+		}
+	}
+}
+
+.field-highlight-pulse {
+	box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.5) !important;
+	border-color: #6366f1 !important;
+	transition: all 0.4s ease;
+}
+
+.category-highlight-pulse {
+	box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.4) !important;
+	border-radius: 12px;
+	transition: all 0.4s ease;
 }
 
 .budget-amount-field {
