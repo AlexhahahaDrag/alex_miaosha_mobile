@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="consume-overview-container">
 		<!-- 顶部问候与简介 -->
 		<div class="greeting-section">
@@ -202,7 +202,7 @@
 <script setup lang="ts">
 import { showToast } from 'vant';
 import { typeIconMap, type CardItem, getCardColor } from '../config/index';
-import SvgIcon from '@/views/common/icons/svgIcon.vue';
+import SvgIcon from '@/components/common/SvgIcon.vue';
 import { useNavBar } from '@/composables/useNavBar';
 
 // 使用局部组件（通过标签 <SvgIcon /> 引用）

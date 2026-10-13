@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div
 		class="all-content"
 		:style="{ background: info?.color || '#1c54aa' }"
@@ -55,7 +55,7 @@
 	</div>
 </template>
 <script setup lang="ts">
-import type { Info } from '@/views/common/boardData/config';
+import type { Info } from '@/components/boardData/config';
 
 interface Props {
 	info: Info;

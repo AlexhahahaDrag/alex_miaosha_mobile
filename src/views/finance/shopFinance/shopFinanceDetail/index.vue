@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="shop-finance-detail-container">
 		<!-- Header Card -->
 		<div class="header-card">
@@ -193,7 +193,7 @@ import { showFailToast, showSuccessToast } from 'vant';
 import { rulesRef, type ShopFinanceData } from '@/views/finance/shopFinance/config';
 import { getListName, type DictFieldConfig } from '@/views/common/config';
 import { addShopFinance, updateShopFinance, getShopFinanceDetail } from '@/views/finance/shopFinance/api';
-import type { Info } from '@/views/common/pop/selectPop.vue';
+import type { Info } from '@/components/pop/selectPop.vue';
 import { getDictList } from '@/views/finance/dict/api';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';

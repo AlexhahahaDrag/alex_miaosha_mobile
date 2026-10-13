@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="coupon-page">
 		<!-- 搜索栏与过滤面板 -->
 		<section class="page-search">
@@ -234,7 +234,7 @@ import { formatDate, formatDayjs, nowDayjs, type Dayjs } from '@/utils/dayjs';
 import { getCpnCouponInfoPage, deleteCpnCouponInfo } from '@/views/cpn-coupon/cpn-coupon-info/api';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
-import CommonList from '@/views/components/CommonList.vue';
+import CommonList from '@/components/common/CommonList.vue';
 import type { ResponseBody } from '@/types/api';
 
 const router = useRouter();

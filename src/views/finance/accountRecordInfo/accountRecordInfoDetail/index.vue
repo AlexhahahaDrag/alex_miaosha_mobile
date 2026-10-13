@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<van-form
 		@submit="onSubmit"
 		:rules="rulesRef"
@@ -74,7 +74,7 @@ import {
 	getAccountRecordInfoDetail,
 } from '@/views/finance/accountRecordInfo/api';
 import { getDictList } from '@/views/finance/dict/api';
-import type { Info } from '@/views/common/pop/selectPop.vue';
+import type { Info } from '@/components/pop/selectPop.vue';
 import type { DatePickerInfo } from '@/utils/common';
 
 const route = useRoute();
@@ -139,21 +139,17 @@ const accountInfo = ref<Info<DictInfo>>({
 const popInfo = ref<Info<DictInfo>>({ showFlag: false });
 
 function choose(type: string) {
-	switch (type) {
-		case 'account':
-			popInfo.value = accountInfo.value;
-			break;
+	if (type === 'account') {
+		popInfo.value = accountInfo.value;
 	}
 	popInfo.value.showFlag = true;
 }
 
 function selectInfo(type: string, value: string, name: string) {
 	popInfo.value.showFlag = false;
-	switch (type) {
-		case 'account':
-			formInfo.value.account = value;
-			accountName.value = name;
-			break;
+	if (type === 'account') {
+		formInfo.value.account = value;
+		accountName.value = name;
 	}
 }
 
@@ -188,19 +184,15 @@ const chooseDateInfo = ref<DatePickerInfo<Dayjs>>({
 
 function chooseDate(type: string) {
 	chooseDateInfo.value.showFlag = true;
-	switch (type) {
-		case 'avliDate':
-			chooseDateInfo.value = avliDateInfo.value;
-			break;
+	if (type === 'avliDate') {
+		chooseDateInfo.value = avliDateInfo.value;
 	}
 }
 
 function selectDateInfo(date: Dayjs, dateName: string, type: string) {
-	switch (type) {
-		case 'avliDate':
-			formInfo.value.avliDate = date;
-			avliDateName.value = dateName;
-			break;
+	if (type === 'avliDate') {
+		formInfo.value.avliDate = date;
+		avliDateName.value = dateName;
 	}
 	chooseDateInfo.value.showFlag = false;
 }
@@ -210,13 +202,9 @@ function cancelDateInfo() {
 }
 
 function initInfoDate(infoDate: Dayjs | string | undefined, type: string) {
-	if (infoDate) {
-		switch (type) {
-			case 'avliDate':
-				avliDateName.value = formatDate(infoDate);
-				avliDateInfo.value.selectValue = formatDayjs(infoDate);
-				break;
-		}
+	if (infoDate && type === 'avliDate') {
+		avliDateName.value = formatDate(infoDate);
+		avliDateInfo.value.selectValue = formatDayjs(infoDate);
 	}
 }
 

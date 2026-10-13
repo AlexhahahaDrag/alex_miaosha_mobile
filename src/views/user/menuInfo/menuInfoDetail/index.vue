@@ -120,7 +120,7 @@ import { label, rulesRef } from './menuInfoDetailTs';
 import { useNavBar } from '@/composables/useNavBar';
 import { getListName } from '@/views/common/config';
 import { addMenuInfo, updateMenuInfo, getMenuInfoDetail } from '@/views/user/menuInfo/api';
-import type { Info } from '@/views/common/pop/selectPop.vue';
+import type { Info } from '@/components/pop/selectPop.vue';
 import { getDictList } from '@/views/finance/dict/api';
 
 const route = useRoute();

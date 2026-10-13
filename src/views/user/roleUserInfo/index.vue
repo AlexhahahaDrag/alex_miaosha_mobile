@@ -126,7 +126,7 @@ import { useNavBar } from '@/composables/useNavBar';
 import { getRoleUserInfoPage, deleteRoleUserInfo } from '@/views/user/roleUserInfo/api';
 import { getUserManagerList } from '@/views/user/userManager/api';
 import { getRoleInfoList } from '@/views/user/roleInfo/api';
-import type { Info } from '@/views/common/pop/selectPop.vue';
+import type { Info } from '@/components/pop/selectPop.vue';
 import type { PageInfo } from '@/views/common/config/index';
 import type { RoleUserInfoData } from '@/views/user/roleUserInfo/config';
 import type { UserManagerData } from '@/views/user/userManager/config';

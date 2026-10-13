@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<van-form
 		@submit="onSubmit"
 		:rules="rulesRef"
@@ -62,7 +62,7 @@ import { showFailToast, showSuccessToast } from 'vant';
 import { rulesRef, type PersonalGiftData, labelMap } from '../config';
 import { getPersonalGiftDetail, addPersonalGift, editPersonalGift } from '../api/personalGiftTs';
 import { getListName } from '@/views/common/config';
-import type { Info } from '@/views/common/pop/selectPop.vue';
+import type { Info } from '@/components/pop/selectPop.vue';
 import { getRoutePathByName } from '@/utils/router';
 import { datePickerFormatter, formatDayjs, nowDayjs, type Dayjs } from '@/utils/dayjs';
 import type { DatePickerInfo } from '@/utils/common';

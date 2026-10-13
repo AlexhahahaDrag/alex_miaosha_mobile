@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="profile-page">
 		<van-divider>头像</van-divider>
 		<div class="avatar-row">
@@ -92,7 +92,7 @@
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-import uploadImage from '@/views/common/upload/uploadImage.vue';
+import uploadImage from '@/components/common/UploadImage.vue';
 import { useNavBar } from '@/composables/useNavBar';
 import type { NavBarConfig } from '@/composables/useNavBar';
 import { useUserStore } from '@/store/modules/user/user';

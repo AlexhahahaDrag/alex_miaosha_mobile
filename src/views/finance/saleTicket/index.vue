@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="sale-ticket-container">
 		<!-- Header Card -->
 		<div class="header-card">
@@ -143,7 +143,7 @@ import { useTabBar } from '@/composables/useTabBar';
 import { getListName } from '@/views/common/config';
 import type { ShopStockData } from '@/views/finance/shopStock/config';
 import type { SaleOrderInfo } from '@/views/finance/saleTicket/saleTicketTs';
-import type { Info } from '@/views/common/pop/selectPop.vue';
+import type { Info } from '@/components/pop/selectPop.vue';
 import type { DictInfo } from '@/views/finance/dict/api';
 
 const route = useRoute();

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="shop-stock-attrs-detail">
 		<div class="detail-container">
 			<van-form
@@ -198,7 +198,7 @@ import { showFailToast, showSuccessToast } from 'vant';
 import { label, rulesRef } from '@/views/finance/shopStockAttrs/config';
 import type { ShopStockAttrsData } from '@/views/finance/shopStockAttrs/config';
 import { addShopStockAttrs, updateShopStockAttrs, getShopStockAttrsDetail } from '@/views/finance/shopStockAttrs/api';
-import type { Info } from '@/views/common/pop/selectPop.vue';
+import type { Info } from '@/components/pop/selectPop.vue';
 import type { DictInfo } from '@/views/common/config';
 import { getListName } from '@/views/common/config';
 import { getDictList } from '@/views/finance/dict/api';
@@ -230,21 +230,17 @@ const isValidInfo = ref<Info>({
 // [Methods]
 const choose = (type: string): void => {
 	navigator.vibrate?.(50);
-	switch (type) {
-		case 'isValid':
-			popInfo.value = isValidInfo.value;
-			break;
+	if (type === 'isValid') {
+		popInfo.value = isValidInfo.value;
 	}
 	popInfo.value.showFlag = true;
 };
 
 const selectInfo = (type: string, value: any, name: string): void => {
 	popInfo.value.showFlag = false;
-	switch (type) {
-		case 'isValid':
-			formInfo.value.isValid = value;
-			isValidName.value = name;
-			break;
+	if (type === 'isValid') {
+		formInfo.value.isValid = value;
+		isValidName.value = name;
 	}
 };
 

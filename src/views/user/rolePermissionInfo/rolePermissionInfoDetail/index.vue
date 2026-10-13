@@ -68,7 +68,7 @@ import {
 	getRolePermissionInfoDetail,
 } from '@/views/user/rolePermissionInfo/api';
 import type { RolePermissionInfoData } from '@/views/user/rolePermissionInfo/config';
-import type { Info } from '@/views/common/pop/selectPop.vue';
+import type { Info } from '@/components/pop/selectPop.vue';
 import { getDictList, type DictInfo } from '@/views/finance/dict/api';
 
 interface RolePermissionDetailForm extends RolePermissionInfoData {

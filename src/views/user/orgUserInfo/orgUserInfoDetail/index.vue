@@ -67,7 +67,7 @@ import { label, rulesRef } from './orgUserInfoDetailTs';
 import { useNavBar } from '@/composables/useNavBar';
 import { getListName } from '@/views/common/config';
 import { addOrgUserInfo, updateOrgUserInfo, getOrgUserInfoDetail } from '@/views/user/orgUserInfo/api';
-import type { Info } from '@/views/common/pop/selectPop.vue';
+import type { Info } from '@/components/pop/selectPop.vue';
 import { getDictList } from '@/views/finance/dict/api';
 import { getOrgInfoTree } from '@/views/user/orgInfo/api';
 import { flattenOrgTree, type OrgTreeOption } from '@/views/user/orgInfo/orgInfoTs';
@@ -239,12 +239,7 @@ function init() {
 						'id',
 						'rawName',
 					);
-					userName.value = getListName<UserManagerData>(
-						userInfo.value.list || [],
-						formInfo.value.userId,
-						'id',
-						'nickName',
-					);
+					userName.value = getListName<UserManagerData>(userInfo.value.list || [], formInfo.value.userId, 'id', 'nickName');
 				} else {
 					showFailToast(detailRes?.message || '查询详情失败，请联系管理员');
 				}

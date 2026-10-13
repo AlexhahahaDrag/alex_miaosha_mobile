@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="gift-dashboard">
 		<section class="overview">
 			<div class="overview__item">
@@ -46,8 +46,8 @@
 <script setup lang="ts">
 import { showFailToast } from 'vant';
 import { useNavBar } from '@/composables/useNavBar';
-import CommonPullRefresh from '@/views/components/CommonPullRefresh.vue';
-import CommonList from '@/views/components/CommonList.vue';
+import CommonPullRefresh from '@/components/common/CommonPullRefresh.vue';
+import CommonList from '@/components/common/CommonList.vue';
 import GiftRecordCard from '@/views/finance/gift/components/GiftRecordCard.vue';
 import { getGiftRecordPage } from '@/views/finance/gift/record/api';
 import type { GiftRecordInfo } from '@/views/finance/gift/config';

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="selector-container">
 		<div
 			class="selector-item"
@@ -62,7 +62,7 @@
 <script lang="ts" setup>
 import { showFailToast } from 'vant';
 import { formatDate, formatMonth, nowDayjs, datePickerFormatter, type Dayjs } from '@/utils/dayjs';
-import type { Info } from '@/views/common/pop/selectPop.vue';
+import type { Info } from '@/components/pop/selectPop.vue';
 import { getListName } from '@/views/common/config';
 import { useUserStore } from '@/store/modules/user/user';
 import { getUserManagerList } from '@/views/user/userManager/api';

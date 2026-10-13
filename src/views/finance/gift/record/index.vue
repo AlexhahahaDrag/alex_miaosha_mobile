@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="gift-mobile-page">
 		<section class="gift-search">
 			<van-search
@@ -270,8 +270,8 @@
 import { showConfirmDialog, showFailToast, showSuccessToast, showToast } from 'vant';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
-import CommonPullRefresh from '@/views/components/CommonPullRefresh.vue';
-import CommonList from '@/views/components/CommonList.vue';
+import CommonPullRefresh from '@/components/common/CommonPullRefresh.vue';
+import CommonList from '@/components/common/CommonList.vue';
 import GiftRecordCard from '@/views/finance/gift/components/GiftRecordCard.vue';
 import {
 	addGiftRecord,

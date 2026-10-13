@@ -26,7 +26,7 @@ import { showNotify } from 'vant';
 import type { ShopStockAnalysisData } from '@/views/finance/shopStockAnalysis/config';
 import { getAllStock, getCashAmount } from '@/views/finance/shopStockAnalysis/api';
 import commonUtils from '@/utils/common/index';
-import type { Info } from '@/views/common/boardData/config';
+import type { Info } from '@/components/boardData/config';
 
 interface Props {
 	activeTab: number | string;

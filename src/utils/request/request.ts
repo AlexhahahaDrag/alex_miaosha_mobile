@@ -32,7 +32,7 @@ const errorHandler = async (error: AxiosError): Promise<unknown> => {
 
 		const { data } = error.response as AxiosResponse;
 		if (data) {
-			const version = headers ? (headers['x-crypto-version'] || headers['X-Crypto-Version']) : null;
+			const version = headers ? headers['x-crypto-version'] || headers['X-Crypto-Version'] : null;
 			if (version === '2.0' && typeof data === 'string') {
 				response = await decryptGcm(data);
 			} else {
@@ -82,7 +82,7 @@ const requestHandlerFile = (
 
 const responseHandler = async (response: AxiosResponse<unknown>) => {
 	const { data, headers } = response;
-	const version = headers ? (headers['x-crypto-version'] || headers['X-Crypto-Version']) : null;
+	const version = headers ? headers['x-crypto-version'] || headers['X-Crypto-Version'] : null;
 	let resData: any;
 	if (version === '2.0' && typeof data === 'string') {
 		resData = await decryptGcm(data);
@@ -104,4 +104,5 @@ request.interceptors.response.use(responseHandler, errorHandler);
 requestFile.interceptors.request.use(requestHandlerFile, errorHandler);
 requestFile.interceptors.response.use(responseHandler, errorHandler);
 
-export { request as default, requestFile };
+export default request;
+export { requestFile };

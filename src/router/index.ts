@@ -9,11 +9,7 @@ import { canAccessRoutePermission, type RouteAccessOptions } from '@/utils/permi
 import { getUserMenusApi } from '@/views/login/api';
 import type { MenuInfoData } from '@/views/user/menuInfo/config';
 
-const modules = import.meta.glob([
-	'@/views/**/**.vue',
-	'!@/views/common/nav-bar/index.vue',
-	'!@/views/common/tab-bar/index.vue',
-]);
+const modules = import.meta.glob('@/views/**/**.vue');
 
 const pageInfo = {
 	dashboard: '/src/views/home/index.vue',
@@ -21,7 +17,7 @@ const pageInfo = {
 	about: '/src/views/user/index.vue',
 	myself: '/src/views/user/userManager/index.vue',
 	login: '/src/views/login/index.vue',
-	'404': '/src/views/common/error/404.vue',
+	'404': '/src/views/error/404.vue',
 };
 
 const fallbackView = modules[pageInfo['404']];

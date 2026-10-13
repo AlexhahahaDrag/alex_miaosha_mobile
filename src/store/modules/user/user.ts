@@ -113,7 +113,7 @@ export const useUserStore = defineStore('app-user', {
 
 				showFailToast(data?.message || '登录失败！');
 			} catch (error: unknown) {
-				return Promise.reject(error);
+				throw error;
 			}
 		},
 	},

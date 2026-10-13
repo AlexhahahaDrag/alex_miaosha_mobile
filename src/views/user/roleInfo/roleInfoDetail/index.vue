@@ -64,7 +64,7 @@ import { useNavBar } from '@/composables/useNavBar';
 import { getListName } from '@/views/common/config';
 import { addRoleInfo, updateRoleInfo, getRoleInfoDetail } from '@/views/user/roleInfo/api';
 import type { RoleInfoData } from '@/views/user/roleInfo/config';
-import type { Info } from '@/views/common/pop/selectPop.vue';
+import type { Info } from '@/components/pop/selectPop.vue';
 import { getDictList, type DictInfo } from '@/views/finance/dict/api';
 
 interface RoleInfoDetailForm extends RoleInfoData {

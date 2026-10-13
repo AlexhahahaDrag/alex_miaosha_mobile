@@ -28,7 +28,7 @@
 
 <script lang="ts" setup>
 import { showNotify } from 'vant';
-import type { BarItem } from '@/views/model/chart/bar';
+import type { BarItem } from '@/components/chart/types';
 import type { ShopFinanceAnalysisData, TooltipPoint } from '@/views/finance/shopFinanceAnalysis/config';
 import { getDayShopFinanceInfo, getMonthShopFinanceInfo } from '@/views/finance/shopFinanceAnalysis/api';
 

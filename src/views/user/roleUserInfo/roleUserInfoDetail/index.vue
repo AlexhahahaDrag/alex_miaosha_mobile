@@ -67,7 +67,7 @@ import { label, rulesRef } from './roleUserInfoDetailTs';
 import { useNavBar } from '@/composables/useNavBar';
 import { getListName } from '@/views/common/config';
 import { addRoleUserInfo, updateRoleUserInfo, getRoleUserInfoDetail } from '@/views/user/roleUserInfo/api';
-import type { Info } from '@/views/common/pop/selectPop.vue';
+import type { Info } from '@/components/pop/selectPop.vue';
 import { getDictList } from '@/views/finance/dict/api';
 import { getRoleInfoList } from '@/views/user/roleInfo/api';
 import { getUserManagerList } from '@/views/user/userManager/api';
@@ -227,12 +227,7 @@ function init() {
 				if (detailRes.code == '200') {
 					formInfo.value = detailRes.data || {};
 					roleName.value = getListName(roleInfo.value.list || [], formInfo.value.roleId, 'id', 'roleName');
-					userName.value = getListName<UserManagerData>(
-						userInfo.value.list || [],
-						formInfo.value.userId,
-						'id',
-						'nickName',
-					);
+					userName.value = getListName<UserManagerData>(userInfo.value.list || [], formInfo.value.userId, 'id', 'nickName');
 				} else {
 					showFailToast(detailRes?.message || '查询详情失败，请联系管理员');
 				}

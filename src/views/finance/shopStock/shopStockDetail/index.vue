@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="shop-stock-detail-container">
 		<!-- Header Card -->
 		<div class="header-card">
@@ -258,7 +258,7 @@ import { type ShopStockData, label, rulesRef } from '../config';
 import type { ShopStockBatchData } from '../../shopStockBatch/config';
 import { getListName, type DictFieldConfig } from '@/views/common/config';
 import { addShopStock, updateShopStock, getShopStockDetail } from '@/views/finance/shopStock/api';
-import type { Info } from '@/views/common/pop/selectPop.vue';
+import type { Info } from '@/components/pop/selectPop.vue';
 import { getDictList } from '@/views/finance/dict/api';
 import { getShopStockBatchList } from '@/views/finance/shopStockBatch/api';
 import { useNavBar } from '@/composables/useNavBar';

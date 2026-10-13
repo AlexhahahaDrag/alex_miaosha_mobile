@@ -23,8 +23,12 @@
 					>
 						<div class="form-fields">
 							<div class="field-group">
-								<label class="field-label">用户名</label>
+								<label
+									for="login-username"
+									class="field-label"
+								>用户名</label>
 								<van-field
+									id="login-username"
 									v-model="loginForm.username"
 									name="username"
 									placeholder="请输入用户名"
@@ -34,8 +38,12 @@
 								/>
 							</div>
 							<div class="field-group">
-								<label class="field-label">密码</label>
+								<label
+									for="login-password"
+									class="field-label"
+								>密码</label>
 								<van-field
+									id="login-password"
 									v-model="loginForm.password"
 									:type="showPassword ? 'text' : 'password'"
 									name="password"

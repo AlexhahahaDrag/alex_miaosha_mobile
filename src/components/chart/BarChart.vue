@@ -7,7 +7,8 @@
 </template>
 
 <script setup lang="ts">
-import type { BarItem } from '@/views/model/chart/bar';
+import BaseChart from './BaseChart.vue';
+import type { BarItem } from './types';
 
 // 图表颜色配置常量
 const CHART_COLORS = [
@@ -46,11 +47,11 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
 	config: () => ({}),
-	title: 'title',
+	title: '',
 	tooltip: () => ({}),
 	data: () => ({}),
-	width: '600px',
-	height: '400px',
+	width: '100%',
+	height: '350px',
 	stackInfo: () => [],
 	nameInfo: () => [],
 });
@@ -68,9 +69,57 @@ const formatYAxisLabel = (value: number): string | number => {
 	return value;
 };
 
+// 计算 Y 轴最大值（向上取整到合适的刻度）
+const getMax = (num: number): number => {
+	if (num <= 5) return 5;
+	if (num <= 10) return 10;
+	if (num <= 100) return Math.ceil(num / 5) * 5;
+	return getMax(num / 10) * 10;
+};
+
+// 计算 Y 轴最小值（向下取整到合适的刻度）
+const getMin = (num: number): number => {
+	if (num < 0) return -getMax(-num);
+	if (num <= 5) return 0;
+	if (num <= 10) return 5;
+	if (num <= 100) return Math.floor(num / 5) * 5;
+	return getMin(num / 10) * 10;
+};
+
+// 初始化图表配置
+const initChartOption = (): Record<string, unknown> => ({
+	title: {
+		text: '',
+		left: 'center',
+	},
+	color: CHART_COLORS,
+	tooltip: {
+		trigger: 'axis',
+	},
+	xAxis: {
+		type: 'category',
+		boundaryGap: false,
+		data: [] as string[],
+		axisTick: {
+			alignWithLabel: true,
+		},
+		name: '',
+	},
+	yAxis: [
+		{
+			type: 'value',
+			name: '',
+		},
+	],
+	series: [] as Array<Record<string, unknown>>,
+});
+
+const options = ref<Record<string, unknown>>(initChartOption());
+
 // 设置图表配置
 const setOption = (data: BarItem<number>) => {
-	const { xAxis, nameInfo, yTitle, tooltip, xTile, dataType, stackInfo, grid } = props.config;
+	const config = props.config || {};
+	const { xAxis, nameInfo, yTitle, tooltip, xTile, xTitle, dataType, stackInfo, grid } = config;
 
 	if (!data?.series?.length) {
 		return;
@@ -122,7 +171,7 @@ const setOption = (data: BarItem<number>) => {
 				max,
 				nameLocation: 'center',
 				nameGap: 25,
-				interval: (max - min) / 5,
+				interval: (max - min) / 5 || 1,
 				axisLabel: {
 					formatter: formatYAxisLabel,
 				},
@@ -131,13 +180,9 @@ const setOption = (data: BarItem<number>) => {
 			// 更新已存在的 Y 轴范围
 			const existingAxis = yAxis.find((item) => item.name === title);
 			if (existingAxis) {
-				if (existingAxis.max < max) {
-					existingAxis.max = max;
-				}
-				if (existingAxis.min > min) {
-					existingAxis.min = min;
-				}
-				existingAxis.interval = (existingAxis.max - existingAxis.min) / 5;
+				if (existingAxis.max < max) existingAxis.max = max;
+				if (existingAxis.min > min) existingAxis.min = min;
+				existingAxis.interval = (existingAxis.max - existingAxis.min) / 5 || 1;
 			}
 		}
 
@@ -169,73 +214,12 @@ const setOption = (data: BarItem<number>) => {
 			axisTick: {
 				alignWithLabel: true,
 			},
-			name: xTile ?? '',
+			name: xTitle ?? xTile ?? '',
 		},
 		yAxis,
 		series,
 	};
 };
-
-// 计算 Y 轴最大值（向上取整到合适的刻度）
-const getMax = (num: number): number => {
-	if (num <= 5) {
-		return 5;
-	}
-	if (num <= 10) {
-		return 10;
-	}
-	if (num <= 100) {
-		return Math.ceil(num / 5) * 5;
-	}
-	return getMax(num / 10) * 10;
-};
-
-// 计算 Y 轴最小值（向下取整到合适的刻度）
-const getMin = (num: number): number => {
-	if (num < 0) {
-		return -getMax(-num);
-	}
-	if (num <= 5) {
-		return 0;
-	}
-	if (num <= 10) {
-		return 5;
-	}
-	if (num <= 100) {
-		return Math.floor(num / 5) * 5;
-	}
-	return getMin(num / 10) * 10;
-};
-
-// 初始化图表配置
-const initChartOption = (): Record<string, unknown> => ({
-	title: {
-		text: '',
-		left: 'center',
-	},
-	color: CHART_COLORS,
-	tooltip: {
-		trigger: 'axis',
-	},
-	xAxis: {
-		type: 'category',
-		boundaryGap: false,
-		data: [] as string[],
-		axisTick: {
-			alignWithLabel: true,
-		},
-		name: '',
-	},
-	yAxis: [
-		{
-			type: 'value',
-			name: '',
-		},
-	],
-	series: [] as Array<Record<string, unknown>>,
-});
-
-const options = ref<Record<string, unknown>>(initChartOption());
 
 // 监听 data 变化，更新图表
 watch(
@@ -265,6 +249,8 @@ onMounted(() => {
 		setOption(props.data);
 	}
 });
-</script>
 
-<style lang="less" scoped></style>
+defineOptions({
+	name: 'BarChart',
+});
+</script>

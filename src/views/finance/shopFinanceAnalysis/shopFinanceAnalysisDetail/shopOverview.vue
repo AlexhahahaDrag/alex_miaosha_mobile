@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<van-grid :column-num="2">
 		<div class="box-content-show">
 			<div
@@ -26,7 +26,7 @@ import { showNotify } from 'vant';
 import { getMonthRange } from '@/utils/dayjs';
 import { getChainAndYear, getBenefit } from '@/views/finance/shopFinanceAnalysis/api';
 import commonUtils from '@/utils/common/index';
-import type { Info } from '@/views/common/boardData/config';
+import type { Info } from '@/components/boardData/config';
 
 interface Props {
 	activeTab: number | string;

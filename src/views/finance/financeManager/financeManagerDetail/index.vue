@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="finance-detail-container">
 		<div
 			v-if="formInfo.id && !canEditRecord"
@@ -376,7 +376,7 @@ import { rulesRef, type FinanceManagerData } from '@/views/finance/financeManage
 import { getDictList } from '@/views/finance/dict/api';
 import { getUserManagerList } from '@/views/user/userManager/api';
 import { useUserStore } from '@/store/modules/user/user';
-import type { Info } from '@/views/common/pop/selectPop.vue';
+import type { Info } from '@/components/pop/selectPop.vue';
 import { datePickerFormatter, formatDayjs, formatDate, formatMonth, nowDayjs, type Dayjs } from '@/utils/dayjs';
 import type { DatePickerInfo } from '@/utils/common';
 import type { DictInfo } from '@/views/finance/dict/api';

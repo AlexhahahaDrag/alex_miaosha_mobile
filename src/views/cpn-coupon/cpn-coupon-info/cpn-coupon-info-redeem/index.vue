@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="redeem-page">
 		<!-- 顶部展示卡片 - 英雄区 -->
 		<div class="section-card coupon-hero-card">
@@ -246,7 +246,7 @@ import { showFailToast, showSuccessToast } from 'vant';
 import { getCpnCouponInfoDetail } from '@/views/cpn-coupon/cpn-coupon-info/api';
 import { redeemCpnUserCouponInfo } from '@/views/cpn-coupon/cpn-user-coupon-info/api';
 import { getUserManagerList } from '@/views/user/userManager/api';
-import type { Info } from '@/views/common/pop/selectPop.vue';
+import type { Info } from '@/components/pop/selectPop.vue';
 import type { UserManagerData } from '@/views/user/userManager/config';
 import { getRoutePathByName } from '@/utils/router';
 import { formatDate, formatTime, nowDayjs, datePickerFormatter, type Dayjs } from '@/utils/dayjs';

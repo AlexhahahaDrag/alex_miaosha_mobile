@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="shop-stock-batch-detail-container">
 		<van-form
 			@submit="onSubmit"
@@ -171,7 +171,7 @@ import { label, rulesRef } from '@/views/finance/shopStockBatch/config';
 import type { ShopStockBatchData } from '@/views/finance/shopStockBatch/config';
 import { getListName } from '@/views/common/config';
 import { addShopStockBatch, updateShopStockBatch, getShopStockBatchDetail } from '@/views/finance/shopStockBatch/api';
-import type { Info } from '@/views/common/pop/selectPop.vue';
+import type { Info } from '@/components/pop/selectPop.vue';
 import { getDictList } from '@/views/finance/dict/api';
 import { useNavBar } from '@/composables/useNavBar';
 import type { DictInfo } from '@/views/common/config';
@@ -207,22 +207,18 @@ const isValidInfo = ref<Info<DictInfo>>({
 
 // --- Methods ---
 const choose = (type: string) => {
-	switch (type) {
-		case 'isValid':
-			isValidInfo.value.selectValue = formInfo.value.isValid;
-			popInfo.value = isValidInfo.value;
-			break;
+	if (type === 'isValid') {
+		isValidInfo.value.selectValue = formInfo.value.isValid;
+		popInfo.value = isValidInfo.value;
 	}
 	popInfo.value.showFlag = true;
 };
 
 const selectInfo = (type: string, value: string, name: string) => {
 	popInfo.value.showFlag = false;
-	switch (type) {
-		case 'isValid':
-			formInfo.value.isValid = value;
-			isValidName.value = name;
-			break;
+	if (type === 'isValid') {
+		formInfo.value.isValid = value;
+		isValidName.value = name;
 	}
 };
 
