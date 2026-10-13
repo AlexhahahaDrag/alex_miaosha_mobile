@@ -1,4 +1,4 @@
-import type { FileInfoData } from '@/views/file/config';
+import type { FileInfoData } from '@/views/common/api/file';
 
 export type GiftDirection = 'GIVE' | 'RECEIVE' | 'RETURN';
 export type GiftId = string;

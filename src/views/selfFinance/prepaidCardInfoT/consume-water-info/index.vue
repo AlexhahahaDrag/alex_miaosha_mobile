@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<div class="transaction-history">
 		<!-- Main Content -->
 		<div class="main-content">
@@ -188,14 +188,14 @@
 <script setup lang="ts">
 import { showFailToast } from 'vant';
 import { typeIconMap } from '../config/index';
-import { getPrepaidCardInfoList } from '../api';
-import { useNavBar } from '@/composables/useNavBar';
-import { getFormatTimeInfo } from '@/utils/dayjs';
 import {
+	getPrepaidCardInfoList,
 	getConsumeCardRecordPage,
 	type TransactionRecord,
 	type TransactionQueryParams,
-} from '@/views/finance/consumeCardRecord/api';
+} from '../api';
+import { useNavBar } from '@/composables/useNavBar';
+import { getFormatTimeInfo } from '@/utils/dayjs';
 import filterIcon from '@/assets/icons/shop/filter.svg';
 
 const route = useRoute();

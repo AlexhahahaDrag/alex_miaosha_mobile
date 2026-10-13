@@ -1,4 +1,4 @@
-import type { FileInfoData, FileInfoFormData } from '../config';
+import type { CommonPageResult, ResponseBody } from '@/types/api';
 import {
 	getData,
 	postData,
@@ -7,7 +7,18 @@ import {
 	baseService,
 	postFileData,
 } from '@/views/common/api';
-import type { CommonPageResult, ResponseBody } from '@/types/api';
+
+export interface FileInfoData {
+	id?: string;
+	name?: string;
+	type?: string;
+	url?: string;
+	preUrl?: string;
+	preThumbnailUrl?: string;
+	[key: string]: unknown;
+}
+
+export type FileInfoFormData = FileInfoData | FormData;
 
 const baseFileManager = '/file-info';
 

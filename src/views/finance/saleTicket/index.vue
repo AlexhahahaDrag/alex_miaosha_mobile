@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<div class="sale-ticket-container">
 		<!-- Header Card -->
 		<div class="header-card">
@@ -131,12 +131,12 @@
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-import type { ShopCartData } from '../shopCart/config';
+import type { ShopCartData } from '../shoppingCart/config';
 import { nowDayjs } from '@/utils/dayjs';
 import commonUtils from '@/utils/common/index';
 import { getShopList } from '@/views/finance/shopStock/api';
 import { submitOrder } from '@/views/finance/shopOrder/api';
-import { getShopCartList } from '@/views/finance/shopCart/api';
+import { getShopCartList } from '@/views/finance/shoppingCart/api';
 import { getDictList } from '@/views/finance/dict/api';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';

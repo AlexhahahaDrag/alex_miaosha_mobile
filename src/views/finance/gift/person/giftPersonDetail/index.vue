@@ -295,7 +295,7 @@ import { usePermission } from '@/composables/usePermission';
 import { useGiftRelationOptions } from '@/composables/useGiftRelationOptions';
 import { formatTime, dataTimeFormat } from '@/utils/dayjs';
 import { getRoutePathByName } from '@/utils/router';
-import { addFileManager } from '@/views/file/api';
+import { addFileManager } from '@/views/common/api/file';
 import {
 	addGiftPerson,
 	deleteGiftPerson,

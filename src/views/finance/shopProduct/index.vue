@@ -119,7 +119,7 @@ import { showFailToast, showSuccessToast } from 'vant';
 import type { ShopStockInfo } from './config';
 import type { ShopStockData } from '@/views/finance/shopStock/config';
 import { getShopStockPage } from '@/views/finance/shopStock/api';
-import { addShopCart } from '@/views/finance/shopCart/api';
+import { addShopCart } from '@/views/finance/shoppingCart/api';
 import commonUtils from '@/utils/common';
 import { useUserStore } from '@/store/modules/user/user';
 import { useNavBar } from '@/composables/useNavBar';
