@@ -196,7 +196,7 @@ import {
 } from '../api';
 import { useNavBar } from '@/composables/useNavBar';
 import { getFormatTimeInfo } from '@/utils/dayjs';
-import filterIcon from '@/assets/icons/shop/filter.svg';
+import filterIcon from '@/assets/images/shop/filter.svg';
 
 const route = useRoute();
 

@@ -1,11 +1,11 @@
-import ahySvg from '@/assets/icons/shop/ahy.svg';
-import bytSvg from '@/assets/icons/shop/byt.svg';
-import mcSvg from '@/assets/icons/shop/mc.svg';
-import txdSvg from '@/assets/icons/shop/txd.svg';
-import xwtpSvg from '@/assets/icons/shop/xwtp.svg';
-import ylSvg from '@/assets/icons/shop/yl.svg';
-import hllSvg from '@/assets/icons/shop/hll.svg';
-import glSvg from '@/assets/icons/shop/gl.svg';
+import ahySvg from '@/assets/images/shop/ahy.svg';
+import bytSvg from '@/assets/images/shop/byt.svg';
+import mcSvg from '@/assets/images/shop/mc.svg';
+import txdSvg from '@/assets/images/shop/txd.svg';
+import xwtpSvg from '@/assets/images/shop/xwtp.svg';
+import ylSvg from '@/assets/images/shop/yl.svg';
+import hllSvg from '@/assets/images/shop/hll.svg';
+import glSvg from '@/assets/images/shop/gl.svg';
 
 // 定义类型接口
 export interface CardItem {

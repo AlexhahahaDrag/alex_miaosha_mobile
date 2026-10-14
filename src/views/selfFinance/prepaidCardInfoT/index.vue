@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<div class="prepaid-card-container">
 		<!-- 标题栏 -->
 		<div class="card-header">
@@ -190,8 +190,8 @@ import { getPrepaidCardInfoList, getPrepaidConsumeRecordPage } from './api';
 import { type CardItem, type TransactionItem, getCardColor, typeIconMap } from './config/index';
 import { formatTime, formatAmount } from '@/views/common/config';
 import { useNavBar } from '@/composables/useNavBar';
-import shopCardSvg from '@/assets/icons/shop/shop-card.svg';
-import shopCarSvg from '@/assets/icons/shop/shop-car.svg';
+import shopCardSvg from '@/assets/images/shop/shop-card.svg';
+import shopCarSvg from '@/assets/images/shop/shop-car.svg';
 
 // 路由实例
 const router = useRouter();
