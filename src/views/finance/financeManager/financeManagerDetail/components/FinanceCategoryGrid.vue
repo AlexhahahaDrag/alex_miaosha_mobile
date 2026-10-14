@@ -65,7 +65,11 @@
 </template>
 
 <script setup lang="ts">
-import { expensePresets, incomePresets, type CategoryItem } from '../types';
+import {
+	expensePresets,
+	incomePresets,
+	type CategoryItem,
+} from '@/views/finance/financeManager/financeManagerDetail/types';
 
 const props = withDefaults(
 	defineProps<{

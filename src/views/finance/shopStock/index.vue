@@ -80,8 +80,8 @@
 <script lang="ts" setup>
 import { useRouter, useRoute } from 'vue-router';
 import { showSuccessToast, showFailToast } from 'vant';
-import ShopStockCard from './components/ShopStockCard.vue';
-import type { ShopStockData } from './config';
+import ShopStockCard from '@/views/finance/shopStock/components/ShopStockCard.vue';
+import type { ShopStockData } from '@/views/finance/shopStock/config';
 import { getShopStockPage, deleteShopStock } from '@/views/finance/shopStock/api';
 import { useNavBar } from '@/composables/useNavBar';
 import type { PageInfo } from '@/views/common/config';

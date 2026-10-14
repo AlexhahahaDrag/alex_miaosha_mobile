@@ -165,7 +165,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import type { FinanceBudgetStatusVo } from '../config';
+import type { FinanceBudgetStatusVo } from '@/views/finance/financeManager/config';
 
 interface Props {
 	budgetStatus: FinanceBudgetStatusVo | null;

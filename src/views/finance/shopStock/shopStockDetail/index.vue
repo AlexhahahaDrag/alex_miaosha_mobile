@@ -254,8 +254,8 @@
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-import { type ShopStockData, label, rulesRef } from '../config';
-import type { ShopStockBatchData } from '../../shopStockBatch/config';
+import { type ShopStockData, label, rulesRef } from '@/views/finance/shopStock/config';
+import type { ShopStockBatchData } from '@/views/finance/shopStockBatch/config';
 import { getListName, type DictFieldConfig } from '@/views/common/config';
 import { addShopStock, updateShopStock, getShopStockDetail } from '@/views/finance/shopStock/api';
 import type { Info } from '@/components/pop/selectPop.vue';

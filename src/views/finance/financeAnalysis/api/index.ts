@@ -1,4 +1,4 @@
-﻿import type { FinanceDetail } from '../financeAnalysisDetail/common';
+﻿import type { FinanceDetail } from '@/views/finance/financeAnalysis/financeAnalysisDetail/common';
 import { getData, baseService } from '@/views/common/api';
 import type { ResponseBody } from '@/types/api';
 

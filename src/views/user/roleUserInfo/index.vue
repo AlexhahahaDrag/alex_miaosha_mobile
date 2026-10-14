@@ -121,7 +121,7 @@
 </template>
 <script lang="ts" setup>
 import { showSuccessToast, showFailToast } from 'vant';
-import type { RoleUserInfoData as RoleUserInfoSearch } from './roleUserInfoTs';
+import type { RoleUserInfoData as RoleUserInfoSearch } from '@/views/user/roleUserInfo/roleUserInfoTs';
 import { useNavBar } from '@/composables/useNavBar';
 import { getRoleUserInfoPage, deleteRoleUserInfo } from '@/views/user/roleUserInfo/api';
 import { getUserManagerList } from '@/views/user/userManager/api';

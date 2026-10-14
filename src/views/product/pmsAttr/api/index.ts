@@ -1,4 +1,4 @@
-﻿import type { PmsAttrData } from '../config';
+﻿import type { PmsAttrData } from '@/views/product/pmsAttr/config';
 import { getData, postData, putData, deleteData, baseService } from '@/views/common/api';
 import type { CommonPageResult, ResponseBody } from '@/types/api';
 

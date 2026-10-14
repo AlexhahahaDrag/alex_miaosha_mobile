@@ -85,7 +85,7 @@
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-import { label, rulesRef } from './pmsAttrDetailTs';
+import { label, rulesRef } from '@/views/product/pmsAttr/pmsAttrDetail/pmsAttrDetailTs';
 import { useNavBar } from '@/composables/useNavBar';
 import { addPmsAttr, updatePmsAttr, getPmsAttrDetail } from '@/views/product/pmsAttr/api';
 

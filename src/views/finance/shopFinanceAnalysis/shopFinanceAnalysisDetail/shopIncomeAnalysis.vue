@@ -30,7 +30,7 @@
 
 <script lang="ts" setup>
 import { showNotify } from 'vant';
-import type { ItemInfo } from './common';
+import type { ItemInfo } from '@/views/finance/shopFinanceAnalysis/shopFinanceAnalysisDetail/common';
 import type { ShopFinanceAnalysisData } from '@/views/finance/shopFinanceAnalysis/config';
 import { getShopNameInfo, getPayWayInfo } from '@/views/finance/shopFinanceAnalysis/api';
 

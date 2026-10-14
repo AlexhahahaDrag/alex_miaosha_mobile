@@ -64,7 +64,7 @@
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-import type { MenuInfoData } from './config';
+import type { MenuInfoData } from '@/views/user/menuInfo/config';
 import { updateMenuInfo, deleteMenuInfo } from '@/views/user/menuInfo/api';
 
 interface Props {

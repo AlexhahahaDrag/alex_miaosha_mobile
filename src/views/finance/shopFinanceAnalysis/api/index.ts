@@ -1,5 +1,8 @@
-import type { ShopFinanceAnalysisData, ShopFinanceAnalysisParams } from '../config';
-import type { ShopFinanceChainYear } from '../shopFinanceAnalysisDetail/common';
+import type {
+	ShopFinanceAnalysisData,
+	ShopFinanceAnalysisParams,
+} from '@/views/finance/shopFinanceAnalysis/config';
+import type { ShopFinanceChainYear } from '@/views/finance/shopFinanceAnalysis/shopFinanceAnalysisDetail/common';
 import type { ResponseBody } from '@/types/api';
 import { getData, baseService } from '@/views/common/api';
 

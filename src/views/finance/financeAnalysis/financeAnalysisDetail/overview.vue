@@ -147,7 +147,7 @@
 
 <script lang="ts" setup>
 import { showNotify } from 'vant';
-import type { FinanceDetail } from './common';
+import type { FinanceDetail } from '@/views/finance/financeAnalysis/financeAnalysisDetail/common';
 import { getBalance } from '@/views/finance/financeAnalysis/api';
 
 interface Props {

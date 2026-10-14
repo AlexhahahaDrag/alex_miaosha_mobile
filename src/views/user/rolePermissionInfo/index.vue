@@ -182,7 +182,7 @@
 
 <script lang="ts" setup>
 import { showFailToast, showSuccessToast } from 'vant';
-import type { SearchInfo } from './rolePermissionInfoTs';
+import type { SearchInfo } from '@/views/user/rolePermissionInfo/rolePermissionInfoTs';
 import type { PageInfo } from '@/views/common/config';
 import { useNavBar } from '@/composables/useNavBar';
 import {

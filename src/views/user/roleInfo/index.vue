@@ -92,7 +92,7 @@
 </template>
 <script lang="ts" setup>
 import { showSuccessToast, showFailToast } from 'vant';
-import type { SearchInfo } from './roleInfoTs';
+import type { SearchInfo } from '@/views/user/roleInfo/roleInfoTs';
 import { useNavBar } from '@/composables/useNavBar';
 import { getRoleInfoPage, deleteRoleInfo } from '@/views/user/roleInfo/api';
 import { getUserManagerList } from '@/views/user/userManager/api';

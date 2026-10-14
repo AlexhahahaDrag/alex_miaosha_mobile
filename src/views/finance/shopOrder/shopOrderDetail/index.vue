@@ -64,7 +64,7 @@
 
 <script setup lang="ts">
 import { showFailToast } from 'vant';
-import { label } from './shopOrderDetailTs';
+import { label } from '@/views/finance/shopOrder/shopOrderDetail/shopOrderDetailTs';
 import { formatDate, formatDayjs, nowDayjs, type Dayjs } from '@/utils/dayjs';
 import { useNavBar } from '@/composables/useNavBar';
 import { getListName } from '@/views/common/config';

@@ -1,4 +1,4 @@
-﻿import type { ShopOrderData } from '../config';
+﻿import type { ShopOrderData } from '@/views/finance/shopOrder/config';
 import { getData, postData, putData, deleteData, baseService } from '@/views/common/api';
 import type { CommonPageResult, ResponseBody } from '@/types/api';
 

@@ -1,4 +1,4 @@
-﻿import type { RoleUserInfoData } from '../config';
+﻿import type { RoleUserInfoData } from '@/views/user/roleUserInfo/config';
 import { getData, postData, putData, deleteData, baseService } from '@/views/common/api';
 import type { CommonPageResult, ResponseBody } from '@/types/api';
 

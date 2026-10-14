@@ -282,9 +282,9 @@
 
 <script lang="ts" setup>
 import { showToast } from 'vant';
-import logout from './logout/index.vue';
-import ThemePopup from './components/ThemePopup.vue';
-import type { UserManagerData } from './userManager/config';
+import logout from '@/views/user/logout/index.vue';
+import ThemePopup from '@/views/user/components/ThemePopup.vue';
+import type { UserManagerData } from '@/views/user/userManager/config';
 import { useUserStore } from '@/store/modules/user/user';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';

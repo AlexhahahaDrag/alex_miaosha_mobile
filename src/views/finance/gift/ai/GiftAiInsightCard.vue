@@ -64,8 +64,11 @@
 
 <script setup lang="ts">
 import { showFailToast } from 'vant';
-import { chatGiftAiStream } from './api';
-import { buildGiftAnalysisAiRequest, type GiftAnalysisInsightInput } from './buildAnalysisContext';
+import { chatGiftAiStream } from '@/views/finance/gift/ai/api';
+import {
+	buildGiftAnalysisAiRequest,
+	type GiftAnalysisInsightInput,
+} from '@/views/finance/gift/ai/buildAnalysisContext';
 import { usePermission } from '@/composables/usePermission';
 import {
 	getGiftAnalysisEventRanking,

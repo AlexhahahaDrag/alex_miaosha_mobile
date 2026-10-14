@@ -63,7 +63,7 @@
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-import { label, rulesRef } from './orgUserInfoDetailTs';
+import { label, rulesRef } from '@/views/user/orgUserInfo/orgUserInfoDetail/orgUserInfoDetailTs';
 import { useNavBar } from '@/composables/useNavBar';
 import { getListName } from '@/views/common/config';
 import { addOrgUserInfo, updateOrgUserInfo, getOrgUserInfoDetail } from '@/views/user/orgUserInfo/api';

@@ -1,4 +1,4 @@
-﻿import type { ResponseBody, CommonPageResult } from '../../../types/api';
+﻿import type { ResponseBody, CommonPageResult } from '@/views/types/api';
 import { getData, postData, putData, deleteData, baseService } from '@/views/common/api';
 
 const baseDictManager = '/dict-info';

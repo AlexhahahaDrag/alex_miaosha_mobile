@@ -112,7 +112,7 @@
 
 <script lang="ts" setup>
 import { showSuccessToast, showFailToast } from 'vant';
-import type { ShopStockAttrsData } from './config';
+import type { ShopStockAttrsData } from '@/views/finance/shopStockAttrs/config';
 import type { UserManagerData } from '@/views/user/userManager/config';
 import { getShopStockAttrsPage, deleteShopStockAttrs } from '@/views/finance/shopStockAttrs/api';
 import { getUserManagerList } from '@/views/user/userManager/api';

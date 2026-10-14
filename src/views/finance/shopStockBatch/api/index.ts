@@ -1,4 +1,4 @@
-import type { ShopStockBatchData } from '../config';
+import type { ShopStockBatchData } from '@/views/finance/shopStockBatch/config';
 import { getData, postData, putData, deleteData, baseService } from '@/views/common/api';
 import type { CommonPageResult, ResponseBody } from '@/types/api';
 

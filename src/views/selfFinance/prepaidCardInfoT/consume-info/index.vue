@@ -90,7 +90,7 @@
 
 <script setup lang="ts">
 import { showToast, showSuccessToast, showFailToast } from 'vant';
-import { getPrepaidCardInfoDetail, prepaidCardConsumeAndRecharge } from '../api';
+import { getPrepaidCardInfoDetail, prepaidCardConsumeAndRecharge } from '@/views/selfFinance/prepaidCardInfoT/api';
 import { formatDayjs, nowDayjs, type Dayjs } from '@/utils/dayjs';
 import type { DatePickerInfo } from '@/utils/common';
 import { useNavBar } from '@/composables/useNavBar';

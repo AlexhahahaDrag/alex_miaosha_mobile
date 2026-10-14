@@ -100,9 +100,9 @@
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
 import { useRouter } from 'vue-router';
-import BudgetAiAssistantCard from './components/BudgetAiAssistantCard.vue';
-import BudgetCategorySelector from './components/BudgetCategorySelector.vue';
-import BudgetSimulationCard from './components/BudgetSimulationCard.vue';
+import BudgetAiAssistantCard from '@/views/finance/financeManager/budgetManage/components/BudgetAiAssistantCard.vue';
+import BudgetCategorySelector from '@/views/finance/financeManager/budgetManage/components/BudgetCategorySelector.vue';
+import BudgetSimulationCard from '@/views/finance/financeManager/budgetManage/components/BudgetSimulationCard.vue';
 import { useNavBar } from '@/composables/useNavBar';
 import { usePermission } from '@/composables/usePermission';
 import { formatMonth, getMonthRange } from '@/utils/dayjs';

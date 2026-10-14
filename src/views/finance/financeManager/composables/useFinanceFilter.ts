@@ -1,5 +1,8 @@
 import { ref, computed } from 'vue';
-import { fromSourceTransferList, type FinanceManagerData } from '../config';
+import {
+	fromSourceTransferList,
+	type FinanceManagerData,
+} from '@/views/finance/financeManager/config';
 import type { Dayjs } from '@/utils/dayjs';
 import { formatDayjs, nowDayjs } from '@/utils/dayjs';
 import type { DictInfo } from '@/views/common/config';

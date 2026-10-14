@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildGiftAnalysisAiRequest } from './buildAnalysisContext';
+import { buildGiftAnalysisAiRequest } from '@/views/finance/gift/ai/buildAnalysisContext';
 
 describe('buildGiftAnalysisAiRequest', () => {
 	it('keeps *Id fields as string and omits phone-like keys', () => {

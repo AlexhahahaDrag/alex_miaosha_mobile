@@ -52,7 +52,7 @@
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-import type { OrgInfoData } from './config';
+import type { OrgInfoData } from '@/views/user/orgInfo/config';
 import { updateOrgInfo } from '@/views/user/orgInfo/api';
 
 interface Props {

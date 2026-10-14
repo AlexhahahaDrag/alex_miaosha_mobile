@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, afterEach } from 'vitest';
-import { chatGiftAiStream } from './api';
+import { chatGiftAiStream } from '@/views/finance/gift/ai/api';
 
 vi.mock('@/views/common/api', () => ({
 	postData: vi.fn(),

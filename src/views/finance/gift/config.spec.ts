@@ -27,7 +27,7 @@ import {
 	resolvePresetCode,
 	shouldCollapseRemark,
 	FALLBACK_GIFT_RELATION_OPTIONS,
-} from './config';
+} from '@/views/finance/gift/config';
 
 describe('gift mobile tab bar', () => {
 	it('exposes four tabs in order with locked titles and route names', () => {

@@ -193,10 +193,10 @@
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
 import { useRoute, useRouter } from 'vue-router';
-import FinanceCard from './components/FinanceCard.vue';
-import PocketMoneyCard from './components/PocketMoneyCard.vue';
-import { useFinanceFilter } from './composables/useFinanceFilter';
-import type { FinanceManagerData, FinanceBudgetStatusVo } from './config';
+import FinanceCard from '@/views/finance/financeManager/components/FinanceCard.vue';
+import PocketMoneyCard from '@/views/finance/financeManager/components/PocketMoneyCard.vue';
+import { useFinanceFilter } from '@/views/finance/financeManager/composables/useFinanceFilter';
+import type { FinanceManagerData, FinanceBudgetStatusVo } from '@/views/finance/financeManager/config';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
 import { usePermission } from '@/composables/usePermission';

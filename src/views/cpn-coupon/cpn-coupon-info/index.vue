@@ -226,7 +226,7 @@
 </template>
 <script lang="ts" setup>
 import { showFailToast, showSuccessToast } from 'vant';
-import type { CpnCouponInfoData } from './config';
+import type { CpnCouponInfoData } from '@/views/cpn-coupon/cpn-coupon-info/config';
 import { debounce } from '@/utils/common';
 import type { PageInfo } from '@/views/common/config';
 import { getRoutePathByName } from '@/utils/router';

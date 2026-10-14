@@ -1,4 +1,4 @@
-import type { ShopCartData } from '../config';
+import type { ShopCartData } from '@/views/finance/shoppingCart/config';
 import { getData, postData, putData, deleteData, baseService } from '@/views/common/api';
 import type { CommonPageResult, ResponseBody } from '@/types/api';
 

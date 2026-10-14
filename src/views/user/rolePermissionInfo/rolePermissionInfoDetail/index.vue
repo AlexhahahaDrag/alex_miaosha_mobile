@@ -59,7 +59,7 @@
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-import { label, rulesRef } from './rolePermissionInfoDetailTs';
+import { label, rulesRef } from '@/views/user/rolePermissionInfo/rolePermissionInfoDetail/rolePermissionInfoDetailTs';
 import { useNavBar } from '@/composables/useNavBar';
 import { getListName } from '@/views/common/config';
 import {

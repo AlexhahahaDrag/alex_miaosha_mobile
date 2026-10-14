@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/no-mutating-props -->
 <template>
 	<div class="gift-person-edit-form">
 		<van-form
@@ -144,23 +143,22 @@
 </template>
 
 <script setup lang="ts">
-/* eslint-disable vue/no-mutating-props */
 import { showFailToast, showSuccessToast } from 'vant';
 import { addFileManager } from '@/views/common/api/file';
 import type { GiftPersonFormState } from '@/views/finance/gift/config';
 import { RELATION_CUSTOM, formatPhoneDisplay, normalizePhoneDigits } from '@/views/finance/gift/config';
 import type { GiftPersonRelationOptionVo, RelationSelectGroup } from '@/composables/useGiftRelationOptions';
 
+const formState = defineModel<GiftPersonFormState>('formState', { required: true });
+const avatarPreviewUrl = defineModel<string>('avatarPreviewUrl', { default: '' });
+
 const props = withDefaults(
 	defineProps<{
-		formState: GiftPersonFormState;
-		avatarPreviewUrl?: string;
 		saving?: boolean;
 		presetOptions?: GiftPersonRelationOptionVo[];
 		relationSelectOptions?: RelationSelectGroup[];
 	}>(),
 	{
-		avatarPreviewUrl: '',
 		saving: false,
 		presetOptions: () => [],
 		relationSelectOptions: () => [],
@@ -168,7 +166,6 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-	(e: 'update:avatarPreviewUrl', val: string): void;
 	(e: 'submit'): void;
 }>();
 
@@ -179,34 +176,34 @@ const showRelationPicker = ref<boolean>(false);
 
 const firstName = (value?: string) => value?.slice(0, 1) || '-';
 
-const remarkLen = computed(() => Math.min(props.formState.remark?.length ?? 0, 50));
+const remarkLen = computed(() => Math.min(formState.value.remark?.length ?? 0, 50));
 
 /** 展示 3-4-4；写入纯数字（最多 11 位） */
 const phoneDisplay = computed({
-	get: () => formatPhoneDisplay(props.formState.phone),
+	get: () => formatPhoneDisplay(formState.value.phone),
 	set: (value: string) => {
-		props.formState.phone = normalizePhoneDigits(value).slice(0, 11);
+		formState.value.phone = normalizePhoneDigits(value).slice(0, 11);
 	},
 });
 
 const canSave = computed(() => {
-	const nameOk = !!props.formState.personName?.trim();
-	if (!props.formState.relationMode) return false;
-	if (props.formState.relationMode === RELATION_CUSTOM) {
-		return nameOk && !!props.formState.customRelation?.trim();
+	const nameOk = !!formState.value.personName?.trim();
+	if (!formState.value.relationMode) return false;
+	if (formState.value.relationMode === RELATION_CUSTOM) {
+		return nameOk && !!formState.value.customRelation?.trim();
 	}
 	return nameOk;
 });
 
-const saveLabel = computed(() => (props.formState.id ? '保存更改' : '保存'));
+const saveLabel = computed(() => (formState.value.id ? '保存更改' : '保存'));
 
 const relationDisplay = computed(() => {
-	if (props.formState.relationMode === RELATION_CUSTOM) {
-		return props.formState.customRelation || '自定义…';
+	if (formState.value.relationMode === RELATION_CUSTOM) {
+		return formState.value.customRelation || '自定义…';
 	}
-	if (!props.formState.relationMode) return '';
+	if (!formState.value.relationMode) return '';
 	for (const group of props.relationSelectOptions) {
-		const hit = group.options.find((item) => item.value === props.formState.relationMode);
+		const hit = group.options.find((item) => item.value === formState.value.relationMode);
 		if (hit) return hit.label;
 	}
 	return '';
@@ -247,9 +244,9 @@ const customRelationRules = [
 
 const clearAvatar = () => {
 	navigator.vibrate?.(50);
-	props.formState.avatar = undefined;
-	props.formState.fileInfoVo = undefined;
-	emit('update:avatarPreviewUrl', '');
+	formState.value.avatar = undefined;
+	formState.value.fileInfoVo = undefined;
+	avatarPreviewUrl.value = '';
 };
 
 const onAvatarAfterRead = async (file: unknown) => {
@@ -263,8 +260,8 @@ const onAvatarAfterRead = async (file: unknown) => {
 		formData.append('file', blob);
 		const { code, data, message } = await addFileManager('common', formData);
 		if (code === '200' && data?.id != null) {
-			props.formState.avatar = String(data.id);
-			emit('update:avatarPreviewUrl', String(data.preThumbnailUrl || data.preUrl || ''));
+			formState.value.avatar = String(data.id);
+			avatarPreviewUrl.value = String(data.preThumbnailUrl || data.preUrl || '');
 			showSuccessToast('头像已上传');
 		} else {
 			showFailToast(message || '上传失败');
@@ -278,9 +275,9 @@ const onAvatarAfterRead = async (file: unknown) => {
 
 const onRelationConfirm = ({ selectedOptions }: { selectedOptions: Array<{ text?: string; value?: string }> }) => {
 	const selected = selectedOptions[0];
-	props.formState.relationMode = selected?.value;
+	formState.value.relationMode = selected?.value;
 	if (selected?.value !== RELATION_CUSTOM) {
-		props.formState.customRelation = '';
+		formState.value.customRelation = '';
 	}
 	showRelationPicker.value = false;
 };

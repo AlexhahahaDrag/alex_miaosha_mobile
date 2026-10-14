@@ -112,7 +112,7 @@
 
 <script lang="ts" setup>
 import { showSuccessToast, showFailToast, showConfirmDialog } from 'vant';
-import type { ShopStockBatchData } from './config';
+import type { ShopStockBatchData } from '@/views/finance/shopStockBatch/config';
 import { getShopStockBatchPage, deleteShopStockBatch } from '@/views/finance/shopStockBatch/api';
 import { getUserManagerList } from '@/views/user/userManager/api';
 import { useNavBar } from '@/composables/useNavBar';

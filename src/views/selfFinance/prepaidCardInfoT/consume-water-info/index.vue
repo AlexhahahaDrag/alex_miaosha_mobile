@@ -187,13 +187,13 @@
 
 <script setup lang="ts">
 import { showFailToast } from 'vant';
-import { typeIconMap } from '../config/index';
+import { typeIconMap } from '@/views/selfFinance/prepaidCardInfoT/config/index';
 import {
 	getPrepaidCardInfoList,
 	getConsumeCardRecordPage,
 	type TransactionRecord,
 	type TransactionQueryParams,
-} from '../api';
+} from '@/views/selfFinance/prepaidCardInfoT/api';
 import { useNavBar } from '@/composables/useNavBar';
 import { getFormatTimeInfo } from '@/utils/dayjs';
 import filterIcon from '@/assets/images/shop/filter.svg';

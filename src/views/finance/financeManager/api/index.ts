@@ -1,4 +1,4 @@
-import type { FinanceManagerData } from '../config';
+import type { FinanceManagerData } from '@/views/finance/financeManager/config';
 import { getData, postData, putData, deleteData, baseService } from '@/views/common/api';
 import type { ResponseBody, CommonPageResult } from '@/types/api';
 

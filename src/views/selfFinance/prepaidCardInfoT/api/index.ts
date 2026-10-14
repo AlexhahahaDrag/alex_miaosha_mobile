@@ -1,4 +1,4 @@
-import type { PrepaidCardInfoTData } from '../config';
+import type { PrepaidCardInfoTData } from '@/views/selfFinance/prepaidCardInfoT/config';
 import { getData, postData, putData, deleteData, baseService } from '@/views/common/api';
 import type { CommonPageResult, ResponseBody } from '@/types/api';
 

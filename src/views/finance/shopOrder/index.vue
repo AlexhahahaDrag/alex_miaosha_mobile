@@ -90,7 +90,7 @@
 <script lang="ts" setup>
 import { useRouter, useRoute } from 'vue-router';
 import { showFailToast } from 'vant';
-import type { ShopOrderData } from './config';
+import type { ShopOrderData } from '@/views/finance/shopOrder/config';
 import { getShopOrderPage } from '@/views/finance/shopOrder/api';
 import { useNavBar } from '@/composables/useNavBar';
 import type { PageInfo } from '@/views/common/config';

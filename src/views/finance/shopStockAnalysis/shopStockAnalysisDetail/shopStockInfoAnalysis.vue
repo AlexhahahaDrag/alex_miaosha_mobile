@@ -28,7 +28,7 @@
 
 <script lang="ts" setup>
 import { showNotify } from 'vant';
-import type { ItemInfo } from './common';
+import type { ItemInfo } from '@/views/finance/shopStockAnalysis/shopStockAnalysisDetail/common';
 import type { ShopStockAnalysisData } from '@/views/finance/shopStockAnalysis/config';
 import { getAllAmount } from '@/views/finance/shopStockAnalysis/api';
 

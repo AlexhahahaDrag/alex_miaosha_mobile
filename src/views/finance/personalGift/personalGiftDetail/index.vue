@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<van-form
 		@submit="onSubmit"
 		:rules="rulesRef"
@@ -59,8 +59,12 @@
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-import { rulesRef, type PersonalGiftData, labelMap } from '../config';
-import { getPersonalGiftDetail, addPersonalGift, editPersonalGift } from '../api/personalGiftTs';
+import { rulesRef, type PersonalGiftData, labelMap } from '@/views/finance/personalGift/config';
+import {
+	getPersonalGiftDetail,
+	addPersonalGift,
+	editPersonalGift,
+} from '@/views/finance/personalGift/api/personalGiftTs';
 import { getListName } from '@/views/common/config';
 import type { Info } from '@/components/pop/selectPop.vue';
 import { getRoutePathByName } from '@/utils/router';
@@ -267,4 +271,3 @@ const init = async () => {
 
 init();
 </script>
-<style lang="less" scoped></style>

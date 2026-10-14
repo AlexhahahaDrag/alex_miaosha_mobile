@@ -201,7 +201,7 @@
 
 <script setup lang="ts">
 import { showToast } from 'vant';
-import { typeIconMap, type CardItem, getCardColor } from '../config/index';
+import { typeIconMap, type CardItem, getCardColor } from '@/views/selfFinance/prepaidCardInfoT/config/index';
 import SvgIcon from '@/components/common/SvgIcon.vue';
 import { useNavBar } from '@/composables/useNavBar';
 

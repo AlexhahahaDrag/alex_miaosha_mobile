@@ -131,7 +131,7 @@
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-import type { ShopCartData } from '../shoppingCart/config';
+import type { ShopCartData } from '@/views/finance/shoppingCart/config';
 import { nowDayjs } from '@/utils/dayjs';
 import commonUtils from '@/utils/common/index';
 import { getShopList } from '@/views/finance/shopStock/api';

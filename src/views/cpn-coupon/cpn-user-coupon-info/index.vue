@@ -108,8 +108,8 @@
 
 <script lang="ts" setup>
 import { showSuccessToast, showFailToast, showConfirmDialog } from 'vant';
-import type { CpnUserCouponInfoData } from './config';
-import { statusOptions } from './config';
+import type { CpnUserCouponInfoData } from '@/views/cpn-coupon/cpn-user-coupon-info/config';
+import { statusOptions } from '@/views/cpn-coupon/cpn-user-coupon-info/config';
 import type { PageInfo } from '@/views/common/config';
 import { getFormatTimeInfo } from '@/utils/dayjs';
 import { getCpnUserCouponInfoPage, cancelRedeemCpnUserCouponInfo } from '@/views/cpn-coupon/cpn-user-coupon-info/api';

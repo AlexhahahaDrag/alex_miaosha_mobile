@@ -1,4 +1,4 @@
-import type { ShopStockAnalysisData } from '../config';
+import type { ShopStockAnalysisData } from '@/views/finance/shopStockAnalysis/config';
 import type { ResponseBody } from '@/types/api';
 import { getData, baseService } from '@/views/common/api';
 

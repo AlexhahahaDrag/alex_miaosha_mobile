@@ -13,7 +13,7 @@
 		/>
 		<gift-person-edit-form
 			v-else
-			:form-state="formState"
+			v-model:form-state="formState"
 			v-model:avatar-preview-url="avatarPreviewUrl"
 			:saving="saving"
 			:preset-options="presetOptions"
@@ -25,8 +25,8 @@
 
 <script setup lang="ts">
 import { showConfirmDialog, showFailToast, showSuccessToast } from 'vant';
-import GiftPersonProfileView from './components/GiftPersonProfileView.vue';
-import GiftPersonEditForm from './components/GiftPersonEditForm.vue';
+import GiftPersonProfileView from '@/views/finance/gift/person/giftPersonDetail/components/GiftPersonProfileView.vue';
+import GiftPersonEditForm from '@/views/finance/gift/person/giftPersonDetail/components/GiftPersonEditForm.vue';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
 import { usePermission } from '@/composables/usePermission';

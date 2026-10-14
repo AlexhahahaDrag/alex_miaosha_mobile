@@ -67,7 +67,7 @@
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-import { label, rulesRef } from './permissionInfoDetailTs';
+import { label, rulesRef } from '@/views/user/permissionInfo/permissionInfoDetail/permissionInfoDetailTs';
 import { useNavBar } from '@/composables/useNavBar';
 import { getListName } from '@/views/common/config';
 import { addPermissionInfo, updatePermissionInfo, getPermissionInfoDetail } from '@/views/user/permissionInfo/api';

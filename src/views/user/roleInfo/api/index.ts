@@ -1,4 +1,4 @@
-﻿import type { RoleInfoData } from '../config';
+﻿import type { RoleInfoData } from '@/views/user/roleInfo/config';
 import { getData, postData, putData, deleteData, baseService } from '@/views/common/api';
 import type { CommonPageResult, ResponseBody } from '@/types/api';
 
@@ -22,7 +22,9 @@ export function getRoleInfoPage(
 }
 
 // 角色信息表无独立 /list 接口，沿用分页接口取较大页容量作为下拉/picker 选项来源
-export function getRoleInfoList(params?: RoleInfoData): Promise<ResponseBody<CommonPageResult<RoleInfoData>>> {
+export function getRoleInfoList(
+	params?: RoleInfoData,
+): Promise<ResponseBody<CommonPageResult<RoleInfoData>>> {
 	return getRoleInfoPage(params || {}, 1, 1000);
 }
 

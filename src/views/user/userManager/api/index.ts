@@ -1,4 +1,4 @@
-import type { UserManagerData } from '../config';
+import type { UserManagerData } from '@/views/user/userManager/config';
 import type { CommonPageResult, ResponseBody } from '@/types/api';
 import { getData, postData, putData, deleteData, baseService } from '@/views/common/api';
 

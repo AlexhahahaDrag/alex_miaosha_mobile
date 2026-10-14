@@ -23,7 +23,7 @@
 
 <script lang="ts" setup>
 import { type PropType } from 'vue';
-import type { DataItem } from '../shopOrderTs';
+import type { DataItem } from '@/views/finance/shopOrder/shopOrderTs';
 import { formatDate } from '@/utils/dayjs';
 import commonUtils from '@/utils/common/index';
 

@@ -1,4 +1,4 @@
-﻿import type { RolePermissionInfoData } from '../config';
+﻿import type { RolePermissionInfoData } from '@/views/user/rolePermissionInfo/config';
 import { getData, postData, putData, deleteData, baseService } from '@/views/common/api';
 import type { CommonPageResult, ResponseBody } from '@/types/api';
 

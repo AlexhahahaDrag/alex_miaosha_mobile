@@ -100,8 +100,8 @@
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-import type { ShopCartData } from './config';
-import { getShopCartList, updateShopCart, deleteShopCart } from './api';
+import type { ShopCartData } from '@/views/finance/shoppingCart/config';
+import { getShopCartList, updateShopCart, deleteShopCart } from '@/views/finance/shoppingCart/api';
 import { useNavBar } from '@/composables/useNavBar';
 import commonUtils from '@/utils/common/index';
 import type { ShopCartInfo } from '@/views/finance/shoppingCart/shoppingCartTs';

@@ -116,7 +116,7 @@
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-import { label, rulesRef } from './menuInfoDetailTs';
+import { label, rulesRef } from '@/views/user/menuInfo/menuInfoDetail/menuInfoDetailTs';
 import { useNavBar } from '@/composables/useNavBar';
 import { getListName } from '@/views/common/config';
 import { addMenuInfo, updateMenuInfo, getMenuInfoDetail } from '@/views/user/menuInfo/api';

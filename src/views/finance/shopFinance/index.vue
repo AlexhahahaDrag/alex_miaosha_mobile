@@ -100,7 +100,7 @@
 <script lang="ts" setup>
 import { useRouter, useRoute } from 'vue-router';
 import { showSuccessToast, showFailToast } from 'vant';
-import type { ShopFinanceData } from './config';
+import type { ShopFinanceData } from '@/views/finance/shopFinance/config';
 import { formatHeaderDate, formatDate } from '@/utils/dayjs';
 import { getShopFinancePage, deleteShopFinance } from '@/views/finance/shopFinance/api';
 import { useNavBar } from '@/composables/useNavBar';

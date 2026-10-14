@@ -1,5 +1,5 @@
-import type { AiAnalyzeReq, AiAnalyzeResp, AiStreamHandlers } from './types';
-import { consumeSseBuffer, parseSseJson } from './sseParse';
+import type { AiAnalyzeReq, AiAnalyzeResp, AiStreamHandlers } from '@/views/finance/gift/ai/types';
+import { consumeSseBuffer, parseSseJson } from '@/views/finance/gift/ai/sseParse';
 import { postData, baseService } from '@/views/common/api';
 import { useUserStore } from '@/store/modules/user/user';
 import type { ResponseBody } from '@/types/api';
@@ -141,4 +141,4 @@ export async function chatGiftAiStream(
 	}
 }
 
-export type { AiAnalyzeReq, AiAnalyzeResp, AiStreamHandlers } from './types';
+export type { AiAnalyzeReq, AiAnalyzeResp, AiStreamHandlers } from '@/views/finance/gift/ai/types';

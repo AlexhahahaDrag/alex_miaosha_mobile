@@ -1,4 +1,4 @@
-﻿import type { MenuInfoData } from '../config';
+﻿import type { MenuInfoData } from '@/views/user/menuInfo/config';
 import { getData, postData, putData, deleteData, baseService } from '@/views/common/api';
 import type { CommonPageResult, ResponseBody } from '@/types/api';
 

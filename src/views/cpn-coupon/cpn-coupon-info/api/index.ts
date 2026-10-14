@@ -1,4 +1,4 @@
-﻿import type { CpnCouponInfoData } from '../config';
+﻿import type { CpnCouponInfoData } from '@/views/cpn-coupon/cpn-coupon-info/config';
 import { getData, postData, putData, deleteData, baseService } from '@/views/common/api';
 import type { ResponseBody, CommonPageResult } from '@/types/api';
 

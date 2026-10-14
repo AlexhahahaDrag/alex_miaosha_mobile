@@ -1,4 +1,4 @@
-﻿import type { OrgInfoData } from '../config';
+﻿import type { OrgInfoData } from '@/views/user/orgInfo/config';
 import { getData, postData, putData, deleteData, baseService } from '@/views/common/api';
 import type { CommonPageResult, ResponseBody } from '@/types/api';
 

@@ -55,7 +55,7 @@
 
 <script lang="ts" setup>
 import { computed, type PropType } from 'vue';
-import { fromSourceTransferList, type ShopFinanceData } from '../config';
+import { fromSourceTransferList, type ShopFinanceData } from '@/views/finance/shopFinance/config';
 
 const props = defineProps({
 	item: {

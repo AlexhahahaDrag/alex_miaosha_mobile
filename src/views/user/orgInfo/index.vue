@@ -124,8 +124,8 @@
 </template>
 <script lang="ts" setup>
 import { showSuccessToast, showFailToast } from 'vant';
-import type { OrgInfoData } from './config';
-import type { SearchInfo } from './orgInfoTs';
+import type { OrgInfoData } from '@/views/user/orgInfo/config';
+import type { SearchInfo } from '@/views/user/orgInfo/orgInfoTs';
 import { useNavBar } from '@/composables/useNavBar';
 import { getOrgInfoPage, getOrgInfoTree, deleteOrgInfo, updateOrgInfo } from '@/views/user/orgInfo/api';
 import { getUserManagerList } from '@/views/user/userManager/api';

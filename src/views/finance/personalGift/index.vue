@@ -106,8 +106,8 @@
 </template>
 <script lang="ts" setup>
 import { showSuccessToast, showFailToast, showConfirmDialog } from 'vant';
-import type { PersonalGiftData } from './config';
-import { getPersonalGiftPage, deletePersonalGift } from './api/personalGiftTs';
+import type { PersonalGiftData } from '@/views/finance/personalGift/config';
+import { getPersonalGiftPage, deletePersonalGift } from '@/views/finance/personalGift/api/personalGiftTs';
 import { type Dayjs } from '@/utils/dayjs';
 import type { PageInfo } from '@/views/common/config';
 import { useNavBar } from '@/composables/useNavBar';

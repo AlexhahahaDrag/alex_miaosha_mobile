@@ -1,4 +1,4 @@
-import type { LoginResultData } from '../config';
+import type { LoginResultData } from '@/views/login/config';
 import request from '@/utils/request/request';
 import type { ResponseBody } from '@/types/api';
 import { baseService, getData } from '@/views/common/api';

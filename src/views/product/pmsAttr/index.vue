@@ -89,7 +89,7 @@
 </template>
 <script lang="ts" setup>
 import { showSuccessToast, showFailToast } from 'vant';
-import type { SearchInfo } from './pmsAttrTs';
+import type { SearchInfo } from '@/views/product/pmsAttr/pmsAttrTs';
 import { useNavBar } from '@/composables/useNavBar';
 import { getPmsAttrPage, deletePmsAttr } from '@/views/product/pmsAttr/api';
 import { getUserManagerList } from '@/views/user/userManager/api';

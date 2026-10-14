@@ -100,7 +100,7 @@
 </template>
 <script lang="ts" setup>
 import { showSuccessToast, showFailToast } from 'vant';
-import type { SearchInfo } from './permissionInfoTs';
+import type { SearchInfo } from '@/views/user/permissionInfo/permissionInfoTs';
 import { useNavBar } from '@/composables/useNavBar';
 import { getPermissionInfoPage, deletePermissionInfo, updatePermissionInfo } from '@/views/user/permissionInfo/api';
 import { getUserManagerList } from '@/views/user/userManager/api';

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { consumeSseBuffer, parseSseJson } from './sseParse';
+import { consumeSseBuffer, parseSseJson } from '@/views/finance/gift/ai/sseParse';
 
 describe('consumeSseBuffer', () => {
 	it('parses complete meta event and keeps partial rest', () => {

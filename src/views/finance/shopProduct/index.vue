@@ -116,7 +116,7 @@
 
 <script lang="ts" setup>
 import { showFailToast, showSuccessToast } from 'vant';
-import type { ShopStockInfo } from './config';
+import type { ShopStockInfo } from '@/views/finance/shopProduct/config';
 import type { ShopStockData } from '@/views/finance/shopStock/config';
 import { getShopStockPage } from '@/views/finance/shopStock/api';
 import { addShopCart } from '@/views/finance/shoppingCart/api';

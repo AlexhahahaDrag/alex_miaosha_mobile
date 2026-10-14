@@ -159,8 +159,8 @@
 
 <script setup lang="ts">
 import { showSuccessToast, showFailToast, showConfirmDialog } from 'vant';
-import type { CpnUserCouponInfoData } from '../config';
-import { getCpnUserCouponInfoDetail, cancelRedeemCpnUserCouponInfo } from '../api';
+import type { CpnUserCouponInfoData } from '@/views/cpn-coupon/cpn-user-coupon-info/config';
+import { getCpnUserCouponInfoDetail, cancelRedeemCpnUserCouponInfo } from '@/views/cpn-coupon/cpn-user-coupon-info/api';
 import { formatTime } from '@/utils/dayjs';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';

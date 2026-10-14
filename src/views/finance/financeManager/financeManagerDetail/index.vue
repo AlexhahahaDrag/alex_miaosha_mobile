@@ -210,9 +210,13 @@
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-import FinanceCategoryGrid from './components/FinanceCategoryGrid.vue';
-import { expensePresets, incomePresets, type CategoryItem } from './types';
-import FinanceKeypad from './components/FinanceKeypad.vue';
+import FinanceCategoryGrid from '@/views/finance/financeManager/financeManagerDetail/components/FinanceCategoryGrid.vue';
+import {
+	expensePresets,
+	incomePresets,
+	type CategoryItem,
+} from '@/views/finance/financeManager/financeManagerDetail/types';
+import FinanceKeypad from '@/views/finance/financeManager/financeManagerDetail/components/FinanceKeypad.vue';
 import { getListName, type DictFieldConfig } from '@/views/common/config';
 import { rulesRef, type FinanceManagerData } from '@/views/finance/financeManager/config';
 import { getDictList } from '@/views/finance/dict/api';
