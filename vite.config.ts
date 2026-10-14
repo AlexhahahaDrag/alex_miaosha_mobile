@@ -49,7 +49,6 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
 				'dayjs/plugin/utc',
 				'vant',
 				'decimal.js',
-				'nanoid',
 			],
 			// 自定义预构建阶段 Rolldown 打包器的行为
 			rolldownOptions: {
@@ -140,34 +139,32 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
 					manualChunks(id: string) {
 						// 兼容 Windows 路径分隔符（将 \ 统一转为 /）
 						const normalizedId = id.replace(/\\/g, '/');
-						if (normalizedId.includes('node_modules')) {
-							// 基础框架核心（Vue / Pinia / Vue-Router）
-							if (
-								normalizedId.includes('/vue') ||
-								normalizedId.includes('/@vue') ||
-								normalizedId.includes('/pinia') ||
-								normalizedId.includes('/vue-router')
-							) {
-								return 'vue-vendor';
-							}
-							// Vant UI
-							if (normalizedId.includes('/vant')) {
-								return 'vant-vendor';
-							}
-							// 图表库（合并 echarts 与底层 zrender）
-							if (normalizedId.includes('/echarts') || normalizedId.includes('/zrender')) {
-								return 'echarts-vendor';
-							}
-							// 常用通用工具库（网络与加密、日期等）
-							if (
-								normalizedId.includes('/axios') ||
-								normalizedId.includes('/dayjs') ||
-								normalizedId.includes('/crypto-es') ||
-								normalizedId.includes('/decimal.js') ||
-								normalizedId.includes('/nanoid')
-							) {
-								return 'utils-vendor';
-							}
+						if (!normalizedId.includes('node_modules')) {
+							return;
+						}
+						// 1. 基础框架核心（纯粹的 Vue / Pinia / Vue-Router 生态）
+						if (
+							/[\\/]node_modules[\\/](vue|@vue[\\/][^\\/]+|pinia|vue-router|pinia-plugin-persistedstate)[\\/]/.test(
+								normalizedId,
+							)
+						) {
+							return 'vue-vendor';
+						}
+						// 2. Vant UI 移动端组件库
+						if (/[\\/]node_modules[\\/](vant|@vant[\\/][^\\/]+)[\\/]/.test(normalizedId)) {
+							return 'vant-vendor';
+						}
+						// 3. 图表库（合并 echarts 与底层 zrender，仅图表路由按需加载）
+						if (/[\\/]node_modules[\\/](echarts|zrender)[\\/]/.test(normalizedId)) {
+							return 'echarts-vendor';
+						}
+						// 4. 大数高精度计算库（独立拆包，避免污染核心通用库）
+						if (/[\\/]node_modules[\\/]decimal\.js[\\/]/.test(normalizedId)) {
+							return 'decimal-vendor';
+						}
+						// 5. 核心通用工具库（网络通信、日期时间、国密加解密）
+						if (/[\\/]node_modules[\\/](axios|dayjs|crypto-es)[\\/]/.test(normalizedId)) {
+							return 'utils-vendor';
 						}
 					},
 				},

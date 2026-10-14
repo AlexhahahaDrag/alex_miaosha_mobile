@@ -53,3 +53,27 @@ export const getCardColor = (index: number) => {
 export interface PrepaidCardInfoTData {
 	[key: string]: unknown;
 }
+
+// 金额格式拆分（整数与小数）
+export const getBalanceParts = (value: string | number) => {
+	const numeric = typeof value === 'number' ? value : Number(String(value).replace(/[^\d.-]/g, ''));
+	if (Number.isNaN(numeric)) {
+		return { integer: '0', fraction: '.00' };
+	}
+	const fixed = numeric.toFixed(2);
+	const [intPart, fracPart] = fixed.split('.');
+	return { integer: intPart, fraction: `.${fracPart}` };
+};
+
+// 状态映射（颜色与标签）
+export const getStatusLabel = (card?: CardItem | null) => {
+	const status = (card?.status || '1').toString();
+	if (status === '1' || status === '正常' || status === 'normal') return '正常';
+	if (status === '0' || status === '禁用' || status === 'disabled') return '禁用';
+	return '未知';
+};
+
+// 获取分类图标
+export function getCategoryIcon(type: string): string {
+	return (typeIconMap as Record<string, string>)[type] || '';
+}

@@ -9,7 +9,7 @@
 <script setup lang="ts">
 import * as echarts from 'echarts/core';
 import { BarChart, LineChart, PieChart } from 'echarts/charts';
-import { TitleComponent, TooltipComponent, GridComponent, LegendComponent, ToolboxComponent } from 'echarts/components';
+import { TitleComponent, TooltipComponent, GridComponent, LegendComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 
 // 注册基础图表核心与渲染器
@@ -18,7 +18,6 @@ echarts.use([
 	TooltipComponent,
 	GridComponent,
 	LegendComponent,
-	ToolboxComponent,
 	BarChart,
 	LineChart,
 	PieChart,

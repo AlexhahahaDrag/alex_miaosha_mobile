@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<div class="coupon-page">
 		<!-- 搜索栏与过滤面板 -->
 		<section class="page-search">
@@ -64,10 +64,10 @@
 		<van-calendar
 			v-model:show="showCustomDatePicker"
 			type="range"
-			@confirm="onConfirmCustomDate"
 			color="#1989fa"
 			:min-date="new Date(2020, 0, 1)"
 			:max-date="new Date()"
+			@confirm="onConfirmCustomDate"
 		/>
 
 		<!-- 汇总信息与排序 -->
@@ -81,8 +81,8 @@
 		<!-- 下拉刷新容器 -->
 		<common-pull-refresh
 			v-model="isRefresh"
-			@refresh="onRefreshData"
 			class="refresh-container"
+			@refresh="onRefreshData"
 		>
 			<common-list
 				v-model="loading"
@@ -90,8 +90,8 @@
 				:refreshing="isRefresh"
 				:finished="finished"
 				:is-empty="!dataSource.length"
-				@load="onLoadMore"
 				class="content-wrapper"
+				@load="onLoadMore"
 			>
 				<!-- 骨架屏状态 -->
 				<template #skeleton>
@@ -114,72 +114,15 @@
 
 				<!-- 消费券列表 -->
 				<div class="card-list-wrapper">
-					<div
+					<coupon-card-item
 						v-for="(item, index) in dataSource"
 						:key="item.id"
-						class="card-item"
-					>
-						<van-swipe-cell>
-							<div
-								class="coupon-card"
-								@click="onCardClick(item.id)"
-							>
-								<!-- 左侧大圆角图标 -->
-								<div class="coupon-icon">
-									<img
-										:src="getCouponImage(index)"
-										alt="coupon"
-									/>
-								</div>
-
-								<!-- 中间内容 -->
-								<div class="coupon-content">
-									<div class="coupon-header">
-										<span class="coupon-name">{{ item.couponName || '未命名消费券' }}</span>
-										<van-tag
-											:type="item.paymentStatus === 1 ? 'success' : 'warning'"
-											plain
-											size="medium"
-											class="status-tag"
-										>
-											{{ item.paymentStatus === 1 ? '已支付' : '未支付' }}
-										</van-tag>
-									</div>
-									<div class="coupon-price">¥ {{ item.unitValue?.toFixed(2) || '0.00' }}</div>
-									<div class="coupon-footer">
-										{{ getValidityText(item) }} <span class="divider">|</span> 剩余 {{ item.remainingQuantity || 0 }} /
-										{{ item.totalQuantity || 0 }}
-									</div>
-								</div>
-
-								<!-- 右侧箭头 -->
-								<div class="coupon-arrow">
-									<van-icon
-										name="arrow"
-										color="#c8c9cc"
-										size="18"
-									/>
-								</div>
-							</div>
-							<template #right>
-								<van-button
-									v-if="item.remainingQuantity && item.remainingQuantity > 0"
-									class="redeem-button"
-									@click="onRedeem(item.id)"
-									square
-									type="primary"
-									text="核销"
-								/>
-								<van-button
-									class="delete-button"
-									@click="onDeleteCpnCouponInfo(item.id)"
-									square
-									type="danger"
-									text="删除"
-								/>
-							</template>
-						</van-swipe-cell>
-					</div>
+						:item="item"
+						:index="index"
+						@click="onCardClick"
+						@redeem="onRedeem"
+						@delete="onDeleteCpnCouponInfo"
+					/>
 				</div>
 			</common-list>
 		</common-pull-refresh>
@@ -224,17 +167,19 @@
 		</van-popup>
 	</div>
 </template>
+
 <script lang="ts" setup>
 import { showFailToast, showSuccessToast } from 'vant';
 import type { CpnCouponInfoData } from '@/views/cpn-coupon/cpn-coupon-info/config';
 import { debounce } from '@/utils/common';
 import type { PageInfo } from '@/views/common/config';
 import { getRoutePathByName } from '@/utils/router';
-import { formatDate, formatDayjs, nowDayjs, type Dayjs } from '@/utils/dayjs';
 import { getCpnCouponInfoPage, deleteCpnCouponInfo } from '@/views/cpn-coupon/cpn-coupon-info/api';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
 import CommonList from '@/components/common/CommonList.vue';
+import CouponCardItem from '@/views/cpn-coupon/cpn-coupon-info/components/CouponCardItem.vue';
+import { useCouponFilter } from '@/views/cpn-coupon/cpn-coupon-info/composables/useCouponFilter';
 import type { ResponseBody } from '@/types/api';
 
 const router = useRouter();
@@ -276,189 +221,21 @@ const { pagination, resetPagination, setTotal, nextPage } = usePagination();
 const showDeletePopup = ref<boolean>(false);
 const deleteTargetId = ref<string | undefined>(undefined);
 
-type TimePreset = 'today' | '7d' | 'month' | 'all' | 'custom';
-
-const timeFilterOptions: { label: string; value: TimePreset }[] = [
-	{ label: '全部', value: 'all' },
-	{ label: '今天', value: 'today' },
-	{ label: '近7天', value: '7d' },
-	{ label: '当月', value: 'month' },
-	{ label: '自定义', value: 'custom' },
-];
-
-const statusOptions = [
-	{ text: '全部', value: '' },
-	{ text: '可用', value: 'AVAILABLE' },
-	{ text: '未支付', value: 'UNPAID' },
-];
-
-const manualFilterPanelOpen = ref<boolean>(false);
-const activeStatus = ref<string>('AVAILABLE'); // 默认展示可用
-const activeTimePreset = ref<TimePreset>('all');
-const showCustomDatePicker = ref<boolean>(false);
-const customDateRange = ref<[Date, Date] | null>(null);
-
-const showFilterPanel = computed(() => manualFilterPanelOpen.value);
-
-const filterSections = computed(() => [
-	{ label: '状态', icon: 'info-o', key: 'status', options: statusOptions },
-	{ label: '时间', icon: 'underway-o', key: 'time', options: timeFilterOptions },
-]);
-
-interface ActiveFilterTag {
-	key: string;
-	label: string;
-}
-
-const activeFilterTags = computed<ActiveFilterTag[]>(() => {
-	const tags: ActiveFilterTag[] = [];
-	const keyword = searchInfo.value.couponName?.trim();
-	const statusText = statusOptions.find((o) => o.value === activeStatus.value)?.text;
-
-	if (keyword) {
-		tags.push({ key: 'keyword', label: keyword });
-	}
-
-	if (statusText && activeStatus.value) {
-		tags.push({ key: 'status', label: statusText });
-	}
-
-	if (activeTimePreset.value !== 'all') {
-		tags.push({ key: 'time', label: getTimePresetLabel(activeTimePreset.value) });
-	}
-
-	return tags;
-});
-
-const onToggleFilterPanel = () => {
-	manualFilterPanelOpen.value = !manualFilterPanelOpen.value;
-};
-
-const handleFilterSelect = ({ key, value }: { key: string; value: unknown }) => {
-	if (key === 'status') {
-		activeStatus.value = value as string;
-	} else if (key === 'time') {
-		onSelectTimePreset(value as TimePreset);
-	}
-};
-
-const onSelectTimePreset = (value: TimePreset) => {
-	if (value === 'custom') {
-		showCustomDatePicker.value = true;
-		return;
-	}
-
-	activeTimePreset.value = value;
-	customDateRange.value = null;
-};
-
-const onConfirmCustomDate = (value: Date[]) => {
-	if (Array.isArray(value) && value.length === 2) {
-		customDateRange.value = [value[0], value[1]];
-		activeTimePreset.value = 'custom';
-	}
-	showCustomDatePicker.value = false;
-};
-
-const getTimePresetLabel = (value: TimePreset) => {
-	switch (value) {
-		case 'today':
-			return '今天';
-		case '7d':
-			return '近7天';
-		case 'month':
-			return '当月';
-		case 'custom':
-			if (customDateRange.value) {
-				return `${formatDate(customDateRange.value[0], 'MM/DD')} - ${formatDate(customDateRange.value[1], 'MM/DD')}`;
-			}
-			return '自定义';
-		default:
-			return '全部';
-	}
-};
-
-const getTimeBoundary = (): { start: Dayjs; end: Dayjs } | null => {
-	const now = nowDayjs();
-
-	switch (activeTimePreset.value) {
-		case 'today':
-			return { start: now.startOf('day'), end: now.endOf('day') };
-		case '7d':
-			return { start: now.subtract(6, 'day').startOf('day'), end: now.endOf('day') };
-		case 'month':
-			return { start: now.startOf('month'), end: now.endOf('month') };
-		case 'custom':
-			if (!customDateRange.value) {
-				return null;
-			}
-			return {
-				start: formatDayjs(customDateRange.value[0]).startOf('day'),
-				end: formatDayjs(customDateRange.value[1]).endOf('day'),
-			};
-		default:
-			return null;
-	}
-};
-
-const applyStatusFilter = () => {
-	searchInfo.value.onlyValidAndNotFullyRedeemed = undefined;
-	searchInfo.value.paymentStatus = undefined;
-	if (activeStatus.value === 'AVAILABLE') {
-		searchInfo.value.onlyValidAndNotFullyRedeemed = true;
-	} else if (activeStatus.value === 'UNPAID') {
-		searchInfo.value.paymentStatus = 0;
-	}
-
-	// 处理时间过滤
-	const boundary = getTimeBoundary();
-	if (boundary) {
-		searchInfo.value.createTimeStart = boundary.start.format('YYYY-MM-DD');
-		searchInfo.value.createTimeEnd = boundary.end.format('YYYY-MM-DD');
-	} else {
-		delete searchInfo.value.createTimeStart;
-		delete searchInfo.value.createTimeEnd;
-	}
-};
-
-const onApplyFilters = () => {
-	manualFilterPanelOpen.value = false;
-	applyStatusFilter();
-};
-
-const onResetFilters = () => {
-	searchInfo.value.couponName = '';
-	activeStatus.value = 'AVAILABLE';
-	activeTimePreset.value = 'all';
-	customDateRange.value = null;
-	manualFilterPanelOpen.value = false;
-	applyStatusFilter();
-};
-
-// 获取消费券图片（使用更大的圆角 rx="16"）
-const getCouponImage = (index: number) => {
-	const images = [
-		'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjN2NiMzQyIiByeD0iMTYiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1zaXplPSIyNCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7imJU8L3RleHQ+PC9zdmc+',
-		'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjZmY5ODAwIiByeD0iMTYiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1zaXplPSIyNCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7imJY8L3RleHQ+PC9zdmc+',
-		'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjNTY5ZGZmIiByeD0iMTYiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1zaXplPSIyNCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7imIU8L3RleHQ+PC9zdmc+',
-		'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjZmY0NTU3IiByeD0iMTYiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1zaXplPSIyNCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7imIY8L3RleHQ+PC9zdmc+',
-	];
-	return images[index % images.length];
-};
-
-// 获取有效期文本
-const getValidityText = (item: CpnCouponInfoData) => {
-	if (!item.endDate) return '无限期';
-	const endDate = formatDate(item.endDate);
-	const today = new Date();
-	const end = new Date(item.endDate.toString());
-	const daysLeft = Math.ceil((end.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-
-	if (daysLeft < 0) return '已过期';
-	if (daysLeft === 0) return '今天到期';
-	if (daysLeft <= 3) return `${daysLeft}天后到期`;
-	return `有效期至 ${endDate}`;
-};
+// 过滤器组合式逻辑
+const {
+	activeStatus,
+	activeTimePreset,
+	showFilterPanel,
+	showCustomDatePicker,
+	filterSections,
+	activeFilterTags,
+	onToggleFilterPanel,
+	handleFilterSelect,
+	onConfirmCustomDate,
+	applyStatusFilter,
+	onApplyFilters,
+	onResetFilters,
+} = useCouponFilter(searchInfo);
 
 // 点击卡片 - 跳转到详情页
 const onCardClick = (id?: string) => {
@@ -506,7 +283,7 @@ const getCpnCouponInfoPageData = async (param: CpnCouponInfoData, cur: PageInfo)
 	}
 };
 
-// 搜索处理 (如果需要立刻触发，可强制执行防抖函数)
+// 搜索处理
 const onSearch = () => {
 	debouncedQuery.flush();
 };
@@ -583,10 +360,9 @@ onMounted(() => {
 
 // 防抖查询函数
 const debouncedQuery = debounce(() => {
-	// 搜索条件发生变化时，重置数据并重新获取数据
 	resetData();
 	getCpnCouponInfoPageData(searchInfo.value, pagination);
-}, 300); // 300ms延迟
+}, 300);
 
 watch(
 	() => searchInfo.value,
@@ -627,7 +403,7 @@ watch(
 		height: 38px;
 		padding: 0;
 		border-radius: 12px;
-		font-size: 18px; /* 调大一点图标 */
+		font-size: 18px;
 	}
 }
 
@@ -701,14 +477,6 @@ watch(
 	flex-direction: column;
 }
 
-.card-item {
-	margin-bottom: 12px;
-
-	&:last-child {
-		margin-bottom: 0;
-	}
-}
-
 .skeleton-list {
 	display: flex;
 	flex-direction: column;
@@ -720,121 +488,6 @@ watch(
 	border-radius: 16px;
 	padding: 16px;
 	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
-}
-
-.coupon-card {
-	background: #fff;
-	border-radius: 16px;
-	padding: 16px;
-	display: flex;
-	align-items: center;
-	gap: 16px;
-	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
-	position: relative;
-	cursor: pointer;
-	transition:
-		transform 0.2s,
-		box-shadow 0.2s;
-
-	&:active {
-		transform: scale(0.98);
-	}
-}
-
-.coupon-icon {
-	flex-shrink: 0;
-	width: 64px;
-	height: 64px;
-	border-radius: 16px;
-	overflow: hidden;
-
-	img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-	}
-}
-
-.coupon-content {
-	flex: 1;
-	display: flex;
-	flex-direction: column;
-	min-width: 0;
-
-	.coupon-header {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		margin-bottom: 6px;
-
-		.coupon-name {
-			font-size: 16px;
-			font-weight: 600;
-			color: #323233;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-			flex: 0 1 auto;
-			min-width: 0;
-		}
-
-		.status-tag {
-			flex-shrink: 0;
-			border-radius: 4px;
-		}
-	}
-
-	.coupon-price {
-		font-size: 20px;
-		font-weight: 700;
-		color: #1989fa;
-		margin-bottom: 8px;
-		letter-spacing: -0.5px;
-	}
-
-	.coupon-footer {
-		font-size: 12px;
-		color: #969799;
-		display: flex;
-		align-items: center;
-
-		.divider {
-			margin: 0 6px;
-			color: #dcdee0;
-		}
-	}
-}
-
-.coupon-arrow {
-	flex-shrink: 0;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding-left: 4px;
-}
-
-:deep(.van-swipe-cell__right) {
-	display: flex;
-	height: 100%;
-}
-
-.redeem-button {
-	width: 65px;
-	height: 100%;
-	border: none;
-}
-
-.delete-button {
-	width: 65px;
-	height: 100%;
-	border: none;
-	border-top-right-radius: 12px;
-	border-bottom-right-radius: 12px;
-}
-
-// 如果只有删除按钮时占满高度和位置
-.van-swipe-cell__right .delete-button:only-child {
-	width: 65px;
 }
 
 .delete-popup-content {
@@ -853,90 +506,35 @@ watch(
 	}
 
 	.delete-icon {
-		width: 60px;
-		height: 60px;
-		margin: 0 auto 16px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background-color: #fee;
-		border-radius: 50%;
-		animation: icon-bounce 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.2s backwards;
-
-		@keyframes icon-bounce {
-			0% {
-				transform: scale(0);
-			}
-			50% {
-				transform: scale(1.1);
-			}
-			100% {
-				transform: scale(1);
-			}
-		}
+		margin-bottom: 16px;
 	}
 
 	.delete-title {
 		font-size: 18px;
 		font-weight: 600;
 		color: #323233;
-		margin-bottom: 12px;
-		animation: fade-in 0.4s ease 0.3s backwards;
+		margin-bottom: 8px;
 	}
 
 	.delete-message {
 		font-size: 14px;
 		color: #969799;
-		line-height: 20px;
+		line-height: 1.5;
 		margin-bottom: 24px;
-		padding: 0 10px;
-		animation: fade-in 0.4s ease 0.4s backwards;
-
-		@keyframes fade-in {
-			from {
-				opacity: 0;
-			}
-			to {
-				opacity: 1;
-			}
-		}
 	}
 
 	.delete-buttons {
 		display: flex;
 		gap: 12px;
-		animation: fade-in 0.4s ease 0.5s backwards;
-
-		.cancel-btn,
-		.confirm-btn {
-			transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-
-			&:active {
-				transform: scale(0.95);
-			}
-		}
 
 		.cancel-btn {
-			background-color: #f7f8fa;
-			color: #323233;
+			background: #f7f8fa;
+			color: #646566;
 			border: none;
-
-			&:hover {
-				background-color: #ebedf0;
-			}
 		}
 
 		.confirm-btn {
-			background-color: #ee0a24;
 			border: none;
-
-			&:hover {
-				background-color: #d9001b;
-			}
-
-			&:active {
-				background-color: #c00018;
-			}
 		}
 	}
 }
