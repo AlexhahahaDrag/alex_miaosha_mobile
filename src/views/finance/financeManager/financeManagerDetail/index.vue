@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<div class="finance-detail-container">
 		<div
 			v-if="formInfo.id && !canEditRecord"
@@ -121,58 +121,17 @@
 			</div>
 		</div>
 
-		<!-- 3. 中间可滚动区域：九宫格分类网格 + 高级设置折叠 -->
+		<!-- 3. 中间可滚动区域：分类九宫格网格 + 高级设置折叠 -->
 		<div
 			class="scroll-body-wrapper"
 			ref="scrollContainerRef"
 		>
-			<!-- 分类网格九宫格 -->
-			<div class="category-grid-card">
-				<div class="card-header-bar">
-					<span class="header-title">选择记账分类</span>
-					<span
-						v-if="dynamicCategories.length"
-						class="header-hint"
-					>已融合常用历史分类</span>
-				</div>
-
-				<div class="category-grid">
-					<div
-						v-for="cat in activeCategoryList"
-						:key="cat.name"
-						:class="['category-cell', { active: formInfo.typeCode === cat.name }]"
-						@click="selectCategory(cat)"
-					>
-						<div
-							class="cat-icon-bubble"
-							:style="{
-								backgroundColor: formInfo.typeCode === cat.name ? cat.color : cat.bgColor,
-								color: formInfo.typeCode === cat.name ? '#ffffff' : cat.color,
-							}"
-						>
-							<van-icon
-								:name="cat.icon"
-								class="cat-icon"
-							/>
-						</div>
-						<span class="cat-label">{{ cat.name }}</span>
-					</div>
-
-					<!-- 自定义分类卡片 -->
-					<div
-						class="category-cell custom-cell"
-						@click="openCustomCategoryDialog"
-					>
-						<div class="cat-icon-bubble custom-bubble">
-							<van-icon
-								name="plus"
-								class="cat-icon"
-							/>
-						</div>
-						<span class="cat-label">自定义</span>
-					</div>
-				</div>
-			</div>
+			<finance-category-grid
+				v-model="formInfo.typeCode"
+				:direction="formInfo.incomeAndExpenses"
+				:dynamic-categories="dynamicCategories"
+				@select="onSelectCategory"
+			/>
 
 			<!-- 高级选项收折卡片 (所属人、状态等) -->
 			<div class="advanced-card">
@@ -221,122 +180,19 @@
 			</div>
 		</div>
 
-		<!-- 4. 底部定制记账数字键盘 (Built-in Keypad) -->
-		<div class="keypad-panel">
-			<div class="keypad-grid">
-				<button
-					type="button"
-					class="kp-btn num-btn"
-					@click="pressKey('1')"
-				>1</button>
-				<button
-					type="button"
-					class="kp-btn num-btn"
-					@click="pressKey('2')"
-				>2</button>
-				<button
-					type="button"
-					class="kp-btn num-btn"
-					@click="pressKey('3')"
-				>3</button>
-				<button
-					type="button"
-					class="kp-btn func-btn delete-btn"
-					@click="pressKey('backspace')"
-				>
-					<van-icon name="delete-o" />
-				</button>
-
-				<button
-					type="button"
-					class="kp-btn num-btn"
-					@click="pressKey('4')"
-				>4</button>
-				<button
-					type="button"
-					class="kp-btn num-btn"
-					@click="pressKey('5')"
-				>5</button>
-				<button
-					type="button"
-					class="kp-btn num-btn"
-					@click="pressKey('6')"
-				>6</button>
-				<button
-					type="button"
-					class="kp-btn func-btn date-shortcut-btn"
-					@click="chooseDate"
-				>
-					<span class="date-shortcut-text">{{ isToday ? '今天' : keypadDateShort }}</span>
-				</button>
-
-				<button
-					type="button"
-					class="kp-btn num-btn"
-					@click="pressKey('7')"
-				>7</button>
-				<button
-					type="button"
-					class="kp-btn num-btn"
-					@click="pressKey('8')"
-				>8</button>
-				<button
-					type="button"
-					class="kp-btn num-btn"
-					@click="pressKey('9')"
-				>9</button>
-				<button
-					v-if="!formInfo.id"
-					type="button"
-					class="kp-btn func-btn continue-btn"
-					:disabled="loading"
-					@click="handleSaveAndContinue"
-				>
-					再记一笔
-				</button>
-				<button
-					v-else
-					type="button"
-					class="kp-btn func-btn reset-btn"
-					@click="resetFormToInitial"
-				>
-					重置
-				</button>
-
-				<button
-					type="button"
-					class="kp-btn num-btn"
-					@click="pressKey('.')"
-				>.</button>
-				<button
-					type="button"
-					class="kp-btn num-btn"
-					@click="pressKey('0')"
-				>0</button>
-				<button
-					type="button"
-					class="kp-btn num-btn"
-					@click="pressKey('00')"
-				>00</button>
-				<button
-					v-if="canEditRecord"
-					type="button"
-					class="kp-btn func-btn submit-btn"
-					:disabled="loading"
-					@click="handleSaveAndFinish"
-				>
-					{{ loading ? '保存中' : formInfo.id ? '保存' : '完成' }}
-				</button>
-				<button
-					v-else
-					type="button"
-					class="kp-btn func-btn submit-btn readonly-btn"
-					disabled
-				>
-					仅查看
-				</button>
-			</div>
-		</div>
+		<!-- 4. 底部定制记账数字键盘 -->
+		<finance-keypad
+			v-model="amountStr"
+			:loading="loading"
+			:is-edit="!!formInfo.id"
+			:can-edit="canEditRecord"
+			:date-shortcut-text="isToday ? '今天' : keypadDateShort"
+			@change-amount="(val) => (formInfo.amount = val)"
+			@date-click="chooseDate"
+			@save-and-continue="handleSaveAndContinue"
+			@save-and-finish="handleSaveAndFinish"
+			@reset="resetFormToInitial"
+		/>
 
 		<!-- 弹窗组件 -->
 		<select-pop
@@ -349,28 +205,14 @@
 			@select-date-info="selectDateInfo"
 			@cancel-date-info="cancelDateInfo"
 		/>
-
-		<!-- 自定义分类录入弹窗 -->
-		<van-dialog
-			v-model:show="showCustomCatDialog"
-			title="新增自定义分类"
-			show-cancel-button
-			@confirm="confirmCustomCategory"
-		>
-			<div class="custom-cat-dialog-box">
-				<van-field
-					v-model="customCatInput"
-					placeholder="例如: 宠物/外卖/健身"
-					maxlength="10"
-					clearable
-				/>
-			</div>
-		</van-dialog>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
+import FinanceCategoryGrid from './components/FinanceCategoryGrid.vue';
+import { expensePresets, incomePresets, type CategoryItem } from './types';
+import FinanceKeypad from './components/FinanceKeypad.vue';
 import { getListName, type DictFieldConfig } from '@/views/common/config';
 import { rulesRef, type FinanceManagerData } from '@/views/finance/financeManager/config';
 import { getDictList } from '@/views/finance/dict/api';
@@ -433,73 +275,10 @@ const loading = ref<boolean>(false);
 const amountStr = ref<string>('');
 const showNameInput = ref<boolean>(false);
 const showAdvanced = ref<boolean>(false);
-const showCustomCatDialog = ref<boolean>(false);
-const customCatInput = ref<string>('');
 const scrollContainerRef = ref<HTMLElement | null>(null);
 
 // 历史/动态分类列表
 const dynamicCategories = ref<string[]>([]);
-
-interface CategoryItem {
-	name: string;
-	icon: string;
-	color: string;
-	bgColor: string;
-}
-
-const expensePresets: CategoryItem[] = [
-	{ name: '餐饮', icon: 'food-o', color: '#fa8c16', bgColor: '#fff7e6' },
-	{ name: '交通', icon: 'logistics', color: '#1890ff', bgColor: '#e6f7ff' },
-	{ name: '购物', icon: 'bag-o', color: '#eb2f96', bgColor: '#fff0f6' },
-	{ name: '日用', icon: 'cart-o', color: '#52c41a', bgColor: '#f6ffed' },
-	{ name: '娱乐', icon: 'smile-o', color: '#722ed1', bgColor: '#f9f0ff' },
-	{ name: '医疗', icon: 'plus', color: '#ff4d4f', bgColor: '#fff1f0' },
-	{ name: '住房', icon: 'home-o', color: '#13c2c2', bgColor: '#e6fffb' },
-	{ name: '通信', icon: 'phone-o', color: '#2f54eb', bgColor: '#f0f5ff' },
-	{ name: '服饰', icon: 'gift-o', color: '#fa541c', bgColor: '#fff2e8' },
-	{ name: '零食', icon: 'shop-o', color: '#faad14', bgColor: '#fffbe6' },
-	{ name: '学习', icon: 'notes-o', color: '#096dd9', bgColor: '#e6f7ff' },
-	{ name: '其它', icon: 'ellipsis', color: '#8c8c8c', bgColor: '#f5f5f5' },
-];
-
-const incomePresets: CategoryItem[] = [
-	{ name: '工资', icon: 'gold-coin-o', color: '#52c41a', bgColor: '#f6ffed' },
-	{ name: '兼职', icon: 'cash-back-record', color: '#fa8c16', bgColor: '#fff7e6' },
-	{ name: '理财', icon: 'chart-trending-o', color: '#1890ff', bgColor: '#e6f7ff' },
-	{ name: '礼金', icon: 'gem-o', color: '#ff4d4f', bgColor: '#fff1f0' },
-	{ name: '退款', icon: 'refund-o', color: '#13c2c2', bgColor: '#e6fffb' },
-	{ name: '其它', icon: 'ellipsis', color: '#8c8c8c', bgColor: '#f5f5f5' },
-];
-
-const activeCategoryList = computed<CategoryItem[]>(() => {
-	const baseList = formInfo.value.incomeAndExpenses === 'income' ? incomePresets : expensePresets;
-	const existingNames = new Set(baseList.map((item) => item.name));
-	const extra: CategoryItem[] = [];
-
-	for (const cat of dynamicCategories.value) {
-		if (cat && !existingNames.has(cat)) {
-			extra.push({
-				name: cat,
-				icon: 'apps-o',
-				color: '#1677ff',
-				bgColor: '#eff6ff',
-			});
-			existingNames.add(cat);
-		}
-	}
-
-	// 如果当前选择的分类不在列表中，也动态追加
-	if (formInfo.value.typeCode && !existingNames.has(formInfo.value.typeCode)) {
-		extra.unshift({
-			name: formInfo.value.typeCode,
-			icon: 'apps-o',
-			color: '#1677ff',
-			bgColor: '#eff6ff',
-		});
-	}
-
-	return [...extra, ...baseList];
-});
 
 const isToday = computed(() => {
 	const cur = formatDayjs(formInfo.value.infoDate);
@@ -647,97 +426,14 @@ const switchDirection = (dir: 'expense' | 'income') => {
 	}
 };
 
-const selectCategory = (cat: CategoryItem) => {
-	navigator.vibrate?.(10);
-	formInfo.value.typeCode = cat.name;
+const onSelectCategory = (cat: CategoryItem) => {
 	if (!formInfo.value.name || formInfo.value.name.trim() === '') {
 		formInfo.value.name = cat.name;
 	}
 };
 
-const openCustomCategoryDialog = () => {
-	customCatInput.value = '';
-	showCustomCatDialog.value = true;
-};
-
-const confirmCustomCategory = () => {
-	const name = customCatInput.value.trim();
-	if (name) {
-		if (!dynamicCategories.value.includes(name)) {
-			dynamicCategories.value.unshift(name);
-		}
-		selectCategory({
-			name,
-			icon: 'apps-o',
-			color: '#1677ff',
-			bgColor: '#eff6ff',
-		});
-	}
-};
-
 const scrollToCategories = () => {
 	scrollContainerRef.value?.scrollTo({ top: 0, behavior: 'smooth' });
-};
-
-const pressKey = (key: string) => {
-	navigator.vibrate?.(10);
-	if (key === 'backspace') {
-		if (amountStr.value.length > 0) {
-			amountStr.value = amountStr.value.slice(0, -1);
-		}
-		formInfo.value.amount = Number(amountStr.value) || 0;
-		return;
-	}
-
-	if (key === '.') {
-		if (amountStr.value.includes('.')) return;
-		if (!amountStr.value) {
-			amountStr.value = '0.';
-		} else {
-			amountStr.value += '.';
-		}
-		formInfo.value.amount = Number(amountStr.value) || 0;
-		return;
-	}
-
-	if (key === '00') {
-		if (!amountStr.value || amountStr.value === '0') {
-			amountStr.value = '0';
-			formInfo.value.amount = 0;
-			return;
-		}
-		if (amountStr.value.includes('.')) {
-			const decimalPart = amountStr.value.split('.')[1] || '';
-			if (decimalPart.length >= 2) return;
-			if (decimalPart.length === 1) {
-				amountStr.value += '0';
-			} else {
-				amountStr.value += '00';
-			}
-		} else {
-			if (Number(`${amountStr.value}00`) > 9999999.99) return;
-			amountStr.value += '00';
-		}
-		formInfo.value.amount = Number(amountStr.value) || 0;
-		return;
-	}
-
-	// 数字按键 0-9
-	if (!amountStr.value || amountStr.value === '0') {
-		if (key === '0') {
-			amountStr.value = '0';
-		} else {
-			amountStr.value = key;
-		}
-	} else {
-		if (amountStr.value.includes('.')) {
-			const decimalPart = amountStr.value.split('.')[1] || '';
-			if (decimalPart.length >= 2) return;
-		}
-		if (Number(amountStr.value + key) > 9999999.99) return;
-		amountStr.value += key;
-	}
-	formInfo.value.amount = Number(amountStr.value) || 0;
 };
 
 const resetFormToInitial = () => {
@@ -1077,97 +773,6 @@ init();
 	padding: 0 16px 12px;
 	-webkit-overflow-scrolling: touch;
 
-	.category-grid-card {
-		background: #ffffff;
-		border-radius: 16px;
-		padding: 12px 12px 14px;
-		border: 1px solid #f1f5f9;
-		box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
-
-		.card-header-bar {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			margin-bottom: 10px;
-			padding: 0 4px;
-
-			.header-title {
-				font-size: 13px;
-				font-weight: 600;
-				color: #334155;
-			}
-
-			.header-hint {
-				font-size: 11px;
-				color: #3b82f6;
-			}
-		}
-
-		.category-grid {
-			display: grid;
-			grid-template-columns: repeat(4, 1fr);
-			gap: 12px 6px;
-
-			.category-cell {
-				display: flex;
-				flex-direction: column;
-				align-items: center;
-				cursor: pointer;
-				transition: transform 0.15s ease;
-
-				&:active {
-					transform: scale(0.92);
-				}
-
-				.cat-icon-bubble {
-					width: 44px;
-					height: 44px;
-					border-radius: 50%;
-					display: flex;
-					align-items: center;
-					justify-content: center;
-					margin-bottom: 4px;
-					transition: all 0.2s ease;
-
-					.cat-icon {
-						font-size: 22px;
-					}
-				}
-
-				.cat-label {
-					font-size: 12px;
-					color: #475569;
-					line-height: 1.2;
-					text-align: center;
-					max-width: 60px;
-					overflow: hidden;
-					text-overflow: ellipsis;
-					white-space: nowrap;
-				}
-
-				&.active {
-					.cat-icon-bubble {
-						transform: scale(1.08);
-						box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-					}
-
-					.cat-label {
-						color: #0f172a;
-						font-weight: 600;
-					}
-				}
-
-				&.custom-cell {
-					.custom-bubble {
-						background: #f1f5f9;
-						color: #94a3b8;
-						border: 1px dashed #cbd5e1;
-					}
-				}
-			}
-		}
-	}
-
 	.advanced-card {
 		margin-top: 10px;
 		background: #ffffff;
@@ -1206,108 +811,6 @@ init();
 			padding: 6px 0;
 		}
 	}
-}
-
-// 4. 底部定制记账数字键盘
-.keypad-panel {
-	flex-shrink: 0;
-	background: #ffffff;
-	border-top: 1px solid #e2e8f0;
-	padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
-	box-shadow: 0 -4px 12px rgba(15, 23, 42, 0.04);
-
-	.keypad-grid {
-		display: grid;
-		grid-template-columns: repeat(4, 1fr);
-		grid-auto-rows: 48px;
-		gap: 6px;
-
-		.kp-btn {
-			border: none;
-			border-radius: 10px;
-			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-			font-size: 20px;
-			font-weight: 600;
-			color: #1e293b;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			cursor: pointer;
-			user-select: none;
-			transition: background-color 0.1s ease;
-
-			&.num-btn {
-				background: #f8fafc;
-
-				&:active {
-					background: #e2e8f0;
-				}
-			}
-
-			&.func-btn {
-				&.delete-btn {
-					background: #f1f5f9;
-					color: #64748b;
-					font-size: 20px;
-
-					&:active {
-						background: #e2e8f0;
-					}
-				}
-
-				&.date-shortcut-btn {
-					background: #f1f5f9;
-					color: #2563eb;
-					font-size: 13px;
-					font-weight: 500;
-
-					&:active {
-						background: #e2e8f0;
-					}
-				}
-
-				&.continue-btn {
-					background: #eff6ff;
-					color: #2563eb;
-					font-size: 13px;
-					font-weight: 600;
-
-					&:active {
-						background: #dbeafe;
-					}
-				}
-
-				&.reset-btn {
-					background: #f1f5f9;
-					color: #64748b;
-					font-size: 13px;
-
-					&:active {
-						background: #e2e8f0;
-					}
-				}
-
-				&.submit-btn {
-					background: #2563eb;
-					color: #ffffff;
-					font-size: 15px;
-					font-weight: 600;
-
-					&:active {
-						background: #1d4ed8;
-					}
-
-					&:disabled {
-						opacity: 0.7;
-					}
-				}
-			}
-		}
-	}
-}
-
-.custom-cat-dialog-box {
-	padding: 12px 16px;
 }
 
 @keyframes caret-blink {
