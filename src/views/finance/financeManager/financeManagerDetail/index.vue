@@ -43,6 +43,7 @@
 				<span
 					class="amount-val"
 					:class="{ 'is-zero': !amountStr }"
+					data-testid="hero-amount-val"
 				>
 					{{ amountStr || '0.00' }}
 				</span>

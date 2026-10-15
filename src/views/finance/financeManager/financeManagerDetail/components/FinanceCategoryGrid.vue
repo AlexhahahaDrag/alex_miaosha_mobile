@@ -13,6 +13,7 @@
 				v-for="cat in activeCategoryList"
 				:key="cat.name"
 				:class="['category-cell', { active: modelValue === cat.name }]"
+				:data-testid="'category-cell-' + cat.name"
 				@click="selectCategory(cat)"
 			>
 				<div

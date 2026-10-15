@@ -4,21 +4,25 @@
 			<button
 				type="button"
 				class="kp-btn num-btn"
+				data-testid="keypad-btn-1"
 				@click="pressKey('1')"
 			>1</button>
 			<button
 				type="button"
 				class="kp-btn num-btn"
+				data-testid="keypad-btn-2"
 				@click="pressKey('2')"
 			>2</button>
 			<button
 				type="button"
 				class="kp-btn num-btn"
+				data-testid="keypad-btn-3"
 				@click="pressKey('3')"
 			>3</button>
 			<button
 				type="button"
 				class="kp-btn func-btn delete-btn"
+				data-testid="keypad-btn-delete"
 				@click="pressKey('backspace')"
 			>
 				<van-icon name="delete-o" />
@@ -27,21 +31,25 @@
 			<button
 				type="button"
 				class="kp-btn num-btn"
+				data-testid="keypad-btn-4"
 				@click="pressKey('4')"
 			>4</button>
 			<button
 				type="button"
 				class="kp-btn num-btn"
+				data-testid="keypad-btn-5"
 				@click="pressKey('5')"
 			>5</button>
 			<button
 				type="button"
 				class="kp-btn num-btn"
+				data-testid="keypad-btn-6"
 				@click="pressKey('6')"
 			>6</button>
 			<button
 				type="button"
 				class="kp-btn func-btn date-shortcut-btn"
+				data-testid="keypad-btn-date"
 				@click="emit('date-click')"
 			>
 				<span class="date-shortcut-text">{{ dateShortcutText }}</span>
@@ -50,22 +58,26 @@
 			<button
 				type="button"
 				class="kp-btn num-btn"
+				data-testid="keypad-btn-7"
 				@click="pressKey('7')"
 			>7</button>
 			<button
 				type="button"
 				class="kp-btn num-btn"
+				data-testid="keypad-btn-8"
 				@click="pressKey('8')"
 			>8</button>
 			<button
 				type="button"
 				class="kp-btn num-btn"
+				data-testid="keypad-btn-9"
 				@click="pressKey('9')"
 			>9</button>
 			<button
 				v-if="!isEdit"
 				type="button"
 				class="kp-btn func-btn continue-btn"
+				data-testid="keypad-btn-continue"
 				:disabled="loading"
 				@click="emit('save-and-continue')"
 			>
@@ -75,6 +87,7 @@
 				v-else
 				type="button"
 				class="kp-btn func-btn reset-btn"
+				data-testid="keypad-btn-reset"
 				@click="emit('reset')"
 			>
 				重置
@@ -83,22 +96,26 @@
 			<button
 				type="button"
 				class="kp-btn num-btn"
+				data-testid="keypad-btn-dot"
 				@click="pressKey('.')"
 			>.</button>
 			<button
 				type="button"
 				class="kp-btn num-btn"
+				data-testid="keypad-btn-0"
 				@click="pressKey('0')"
 			>0</button>
 			<button
 				type="button"
 				class="kp-btn num-btn"
+				data-testid="keypad-btn-00"
 				@click="pressKey('00')"
 			>00</button>
 			<button
 				v-if="canEdit"
 				type="button"
 				class="kp-btn func-btn submit-btn"
+				data-testid="keypad-btn-submit"
 				:disabled="loading"
 				@click="emit('save-and-finish')"
 			>

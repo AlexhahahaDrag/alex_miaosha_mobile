@@ -8,6 +8,7 @@
 		<!-- 紧凑常驻条 (平时仅展示标题、余额与百分比，点击触发折叠/展开) -->
 		<div
 			class="pocket-money-header"
+			data-testid="pocket-money-header"
 			@click="toggleBudgetCardExpand"
 		>
 			<div class="pocket-money-title">
@@ -21,6 +22,7 @@
 				<span
 					v-if="budgetHealthStatus"
 					class="health-badge"
+					data-testid="budget-health-badge"
 					:style="{
 						color: budgetHealthStatus.color,
 						backgroundColor: budgetHealthStatus.bgColor,
@@ -38,7 +40,10 @@
 			<div class="pocket-money-summary">
 				<div class="summary-metric">
 					<span class="metric-label">剩余</span>
-					<span :class="['metric-val', (budgetStatus?.remainingAmount ?? 0) < 0 ? 'over' : 'remain']">
+					<span
+						:class="['metric-val', (budgetStatus?.remainingAmount ?? 0) < 0 ? 'over' : 'remain']"
+						data-testid="metric-remaining-amount"
+					>
 						<span class="currency-symbol">{{ (budgetStatus?.remainingAmount ?? 0) < 0 ? '-¥' : '¥' }}</span>{{ formatAmount(Math.abs(budgetStatus?.remainingAmount || 0)) }}
 					</span>
 				</div>

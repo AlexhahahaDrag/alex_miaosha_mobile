@@ -26,6 +26,7 @@
 			>
 				<div
 					class="ai-action-btn"
+					data-testid="btn-mobile-ai-recommend"
 					:class="{ 'is-loading': aiRecommending }"
 					@click="onFetchAiRecommend"
 				>
@@ -38,6 +39,7 @@
 				<span class="action-divider">|</span>
 				<div
 					class="ai-toggle-btn"
+					data-testid="btn-mobile-toggle-ai"
 					@click="toggleAiExpanded"
 				>
 					<span>{{ isAiExpanded ? '收起' : '口语配置' }}</span>
@@ -63,6 +65,7 @@
 					<input
 						v-model="aiCommandInput"
 						class="ai-input"
+						data-testid="mobile-ai-command-input"
 						type="text"
 						placeholder="如：“设2500预算，重点管餐饮”"
 						@keyup.enter="onAiParseCommand"
@@ -75,6 +78,7 @@
 					/>
 					<button
 						class="ai-parse-btn"
+						data-testid="btn-mobile-ai-parse"
 						:disabled="aiParsing"
 						@click="onAiParseCommand"
 					>
@@ -134,6 +138,7 @@
 					</div>
 					<div
 						class="ai-tier-cell ai-tier-cell--recom"
+						data-testid="btn-mobile-apply-moderate"
 						:class="{
 							active: modelValueAmount === aiRecommendData.moderateAmount,
 						}"
@@ -256,6 +261,7 @@ const onFetchAiRecommend = async () => {
 		});
 		if (code === '200' && data) {
 			aiRecommendData.value = data;
+			isAiExpanded.value = true;
 			showSuccessToast('AI 测算完成');
 		} else {
 			showFailToast(msg || 'AI 测算服务暂不可用');

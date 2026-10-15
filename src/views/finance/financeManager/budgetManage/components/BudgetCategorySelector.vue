@@ -11,11 +11,13 @@
 			>
 				<span
 					class="action-btn"
+					data-testid="btn-select-all-categories"
 					@click="selectAllCategories"
 				>全选</span>
 				<span class="action-sep">|</span>
 				<span
 					class="action-btn"
+					data-testid="btn-clear-categories"
 					@click="clearAllCategories"
 				>清空</span>
 			</div>
@@ -30,6 +32,7 @@
 					isDirectionSelected('expense') && 'active',
 					!canEditBudget && 'chip-item--disabled',
 				]"
+				data-testid="chip-direction-expense"
 				@click="toggleDirection('expense')"
 			>
 				<van-icon
@@ -46,6 +49,7 @@
 					isDirectionSelected('income') && 'active',
 					!canEditBudget && 'chip-item--disabled',
 				]"
+				data-testid="chip-direction-income"
 				@click="toggleDirection('income')"
 			>
 				<van-icon
@@ -72,6 +76,7 @@
 				v-for="cat in recentCategories"
 				:key="cat"
 				:class="['chip-item', isCategorySelected(cat) && 'active', !canEditBudget && 'chip-item--disabled']"
+				:data-testid="'chip-category-' + cat"
 				@click="toggleCategory(cat)"
 			>
 				<van-icon

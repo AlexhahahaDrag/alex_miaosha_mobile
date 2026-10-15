@@ -26,5 +26,47 @@
 		"route": "/finance/gift/person/giftPersonDetail?id=101",
 		"level": "flow",
 		"persona": "gift_admin"
+	},
+	{
+		"caseId": "FINANCE-E2E-MOBILE-POCKET-BUDGET",
+		"title": "移动端零花钱卡片展开与预算设置全流程",
+		"route": "/finance/financeManager",
+		"level": "flow",
+		"persona": "gift_admin"
+	},
+	{
+		"caseId": "FINANCE-E2E-MOBILE-KEYPAD-RECORD",
+		"title": "移动端九宫格触觉反馈与数字键盘极速记账",
+		"route": "/finance/financeManager/financeManagerDetail",
+		"level": "flow",
+		"persona": "gift_admin"
+	},
+	{
+		"caseId": "GIFT-AI-MOBILE-BUDGET-001",
+		"title": "移动端零花钱预算 AI 智能测算与三档推荐采纳",
+		"route": "/finance/financeManager/budgetManage",
+		"level": "flow",
+		"persona": "gift_admin"
+	},
+	{
+		"caseId": "GIFT-AI-MOBILE-BUDGET-002",
+		"title": "移动端零花钱口语化指令解析回填与触觉振动",
+		"route": "/finance/financeManager/budgetManage",
+		"level": "flow",
+		"persona": "gift_admin"
+	},
+	{
+		"caseId": "BUDGET-MOBILE-STATUS-OVER",
+		"title": "移动端零花钱卡片超支状态机判定与负数超支展示",
+		"route": "/finance/financeManager",
+		"level": "flow",
+		"persona": "gift_admin"
+	},
+	{
+		"caseId": "RBAC-MOBILE-MEMBER-READONLY-NOTICE",
+		"title": "移动端普通成员预算只读模式与横幅提示",
+		"route": "/finance/financeManager/budgetManage",
+		"level": "flow",
+		"persona": "family_member"
 	}
 ]

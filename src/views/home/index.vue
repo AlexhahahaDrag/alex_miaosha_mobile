@@ -584,8 +584,8 @@ watch(
 }
 
 .menu-search-bar {
-	padding: 0 !important;
-	background: transparent !important;
+	padding: 0;
+	background: transparent;
 
 	:deep(.van-search__content) {
 		background-color: var(--card-bg, #ffffff);
