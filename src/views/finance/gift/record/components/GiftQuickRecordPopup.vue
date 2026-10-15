@@ -174,6 +174,7 @@
 						round
 						type="primary"
 						native-type="submit"
+						data-testid="gift-record-quick-submit"
 						:loading="saving"
 					>保存</van-button>
 				</div>

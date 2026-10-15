@@ -95,6 +95,14 @@ const mockMenus = [
 				component: '/src/views/finance/gift/event/index.vue',
 				permissionCode: 'finance:gift:event',
 			},
+			{
+				id: '504',
+				name: 'financeGiftPersonDetail',
+				title: '亲友详情',
+				path: '/finance/gift/person/giftPersonDetail',
+				component: '/src/views/finance/gift/person/giftPersonDetail/index.vue',
+				permissionCode: 'finance:gift:person',
+			},
 		],
 	},
 ];
@@ -243,6 +251,44 @@ async function setupRouteMocks(page) {
 				});
 			}
 
+			if (pathname.includes('/gift-person-info-t/profile')) {
+				return fulfillEncrypted(route, {
+					code: '200',
+					data: {
+						person: {
+							id: '101',
+							personName: '李四',
+							relationType: 'friend',
+							phone: '13800138000',
+							remark: '大学室友兼死党',
+							totalGiveAmount: 1600,
+							totalReceiveAmount: 2200,
+							netAmount: 600,
+						},
+						records: [
+							{
+								id: '9001',
+								direction: 'RECEIVE',
+								amount: 1200,
+								payTime: '2026-05-20 12:00:00',
+								remark: '婚礼贺礼',
+							},
+						],
+					},
+				});
+			}
+
+			if (
+				pathname.includes('/gift-record-info-t') &&
+				(route.request().method() === 'POST' || route.request().method() === 'PUT')
+			) {
+				return fulfillEncrypted(route, {
+					code: '200',
+					message: '保存成功',
+					data: true,
+				});
+			}
+
 			return fulfillEncrypted(route, { code: '200', data: {} });
 		},
 	);
@@ -315,13 +361,87 @@ async function executeCase(page, c, runtime) {
 			await copyGreetingBtn.click();
 
 			// 等待振动探针触发断言
-			await page.waitForTimeout(300);
+			await page.waitForFunction((prev) => (window.__giftVibrateCount || 0) > prev, prevVibrates, {
+				timeout: 3000,
+			});
 			const newVibrates = await page.evaluate(() => window.__giftVibrateCount || 0);
 			if (newVibrates <= prevVibrates) {
 				throw new Error(
 					`触觉振动探针断言失败: 点击复制贺词前后振动次数未递增 (前=${prevVibrates}, 后=${newVibrates})`,
 				);
 			}
+			// 关闭面板保持状态纯净
+			const overlay = page.locator('.van-overlay').first();
+			if ((await overlay.count()) && (await overlay.isVisible())) {
+				await overlay.click({ force: true });
+			}
+			break;
+		}
+
+		case 'GIFT-E2E-MOBILE-QUICK-RECORD': {
+			await page.goto(`${runtime.baseUrl}#/finance/gift/record`);
+
+			// 1. 如果快速记礼面板未打开，则点击浮动添加按钮打开
+			const quickPanel = page.locator('[data-testid="gift-record-quick-panel"]').first();
+			if (!(await quickPanel.count()) || !(await quickPanel.isVisible())) {
+				const fab = page.locator('[data-testid="gift-record-fab"]').first();
+				await fab.waitFor({ state: 'visible', timeout: 10000 });
+				await fab.click();
+				await quickPanel.waitFor({ state: 'visible', timeout: 5000 });
+			}
+
+			// 2. 点击快捷金额 Chip
+			const quickAmountBtn = page.locator('[data-testid="gift-record-quick-amount"]').first();
+			if (await quickAmountBtn.count()) {
+				await quickAmountBtn.click();
+			}
+
+			// 3. 输入金额
+			const amountInput = page.locator('input[name="amount"]').first();
+			await amountInput.waitFor({ state: 'visible', timeout: 5000 });
+			await amountInput.fill('666');
+
+			// 4. 点击提交保存按钮
+			const submitBtn = page.locator('[data-testid="gift-record-quick-submit"]').first();
+			await submitBtn.waitFor({ state: 'visible', timeout: 5000 });
+
+			// 5. 侦听保存请求
+			const [saveReq] = await Promise.all([
+				page.waitForRequest(
+					(req) =>
+						req.url().includes('/gift-record-info-t') &&
+						(req.method() === 'POST' || req.method() === 'PUT'),
+				),
+				submitBtn.click(),
+			]);
+			if (!saveReq) {
+				throw new Error('移动端快速记礼提交保存请求未正常触发');
+			}
+			break;
+		}
+
+		case 'GIFT-E2E-MOBILE-PERSON-PROFILE': {
+			await page.goto(`${runtime.baseUrl}#/finance/gift/person/giftPersonDetail?id=101`);
+
+			// 1. 等待亲友名字渲染
+			const heroName = page.locator('.profile-hero__name').first();
+			await heroName.waitFor({ state: 'visible', timeout: 10000 });
+
+			const nameText = await heroName.innerText();
+			if (!nameText.includes('李四')) {
+				throw new Error(`移动端亲友姓名断言失败: 期望包含 李四, 实际为 ${nameText}`);
+			}
+
+			// 2. 验证累计送礼/收礼指标卡渲染
+			const metricCard = page.locator('.metric-card--recv strong').first();
+			await metricCard.waitFor({ state: 'visible', timeout: 5000 });
+
+			// 3. 验证编辑与删除按钮契约
+			const editBtn = page.locator('[data-testid="gift-person-edit"]').first();
+			await editBtn.waitFor({ state: 'visible', timeout: 5000 });
+
+			const deleteBtn = page.locator('[data-testid="gift-person-delete"]').first();
+			await deleteBtn.waitFor({ state: 'visible', timeout: 5000 });
 			break;
 		}
 

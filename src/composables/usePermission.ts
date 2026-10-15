@@ -10,8 +10,10 @@ export const usePermission = () => {
 	const context = computed(() => userStore.getPermissionContext);
 	const permissionSet = computed(() => buildPermissionSet(context.value));
 
-	const hasPermission = (permissionCode?: string | string[]) =>
-		canAccessPermission(permissionSet.value, permissionCode, judgeSuperAdmin(context.value));
+	const hasPermission = (permissionCode?: string | string[]) => {
+		if (userStore.getSuperAdmin) return true;
+		return canAccessPermission(permissionSet.value, permissionCode, judgeSuperAdmin(context.value));
+	};
 
 	return {
 		permissionContext: context,

@@ -56,6 +56,16 @@ export const useUserStore = defineStore('app-user', {
 		getSuperAdmin(state): boolean {
 			return state.superAdmin;
 		},
+		getPermissionContext(state) {
+			return {
+				orgInfo: state.orgInfo,
+				roleList: state.roleList,
+				roleInfo: state.roleInfo,
+				permissionCodes: state.permissionCodes,
+				buttonPermissionCodes: state.permissionCodes,
+				superAdmin: state.superAdmin,
+			};
+		},
 	},
 	actions: {
 		setToken(info: string | undefined) {

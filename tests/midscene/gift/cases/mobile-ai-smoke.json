@@ -12,5 +12,19 @@
 		"route": "/finance/gift/record",
 		"level": "flow",
 		"persona": "gift_admin"
+	},
+	{
+		"caseId": "GIFT-E2E-MOBILE-QUICK-RECORD",
+		"title": "移动端快速记礼弹窗全流程与 Picker 联动",
+		"route": "/finance/gift/record",
+		"level": "flow",
+		"persona": "gift_admin"
+	},
+	{
+		"caseId": "GIFT-E2E-MOBILE-PERSON-PROFILE",
+		"title": "移动端亲友档案详情与净值统计展示",
+		"route": "/finance/gift/person/giftPersonDetail?id=101",
+		"level": "flow",
+		"persona": "gift_admin"
 	}
 ]
