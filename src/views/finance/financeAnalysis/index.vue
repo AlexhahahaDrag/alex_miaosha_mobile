@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<div class="selector-container">
 		<div
 			class="selector-item"
@@ -90,7 +90,7 @@ useTabBar({
 
 // 常量定义
 const DATE_FORMATTER = 'YYYY年MM月';
-const ALL_USER_OPTION = { id: '0', nickName: '所有人' };
+const ALL_USER_OPTION = { id: '0', nickName: '家庭组所有人' };
 
 // 响应式数据
 const userInfo = useUserStore()?.getUserInfo;

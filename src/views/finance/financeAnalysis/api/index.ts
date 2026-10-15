@@ -1,4 +1,4 @@
-﻿import type { FinanceDetail } from '@/views/finance/financeAnalysis/financeAnalysisDetail/common';
+import type { FinanceDetail } from '@/views/finance/financeAnalysis/financeAnalysisDetail/common';
 import { getData, baseService } from '@/views/common/api';
 import type { ResponseBody } from '@/types/api';
 
@@ -11,13 +11,21 @@ const financeAnalysisUrl = {
 	getMonthExpense: '/getMonthExpense',
 };
 
+const formatParams = (belongTo?: number | string | null, searchDate?: string) => {
+	const params: Record<string, unknown> = { searchDate };
+	if (belongTo && belongTo !== '0') {
+		params.belongTo = belongTo;
+	}
+	return params;
+};
+
 // 获取财务分析总览
 export function getIncomeAndExpense(
 	belongTo?: number | string | null,
 	searchDate?: string,
 ): Promise<ResponseBody<FinanceDetail[]>> {
 	const url = `${baseService.finance + baseFinanceAnalysis + financeAnalysisUrl.getIncomeAndExpense}`;
-	return getData(url, { belongTo, searchDate });
+	return getData(url, formatParams(belongTo, searchDate));
 }
 
 // 获取财务分析余额
@@ -28,7 +36,7 @@ export function getBalance(
 	ResponseBody<FinanceDetail[] | { list: FinanceDetail[]; yoyTrend?: string; momTrend?: string }>
 > {
 	const url = `${baseService.finance + baseFinanceAnalysis + financeAnalysisUrl.getBalance}`;
-	return getData(url, { belongTo, searchDate });
+	return getData(url, formatParams(belongTo, searchDate));
 }
 
 // 获取财务分析日支出
@@ -37,7 +45,7 @@ export function getDayExpense(
 	searchDate?: string,
 ): Promise<ResponseBody<FinanceDetail[]>> {
 	const url = `${baseService.finance + baseFinanceAnalysis + financeAnalysisUrl.getDayExpense}`;
-	return getData(url, { belongTo, searchDate });
+	return getData(url, formatParams(belongTo, searchDate));
 }
 
 // 获取财务分析月支出
@@ -46,5 +54,5 @@ export function getMonthExpense(
 	searchDate?: string,
 ): Promise<ResponseBody<FinanceDetail[]>> {
 	const url = `${baseService.finance + baseFinanceAnalysis + financeAnalysisUrl.getMonthExpense}`;
-	return getData(url, { belongTo, searchDate });
+	return getData(url, formatParams(belongTo, searchDate));
 }
