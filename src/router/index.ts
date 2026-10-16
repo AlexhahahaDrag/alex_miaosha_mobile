@@ -259,6 +259,10 @@ const getChildren = (item: MenuInfoData, access: RouteAccessOptions): MenuDataIt
 				const cur = getChildren(childItem, access);
 				if (cur.name && !router.hasRoute(cur.name)) {
 					routeInfo.children?.push(cur);
+					if (getStringField(childItem, 'component') !== 'Layout' && cur.children?.length) {
+						const nestedRoutes = cur.children.splice(0);
+						routeInfo.children?.push(...nestedRoutes);
+					}
 				}
 			}
 		});
