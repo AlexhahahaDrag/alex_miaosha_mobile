@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<van-form
 		@submit="onSubmit"
 		:rules="rulesRef"
@@ -203,8 +203,8 @@ const init = async () => {
 	const id = route?.query?.id as string | string[] | undefined;
 	if (id) {
 		try {
-			const safeId = Array.isArray(id) ? id[0] : id;
-			const [detailRes, dictRes] = await Promise.all([getOrgInfoDetail(safeId || '-1'), getDictList('is_valid')]);
+			const safeId = Array.isArray(id) ? id[0] || '-1' : id;
+			const [detailRes, dictRes] = await Promise.all([getOrgInfoDetail(safeId), getDictList('is_valid')]);
 			const { code: detailCode, data: detailData, message: detailMessage } = detailRes;
 			const { code: dictCode, data: dictData, message: dictMessage } = dictRes;
 			if (detailCode === '200' && detailData) {

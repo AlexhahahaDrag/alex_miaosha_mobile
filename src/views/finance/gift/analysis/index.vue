@@ -82,7 +82,9 @@ const load = async () => {
 	];
 };
 
-void load();
+onMounted(() => {
+	void load();
+});
 </script>
 
 <style scoped lang="less">

@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<div class="gift-dashboard">
 		<section class="overview">
 			<div class="overview__item">
@@ -94,7 +94,9 @@ const refresh = () => {
 
 const loadMore = () => load();
 
-refresh();
+onMounted(() => {
+	refresh();
+});
 </script>
 
 <style scoped lang="less">

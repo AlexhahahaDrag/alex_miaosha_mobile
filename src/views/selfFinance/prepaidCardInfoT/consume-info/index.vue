@@ -293,7 +293,9 @@ const init = async () => {
 	await getPrepaidCardInfoDetailInfo();
 };
 
-void init();
+onMounted(() => {
+	void init();
+});
 </script>
 
 <style scoped lang="less">

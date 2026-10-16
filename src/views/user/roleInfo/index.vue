@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<common-pull-refresh
 		:style="{ height: 'calc(100% - 44px)' }"
 		v-model="isRefresh"
@@ -212,7 +212,9 @@ function init() {
 	getUserInfoList();
 }
 
-void init();
+onMounted(() => {
+	void init();
+});
 </script>
 
 <style lang="less" scoped>

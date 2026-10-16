@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<van-form
 		@submit="onSubmit"
 		:rules="rulesRef"
@@ -217,34 +217,36 @@ const onSubmit = () => {
 	});
 };
 
-function init() {
+async function init() {
 	const id = route?.query?.id as string | undefined;
-	const tasks: Promise<unknown>[] = [getDictList('is_valid'), loadRoleOptions(), loadUserOptions()];
-	if (id) {
-		Promise.all([getRoleUserInfoDetail(id || '-1'), ...tasks])
-			.then((res) => {
-				const detailRes = res[0] as { code?: string; data?: RoleUserInfoForm; message?: string };
-				if (detailRes.code == '200') {
-					formInfo.value = detailRes.data || {};
-					roleName.value = getListName(roleInfo.value.list || [], formInfo.value.roleId, 'id', 'roleName');
-					userName.value = getListName<UserManagerData>(userInfo.value.list || [], formInfo.value.userId, 'id', 'nickName');
-				} else {
-					showFailToast(detailRes?.message || '查询详情失败，请联系管理员');
-				}
-				getDictInfoList(res[1] as { code?: string; data?: Array<{ belongTo: string }>; message?: string });
-			})
-			.catch(() => {
-				showFailToast('系统异常，请联系管理员');
-			});
-	} else {
-		Promise.all(tasks).then((res) => {
-			getDictInfoList(res[0] as { code?: string; data?: Array<{ belongTo: string }>; message?: string });
-		});
-		formInfo.value = {};
+
+	try {
+		// 1. 公共数据（字典、角色列表、用户列表）：统一并发加载
+		const [dictRes] = await Promise.all([getDictList('is_valid'), loadRoleOptions(), loadUserOptions()]);
+		getDictInfoList(dictRes as { code?: string; data?: Array<{ belongTo: string }>; message?: string });
+
+		// 2. 仅编辑模式按需拉取详情并回填
+		if (id) {
+			const { code, data, message } = await getRoleUserInfoDetail(id);
+			if (code == '200') {
+				formInfo.value = data || {};
+				roleName.value = getListName(roleInfo.value.list || [], formInfo.value.roleId, 'id', 'roleName');
+				userName.value = getListName<UserManagerData>(userInfo.value.list || [], formInfo.value.userId, 'id', 'nickName');
+				statusName.value = getListName(statusInfo.value.list || [], formInfo.value.status, 'typeCode', 'typeName');
+			} else {
+				showFailToast(message || '查询详情失败，请联系管理员');
+			}
+		} else {
+			formInfo.value = {};
+		}
+	} catch {
+		showFailToast('系统异常，请联系管理员');
 	}
 }
 
-void init();
+onMounted(() => {
+	void init();
+});
 </script>
 <style lang="less" scoped>
 .subButton {

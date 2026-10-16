@@ -196,7 +196,9 @@ const showPending = async (item: GiftRecordInfo) => {
 	}
 };
 
-refresh();
+onMounted(() => {
+	refresh();
+});
 </script>
 
 <style scoped lang="less">

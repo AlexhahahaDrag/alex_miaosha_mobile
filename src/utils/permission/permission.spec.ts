@@ -28,4 +28,15 @@ describe('permission utils', () => {
 		expect(canAccessPermission(set, ['gift:edit', 'gift:view'], false)).toBe(true);
 		expect(canAccessPermission(set, ['gift:edit', 'gift:delete'], false)).toBe(false);
 	});
+
+	it('isSuperAdmin handles context roleList, roleCode, and edge cases', () => {
+		expect(isSuperAdmin(null)).toBe(false);
+		expect(isSuperAdmin(undefined)).toBe(false);
+		expect(isSuperAdmin({ superAdmin: true })).toBe(true);
+		expect(isSuperAdmin({ roleCode: 'super_super' })).toBe(true);
+		expect(isSuperAdmin({ roleCode: 'admin' })).toBe(false);
+		expect(isSuperAdmin({ roleList: [{ roleCode: 'super_super' }] })).toBe(true);
+		expect(isSuperAdmin({ roleList: [{ roleCode: 'admin' }] })).toBe(false);
+		expect(isSuperAdmin({ roleList: null as never })).toBe(false);
+	});
 });

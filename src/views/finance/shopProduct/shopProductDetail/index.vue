@@ -244,7 +244,9 @@ const init = async () => {
 	}
 };
 
-init();
+onMounted(() => {
+	void init();
+});
 </script>
 
 <style lang="less" scoped>

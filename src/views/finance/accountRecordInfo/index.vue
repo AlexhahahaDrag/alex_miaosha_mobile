@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<common-pull-refresh
 		:style="{ height: 'calc(100% - 44px)' }"
 		v-model="isRefresh"
@@ -188,7 +188,7 @@ const delAccountRecordInfo = async (id: string) => {
 		refresh();
 		showSuccessToast(message || '删除成功！');
 	} else {
-		showFailToast(message || '鍒犻櫎澶辫触锛岃鑱旂郴绠＄悊鍛橈紒');
+		showFailToast(message || '删除失败，请联系管理员！');
 	}
 };
 
@@ -196,11 +196,13 @@ function init() {
 	dataSource.value = [];
 	resetPagination();
 	query(searchInfo.value, pagination);
-	//鑾峰彇鐢ㄦ埛淇℃伅
+	// 获取用户信息
 	getUserInfoList();
 }
 
-void init();
+onMounted(() => {
+	void init();
+});
 </script>
 
 <style lang="less" scoped>

@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<common-pull-refresh
 		:style="{ height: 'calc(100% - 44px)' }"
 		v-model="isRefresh"
@@ -194,11 +194,13 @@ function init() {
 	dataSource.value = [];
 	resetPagination();
 	query(searchInfo.value, pagination);
-	//鑾峰彇鐢ㄦ埛淇℃伅
+	// 获取用户信息
 	getUserInfoList();
 }
 
-void init();
+onMounted(() => {
+	void init();
+});
 </script>
 
 <style lang="less" scoped>

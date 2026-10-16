@@ -248,26 +248,32 @@ const initInfoDate = (infoDate: Dayjs) => {
 // 统一数据获取逻辑，减少重复代码
 const init = async () => {
 	const id: string = route?.query?.id as string;
-	// 统一获取字典数据，无论是否有 id
-	const [detailRes, dictRes] = await Promise.all([
-		id ? getPersonalGiftDetail(id || '0') : Promise.resolve({ code: '200', data: {} }),
-		getDictList('gift_action'),
-	]);
-	if (id) {
-		if (detailRes.code == '200') {
-			formInfo.value = detailRes?.data || {};
-			formInfo.value.eventTime = formatDayjs(formInfo.value.eventTime);
+	try {
+		// 统一获取字典数据，无论是否有 id
+		const [detailRes, dictRes] = await Promise.all([
+			id ? getPersonalGiftDetail(id) : Promise.resolve({ code: '200', data: {} }),
+			getDictList('gift_action'),
+		]);
+		if (id) {
+			if (detailRes.code == '200') {
+				formInfo.value = detailRes?.data || {};
+				formInfo.value.eventTime = formatDayjs(formInfo.value.eventTime);
+			} else {
+				showFailToast((detailRes as { message?: string })?.message || '查询详情失败，请联系管理员!');
+			}
 		} else {
-			showFailToast((detailRes as { message?: string })?.message || '查询详情失败，请联系管理员!');
+			formInfo.value = {
+				eventTime: nowDayjs(),
+			};
 		}
-	} else {
-		formInfo.value = {
-			eventTime: nowDayjs(),
-		};
+		getDictInfoList(dictRes?.data || []);
+		initInfoDate((formInfo.value?.eventTime as Dayjs) || nowDayjs());
+	} catch {
+		showFailToast('初始化失败，请联系管理员！');
 	}
-	getDictInfoList(dictRes?.data || []);
-	initInfoDate((formInfo.value?.eventTime as Dayjs) || nowDayjs());
 };
 
-init();
+onMounted(() => {
+	void init();
+});
 </script>

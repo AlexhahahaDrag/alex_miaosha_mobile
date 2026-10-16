@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<div class="menu-page">
 		<van-divider
 			:style="{
@@ -60,7 +60,9 @@ async function refresh() {
 	}
 }
 
-void refresh();
+onMounted(() => {
+	void refresh();
+});
 </script>
 
 <style lang="less" scoped>

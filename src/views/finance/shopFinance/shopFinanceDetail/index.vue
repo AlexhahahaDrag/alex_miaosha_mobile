@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<div class="shop-finance-detail-container">
 		<!-- Header Card -->
 		<div class="header-card">
@@ -403,7 +403,9 @@ const init = async () => {
 	}
 };
 
-init();
+onMounted(() => {
+	void init();
+});
 </script>
 
 <style lang="less" scoped>

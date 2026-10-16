@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<common-pull-refresh
 		:style="{ height: 'calc(100% - 44px)' }"
 		v-model="isRefresh"
@@ -286,7 +286,9 @@ const init = async () => {
 	await Promise.all([getUserInfoList(), getRoleOptionList()]);
 };
 
-void init();
+onMounted(() => {
+	void init();
+});
 </script>
 
 <style lang="less" scoped>

@@ -255,7 +255,9 @@ const init = (): void => {
 	query(searchInfo.value, pagination);
 };
 
-init();
+onMounted(() => {
+	init();
+});
 </script>
 
 <style lang="less" scoped>

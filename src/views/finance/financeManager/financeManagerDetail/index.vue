@@ -539,54 +539,67 @@ const initInfoDate = (infoDate: Dayjs) => {
 const init = async () => {
 	const id: string = route?.query?.id as string;
 	const currentMonth = formatMonth();
+	loading.value = true;
 
-	const [detailRes, userRes, dictRes, catRes] = await Promise.all([
-		id ? getFinanceMangerDetail(id) : Promise.resolve({ code: '200', data: {} as FinanceManagerData }),
-		getUserManagerList({}),
-		getDictList('pay_way,income_expense_type,is_valid'),
-		getBudgetCategories(currentMonth),
-	]);
+	try {
+		const [detailRes, userRes, dictRes, catRes] = await Promise.all([
+			id ? getFinanceMangerDetail(id) : Promise.resolve({ code: '200', data: {} as FinanceManagerData }),
+			getUserManagerList({}),
+			getDictList('pay_way,income_expense_type,is_valid'),
+			getBudgetCategories(currentMonth),
+		]);
 
-	// 动态类别
-	if (catRes.code === '200' && Array.isArray(catRes.data)) {
-		dynamicCategories.value = catRes.data.filter(
-			(c) => c && c !== '支出' && c !== '收入' && c !== 'expense' && c !== 'income' && c !== '转账',
-		);
-	}
-
-	if (id && detailRes.code === '200' && detailRes.data) {
-		formInfo.value = { ...detailRes.data };
-		formInfo.value.infoDate = formatDayjs(detailRes.data.infoDate);
-		if (detailRes.data.amount) {
-			amountStr.value = String(detailRes.data.amount);
+		// 动态类别
+		if (catRes.code === '200' && Array.isArray(catRes.data)) {
+			dynamicCategories.value = catRes.data.filter(
+				(c) => c && c !== '支出' && c !== '收入' && c !== 'expense' && c !== 'income' && c !== '转账',
+			);
 		}
-	} else {
-		// 新增默认值
-		formInfo.value = {
-			isValid: '1',
-			incomeAndExpenses: 'expense',
-			infoDate: nowDayjs(),
-			belongTo: userInfo?.id !== undefined ? Number(userInfo.id) : 0,
-			fromSource: 'wx',
-			typeCode: '餐饮',
-			name: '餐饮',
-		};
-	}
 
-	getUserInfoList(userRes?.data || []);
-	getDictInfoList(dictRes?.data || []);
-	initInfoDate((formInfo.value?.infoDate as Dayjs) || nowDayjs());
+		if (id) {
+			if (detailRes.code === '200' && detailRes.data) {
+				formInfo.value = { ...detailRes.data };
+				formInfo.value.infoDate = formatDayjs(detailRes.data.infoDate);
+				if (detailRes.data.amount) {
+					amountStr.value = String(detailRes.data.amount);
+				}
+			} else {
+				showFailToast((detailRes as { message?: string })?.message || '查询详情失败，请联系管理员！');
+			}
+		} else {
+			// 新增默认值
+			formInfo.value = {
+				isValid: '1',
+				incomeAndExpenses: 'expense',
+				infoDate: nowDayjs(),
+				belongTo: userInfo?.id !== undefined ? Number(userInfo.id) : 0,
+				fromSource: 'wx',
+				typeCode: '餐饮',
+				name: '餐饮',
+			};
+		}
 
-	// 确保支付方式与收支状态显示名称对齐
-	if (!nameRefMap.fromSource.value) {
-		nameRefMap.fromSource.value = '微信';
-	}
-	if (!nameRefMap.incomeAndExpenses.value) {
-		nameRefMap.incomeAndExpenses.value = formInfo.value.incomeAndExpenses === 'income' ? '收入' : '支出';
+		getUserInfoList(userRes?.data || []);
+		getDictInfoList(dictRes?.data || []);
+		initInfoDate((formInfo.value?.infoDate as Dayjs) || nowDayjs());
+
+		// 确保支付方式与收支状态显示名称对齐
+		if (!nameRefMap.fromSource.value) {
+			nameRefMap.fromSource.value = '微信';
+		}
+		if (!nameRefMap.incomeAndExpenses.value) {
+			nameRefMap.incomeAndExpenses.value = formInfo.value.incomeAndExpenses === 'income' ? '收入' : '支出';
+		}
+	} catch {
+		showFailToast('初始化失败，请联系管理员！');
+	} finally {
+		loading.value = false;
 	}
 };
 
-init();
+onMounted(() => {
+	void init();
+});
 </script>
 
 <style lang="less" scoped>

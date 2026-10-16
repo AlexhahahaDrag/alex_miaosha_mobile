@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<div class="profile-page">
 		<van-divider>头像</van-divider>
 		<div class="avatar-row">
@@ -159,7 +159,9 @@ const init = async () => {
 	}
 };
 
-void init();
+onMounted(() => {
+	void init();
+});
 </script>
 
 <style lang="less" scoped>

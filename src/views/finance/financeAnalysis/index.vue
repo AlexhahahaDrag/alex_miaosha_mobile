@@ -200,7 +200,9 @@ const init = () => {
 	getUserInfoListInfo();
 };
 
-init();
+onMounted(() => {
+	init();
+});
 </script>
 <style lang="less" scoped>
 .selector-container {

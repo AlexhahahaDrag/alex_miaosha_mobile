@@ -263,7 +263,9 @@ async function init() {
 	await Promise.all([query(searchInfo.value, pagination), loadTreeData(), getUserInfoList()]);
 }
 
-void init();
+onMounted(() => {
+	void init();
+});
 </script>
 
 <style lang="less" scoped>

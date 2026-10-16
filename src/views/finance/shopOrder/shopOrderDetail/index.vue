@@ -170,7 +170,9 @@ async function init(): Promise<void> {
 	}
 }
 
-void init();
+onMounted(() => {
+	void init();
+});
 </script>
 <style lang="less" scoped>
 .subButton {

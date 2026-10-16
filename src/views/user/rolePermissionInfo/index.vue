@@ -381,7 +381,9 @@ const toggleSelection = (id: string, checked: boolean) => {
 	selectedIds.value = selectedIds.value.filter((item) => item !== id);
 };
 
-void refresh();
+onMounted(() => {
+	void refresh();
+});
 </script>
 
 <style lang="less" scoped>

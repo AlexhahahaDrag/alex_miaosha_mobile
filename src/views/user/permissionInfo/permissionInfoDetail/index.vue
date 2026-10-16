@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<van-form
 		@submit="onSubmit"
 		:rules="rulesRef"
@@ -155,30 +155,34 @@ const onSubmit = () => {
 	});
 };
 
-function init() {
+async function init() {
 	const id = route?.query?.id as string | undefined;
-	if (id) {
-		Promise.all([getPermissionInfoDetail(id || '-1'), getDictList('is_valid')])
-			.then((res) => {
-				if (res[0].code == '200') {
-					formInfo.value = res[0].data;
-				} else {
-					showFailToast(res?.message || '查询详情失败，请联系管理员');
-				}
-				getDictInfoList(res[1]);
-			})
-			.catch(() => {
-				showFailToast('系统异常，请联系管理员');
-			});
-	} else {
-		getDictList('is_valid').then((res) => {
-			getDictInfoList(res);
-		});
-		formInfo.value = {};
+
+	try {
+		// 1. 公共数据（字典）：统一提前加载并初始化
+		const dictRes = await getDictList('is_valid');
+		getDictInfoList(dictRes as { code?: string; data?: Array<{ belongTo: string }>; message?: string });
+
+		// 2. 仅编辑模式按需拉取详情并回填
+		if (id) {
+			const { code, data, message } = await getPermissionInfoDetail(id);
+			if (code == '200' && data) {
+				formInfo.value = data;
+				statusName.value = getListName(statusInfo.value.list || [], formInfo.value.status, 'typeCode', 'typeName');
+			} else {
+				showFailToast(message || '查询详情失败，请联系管理员');
+			}
+		} else {
+			formInfo.value = {};
+		}
+	} catch {
+		showFailToast('系统异常，请联系管理员');
 	}
 }
 
-void init();
+onMounted(() => {
+	void init();
+});
 </script>
 <style lang="less" scoped>
 .subButton {

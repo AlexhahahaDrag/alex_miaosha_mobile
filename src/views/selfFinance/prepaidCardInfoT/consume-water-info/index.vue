@@ -466,10 +466,9 @@ const init = () => {
 	filterParams.cardId = route.query.cardId as string;
 };
 
-init();
-
-// 组件挂载时获取数据
+// 组件挂载时初始化并获取数据
 onMounted(() => {
+	init();
 	fetchTransactionData();
 });
 </script>

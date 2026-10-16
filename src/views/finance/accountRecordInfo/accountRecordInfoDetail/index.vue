@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<van-form
 		@submit="onSubmit"
 		:rules="rulesRef"
@@ -260,7 +260,9 @@ async function init() {
 	}
 }
 
-void init();
+onMounted(() => {
+	void init();
+});
 </script>
 <style lang="less" scoped>
 .subButton {

@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<div class="shop-stock-batch-detail-container">
 		<van-form
 			@submit="onSubmit"
@@ -285,7 +285,9 @@ const init = async () => {
 };
 
 // --- Init ---
-init();
+onMounted(() => {
+	void init();
+});
 </script>
 
 <style lang="less" scoped>

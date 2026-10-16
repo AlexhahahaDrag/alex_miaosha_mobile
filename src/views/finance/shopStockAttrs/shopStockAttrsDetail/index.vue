@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<div class="shop-stock-attrs-detail">
 		<div class="detail-container">
 			<van-form
@@ -275,28 +275,29 @@ const onSubmit = async (): Promise<void> => {
 	}
 };
 
-const init = (): void => {
-	const id = route?.query?.id as string;
-	if (id) {
-		Promise.all([getShopStockAttrsDetail(id), getDictList('is_valid')])
-			.then((res: any) => {
-				if (res[0].code == '200') {
-					formInfo.value = res[0].data;
-				} else {
-					showFailToast(res[0]?.message || '查询详情失败');
-				}
-				getDictInfoList(res[1]?.data || []);
-			})
-			.catch(() => {
-				showFailToast('系统异常，请联系管理员');
-			});
-	} else {
-		getDictList('is_valid').then((res: any) => {
-			getDictInfoList(res.data || []);
-		});
-		formInfo.value = {
-			isValid: '1', // 默认有效
-		};
+const init = async (): Promise<void> => {
+	const id = route?.query?.id as string | undefined;
+
+	try {
+		// 1. 公共数据（字典）：统一提前加载并初始化
+		const dictRes: any = await getDictList('is_valid');
+		getDictInfoList(dictRes?.data || []);
+
+		// 2. 仅编辑模式按需拉取详情并回填
+		if (id) {
+			const res = await getShopStockAttrsDetail(id);
+			if (res.code == '200') {
+				formInfo.value = res.data;
+			} else {
+				showFailToast(res?.message || '查询详情失败');
+			}
+		} else {
+			formInfo.value = {
+				isValid: '1', // 默认有效
+			};
+		}
+	} catch {
+		showFailToast('系统异常，请联系管理员');
 	}
 };
 

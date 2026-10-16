@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<van-form
 		@submit="onSubmit"
 		:rules="rulesRef"
@@ -125,26 +125,27 @@ const onSubmit = () => {
 	});
 };
 
-function init() {
+async function init() {
 	const id = route?.query?.id as string | undefined;
 	if (id) {
-		Promise.all([getPmsAttrDetail(id || '-1')])
-			.then((res) => {
-				if (res[0].code == '200') {
-					formInfo.value = (res[0].data || {}) as PmsAttrForm;
-				} else {
-					showFailToast(res[0]?.message || '查询详情失败，请联系管理员');
-				}
-			})
-			.catch(() => {
-				showFailToast('系统异常，请联系管理员');
-			});
+		try {
+			const { code, data, message } = await getPmsAttrDetail(id);
+			if (code === '200') {
+				formInfo.value = (data || {}) as PmsAttrForm;
+			} else {
+				showFailToast(message || '查询详情失败，请联系管理员');
+			}
+		} catch {
+			showFailToast('系统异常，请联系管理员');
+		}
 	} else {
 		formInfo.value = {};
 	}
 }
 
-void init();
+onMounted(() => {
+	void init();
+});
 </script>
 <style lang="less" scoped>
 .subButton {
