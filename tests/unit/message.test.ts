@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { normalizeMessageIds } from '@/views/message/api';
 import {
+	normalizeMessageIds,
 	MESSAGE_CATEGORY_TABS,
 	resolveMessageBadgeMeta,
 	resolveMobileMessageJumpRoute,
