@@ -98,6 +98,36 @@
 				</div>
 			</div>
 
+			<!-- 流式阶段进度状态条 -->
+			<div
+				v-if="parsing || stageStatus"
+				class="stream-stage-card"
+			>
+				<div class="stage-info">
+					<div class="stage-text">
+						<van-loading
+							v-if="parsing"
+							size="14"
+							type="spinner"
+							class="stage-spinner"
+						/>
+						<van-icon
+							v-else
+							name="passed"
+							color="#07c160"
+						/>
+						<span>{{ stageStatus?.message || '正在分析流水语境...' }}</span>
+					</div>
+					<span class="stage-progress">{{ stageStatus?.progress ?? 0 }}%</span>
+				</div>
+				<van-progress
+					:percentage="stageStatus?.progress ?? 0"
+					stroke-width="4"
+					:show-pivot="false"
+					color="linear-gradient(to right, #1989fa, #07c160)"
+				/>
+			</div>
+
 			<!-- 解析结果卡片 -->
 			<div
 				v-if="parsedResult"
@@ -185,8 +215,13 @@
 
 <script setup lang="ts">
 import { showToast, showSuccessToast, showFailToast } from 'vant';
-import { parseUniversalFinanceLedger } from '@/views/finance/financeManager/api';
-import type { UniversalFinanceAiParseReq, UniversalFinanceAiParseVo } from '@/views/finance/financeManager/config';
+import { parseUniversalFinanceLedger, parseUniversalFinanceLedgerStream } from '@/views/finance/financeManager/api';
+import type {
+	UniversalFinanceAiParseReq,
+	UniversalFinanceAiParseVo,
+	UniversalFinanceAiStageVo,
+} from '@/views/finance/financeManager/config';
+import { triggerHaptic } from '@/utils/haptics';
 
 const props = defineProps<{
 	modelValue: boolean;
@@ -206,6 +241,7 @@ const visible = computed({
 const scene = ref<UniversalFinanceAiParseReq['scene']>('AUTO_DETECT');
 const inputText = ref('');
 const parsing = ref(false);
+const stageStatus = ref<UniversalFinanceAiStageVo | null>(null);
 const parsedResult = ref<UniversalFinanceAiParseVo | null>(null);
 
 const applyExample = (ex: string) => {
@@ -225,23 +261,75 @@ const handleParse = async () => {
 		return;
 	}
 	parsing.value = true;
+	parsedResult.value = null;
+	stageStatus.value = {
+		stage: 'SCENE_ANALYSIS',
+		progress: 10,
+		message: '建立流式连接中...',
+	};
+	triggerHaptic('light');
+
+	let receivedStreamComplete = false;
+
 	try {
-		const { code, data, message } = await parseUniversalFinanceLedger({
-			scene: scene.value,
-			text: inputText.value.trim(),
-			belongTo: props.belongTo,
-		});
-		if (code === 200 || code === '00000') {
-			parsedResult.value = data;
-			showSuccessToast('AI 解析完成，已呈现预览卡片');
-		} else {
-			showFailToast(message || '解析失败，请重试');
-		}
-	} catch (e: any) {
-		showFailToast(e.message || '网络异常，解析失败');
-	} finally {
-		parsing.value = false;
+		await parseUniversalFinanceLedgerStream(
+			{
+				scene: scene.value,
+				text: inputText.value.trim(),
+				belongTo: props.belongTo,
+			},
+			{
+				onStage: (stageVo) => {
+					stageStatus.value = stageVo;
+					triggerHaptic('light');
+					if (stageVo.partialData) {
+						parsedResult.value = stageVo.partialData;
+					}
+				},
+				onComplete: (result) => {
+					receivedStreamComplete = true;
+					parsedResult.value = result;
+					triggerHaptic('success');
+					showSuccessToast('AI 解析完成，已呈现预览卡片');
+				},
+				onError: () => {
+					// 流式异常平滑静默降级走后续同步保底
+				},
+			},
+		);
+	} catch {
+		// 流式调用异常平滑静默降级
 	}
+
+	// 降级兜底
+	if (!receivedStreamComplete && !parsedResult.value) {
+		try {
+			const { code, data, message } = await parseUniversalFinanceLedger({
+				scene: scene.value,
+				text: inputText.value.trim(),
+				belongTo: props.belongTo,
+			});
+			if (code === 200 || code === '00000') {
+				parsedResult.value = data;
+				stageStatus.value = {
+					stage: 'COMPLETE',
+					progress: 100,
+					message: '解析已完成',
+				};
+				triggerHaptic('success');
+				showSuccessToast('AI 解析完成，已呈现预览卡片');
+			} else {
+				triggerHaptic('warning');
+				showFailToast(message || '解析失败，请重试');
+			}
+		} catch (e: unknown) {
+			triggerHaptic('error');
+			const errorMsg = e instanceof Error ? e.message : '网络异常，解析失败';
+			showFailToast(errorMsg);
+		}
+	}
+
+	parsing.value = false;
 };
 
 const handleApply = () => {
@@ -253,6 +341,7 @@ const handleApply = () => {
 const onClosed = () => {
 	inputText.value = '';
 	parsedResult.value = null;
+	stageStatus.value = null;
 	scene.value = 'AUTO_DETECT';
 };
 </script>
@@ -262,6 +351,34 @@ const onClosed = () => {
 	max-height: 85vh;
 	.sheet-content {
 		padding: 16px 20px 32px;
+	}
+	.stream-stage-card {
+		margin-top: 12px;
+		background: #f0fdf4;
+		border: 1px solid #bbf7d0;
+		border-radius: 10px;
+		padding: 10px 12px;
+		.stage-info {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			font-size: 12px;
+			margin-bottom: 6px;
+			.stage-text {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				color: #166534;
+				font-weight: 500;
+				.stage-spinner {
+					margin-right: 2px;
+				}
+			}
+			.stage-progress {
+				color: #15803d;
+				font-weight: 600;
+			}
+		}
 	}
 	.scene-tabs {
 		margin-bottom: 12px;
