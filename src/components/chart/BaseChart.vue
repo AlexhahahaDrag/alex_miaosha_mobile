@@ -42,14 +42,19 @@ const emit = defineEmits<{
 
 const chartDomRef = shallowRef<HTMLDivElement>();
 let chartInstance: echarts.ECharts | null = null;
+let resizeObserver: ResizeObserver | null = null;
 
 const style = computed(() => ({
 	height: props.height,
 	width: props.width,
 }));
 
+let resizeTimer: ReturnType<typeof setTimeout> | null = null;
 const handleResize = () => {
-	chartInstance?.resize();
+	if (resizeTimer) clearTimeout(resizeTimer);
+	resizeTimer = setTimeout(() => {
+		chartInstance?.resize();
+	}, 100);
 };
 
 const initChart = () => {
@@ -68,6 +73,14 @@ const initChart = () => {
 };
 
 const disposeChart = () => {
+	if (resizeObserver) {
+		resizeObserver.disconnect();
+		resizeObserver = null;
+	}
+	if (resizeTimer) {
+		clearTimeout(resizeTimer);
+		resizeTimer = null;
+	}
 	if (chartInstance) {
 		chartInstance.dispose();
 		chartInstance = null;
@@ -77,6 +90,12 @@ const disposeChart = () => {
 onMounted(() => {
 	initChart();
 	window.addEventListener('resize', handleResize);
+	if (chartDomRef.value && typeof ResizeObserver !== 'undefined') {
+		resizeObserver = new ResizeObserver(() => {
+			handleResize();
+		});
+		resizeObserver.observe(chartDomRef.value);
+	}
 });
 
 onUnmounted(() => {

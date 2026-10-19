@@ -149,6 +149,11 @@
 import { showNotify } from 'vant';
 import type { FinanceDetail } from '@/views/finance/financeAnalysis/financeAnalysisDetail/common';
 import { getBalance } from '@/views/finance/financeAnalysis/api';
+import { triggerHaptic } from '@/utils/haptics';
+import {
+	loadBalanceSnapshot,
+	saveBalanceSnapshot,
+} from '@/views/finance/financeAnalysis/composables/useAnalysisOfflineCache';
 
 interface Props {
 	activeTab: number | string;
@@ -244,37 +249,47 @@ interface BalanceResponse {
 	momTrend?: string;
 }
 
+const applyBalanceData = (list: FinanceDetail[], yoy?: string, mom?: string) => {
+	balanceList.value = list;
+	totalYoy.value = yoy ?? '';
+	totalMom.value = mom ?? '';
+	sum.value = (list || []).reduce((acc: number, item: FinanceDetail) => acc + (Number(item.amount) || 0), 0);
+};
+
 const getBalanceInfo = async (userId: string | null, dateStr: string) => {
 	const { code, data, message } = await getBalance(userId, dateStr);
 	if (code == '200') {
+		let list: FinanceDetail[] = [];
+		let yoy = '';
+		let mom = '';
 		if (Array.isArray(data)) {
-			balanceList.value = data;
-			totalYoy.value = '';
-			totalMom.value = '';
+			list = data;
 		} else if (data && typeof data === 'object') {
 			const res = data as BalanceResponse;
-			balanceList.value = res.list ?? [];
-			totalYoy.value = res.yoyTrend ?? '';
-			totalMom.value = res.momTrend ?? '';
+			list = res.list ?? [];
+			yoy = res.yoyTrend ?? '';
+			mom = res.momTrend ?? '';
 		}
 
-		sum.value = (balanceList.value || []).reduce(
-			(acc: number, item: FinanceDetail) => acc + (Number(item.amount) || 0),
-			0,
-		);
+		applyBalanceData(list, yoy, mom);
+		// 写入本地离线快照，供冷启动或离线时秒开呈现
+		saveBalanceSnapshot(list, yoy, mom);
 	} else {
 		showNotify({ type: 'danger', message: message || '查询列表失败！' });
 	}
 };
 
 const init = (dateStr: string, belongTo: number | string | null) => {
+	// SWR 优先从快照快速还原骨架与数值，防止白屏
+	const snapshot = loadBalanceSnapshot();
+	if (snapshot && snapshot.list && snapshot.list.length > 0 && balanceList.value.length === 0) {
+		applyBalanceData(snapshot.list, snapshot.yoyTrend, snapshot.momTrend);
+	}
 	getBalanceInfo(belongTo, dateStr);
 };
 
 const goToFinanceManager = (item: FinanceDetail) => {
-	// 映射 typeName 到 fromSource 代码
-	// 如果 item.typeCode 已经是 yhk, wx 等，则可以直接使用
-	// 根据用户提示，这里使用 typeCode 或者是手动映射
+	triggerHaptic('medium');
 	const query: Record<string, string | number> = { fromSource: item.typeCode || '' };
 	if (props.belongTo && props.belongTo !== '0') {
 		query.belongTo = props.belongTo;

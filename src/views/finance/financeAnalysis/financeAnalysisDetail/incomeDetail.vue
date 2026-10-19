@@ -69,6 +69,10 @@
 
 <script lang="ts" setup>
 import { getDayExpense, getMonthExpense, getIncomeAndExpense } from '@/views/finance/financeAnalysis/api';
+import {
+	loadTrendSnapshot,
+	saveTrendSnapshot,
+} from '@/views/finance/financeAnalysis/composables/useAnalysisOfflineCache';
 
 interface Props {
 	activeTab: number | string;
@@ -213,6 +217,11 @@ const fetchData = async (userId: string | null, dateStr: string) => {
 		}));
 	}
 
+	// 持久化日/月消费走势图离线快照
+	if (dayRes.code === '200' && monthRes.code === '200') {
+		saveTrendSnapshot(dayRes.data || [], monthRes.data || []);
+	}
+
 	// High Value List
 	if (listRes.code === '200' && listRes.data) {
 		highValueList.value = (listRes.data || [])
@@ -234,6 +243,23 @@ const fetchData = async (userId: string | null, dateStr: string) => {
 };
 
 const init = (dateStr: string, belongTo: string | null) => {
+	// SWR 优先从本地快照还原走势图数据，消除切换 Tab 或进页面时的白屏感
+	const snapshot = loadTrendSnapshot();
+	if (
+		snapshot &&
+		(snapshot.dayList.length > 0 || snapshot.monthList.length > 0) &&
+		dayData.value.length === 0 &&
+		monthData.value.length === 0
+	) {
+		dayData.value = snapshot.dayList.map((item) => ({
+			date: item.infoDate?.toString() || '',
+			value: item.amount || 0,
+		}));
+		monthData.value = snapshot.monthList.map((item) => ({
+			date: item.infoDate?.toString() || '',
+			value: item.amount || 0,
+		}));
+	}
 	fetchData(belongTo, dateStr);
 };
 

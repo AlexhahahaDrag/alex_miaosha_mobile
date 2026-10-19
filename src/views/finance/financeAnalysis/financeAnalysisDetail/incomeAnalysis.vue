@@ -99,6 +99,7 @@
 import { showNotify } from 'vant';
 import type { FinanceDetail } from '@/views/finance/financeAnalysis/financeAnalysisDetail/common';
 import { getIncomeAndExpense } from '@/views/finance/financeAnalysis/api';
+import { loadPieSnapshot, savePieSnapshot } from '@/views/finance/financeAnalysis/composables/useAnalysisOfflineCache';
 
 interface Props {
 	activeTab: number | string;
@@ -328,16 +329,34 @@ const expenseOptions = computed(() => ({
 const getIncomeAndExpenseInfo = async (userId: string | null, dateStr: string) => {
 	const { code, data, message } = await getIncomeAndExpense(userId, dateStr);
 	if (code === '200') {
+		const rawList = data || [];
 		pieData.value = {
-			income: transformToPieData(data || [], 'income'),
-			expense: transformToPieData(data || [], 'expense'),
+			income: transformToPieData(rawList, 'income'),
+			expense: transformToPieData(rawList, 'expense'),
 		};
+		// 保存收支饼图离线快照
+		const incomeList = rawList.filter((item) => item.incomeAndExpenses === 'income');
+		const expenseList = rawList.filter((item) => item.incomeAndExpenses === 'expense');
+		savePieSnapshot(incomeList, expenseList);
 	} else {
 		showNotify({ type: 'danger', message: message || '查询列表失败！' });
 	}
 };
 
 const init = (dateStr: string, belongTo: string | null) => {
+	// SWR 优先从本地快照还原饼图数据，消除切换 Tab 时的白屏感
+	const snapshot = loadPieSnapshot();
+	if (
+		snapshot &&
+		(snapshot.income.length > 0 || snapshot.expense.length > 0) &&
+		pieData.value.income.length === 0 &&
+		pieData.value.expense.length === 0
+	) {
+		pieData.value = {
+			income: transformToPieData(snapshot.income, 'income'),
+			expense: transformToPieData(snapshot.expense, 'expense'),
+		};
+	}
 	getIncomeAndExpenseInfo(belongTo, dateStr);
 };
 

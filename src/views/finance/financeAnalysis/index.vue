@@ -70,6 +70,7 @@ import type { DatePickerInfo } from '@/utils/common';
 import type { UserManagerData } from '@/views/user/userManager/api';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
+import { triggerHaptic } from '@/utils/haptics';
 
 const route = useRoute();
 
@@ -136,16 +137,19 @@ const popInfo = ref<Info>({
 
 // Tab 切换处理
 const changeTab = (name: string) => {
+	triggerHaptic('selection');
 	props.activeTab = name;
 	activeTab.value = name;
 };
 
 // 日期选择处理
 const chooseDate = () => {
+	triggerHaptic('light');
 	chooseDateInfo.value.showFlag = true;
 };
 
 const selectDateInfo = (dateInfo: Dayjs, dateName: string) => {
+	triggerHaptic('light');
 	chooseDateInfo.value.showFlag = false;
 	props.dateStr = formatMonth(dateInfo);
 	infoDateName.value = dateName;
@@ -158,10 +162,12 @@ const cancelDateInfo = () => {
 
 // 用户选择处理
 const choose = () => {
+	triggerHaptic('light');
 	popInfo.value.showFlag = true;
 };
 
 const selectInfo = (type: string, value: string | null, name: string) => {
+	triggerHaptic('light');
 	popInfo.value.showFlag = false;
 	if (type === 'belongTo') {
 		belongTo.value = value;
