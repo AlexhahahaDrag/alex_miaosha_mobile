@@ -68,5 +68,19 @@
 		"route": "/finance/financeManager/budgetManage",
 		"level": "flow",
 		"persona": "family_member"
+	},
+	{
+		"caseId": "FINANCE-AI-MOBILE-LEDGER-001",
+		"title": "移动端自然语言记账 ActionSheet 与键盘联动回填",
+		"route": "/finance/financeManager/financeManagerDetail",
+		"level": "flow",
+		"persona": "gift_admin"
+	},
+	{
+		"caseId": "FINANCE-AI-MOBILE-RECEIPT-002",
+		"title": "移动端购物小票识别与条目明细渲染断言",
+		"route": "/finance/financeManager/financeManagerDetail",
+		"level": "flow",
+		"persona": "gift_admin"
 	}
 ]

@@ -369,6 +369,98 @@ async function runCase(testCase, runtime, page, agent) {
 			}
 			break;
 		}
+		case 'FINANCE-AI-MOBILE-LEDGER-001': {
+			await gotoRoute(page, runtime, '/finance/financeManager/financeManagerDetail');
+			const openAiBtn = page.getByTestId('mobile-btn-open-ai-sheet');
+			await openAiBtn.waitFor({ state: 'visible', timeout: 15000 });
+			await openAiBtn.click();
+
+			// 断言 ActionSheet 弹出
+			const sheet = page.getByTestId('sheet-mobile-finance-ai');
+			await sheet.waitFor({ state: 'visible', timeout: 10000 });
+
+			// 点击快捷示例
+			const exampleTag = sheet.locator('.chip-item').first();
+			await exampleTag.waitFor({ state: 'visible', timeout: 5000 });
+			await exampleTag.click();
+
+			// 监听 AI 接口请求
+			const parseReqPromise = page
+				.waitForResponse(
+					(res) => res.url().includes('/finance-manager-info/ai/parse') && res.status() === 200,
+					{ timeout: 20000 },
+				)
+				.catch(() => null);
+
+			const parseBtn = page.getByTestId('mobile-btn-do-ai-parse');
+			await parseBtn.click();
+			await parseReqPromise;
+
+			// 断言预览卡片可见
+			const previewCard = page.getByTestId('mobile-card-ai-preview');
+			await previewCard.waitFor({ state: 'visible', timeout: 10000 });
+			const cardText = await previewCard.innerText();
+			if (!cardText.includes('128.5')) {
+				throw new Error('移动端 AI 智能记账未解析出金额 128.5');
+			}
+
+			// 点击一键填入并保存账目
+			const applyBtn = page.getByTestId('mobile-btn-apply-ai-result');
+			await applyBtn.click();
+			await sheet.waitFor({ state: 'hidden', timeout: 5000 });
+
+			// 断言主界面顶部金额看板已更新
+			const amountHero = page.getByTestId('hero-amount-val');
+			await amountHero.waitFor({ state: 'visible', timeout: 5000 });
+			const heroText = await amountHero.innerText();
+			if (!heroText.includes('128.5')) {
+				throw new Error(`移动端金额看板回填预期包含 128.5，实际为 ${heroText}`);
+			}
+			break;
+		}
+		case 'FINANCE-AI-MOBILE-RECEIPT-002': {
+			await gotoRoute(page, runtime, '/finance/financeManager/financeManagerDetail');
+			const openAiBtn = page.getByTestId('mobile-btn-open-ai-sheet');
+			await openAiBtn.waitFor({ state: 'visible', timeout: 15000 });
+			await openAiBtn.click();
+
+			const sheet = page.getByTestId('sheet-mobile-finance-ai');
+			await sheet.waitFor({ state: 'visible', timeout: 10000 });
+
+			// 点击超市小票示例
+			const receiptTag = sheet.locator('.chip-item').nth(1);
+			await receiptTag.waitFor({ state: 'visible', timeout: 5000 });
+			await receiptTag.click();
+
+			const parseReqPromise = page
+				.waitForResponse(
+					(res) => res.url().includes('/finance-manager-info/ai/parse') && res.status() === 200,
+					{ timeout: 20000 },
+				)
+				.catch(() => null);
+
+			const parseBtn = page.getByTestId('mobile-btn-do-ai-parse');
+			await parseBtn.click();
+			await parseReqPromise;
+
+			// 断言小票商品清单已渲染
+			const receiptList = sheet.locator('.receipt-items-list');
+			await receiptList.waitFor({ state: 'visible', timeout: 10000 });
+			const receiptText = await receiptList.innerText();
+			if (!receiptText.includes('鲜牛奶') || !receiptText.includes('全麦面包')) {
+				throw new Error('移动端购物小票未正确解析展示商品清单');
+			}
+
+			// 关闭 ActionSheet
+			const closeBtn = sheet.locator('.van-action-sheet__close');
+			if (await closeBtn.isVisible().catch(() => false)) {
+				await closeBtn.click();
+			} else {
+				await page.keyboard.press('Escape');
+			}
+			await sheet.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => null);
+			break;
+		}
 		default:
 			throw new Error(`Unsupported caseId=${testCase.caseId}`);
 	}
