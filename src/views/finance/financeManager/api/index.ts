@@ -108,3 +108,10 @@ export function parseBudgetCommand(
 ): Promise<ResponseBody<import('../config').FinanceBudgetAiParseVo>> {
 	return postData(`${baseService.finance + baseFinanceBudget}/ai/parse`, params);
 }
+
+// 通用 AI 智能记账多场景解析 (日常收支、购物小票、预付卡流水)
+export function parseUniversalFinanceLedger(
+	params: import('../config').UniversalFinanceAiParseReq,
+): Promise<ResponseBody<import('../config').UniversalFinanceAiParseVo>> {
+	return postData(`${baseService.finance + baseFinanceManager}/ai-parse`, params);
+}

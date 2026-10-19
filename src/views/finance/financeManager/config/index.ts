@@ -89,6 +89,40 @@ export interface FinanceBudgetAiParseVo {
 	reasoning?: string;
 }
 
+export interface UniversalFinanceAiParseReq {
+	scene?: 'AUTO_DETECT' | 'DAILY_EXPENSE' | 'SHOP_RECEIPT' | 'PREPAID_CARD';
+	text: string;
+	belongTo?: string | number;
+}
+
+export interface UniversalFinanceReceiptItem {
+	itemName?: string;
+	unitPrice?: number;
+	quantity?: number;
+	subtotal?: number;
+}
+
+export interface UniversalFinanceAiParseVo {
+	targetScene?: string;
+	incomeAndExpenses?: string;
+	amount?: number;
+	name?: string;
+	typeCode?: string;
+	typeName?: string;
+	fromSource?: string;
+	fromSourceName?: string;
+	infoDate?: string;
+	belongTo?: string;
+	belongToName?: string;
+	description?: string;
+	prepaidCardId?: string;
+	prepaidCardName?: string;
+	prepaidCardBalance?: number;
+	receiptItems?: UniversalFinanceReceiptItem[];
+	parseEngine?: string;
+	reasoning?: string;
+}
+
 export const fromSourceTransferList: FromSourceTransferItem[] = [
 	{ value: 'xj', label: 'cash', name: '现金' },
 	{ value: 'yhk', label: 'card', name: '银行卡' },

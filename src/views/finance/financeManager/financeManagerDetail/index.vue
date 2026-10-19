@@ -11,8 +11,8 @@
 			<span>此账单由家庭成员记入，仅创建人与家庭管理员可修改</span>
 		</div>
 
-		<!-- 1. 顶部收支分段切换 (Segmented Tabs) -->
-		<div class="segment-wrapper">
+		<!-- 1. 顶部收支分段切换 (Segmented Tabs) 与 AI 智能记账快捷入口 -->
+		<div class="segment-wrapper flex justify-between items-center">
 			<div class="segment-bar">
 				<button
 					type="button"
@@ -31,6 +31,18 @@
 					收入
 				</button>
 			</div>
+			<button
+				type="button"
+				class="ai-quick-btn"
+				data-testid="mobile-btn-open-ai-sheet"
+				@click="showAiSheet = true"
+			>
+				<van-icon
+					name="fire-o"
+					class="mr-1 text-orange-500"
+				/>
+				<span>AI 识别记账</span>
+			</button>
 		</div>
 
 		<!-- 2. 金额看板与快速辅助信息 (Hero Amount & Quick Bar) -->
@@ -206,11 +218,20 @@
 			@select-date-info="selectDateInfo"
 			@cancel-date-info="cancelDateInfo"
 		/>
+
+		<!-- AI 智能记账抽屉 -->
+		<finance-ai-sheet
+			v-model="showAiSheet"
+			:belong-to="formInfo.belongTo"
+			@apply="onApplyAiResult"
+		/>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
+import FinanceAiSheet from '@/views/finance/financeManager/components/FinanceAiSheet.vue';
+import type { UniversalFinanceAiParseVo , rulesRef, type FinanceManagerData } from '@/views/finance/financeManager/config';
 import FinanceCategoryGrid from '@/views/finance/financeManager/financeManagerDetail/components/FinanceCategoryGrid.vue';
 import {
 	expensePresets,
@@ -219,7 +240,6 @@ import {
 } from '@/views/finance/financeManager/financeManagerDetail/types';
 import FinanceKeypad from '@/views/finance/financeManager/financeManagerDetail/components/FinanceKeypad.vue';
 import { getListName, type DictFieldConfig } from '@/views/common/config';
-import { rulesRef, type FinanceManagerData } from '@/views/finance/financeManager/config';
 import { getDictList } from '@/views/finance/dict/api';
 import { getUserManagerList } from '@/views/user/userManager/api';
 import { useUserStore } from '@/store/modules/user/user';
@@ -281,6 +301,41 @@ const amountStr = ref<string>('');
 const showNameInput = ref<boolean>(false);
 const showAdvanced = ref<boolean>(false);
 const scrollContainerRef = ref<HTMLElement | null>(null);
+
+const showAiSheet = ref<boolean>(false);
+
+const onApplyAiResult = (parsed: UniversalFinanceAiParseVo) => {
+	if (!parsed) return;
+	if (parsed.amount) {
+		formInfo.value.amount = Number(parsed.amount);
+		amountStr.value = String(parsed.amount);
+	}
+	if (parsed.name) {
+		formInfo.value.name = parsed.name;
+	}
+	if (parsed.incomeAndExpenses) {
+		formInfo.value.incomeAndExpenses = parsed.incomeAndExpenses;
+		nameRefMap.incomeAndExpenses.value = parsed.incomeAndExpenses === 'income' ? '收入' : '支出';
+	}
+	if (parsed.typeCode) {
+		formInfo.value.typeCode = parsed.typeCode;
+	}
+	if (parsed.fromSource) {
+		formInfo.value.fromSource = parsed.fromSource;
+		nameRefMap.fromSource.value = parsed.fromSourceName || parsed.fromSource;
+	}
+	if (parsed.belongTo) {
+		formInfo.value.belongTo = Number(parsed.belongTo);
+		if (parsed.belongToName) {
+			nameRefMap.belongTo.value = parsed.belongToName;
+		}
+	}
+	if (parsed.infoDate) {
+		formInfo.value.infoDate = formatDayjs(parsed.infoDate);
+		nameRefMap.infoDate.value = formatDate(parsed.infoDate);
+	}
+	showSuccessToast('已将 AI 识别内容填入，确认无误后点击确定保存');
+};
 
 // 历史/动态分类列表
 const dynamicCategories = ref<string[]>([]);
@@ -589,6 +644,18 @@ const init = async () => {
 		}
 		if (!nameRefMap.incomeAndExpenses.value) {
 			nameRefMap.incomeAndExpenses.value = formInfo.value.incomeAndExpenses === 'income' ? '收入' : '支出';
+		}
+
+		// 若从列表页 AI 记账跳转进入，消费并自动回填
+		try {
+			const cachedAiStr = sessionStorage.getItem('alex_mobile_ai_parsed_ledger');
+			if (cachedAiStr) {
+				sessionStorage.removeItem('alex_mobile_ai_parsed_ledger');
+				const parsedVo = JSON.parse(cachedAiStr) as UniversalFinanceAiParseVo;
+				onApplyAiResult(parsedVo);
+			}
+		} catch (e) {
+			console.warn('Load cached AI ledger failed:', e);
 		}
 	} catch {
 		showFailToast('初始化失败，请联系管理员！');

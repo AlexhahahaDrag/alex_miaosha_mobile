@@ -24,6 +24,15 @@
 					class="search-shell__filter-btn"
 					@click="onToggleFilterPanel"
 				/>
+				<van-button
+					type="success"
+					icon="fire-o"
+					class="search-shell__ai-btn ml-1"
+					data-testid="mobile-btn-index-ai-ledger"
+					@click="showAiSheet = true"
+				>
+					AI记账
+				</van-button>
 			</div>
 
 			<div class="quick-time-bar">
@@ -187,6 +196,13 @@
 			target="#finance-manager-list"
 			:bottom="100"
 		/>
+
+		<!-- AI 智能记账抽屉 -->
+		<finance-ai-sheet
+			v-model="showAiSheet"
+			:belong-to="searchInfo.belongTo"
+			@apply="onApplyAiFromIndex"
+		/>
 	</div>
 </template>
 
@@ -195,8 +211,9 @@ import { showFailToast, showSuccessToast } from 'vant';
 import { useRoute, useRouter } from 'vue-router';
 import FinanceCard from '@/views/finance/financeManager/components/FinanceCard.vue';
 import PocketMoneyCard from '@/views/finance/financeManager/components/PocketMoneyCard.vue';
+import FinanceAiSheet from '@/views/finance/financeManager/components/FinanceAiSheet.vue';
+import type { UniversalFinanceAiParseVo , FinanceManagerData, FinanceBudgetStatusVo } from '@/views/finance/financeManager/config';
 import { useFinanceFilter } from '@/views/finance/financeManager/composables/useFinanceFilter';
-import type { FinanceManagerData, FinanceBudgetStatusVo } from '@/views/finance/financeManager/config';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
 import { usePermission } from '@/composables/usePermission';
@@ -229,6 +246,19 @@ const budgetStatus = ref<FinanceBudgetStatusVo | null>(null);
 const currentMonthStr = computed(() => formatMonth());
 const canEditBudget = computed(() => hasPermission('finance:financeManager:budget:edit'));
 const canAddFinance = computed(() => hasPermission('finance:financeManager:add'));
+
+const showAiSheet = ref<boolean>(false);
+
+const onApplyAiFromIndex = (parsed: UniversalFinanceAiParseVo) => {
+	if (!parsed) return;
+	// 将解析结果转存并带参跳转至详情页，利用路由或 session 自动装配
+	try {
+		sessionStorage.setItem('alex_mobile_ai_parsed_ledger', JSON.stringify(parsed));
+	} catch (e) {
+		console.warn('Storage save failed:', e);
+	}
+	router.push({ path: getDetailRoutePath() });
+};
 
 // 挂载筛选组合式函数
 const {
