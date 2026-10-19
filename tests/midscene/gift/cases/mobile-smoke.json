@@ -51,5 +51,18 @@
 		"route": "/finance/gift/event?open=create",
 		"level": "flow",
 		"persona": "gift_admin"
+	},
+	{
+		"caseId": "MESSAGE-MOBILE-SMOKE-001",
+		"title": "移动端底部导航消息 Tab 进入与未读概览卡片加载",
+		"route": "/message",
+		"level": "smoke",
+		"waitFor": "/sys-message-info/summary"
+	},
+	{
+		"caseId": "MESSAGE-MOBILE-SMOKE-002",
+		"title": "移动端分类胶囊切换、仅看未读过滤与列表骨架屏加载",
+		"route": "/message",
+		"level": "flow"
 	}
 ]

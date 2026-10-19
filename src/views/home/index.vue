@@ -127,8 +127,10 @@ import type { RouteRecordRaw } from 'vue-router';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
 import { useDashboardStore } from '@/store/modules/dashboard/dashboard';
+import { useTabBarStore } from '@/store/modules/tabbar';
 import { routes } from '@/router';
 import { formatDate } from '@/utils/dayjs';
+import { getSysMessageSummary } from '@/views/message/api';
 
 const router = useRouter();
 const dashboardStore = useDashboardStore();
@@ -282,6 +284,27 @@ useTabBar({
 		{ name: 'myself', title: '我的', icon: 'user' },
 	],
 	active: 0,
+});
+
+const tabBarStore = useTabBarStore();
+
+const refreshMessageUnreadBadge = async () => {
+	try {
+		const { code, data } = await getSysMessageSummary();
+		if (code == '200' && data) {
+			tabBarStore.setTabBadge('message', data.unreadTotal || 0);
+		}
+	} catch {
+		// 静默忽略未读角标轮询异常
+	}
+};
+
+onMounted(() => {
+	refreshMessageUnreadBadge();
+});
+
+onActivated(() => {
+	refreshMessageUnreadBadge();
 });
 
 // 交互反馈及路由跳转

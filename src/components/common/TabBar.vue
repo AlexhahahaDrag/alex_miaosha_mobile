@@ -11,6 +11,7 @@
 			v-for="(item, index) in tabBarData"
 			:to="item.to"
 			:name="item?.name || ''"
+			:badge="item.badge"
 			:key="index"
 			:data-testid="`tab-${item.name}`"
 		>
@@ -50,6 +51,18 @@ const curActive = ref<string | number>(0);
 
 const props = defineProps<TabBarInfo>();
 
+const formatBadge = (raw?: number | string): string | undefined => {
+	if (raw === undefined || raw === null || raw === '' || raw === 0 || raw === '0') {
+		return undefined;
+	}
+	const num = Number(raw);
+	if (!Number.isNaN(num)) {
+		if (num <= 0) return undefined;
+		return num > 99 ? '99+' : String(num);
+	}
+	return String(raw);
+};
+
 const tabBarData = computed(() => {
 	const allRoutes = router.getRoutes();
 	return (props.data || [])
@@ -57,12 +70,14 @@ const tabBarData = computed(() => {
 			const itemName = typeof item === 'string' ? item : item.name;
 			const targetRoute = allRoutes.find((r) => r.name === itemName);
 			if (targetRoute) {
+				const routeName = targetRoute.name as string;
 				return {
-					name: targetRoute.name as string,
+					name: routeName,
 					path: targetRoute.path,
 					to: targetRoute.path,
 					title: (typeof item !== 'string' && item.title) || (targetRoute.meta?.title as string) || '',
 					icon: (typeof item !== 'string' && item.icon) || (targetRoute.meta?.icon as string) || '',
+					badge: formatBadge(props.badges?.[routeName]),
 				};
 			}
 			return null;

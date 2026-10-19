@@ -309,6 +309,66 @@ async function runCase(testCase, runtime, page, agent) {
 			}
 			break;
 		}
+		case 'MESSAGE-MOBILE-SMOKE-001': {
+			// 等待未读汇总接口返回
+			const summaryPromise = page
+				.waitForResponse(
+					(res) => res.url().includes('/sys-message-info/summary') && res.status() === 200,
+					{ timeout: 15000 },
+				)
+				.catch(() => null);
+			await gotoRoute(page, runtime, '/message');
+			await summaryPromise;
+
+			// 断言消息中心根节点与顶部未读汇总卡片
+			await page.getByTestId('mobile-message-center').waitFor({ state: 'visible', timeout: 15000 });
+			await page
+				.getByTestId('mobile-message-btn-read-all')
+				.waitFor({ state: 'visible', timeout: 10000 });
+			await page.getByTestId('mobile-message-tab-ALL').waitFor({ state: 'visible', timeout: 10000 });
+			await page
+				.getByTestId('mobile-message-tab-GIFT_EVENT')
+				.waitFor({ state: 'visible', timeout: 10000 });
+			break;
+		}
+		case 'MESSAGE-MOBILE-SMOKE-002': {
+			await gotoRoute(page, runtime, '/message');
+			await page.getByTestId('mobile-message-center').waitFor({ state: 'visible', timeout: 15000 });
+
+			// 切换分类胶囊到礼尚往来事件
+			const pageReqPromise = page
+				.waitForResponse(
+					(res) => res.url().includes('/sys-message-info/page') && res.status() === 200,
+					{ timeout: 15000 },
+				)
+				.catch(() => null);
+			await page.getByTestId('mobile-message-tab-GIFT_EVENT').click();
+			await pageReqPromise;
+
+			// 点击仅未读开关过滤
+			const unreadFilterPromise = page
+				.waitForResponse(
+					(res) => res.url().includes('/sys-message-info/page') && res.status() === 200,
+					{ timeout: 15000 },
+				)
+				.catch(() => null);
+			await page.getByTestId('mobile-message-toggle-unread').click();
+			await unreadFilterPromise;
+
+			// 断言列表或空状态正常呈现
+			const hasList = await page
+				.getByTestId('mobile-message-list')
+				.isVisible()
+				.catch(() => false);
+			const hasEmpty = await page
+				.getByTestId('mobile-message-empty')
+				.isVisible()
+				.catch(() => false);
+			if (!hasList && !hasEmpty) {
+				throw new Error('移动端消息列表既未呈现数据列表也未呈现空状态');
+			}
+			break;
+		}
 		default:
 			throw new Error(`Unsupported caseId=${testCase.caseId}`);
 	}

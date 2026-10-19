@@ -17,6 +17,7 @@ export interface TabBarInfo {
 	visible?: boolean;
 	data?: (string | TabBarItemConfig)[];
 	active?: number | string;
+	badges?: Record<string, number | string>;
 }
 
 export const useTabBar = (config: Partial<TabBarInfo>) => {

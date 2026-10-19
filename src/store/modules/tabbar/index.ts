@@ -11,6 +11,7 @@ export const useTabBarStore = defineStore('tabBar', {
 			visible: false,
 			data: [],
 			active: 0,
+			badges: {},
 		},
 	}),
 
@@ -21,6 +22,13 @@ export const useTabBarStore = defineStore('tabBar', {
 
 		setVisible(visible: boolean) {
 			this.info.visible = visible;
+		},
+
+		setTabBadge(name: string, badge: number | string) {
+			this.info.badges = {
+				...(this.info.badges || {}),
+				[name]: badge,
+			};
 		},
 	},
 
