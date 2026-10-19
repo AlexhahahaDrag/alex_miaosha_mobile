@@ -231,7 +231,11 @@
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
 import FinanceAiSheet from '@/views/finance/financeManager/components/FinanceAiSheet.vue';
-import type { UniversalFinanceAiParseVo , rulesRef, type FinanceManagerData } from '@/views/finance/financeManager/config';
+import {
+	rulesRef,
+	type UniversalFinanceAiParseVo,
+	type FinanceManagerData,
+} from '@/views/finance/financeManager/config';
 import FinanceCategoryGrid from '@/views/finance/financeManager/financeManagerDetail/components/FinanceCategoryGrid.vue';
 import {
 	expensePresets,
@@ -258,6 +262,8 @@ import { useNavBar } from '@/composables/useNavBar';
 import { usePermission } from '@/composables/usePermission';
 import { getRoutePathByName } from '@/utils/router';
 import { useTabBar } from '@/composables/useTabBar';
+import { triggerHaptic } from '@/utils/haptics';
+import { recordCategoryUsage } from '@/views/finance/financeManager/financeManagerDetail/composables/useCategoryFrequency';
 import { useDashboardStore } from '@/store/modules/dashboard/dashboard';
 
 const route = useRoute();
@@ -503,11 +509,13 @@ const resetFormToInitial = () => {
 
 const validateAndPrepareSubmit = (): boolean => {
 	if (!formInfo.value.typeCode) {
+		triggerHaptic('warning');
 		showFailToast('请点选一个记账分类！');
 		return false;
 	}
 	const amt = Number(amountStr.value);
 	if (!amt || amt <= 0) {
+		triggerHaptic('warning');
 		showFailToast('请输入有效的账单金额！');
 		return false;
 	}
@@ -525,15 +533,20 @@ const handleSaveAndContinue = async () => {
 		const { code, message } = await addFinanceManger(formInfo.value);
 		if (code === '200') {
 			showSuccessToast('已保存，请记下一笔');
-			navigator.vibrate?.(20);
+			triggerHaptic('success');
+			if (formInfo.value.typeCode) {
+				recordCategoryUsage(formInfo.value.typeCode);
+			}
 			dashboardStore.updateSaveTime('财务信息');
 			amountStr.value = '';
 			formInfo.value.amount = 0;
 			formInfo.value.name = '';
 		} else {
+			triggerHaptic('error');
 			showFailToast(message || '保存失败，请稍后重试');
 		}
 	} catch (e: unknown) {
+		triggerHaptic('error');
 		showFailToast((e as Error)?.message || '网络异常，保存失败');
 	} finally {
 		loading.value = false;
@@ -551,13 +564,18 @@ const handleSaveAndFinish = async () => {
 		const { code, message } = await api(formInfo.value);
 		if (code === '200') {
 			showSuccessToast(message || '保存成功!');
-			navigator.vibrate?.(50);
+			triggerHaptic('success');
+			if (formInfo.value.typeCode) {
+				recordCategoryUsage(formInfo.value.typeCode);
+			}
 			dashboardStore.updateSaveTime('财务信息');
 			router.push({ path: getLeftPath.value });
 		} else {
+			triggerHaptic('error');
 			showFailToast(message || '保存失败，请联系管理员!');
 		}
 	} catch (e: unknown) {
+		triggerHaptic('error');
 		showFailToast((e as Error)?.message || '网络异常，保存失败');
 	} finally {
 		loading.value = false;

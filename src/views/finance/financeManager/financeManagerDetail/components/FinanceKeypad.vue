@@ -134,6 +134,8 @@
 </template>
 
 <script setup lang="ts">
+import { triggerHaptic } from '@/utils/haptics';
+
 const props = withDefaults(
 	defineProps<{
 		modelValue?: string;
@@ -161,7 +163,7 @@ const emit = defineEmits<{
 }>();
 
 const pressKey = (key: string) => {
-	navigator.vibrate?.(10);
+	triggerHaptic('selection');
 	let current = props.modelValue || '';
 
 	if (key === 'backspace') {

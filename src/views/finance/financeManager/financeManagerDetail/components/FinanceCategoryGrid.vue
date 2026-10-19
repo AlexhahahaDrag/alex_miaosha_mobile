@@ -71,6 +71,11 @@ import {
 	incomePresets,
 	type CategoryItem,
 } from '@/views/finance/financeManager/financeManagerDetail/types';
+import { triggerHaptic } from '@/utils/haptics';
+import {
+	loadCategoryFrequency,
+	sortCategoriesByFrequency,
+} from '@/views/finance/financeManager/financeManagerDetail/composables/useCategoryFrequency';
 
 const props = withDefaults(
 	defineProps<{
@@ -93,6 +98,7 @@ const emit = defineEmits<{
 const showCustomCatDialog = ref<boolean>(false);
 const customCatInput = ref<string>('');
 const localCustomCategories = ref<string[]>([]);
+const freqMap = ref(loadCategoryFrequency());
 
 const activeCategoryList = computed<CategoryItem[]>(() => {
 	const baseList = props.direction === 'income' ? incomePresets : expensePresets;
@@ -122,16 +128,19 @@ const activeCategoryList = computed<CategoryItem[]>(() => {
 		});
 	}
 
-	return [...extra, ...baseList];
+	const combined = [...extra, ...baseList];
+	// 按照本地使用频次加权降序重排，高频分类置顶排前
+	return sortCategoriesByFrequency(combined, freqMap.value);
 });
 
 const selectCategory = (cat: CategoryItem) => {
-	navigator.vibrate?.(10);
+	triggerHaptic('light');
 	emit('update:modelValue', cat.name);
 	emit('select', cat);
 };
 
 const openCustomCategoryDialog = () => {
+	triggerHaptic('medium');
 	customCatInput.value = '';
 	showCustomCatDialog.value = true;
 };

@@ -212,7 +212,11 @@ import { useRoute, useRouter } from 'vue-router';
 import FinanceCard from '@/views/finance/financeManager/components/FinanceCard.vue';
 import PocketMoneyCard from '@/views/finance/financeManager/components/PocketMoneyCard.vue';
 import FinanceAiSheet from '@/views/finance/financeManager/components/FinanceAiSheet.vue';
-import type { UniversalFinanceAiParseVo , FinanceManagerData, FinanceBudgetStatusVo } from '@/views/finance/financeManager/config';
+import type {
+	UniversalFinanceAiParseVo,
+	FinanceManagerData,
+	FinanceBudgetStatusVo,
+} from '@/views/finance/financeManager/config';
 import { useFinanceFilter } from '@/views/finance/financeManager/composables/useFinanceFilter';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
@@ -223,6 +227,13 @@ import type { ResponseBody } from '@/types/api';
 import { formatHeaderDate, formatDate, formatMonth, formatDayjs } from '@/utils/dayjs';
 import { getRoutePathByName } from '@/utils/router';
 import { useDashboardStore } from '@/store/modules/dashboard/dashboard';
+import { triggerHaptic } from '@/utils/haptics';
+import {
+	loadFinanceOfflineSnapshot,
+	saveFinanceOfflineSnapshot,
+	loadBudgetOfflineSnapshot,
+	saveBudgetOfflineSnapshot,
+} from '@/views/finance/financeManager/composables/useFinanceOfflineCache';
 
 interface GroupedFinanceRecords {
 	date: string;
@@ -314,12 +325,12 @@ useTabBar({
 });
 
 const onOpenBudgetManage = () => {
-	if (navigator.vibrate) navigator.vibrate(30);
+	triggerHaptic('medium');
 	router.push({ path: '/finance/financeManager/budgetManage' });
 };
 
 const drillDownBudgetMonth = () => {
-	if (navigator.vibrate) navigator.vibrate(30);
+	triggerHaptic('medium');
 	onSelectQuickTime('month');
 	showSuccessToast('已联动筛选本月明细');
 };
@@ -329,6 +340,7 @@ const loadBudgetStatus = async () => {
 		const { code, data } = await getBudgetStatus(currentMonthStr.value, searchInfo.value.belongTo);
 		if (code === '200' && data) {
 			budgetStatus.value = data;
+			saveBudgetOfflineSnapshot(data);
 		}
 	} catch (e) {
 		console.error('获取零花钱预算状态失败:', e);
@@ -373,6 +385,7 @@ const getFinancePage = async (param: FinanceManagerData, cur: PageInfo) => {
 	if (code === '200') {
 		if (cur?.current === 1) {
 			dataSource.value = data?.records || [];
+			saveFinanceOfflineSnapshot(dataSource.value, data?.total || 0);
 		} else {
 			dataSource.value = [...dataSource.value, ...(data?.records || [])];
 		}
@@ -412,15 +425,18 @@ const onDeleteFinance = async (id?: string) => {
 	if (!id) return;
 	const { code, message } = await deleteFinanceManager(`${id}`);
 	if (code === '200') {
+		triggerHaptic('success');
 		dashboardStore.updateSaveTime('财务信息');
 		onRefreshData();
 		showSuccessToast(message || '删除成功');
 		return;
 	}
+	triggerHaptic('error');
 	showFailToast(message || '删除失败，请联系管理员');
 };
 
 const handleCardClick = (item: FinanceManagerData) => {
+	triggerHaptic('light');
 	router.push(getDetailRoute(item.id));
 };
 
@@ -484,12 +500,24 @@ const formatCurrency = (value: number) => {
 const getWeekdayLabel = (date: string) => formatDayjs(date).format('ddd').replace('.', '');
 
 onMounted(() => {
-	resetData();
+	// 离线快照秒开：若本地已存有快照，率先秒级呈现场景骨架与最近账单
+	const cachedSnapshot = loadFinanceOfflineSnapshot();
+	if (cachedSnapshot && cachedSnapshot.records.length > 0) {
+		dataSource.value = cachedSnapshot.records;
+		setTotal(cachedSnapshot.total || cachedSnapshot.records.length);
+		loading.value = false;
+	}
+	const cachedBudget = loadBudgetOfflineSnapshot();
+	if (cachedBudget) {
+		budgetStatus.value = cachedBudget;
+	}
+
 	fetchCategories();
 	fetchUsers();
 	if (route.query.fromSource) {
 		searchInfo.value.fromSource = route.query.fromSource as string;
 	}
+	// 发起最新数据网络请求并平滑替换
 	onSearch();
 	loadBudgetStatus();
 });

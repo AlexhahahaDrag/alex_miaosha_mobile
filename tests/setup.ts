@@ -8,6 +8,38 @@ import { defineStore } from 'pinia';
  */
 Object.assign(globalThis, { ref, reactive, computed, watch, defineStore });
 
+// Node 单测环境内存 localStorage 垫片
+if (typeof globalThis.localStorage === 'undefined') {
+	const storage = new Map<string, string>();
+	const localStoragePolyfill = {
+		getItem: (key: string) => storage.get(key) ?? null,
+		setItem: (key: string, value: string) => storage.set(key, String(value)),
+		removeItem: (key: string) => storage.delete(key),
+		clear: () => storage.clear(),
+		get length() {
+			return storage.size;
+		},
+		key: (i: number) => Array.from(storage.keys())[i] ?? null,
+	};
+	Object.defineProperty(globalThis, 'localStorage', {
+		value: localStoragePolyfill,
+		writable: true,
+	});
+}
+
+// Node 单测环境 navigator.vibrate 垫片
+if (typeof globalThis.navigator === 'undefined') {
+	Object.defineProperty(globalThis, 'navigator', {
+		value: { vibrate: vi.fn().mockReturnValue(true) },
+		writable: true,
+	});
+} else if (!globalThis.navigator.vibrate) {
+	Object.defineProperty(globalThis.navigator, 'vibrate', {
+		value: vi.fn().mockReturnValue(true),
+		writable: true,
+	});
+}
+
 if (typeof window !== 'undefined') {
 	Object.defineProperty(window, 'matchMedia', {
 		writable: true,
