@@ -1,3 +1,31 @@
+export const ID_KEY_PATTERN = /(^id$|Id$)/;
+
+/**
+ * 递归将所有 id / *Id 字段强制转为 string，防止雪花算法 64 位整数在 JS 中精度丢失
+ */
+export function normalizeMessageIds<T>(input: T): T {
+	if (input === null || input === undefined) {
+		return input;
+	}
+	if (Array.isArray(input)) {
+		return input.map((item) => normalizeMessageIds(item)) as unknown as T;
+	}
+	if (typeof input === 'object') {
+		const copy: Record<string, unknown> = {};
+		for (const [key, value] of Object.entries(input as Record<string, unknown>)) {
+			if (ID_KEY_PATTERN.test(key) && (typeof value === 'number' || typeof value === 'bigint')) {
+				copy[key] = String(value);
+			} else if (value && typeof value === 'object') {
+				copy[key] = normalizeMessageIds(value);
+			} else {
+				copy[key] = value;
+			}
+		}
+		return copy as T;
+	}
+	return input;
+}
+
 export type MessageType = 'ALL' | 'GIFT_EVENT' | 'COUPON_EXPIRE' | 'CARD_EXPIRE' | 'SYSTEM';
 
 export type MessageSubType = 'WELCOME' | 'ANNOUNCE' | 'D_DAY' | 'D_MINUS_1' | 'D_MINUS_3';
