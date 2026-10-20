@@ -1,11 +1,15 @@
-import { getData, baseService } from '@/views/common/api';
+import { getData, postData, baseService } from '@/views/common/api';
 import type { ResponseBody } from '@/types/api';
 import type {
 	GiftAnalysisOverview,
 	GiftAmountTrend,
 	GiftRankingItem,
 	GiftRelationDistribution,
+	GiftPersonBalance,
+	GiftReturnRecommendationReq,
+	GiftReturnRecommendationVo,
 } from '@/views/finance/gift/config';
+import { normalizeGiftIds, normalizeGiftResponse } from '@/views/finance/gift/api/normalize';
 
 const baseUrl = () => `${baseService.finance}/gift-analysis`;
 
@@ -29,3 +33,24 @@ export const getGiftAnalysisEventRanking = (): Promise<ResponseBody<GiftRankingI
 /** 联系人排行 */
 export const getGiftAnalysisPersonRanking = (): Promise<ResponseBody<GiftRankingItem[]>> =>
 	getData(`${baseUrl()}/person-ranking`);
+
+/** 亲友互赠收支平衡矩阵查询 */
+export function getGiftBalanceMatrix(params?: {
+	personId?: string;
+	keyword?: string;
+}): Promise<ResponseBody<GiftPersonBalance[]>> {
+	return getData<GiftPersonBalance[]>(
+		`${baseUrl()}/balance-matrix`,
+		params ? normalizeGiftIds(params) : undefined,
+	).then(normalizeGiftResponse);
+}
+
+/** AI 智能回礼档位测算 */
+export function recommendReturnGift(
+	data: GiftReturnRecommendationReq,
+): Promise<ResponseBody<GiftReturnRecommendationVo>> {
+	return postData<GiftReturnRecommendationVo>(
+		`${baseUrl()}/ai/recommend-return-gift`,
+		normalizeGiftIds(data),
+	).then(normalizeGiftResponse);
+}
