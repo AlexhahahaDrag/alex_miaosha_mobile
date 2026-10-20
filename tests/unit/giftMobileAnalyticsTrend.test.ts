@@ -176,6 +176,101 @@ describe('Gift Mobile Analytics Trend & Circle Filtering Tests', () => {
 		});
 	});
 
+	describe('移动端轻量人脉网络图谱配置构建', () => {
+		const buildMobileGraphOption = (list: GiftPersonBalance[]) => {
+			if (!list || list.length === 0) return {};
+
+			const nodes: any[] = [{ id: 'NODE_ME', name: '我', symbolSize: 34 }];
+			const links: any[] = [];
+
+			const categories = [
+				{ id: 'HUB_RELATIVE', name: '亲属' },
+				{ id: 'HUB_COLLEAGUE', name: '同事' },
+				{ id: 'HUB_FRIEND', name: '好友' },
+				{ id: 'HUB_CLASSMATE', name: '同学' },
+			];
+
+			categories.forEach((cat) => {
+				nodes.push({ id: cat.id, name: cat.name, symbolSize: 22 });
+				links.push({ source: 'NODE_ME', target: cat.id });
+			});
+
+			const topList = [...list]
+				.sort(
+					(a, b) =>
+						Number(b.totalReceiveAmount || 0) +
+						Number(b.totalGiveAmount || 0) -
+						(Number(a.totalReceiveAmount || 0) + Number(a.totalGiveAmount || 0)),
+				)
+				.slice(0, 8);
+
+			topList.forEach((item) => {
+				let hubId = 'HUB_FRIEND';
+				if (
+					item.relationType === 'RELATIVE' ||
+					(item.relationTypeName && item.relationTypeName.includes('亲'))
+				) {
+					hubId = 'HUB_RELATIVE';
+				} else if (
+					item.relationType === 'COLLEAGUE' ||
+					(item.relationTypeName && item.relationTypeName.includes('同'))
+				) {
+					hubId = 'HUB_COLLEAGUE';
+				} else if (
+					item.relationType === 'CLASSMATE' ||
+					(item.relationTypeName && item.relationTypeName.includes('学'))
+				) {
+					hubId = 'HUB_CLASSMATE';
+				}
+
+				const pNodeId = `P_${item.personId}`;
+				nodes.push({ id: pNodeId, name: item.personName, symbolSize: 18 });
+				links.push({ source: hubId, target: pNodeId });
+			});
+
+			return { series: [{ data: nodes, links }] };
+		};
+
+		it('空列表返回空配置对象', () => {
+			expect(buildMobileGraphOption([])).toEqual({});
+		});
+
+		it('应正确构建我、4大圈层Hub与前8位亲友节点', () => {
+			const mockList: GiftPersonBalance[] = [
+				{
+					personId: '1',
+					personName: '姑父',
+					relationType: 'RELATIVE',
+					totalReceiveAmount: 2000,
+					totalGiveAmount: 1000,
+					netBalance: 1000,
+					balanceStatus: 'SURPLUS',
+				},
+				{
+					personId: '2',
+					personName: '李经理',
+					relationType: 'COLLEAGUE',
+					totalReceiveAmount: 500,
+					totalGiveAmount: 500,
+					netBalance: 0,
+					balanceStatus: 'BALANCED',
+				},
+			];
+
+			const option = buildMobileGraphOption(mockList);
+			const nodes = option.series[0].data;
+			const links = option.series[0].links;
+
+			// 1(我) + 4(Hub) + 2(亲友) = 7
+			expect(nodes.length).toBe(7);
+			// 4(我到Hub) + 2(Hub到亲友) = 6
+			expect(links.length).toBe(6);
+
+			const p1 = nodes.find((n: any) => n.id === 'P_1');
+			expect(p1.name).toBe('姑父');
+		});
+	});
+
 	describe('圈层点击触觉震动微交互', () => {
 		it('切换圈层胶囊应触发 selection 触觉震动', () => {
 			const res = triggerHaptic('selection');

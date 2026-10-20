@@ -16,32 +16,73 @@
 			</div>
 		</section>
 
-		<!-- 人情收支与顺逆差走势图 -->
+		<!-- 人情收支与顺逆差走势图 / 亲友人脉图谱 -->
 		<section
 			class="trend-card"
 			data-testid="gift-mobile-trend-card"
 		>
 			<div class="trend-card__header">
 				<div class="title-with-badge">
-					<h3>📈 收支与顺逆差走势</h3>
-					<span class="trend-subtitle">柱条显示收送 · 折线呈现差额</span>
+					<h3>{{ activeVisualTab === 'trend' ? '📈 收支顺逆差走势' : '🕸️ 亲友人际网络图谱' }}</h3>
+					<span class="trend-subtitle">{{
+						activeVisualTab === 'trend' ? '柱条显示收送 · 折线呈现差额' : '以我为枢纽辐射亲友社交圈'
+					}}</span>
+				</div>
+				<div
+					class="trend-tab-toggle"
+					data-testid="mobile-trend-tab-toggle"
+				>
+					<span
+						class="toggle-btn"
+						:class="{ active: activeVisualTab === 'trend' }"
+						@click="switchVisualTab('trend')"
+					>
+						走势
+					</span>
+					<span
+						class="toggle-btn"
+						:class="{ active: activeVisualTab === 'graph' }"
+						@click="switchVisualTab('graph')"
+					>
+						人脉
+					</span>
 				</div>
 			</div>
-			<div
-				v-if="trendList.length === 0"
-				class="empty-trend"
-			>
-				暂无月度人情收支记录
+			<div v-if="activeVisualTab === 'trend'">
+				<div
+					v-if="trendList.length === 0"
+					class="empty-trend"
+				>
+					暂无月度人情收支记录
+				</div>
+				<div
+					v-else
+					class="trend-chart-box"
+					data-testid="gift-mobile-trend-chart"
+				>
+					<BaseChart
+						:options="trendChartOption"
+						height="220px"
+					/>
+				</div>
 			</div>
-			<div
-				v-else
-				class="trend-chart-box"
-				data-testid="gift-mobile-trend-chart"
-			>
-				<BaseChart
-					:options="trendChartOption"
-					height="220px"
-				/>
+			<div v-else>
+				<div
+					v-if="matrixList.length === 0"
+					class="empty-trend"
+				>
+					暂无亲友人脉数据
+				</div>
+				<div
+					v-else
+					class="trend-chart-box"
+					data-testid="gift-mobile-graph-chart"
+				>
+					<BaseChart
+						:options="mobileGraphOption"
+						height="250px"
+					/>
+				</div>
 			</div>
 		</section>
 
@@ -316,6 +357,109 @@ const searchKeyword = ref('');
 const showCalculator = ref(false);
 const selectedPerson = ref<GiftPersonBalance | null>(null);
 
+// 可视化走势与图谱选项卡
+const activeVisualTab = ref<'trend' | 'graph'>('trend');
+const switchVisualTab = (tab: 'trend' | 'graph') => {
+	activeVisualTab.value = tab;
+	triggerHaptic('selection');
+};
+
+const mobileGraphOption = computed(() => {
+	const list = matrixList.value || [];
+	if (list.length === 0) return {};
+
+	const nodes: any[] = [
+		{
+			id: 'NODE_ME',
+			name: '我',
+			symbolSize: 34,
+			itemStyle: { color: '#2563eb' },
+			label: { show: true, fontSize: 11, color: '#fff' },
+		},
+	];
+	const links: any[] = [];
+
+	const categories = [
+		{ id: 'HUB_RELATIVE', name: '亲属', color: '#16a34a' },
+		{ id: 'HUB_COLLEAGUE', name: '同事', color: '#ea580c' },
+		{ id: 'HUB_FRIEND', name: '好友', color: '#7c3aed' },
+		{ id: 'HUB_CLASSMATE', name: '同学', color: '#0891b2' },
+	];
+
+	categories.forEach((cat) => {
+		nodes.push({
+			id: cat.id,
+			name: cat.name,
+			symbolSize: 22,
+			itemStyle: { color: cat.color },
+			label: { show: true, fontSize: 10, color: '#fff' },
+		});
+		links.push({
+			source: 'NODE_ME',
+			target: cat.id,
+			lineStyle: { color: cat.color, width: 2 },
+		});
+	});
+
+	// 选取前 8 位往来体量最高亲友
+	const topList = [...list]
+		.sort(
+			(a, b) =>
+				Number(b.totalReceiveAmount || 0) +
+				Number(b.totalGiveAmount || 0) -
+				(Number(a.totalReceiveAmount || 0) + Number(a.totalGiveAmount || 0)),
+		)
+		.slice(0, 8);
+
+	topList.forEach((item) => {
+		let hubId = 'HUB_FRIEND';
+		let hubColor = '#7c3aed';
+		if (item.relationType === 'RELATIVE' || (item.relationTypeName && item.relationTypeName.includes('亲'))) {
+			hubId = 'HUB_RELATIVE';
+			hubColor = '#16a34a';
+		} else if (item.relationType === 'COLLEAGUE' || (item.relationTypeName && item.relationTypeName.includes('同'))) {
+			hubId = 'HUB_COLLEAGUE';
+			hubColor = '#ea580c';
+		} else if (item.relationType === 'CLASSMATE' || (item.relationTypeName && item.relationTypeName.includes('学'))) {
+			hubId = 'HUB_CLASSMATE';
+			hubColor = '#0891b2';
+		}
+
+		const pNodeId = `P_${item.personId}`;
+		nodes.push({
+			id: pNodeId,
+			name: item.personName,
+			symbolSize: 18,
+			itemStyle: { color: hubColor },
+			label: { show: true, fontSize: 9, position: 'bottom' },
+		});
+		links.push({
+			source: hubId,
+			target: pNodeId,
+			lineStyle: { width: 1, opacity: 0.6 },
+		});
+	});
+
+	return {
+		tooltip: { show: true, confine: true },
+		series: [
+			{
+				type: 'graph',
+				layout: 'force',
+				data: nodes,
+				links,
+				roam: false,
+				force: {
+					repulsion: 85,
+					gravity: 0.1,
+					edgeLength: [25, 60],
+				},
+				label: { show: true },
+			},
+		],
+	};
+});
+
 const circleOptions = [
 	{ label: '全部圈子', value: 'all' },
 	{ label: '亲属圈', value: 'RELATIVES' },
@@ -465,6 +609,9 @@ onMounted(() => {
 
 .trend-card {
 	.trend-card__header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
 		margin-bottom: 8px;
 		.title-with-badge {
 			display: flex;
@@ -479,6 +626,30 @@ onMounted(() => {
 			.trend-subtitle {
 				font-size: 11px;
 				color: #94a3b8;
+			}
+		}
+
+		.trend-tab-toggle {
+			display: inline-flex;
+			background: #f1f5f9;
+			padding: 2px;
+			border-radius: 8px;
+			gap: 2px;
+
+			.toggle-btn {
+				padding: 2px 8px;
+				font-size: 11px;
+				color: #64748b;
+				border-radius: 6px;
+				cursor: pointer;
+				transition: all 0.2s;
+
+				&.active {
+					background: #ffffff;
+					color: #2563eb;
+					font-weight: 600;
+					box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+				}
 			}
 		}
 	}

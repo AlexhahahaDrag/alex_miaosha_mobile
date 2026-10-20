@@ -67,14 +67,6 @@ import type { RoleInfoData } from '@/views/user/roleInfo/config';
 import type { Info } from '@/components/pop/selectPop.vue';
 import { getDictList, type DictInfo } from '@/views/finance/dict/api';
 
-interface RoleInfoDetailForm extends RoleInfoData {
-	id?: string;
-	roleCode?: string;
-	roleName?: string;
-	summary?: string;
-	status?: string | number | null;
-}
-
 const route = useRoute();
 const router = useRouter();
 useNavBar({
@@ -83,7 +75,7 @@ useNavBar({
 	visible: true,
 });
 
-const formInfo = ref<RoleInfoDetailForm>({});
+const formInfo = ref<RoleInfoData>({});
 
 const popInfo = ref<Info<DictInfo>>({ showFlag: false });
 
@@ -101,21 +93,17 @@ const statusInfo = ref<Info<DictInfo>>({
 });
 
 const choose = (type: string) => {
-	switch (type) {
-		case 'status':
-			popInfo.value = statusInfo.value;
-			break;
+	if (type === 'status') {
+		popInfo.value = statusInfo.value;
 	}
 	popInfo.value.showFlag = true;
 };
 
 const selectInfo = (type: string, value: string, name: string) => {
 	popInfo.value.showFlag = false;
-	switch (type) {
-		case 'status':
-			formInfo.value.status = value;
-			statusName.value = name;
-			break;
+	if (type === 'status') {
+		formInfo.value.status = value;
+		statusName.value = name;
 	}
 };
 
@@ -154,7 +142,7 @@ async function init() {
 			const { code: detailCode, data: detailData, message: detailMessage } = detailRes;
 			const { code: dictCode, data: dictData, message: dictMessage } = dictRes;
 			if (detailCode === '200') {
-				formInfo.value = (detailData as RoleInfoDetailForm) || {};
+				formInfo.value = (detailData as RoleInfoData) || {};
 			} else {
 				showFailToast(detailMessage || '查询详情失败，请联系管理员！');
 			}

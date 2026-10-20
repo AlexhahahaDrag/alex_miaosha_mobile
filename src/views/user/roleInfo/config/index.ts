@@ -3,6 +3,6 @@ export interface RoleInfoData {
 	roleCode?: string;
 	roleName?: string;
 	summary?: string;
-	status?: string;
+	status?: string | number | null;
 	[key: string]: unknown;
 }
