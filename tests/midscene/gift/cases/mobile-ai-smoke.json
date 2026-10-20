@@ -82,5 +82,12 @@
 		"route": "/finance/financeManager/financeManagerDetail",
 		"level": "flow",
 		"persona": "gift_admin"
+	},
+	{
+		"caseId": "GIFT-E2E-MOBILE-BALANCE-HAPTIC",
+		"title": "移动端人情平衡矩阵卡片、AI回礼速算浮层与触觉振动闭环",
+		"route": "/finance/gift/analysis",
+		"level": "flow",
+		"persona": "gift_admin"
 	}
 ]

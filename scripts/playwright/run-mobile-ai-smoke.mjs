@@ -80,6 +80,14 @@ const mockMenus = [
 				permissionCode: 'finance:gift:record',
 			},
 			{
+				id: '505',
+				name: 'financeGiftAnalysis',
+				title: '统计分析',
+				path: '/finance/gift/analysis',
+				component: '/src/views/finance/gift/analysis/index.vue',
+				permissionCode: 'finance:gift:record',
+			},
+			{
 				id: '502',
 				name: 'financeGiftPerson',
 				title: '亲友管理',
@@ -374,6 +382,69 @@ async function setupRouteMocks(page) {
 					data: {
 						records: [{ id: '201', eventName: '百日宴', eventTypeName: '百日宴' }],
 						total: 1,
+					},
+				});
+			}
+
+			if (pathname.includes('/gift-analysis/overview')) {
+				return fulfillEncrypted(route, {
+					code: '200',
+					data: {
+						receive: 2800,
+						give: 1200,
+						net: 1600,
+						count: 4,
+					},
+				});
+			}
+
+			if (pathname.includes('/gift-analysis/balance-matrix')) {
+				return fulfillEncrypted(route, {
+					code: '200',
+					data: [
+						{
+							personId: '101',
+							personName: '李四',
+							relationType: 'friend',
+							relationTypeName: '朋友',
+							totalReceiveAmount: 2200,
+							totalGiveAmount: 1600,
+							netBalance: 600,
+							balanceStatus: 'SURPLUS',
+							isImbalancedAlert: true,
+							alertReason: '收礼超2000元超半年未回礼，建议关注维护关系',
+						},
+						{
+							personId: '102',
+							personName: '张三',
+							relationType: 'classmate',
+							relationTypeName: '同学',
+							totalReceiveAmount: 600,
+							totalGiveAmount: 1000,
+							netBalance: -400,
+							balanceStatus: 'DEFICIT',
+							isImbalancedAlert: false,
+							alertReason: '',
+						},
+					],
+				});
+			}
+
+			if (
+				pathname.includes('/gift-analysis/ai/recommend-return-gift') ||
+				pathname.includes('/ai-copilot/gift-return-recommendation')
+			) {
+				return fulfillEncrypted(route, {
+					code: '200',
+					data: {
+						personId: '101',
+						personName: '李四',
+						historicalBaseAmount: 2200,
+						minDecentAmount: 1200,
+						recommendedAmount: 1600,
+						generousAmount: 2000,
+						ruleSummary: '结合历史收礼基准 ¥2200 与宴席档次推导，推荐吉利档位 ¥1600。',
+						blessingWords: '良辰吉日，喜结良缘！愿白首齐眉，鸳鸯比翼！',
 					},
 				});
 			}
@@ -985,6 +1056,80 @@ async function executeCase(page, c, runtime) {
 			break;
 		}
 
+		case 'GIFT-E2E-MOBILE-BALANCE-HAPTIC': {
+			await page.goto(`${runtime.baseUrl}#/finance/gift/analysis`);
+			await page.waitForLoadState('networkidle').catch(() => {});
+
+			// 1. 断言亲友互赠平衡矩阵卡片及失衡预警徽标渲染
+			const matrixCard = page.locator('[data-testid="gift-balance-matrix-section"]').first();
+			await matrixCard.waitFor({ state: 'visible', timeout: 10000 });
+
+			const alertBadge = page.locator('[data-testid="matrix-alert-badge"]').first();
+			await alertBadge.waitFor({ state: 'visible', timeout: 5000 });
+
+			// 2. 验证失衡亲友项 (李四)
+			const personItem = page.locator('[data-testid="balance-item-101"]').first();
+			await personItem.waitFor({ state: 'visible', timeout: 5000 });
+
+			// 记录当前触觉震动次数
+			const initialHapticCount = await page.evaluate(() => window.__giftVibrateCount || 0);
+
+			// 3. 点击「✨ AI 测算回礼」唤起底部弹窗
+			const openCalcBtn = page.locator('[data-testid="btn-ai-calc-101"]').first();
+			await openCalcBtn.waitFor({ state: 'visible', timeout: 5000 });
+			await openCalcBtn.click();
+
+			const popup = page.locator('[data-testid="gift-return-calculator-popup"]').first();
+			await popup.waitFor({ state: 'visible', timeout: 8000 });
+
+			// 4. 选择事由 Tag 并触发 AI 智能测算
+			const weddingChip = popup.locator('[data-testid="event-chip-WEDDING"]').first();
+			if (await weddingChip.isVisible()) {
+				await weddingChip.click();
+			}
+
+			const calcBtn = popup.locator('[data-testid="ai-calc-btn"]').first();
+			await calcBtn.waitFor({ state: 'visible', timeout: 5000 });
+			await calcBtn.click();
+
+			// 5. 等待测算结果面板并验证推荐平衡档 1600
+			const resultPanel = popup.locator('[data-testid="ai-calc-result"]').first();
+			await resultPanel.waitFor({ state: 'visible', timeout: 8000 });
+
+			const resultText = await resultPanel.innerText();
+			if (!resultText.includes('1600') || !resultText.includes('推荐平衡档')) {
+				throw new Error(`移动端 AI 回礼测算结果未显示推荐平衡档 1600，实际为: ${resultText}`);
+			}
+
+			// 6. 点击复制贺词并断言触觉反馈
+			const copyBlessingBtn = popup.locator('[data-testid="copy-blessing-btn"]').first();
+			await copyBlessingBtn.waitFor({ state: 'visible', timeout: 5000 });
+			await copyBlessingBtn.click();
+
+			// 7. 断言 Haptic 探针已捕获触觉反馈调用
+			await page.waitForFunction(
+				(prev) => (window.__giftVibrateCount || 0) > prev,
+				initialHapticCount,
+				{
+					timeout: 3000,
+				},
+			);
+			const postHapticCount = await page.evaluate(() => window.__giftVibrateCount || 0);
+			if (postHapticCount <= initialHapticCount) {
+				throw new Error(
+					`移动端触觉反馈探针未捕获到新增振动调用: 前=${initialHapticCount}, 后=${postHapticCount}`,
+				);
+			}
+
+			// 8. 关闭弹窗
+			const closeIcon = popup.locator('.van-popup__close-icon').first();
+			if ((await closeIcon.count()) && (await closeIcon.isVisible())) {
+				await closeIcon.click();
+				await popup.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
+			}
+			break;
+		}
+
 		default:
 			throw new Error(`Unsupported case ID: ${c.caseId}`);
 	}
@@ -995,7 +1140,10 @@ async function main() {
 	ensureDir(screenshotDir);
 	ensureDir(logDir);
 
-	const cases = loadCases();
+	const allCases = loadCases();
+	const targetCaseId =
+		process.env.CASE_ID || process.argv.find((a) => a.startsWith('--case='))?.split('=')[1];
+	const cases = targetCaseId ? allCases.filter((c) => c.caseId === targetCaseId) : allCases;
 	const server = await startViteServerIfNeed(2000);
 
 	let browser;
