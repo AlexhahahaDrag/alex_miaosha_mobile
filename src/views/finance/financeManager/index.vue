@@ -203,6 +203,9 @@
 			:belong-to="searchInfo.belongTo"
 			@apply="onApplyAiFromIndex"
 		/>
+
+		<!-- AI 悬浮球入口 (支持拖拽吸附与微触觉反馈) -->
+		<mobile-ai-floating-bubble @click="showAiSheet = true" />
 	</div>
 </template>
 
@@ -212,6 +215,7 @@ import { useRoute, useRouter } from 'vue-router';
 import FinanceCard from '@/views/finance/financeManager/components/FinanceCard.vue';
 import PocketMoneyCard from '@/views/finance/financeManager/components/PocketMoneyCard.vue';
 import FinanceAiSheet from '@/views/finance/financeManager/components/FinanceAiSheet.vue';
+import MobileAiFloatingBubble from '@/views/finance/financeManager/components/MobileAiFloatingBubble.vue';
 import type {
 	UniversalFinanceAiParseVo,
 	FinanceManagerData,

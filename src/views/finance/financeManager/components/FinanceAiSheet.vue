@@ -64,6 +64,15 @@
 					>
 						刷星礼卡38
 					</van-tag>
+					<van-tag
+						type="danger"
+						plain
+						round
+						class="chip-item"
+						@click="applyExample('滴滴打车出行支付宝支付32.8元发票报销')"
+					>
+						打车报销32.8
+					</van-tag>
 				</div>
 			</div>
 
@@ -93,7 +102,7 @@
 						<template #icon>
 							<van-icon name="fire-o" />
 						</template>
-						开始 AI 智能解析
+						{{ parsing ? 'AI 正在流式解析中...' : '开始 AI 智能解析' }}
 					</van-button>
 				</div>
 			</div>
@@ -126,6 +135,45 @@
 					:show-pivot="false"
 					color="linear-gradient(to right, #1989fa, #07c160)"
 				/>
+			</div>
+
+			<!-- 流式思考链与推理打字机 -->
+			<div
+				v-if="parsing || displayThoughtText"
+				class="stream-reasoning-card"
+			>
+				<div
+					class="reasoning-header"
+					@click="isThoughtExpanded = !isThoughtExpanded"
+				>
+					<div class="reasoning-title">
+						<van-icon
+							name="bulb-o"
+							color="#f59e0b"
+							class="mr-1"
+						/>
+						<span>AI 语义推理过程</span>
+					</div>
+					<div class="reasoning-meta">
+						<span
+							v-if="parsedResult?.parseEngine"
+							class="engine-tag"
+						>
+							{{ parsedResult.parseEngine === 'AI_DEEPSEEK' ? 'DeepSeek' : '规则引擎' }}
+						</span>
+						<van-icon :name="isThoughtExpanded ? 'arrow-up' : 'arrow-down'" />
+					</div>
+				</div>
+				<div
+					v-show="isThoughtExpanded"
+					class="reasoning-body"
+				>
+					<span class="reasoning-text">{{ displayThoughtText }}</span>
+					<span
+						v-if="parsing"
+						class="typing-cursor"
+					>▌</span>
+				</div>
 			</div>
 
 			<!-- 解析结果卡片 -->
@@ -243,8 +291,24 @@ const inputText = ref('');
 const parsing = ref(false);
 const stageStatus = ref<UniversalFinanceAiStageVo | null>(null);
 const parsedResult = ref<UniversalFinanceAiParseVo | null>(null);
+const isThoughtExpanded = ref(true);
+const streamingThought = ref('');
+
+const displayThoughtText = computed(() => {
+	if (streamingThought.value) {
+		return streamingThought.value;
+	}
+	if (parsedResult.value?.reasoning) {
+		return parsedResult.value.reasoning;
+	}
+	if (stageStatus.value?.message) {
+		return stageStatus.value.message;
+	}
+	return '';
+});
 
 const applyExample = (ex: string) => {
+	triggerHaptic('light');
 	inputText.value = ex;
 	if (ex.includes('小票')) {
 		scene.value = 'SHOP_RECEIPT';
@@ -255,6 +319,14 @@ const applyExample = (ex: string) => {
 	}
 };
 
+const normalizeParsedResult = (res: UniversalFinanceAiParseVo): UniversalFinanceAiParseVo => {
+	return {
+		...res,
+		belongTo: res.belongTo != null ? String(res.belongTo) : undefined,
+		prepaidCardId: res.prepaidCardId != null ? String(res.prepaidCardId) : undefined,
+	};
+};
+
 const handleParse = async () => {
 	if (!inputText.value.trim()) {
 		showToast('请输入记账描述或小票文本');
@@ -262,6 +334,7 @@ const handleParse = async () => {
 	}
 	parsing.value = true;
 	parsedResult.value = null;
+	streamingThought.value = '正在建立端到端流式连接并解析流水语义...';
 	stageStatus.value = {
 		stage: 'SCENE_ANALYSIS',
 		progress: 10,
@@ -270,25 +343,38 @@ const handleParse = async () => {
 	triggerHaptic('light');
 
 	let receivedStreamComplete = false;
+	let lastStage = 'SCENE_ANALYSIS';
 
 	try {
 		await parseUniversalFinanceLedgerStream(
 			{
 				scene: scene.value,
 				text: inputText.value.trim(),
-				belongTo: props.belongTo,
+				belongTo: props.belongTo != null ? String(props.belongTo) : undefined,
 			},
 			{
 				onStage: (stageVo) => {
+					if (stageVo.stage !== lastStage) {
+						lastStage = stageVo.stage;
+						triggerHaptic('light');
+					}
 					stageStatus.value = stageVo;
-					triggerHaptic('light');
+					if (stageVo.message) {
+						streamingThought.value = `${streamingThought.value ? `${streamingThought.value}\n` : ''}• ${stageVo.message}`;
+					}
 					if (stageVo.partialData) {
-						parsedResult.value = stageVo.partialData;
+						parsedResult.value = normalizeParsedResult(stageVo.partialData);
+						if (stageVo.partialData.reasoning) {
+							streamingThought.value = stageVo.partialData.reasoning;
+						}
 					}
 				},
 				onComplete: (result) => {
 					receivedStreamComplete = true;
-					parsedResult.value = result;
+					parsedResult.value = normalizeParsedResult(result);
+					if (result.reasoning) {
+						streamingThought.value = result.reasoning;
+					}
 					triggerHaptic('success');
 					showSuccessToast('AI 解析完成，已呈现预览卡片');
 				},
@@ -307,10 +393,13 @@ const handleParse = async () => {
 			const { code, data, message } = await parseUniversalFinanceLedger({
 				scene: scene.value,
 				text: inputText.value.trim(),
-				belongTo: props.belongTo,
+				belongTo: props.belongTo != null ? String(props.belongTo) : undefined,
 			});
 			if (code === 200 || code === '00000') {
-				parsedResult.value = data;
+				parsedResult.value = normalizeParsedResult(data);
+				if (data.reasoning) {
+					streamingThought.value = data.reasoning;
+				}
 				stageStatus.value = {
 					stage: 'COMPLETE',
 					progress: 100,
@@ -334,6 +423,7 @@ const handleParse = async () => {
 
 const handleApply = () => {
 	if (!parsedResult.value) return;
+	triggerHaptic('light');
 	emit('apply', parsedResult.value);
 	visible.value = false;
 };
@@ -342,7 +432,9 @@ const onClosed = () => {
 	inputText.value = '';
 	parsedResult.value = null;
 	stageStatus.value = null;
+	streamingThought.value = '';
 	scene.value = 'AUTO_DETECT';
+	isThoughtExpanded.value = true;
 };
 </script>
 
@@ -351,34 +443,6 @@ const onClosed = () => {
 	max-height: 85vh;
 	.sheet-content {
 		padding: 16px 20px 32px;
-	}
-	.stream-stage-card {
-		margin-top: 12px;
-		background: #f0fdf4;
-		border: 1px solid #bbf7d0;
-		border-radius: 10px;
-		padding: 10px 12px;
-		.stage-info {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			font-size: 12px;
-			margin-bottom: 6px;
-			.stage-text {
-				display: flex;
-				align-items: center;
-				gap: 6px;
-				color: #166534;
-				font-weight: 500;
-				.stage-spinner {
-					margin-right: 2px;
-				}
-			}
-			.stage-progress {
-				color: #15803d;
-				font-weight: 600;
-			}
-		}
 	}
 	.scene-tabs {
 		margin-bottom: 12px;
@@ -416,6 +480,88 @@ const onClosed = () => {
 		}
 		.parse-btn-row {
 			margin-top: 10px;
+		}
+	}
+	.stream-stage-card {
+		margin-top: 12px;
+		background: #f0fdf4;
+		border: 1px solid #bbf7d0;
+		border-radius: 10px;
+		padding: 10px 12px;
+		.stage-info {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			font-size: 12px;
+			margin-bottom: 6px;
+			.stage-text {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				color: #166534;
+				font-weight: 500;
+				.stage-spinner {
+					margin-right: 2px;
+				}
+			}
+			.stage-progress {
+				color: #15803d;
+				font-weight: 600;
+			}
+		}
+	}
+	.stream-reasoning-card {
+		margin-top: 10px;
+		background: #fffbeb;
+		border: 1px solid #fde68a;
+		border-radius: 10px;
+		padding: 10px 12px;
+		.reasoning-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			cursor: pointer;
+			user-select: none;
+			.reasoning-title {
+				display: flex;
+				align-items: center;
+				font-size: 12px;
+				font-weight: 600;
+				color: #92400e;
+			}
+			.reasoning-meta {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				font-size: 12px;
+				color: #b45309;
+				.engine-tag {
+					font-size: 10px;
+					background: #fef3c7;
+					padding: 1px 6px;
+					border-radius: 4px;
+					color: #d97706;
+					font-weight: 500;
+				}
+			}
+		}
+		.reasoning-body {
+			margin-top: 8px;
+			padding-top: 6px;
+			border-top: 1px dashed #fef3c7;
+			font-size: 12px;
+			line-height: 1.6;
+			color: #78350f;
+			white-space: pre-wrap;
+			word-break: break-all;
+			max-height: 120px;
+			overflow-y: auto;
+			.typing-cursor {
+				display: inline-block;
+				margin-left: 2px;
+				color: #f59e0b;
+				animation: cursorBlink 0.9s infinite;
+			}
 		}
 	}
 	.preview-card {
@@ -536,6 +682,16 @@ const onClosed = () => {
 		.apply-btn-wrapper {
 			margin-top: 14px;
 		}
+	}
+}
+
+@keyframes cursorBlink {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0;
 	}
 }
 </style>
