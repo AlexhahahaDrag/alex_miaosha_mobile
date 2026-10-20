@@ -80,6 +80,9 @@ describe('Mobile Message Center Utilities', () => {
 		expect(resolveMobileMessageJumpRoute({ msgType: 'CARD_EXPIRE', bizType: 'PREPAID_CARD' })).toBe(
 			'/selfFinance/prepaidCardInfoT',
 		);
+		expect(resolveMobileMessageJumpRoute({ msgType: 'GIFT_RETURN', bizType: 'GIFT_RETURN' })).toBe(
+			'/finance/gift/analysis',
+		);
 		expect(resolveMobileMessageJumpRoute({ msgType: 'SYSTEM', bizType: 'SYSTEM' })).toBe('');
 	});
 

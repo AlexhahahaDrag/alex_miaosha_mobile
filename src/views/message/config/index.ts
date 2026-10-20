@@ -26,13 +26,16 @@ export function normalizeMessageIds<T>(input: T): T {
 	return input;
 }
 
-export type MessageType = 'ALL' | 'GIFT_EVENT' | 'COUPON_EXPIRE' | 'CARD_EXPIRE' | 'SYSTEM';
+export type MessageType =
+	'ALL' | 'GIFT_EVENT' | 'GIFT_RETURN' | 'COUPON_EXPIRE' | 'CARD_EXPIRE' | 'SYSTEM';
 
-export type MessageSubType = 'WELCOME' | 'ANNOUNCE' | 'D_DAY' | 'D_MINUS_1' | 'D_MINUS_3';
+export type MessageSubType =
+	'WELCOME' | 'ANNOUNCE' | 'D_DAY' | 'D_MINUS_1' | 'D_MINUS_3' | 'IMBALANCE' | 'EVENT_RETURN';
 
 export type MessagePriority = 'HIGH' | 'MEDIUM' | 'NORMAL';
 
-export type MessageBizType = 'SYSTEM' | 'GIFT_EVENT' | 'COUPON' | 'ACCOUNT_RECORD' | 'PREPAID_CARD';
+export type MessageBizType =
+	'SYSTEM' | 'GIFT_EVENT' | 'GIFT_RETURN' | 'COUPON' | 'ACCOUNT_RECORD' | 'PREPAID_CARD';
 
 export interface SysMessageInfoData {
 	id?: string;
@@ -94,6 +97,14 @@ export interface MessageBadgeMeta {
  * 根据消息类型与子阶段解析视觉标签样式
  */
 export const resolveMessageBadgeMeta = (item: SysMessageInfoData): MessageBadgeMeta => {
+	if (item.msgType === 'GIFT_RETURN' || item.bizType === 'GIFT_RETURN') {
+		return {
+			text: item.subType === 'EVENT_RETURN' ? '重大喜事回礼' : '礼金盈余待回',
+			color: '#ff976a',
+			bgColor: 'rgba(255, 151, 106, 0.15)',
+			icon: 'gold-coin-o',
+		};
+	}
 	if (item.subType === 'D_DAY' || item.priority === 'HIGH') {
 		return {
 			text: item.msgType === 'GIFT_EVENT' ? '今日举行' : '今日到期',
@@ -154,6 +165,9 @@ export const resolveMessageBadgeMeta = (item: SysMessageInfoData): MessageBadgeM
  * 解析移动端点击消息后的目标跳转路由
  */
 export const resolveMobileMessageJumpRoute = (item: SysMessageInfoData): string => {
+	if (item.bizType === 'GIFT_RETURN' || item.msgType === 'GIFT_RETURN') {
+		return '/finance/gift/analysis';
+	}
 	if (item.jumpUrl && item.jumpUrl.trim()) {
 		return item.jumpUrl.trim();
 	}
