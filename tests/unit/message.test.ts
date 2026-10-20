@@ -83,7 +83,28 @@ describe('Mobile Message Center Utilities', () => {
 		expect(resolveMobileMessageJumpRoute({ msgType: 'GIFT_RETURN', bizType: 'GIFT_RETURN' })).toBe(
 			'/finance/gift/analysis',
 		);
+		expect(resolveMobileMessageJumpRoute({ msgType: 'BUDGET', bizType: 'BUDGET' })).toBe(
+			'/finance/financeManager/budgetManage',
+		);
 		expect(resolveMobileMessageJumpRoute({ msgType: 'SYSTEM', bizType: 'SYSTEM' })).toBe('');
+	});
+
+	it('resolveMessageBadgeMeta 应正确解析预算超支与预警徽章', () => {
+		const budgetOver = resolveMessageBadgeMeta({
+			msgType: 'BUDGET',
+			subType: 'BUDGET_OVER',
+			priority: 'HIGH',
+		});
+		expect(budgetOver.text).toBe('预算超支');
+		expect(budgetOver.color).toBe('#ee0a24');
+
+		const budgetWarn = resolveMessageBadgeMeta({
+			msgType: 'BUDGET',
+			subType: 'BUDGET_WARN',
+			priority: 'MEDIUM',
+		});
+		expect(budgetWarn.text).toBe('预算预警');
+		expect(budgetWarn.color).toBe('#ff976a');
 	});
 
 	it('MESSAGE_CATEGORY_TABS 应包含 5 个核心分类标签', () => {

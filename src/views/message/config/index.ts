@@ -27,15 +27,23 @@ export function normalizeMessageIds<T>(input: T): T {
 }
 
 export type MessageType =
-	'ALL' | 'GIFT_EVENT' | 'GIFT_RETURN' | 'COUPON_EXPIRE' | 'CARD_EXPIRE' | 'SYSTEM';
+	'ALL' | 'GIFT_EVENT' | 'GIFT_RETURN' | 'BUDGET' | 'COUPON_EXPIRE' | 'CARD_EXPIRE' | 'SYSTEM';
 
 export type MessageSubType =
-	'WELCOME' | 'ANNOUNCE' | 'D_DAY' | 'D_MINUS_1' | 'D_MINUS_3' | 'IMBALANCE' | 'EVENT_RETURN';
+	| 'WELCOME'
+	| 'ANNOUNCE'
+	| 'D_DAY'
+	| 'D_MINUS_1'
+	| 'D_MINUS_3'
+	| 'IMBALANCE'
+	| 'EVENT_RETURN'
+	| 'BUDGET_OVER'
+	| 'BUDGET_WARN';
 
 export type MessagePriority = 'HIGH' | 'MEDIUM' | 'NORMAL';
 
 export type MessageBizType =
-	'SYSTEM' | 'GIFT_EVENT' | 'GIFT_RETURN' | 'COUPON' | 'ACCOUNT_RECORD' | 'PREPAID_CARD';
+	'SYSTEM' | 'GIFT_EVENT' | 'GIFT_RETURN' | 'BUDGET' | 'COUPON' | 'ACCOUNT_RECORD' | 'PREPAID_CARD';
 
 export interface SysMessageInfoData {
 	id?: string;
@@ -97,6 +105,14 @@ export interface MessageBadgeMeta {
  * 根据消息类型与子阶段解析视觉标签样式
  */
 export const resolveMessageBadgeMeta = (item: SysMessageInfoData): MessageBadgeMeta => {
+	if (item.msgType === 'BUDGET' || item.bizType === 'BUDGET') {
+		return {
+			text: item.subType === 'BUDGET_OVER' ? '预算超支' : '预算预警',
+			color: item.subType === 'BUDGET_OVER' ? '#ee0a24' : '#ff976a',
+			bgColor: item.subType === 'BUDGET_OVER' ? 'rgba(238, 10, 36, 0.1)' : 'rgba(255, 151, 106, 0.15)',
+			icon: 'balance-pay',
+		};
+	}
 	if (item.msgType === 'GIFT_RETURN' || item.bizType === 'GIFT_RETURN') {
 		return {
 			text: item.subType === 'EVENT_RETURN' ? '重大喜事回礼' : '礼金盈余待回',
@@ -165,6 +181,9 @@ export const resolveMessageBadgeMeta = (item: SysMessageInfoData): MessageBadgeM
  * 解析移动端点击消息后的目标跳转路由
  */
 export const resolveMobileMessageJumpRoute = (item: SysMessageInfoData): string => {
+	if (item.bizType === 'BUDGET' || item.msgType === 'BUDGET') {
+		return '/finance/financeManager/budgetManage';
+	}
 	if (item.bizType === 'GIFT_RETURN' || item.msgType === 'GIFT_RETURN') {
 		return '/finance/gift/analysis';
 	}
