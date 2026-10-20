@@ -16,6 +16,35 @@
 			</div>
 		</section>
 
+		<!-- 人情收支与顺逆差走势图 -->
+		<section
+			class="trend-card"
+			data-testid="gift-mobile-trend-card"
+		>
+			<div class="trend-card__header">
+				<div class="title-with-badge">
+					<h3>📈 收支与顺逆差走势</h3>
+					<span class="trend-subtitle">柱条显示收送 · 折线呈现差额</span>
+				</div>
+			</div>
+			<div
+				v-if="trendList.length === 0"
+				class="empty-trend"
+			>
+				暂无月度人情收支记录
+			</div>
+			<div
+				v-else
+				class="trend-chart-box"
+				data-testid="gift-mobile-trend-chart"
+			>
+				<BaseChart
+					:options="trendChartOption"
+					height="220px"
+				/>
+			</div>
+		</section>
+
 		<!-- 亲友互赠收支平衡矩阵与 AI 回礼速算板块 -->
 		<section
 			class="matrix-card"
@@ -45,6 +74,22 @@
 					@search="handleSearch"
 					@clear="handleSearch"
 				/>
+			</div>
+
+			<!-- 圈层筛选胶囊 -->
+			<div
+				class="circle-chips-bar"
+				data-testid="matrix-circle-chips"
+			>
+				<div
+					v-for="chip in circleOptions"
+					:key="chip.value"
+					class="circle-chip"
+					:class="{ active: selectedCircle === chip.value }"
+					@click="handleSelectCircle(chip.value)"
+				>
+					{{ chip.label }}
+				</div>
 			</div>
 
 			<!-- 矩阵列表 -->
@@ -169,12 +214,16 @@
 
 <script setup lang="ts">
 import { showFailToast, showToast } from 'vant';
-import { useNavBar } from '@/composables/useNavBar';
-import { useTabBar } from '@/composables/useTabBar';
 import { triggerHaptic } from '@/utils/haptics';
-import { getGiftAnalysisOverview, getGiftBalanceMatrix } from '@/views/finance/gift/analysis/api';
+import { getGiftAnalysisOverview, getGiftBalanceMatrix, getGiftAnalysisTrend } from '@/views/finance/gift/analysis/api';
 import GiftReturnCalculatorPopup from '@/views/finance/gift/analysis/components/GiftReturnCalculatorPopup.vue';
-import { GIFT_TAB_BAR, directionText, formatMoney, type GiftPersonBalance } from '@/views/finance/gift/config';
+import {
+	GIFT_TAB_BAR,
+	directionText,
+	formatMoney,
+	type GiftPersonBalance,
+	type GiftAmountTrend,
+} from '@/views/finance/gift/config';
 
 useNavBar({ title: '统计报表', visible: true });
 
@@ -186,6 +235,80 @@ useTabBar({
 const report = reactive({ receive: 0, give: 0, net: 0 });
 const rows = ref<{ label: string; count: number; amount: number }[]>([]);
 
+// 趋势数据
+const trendList = ref<GiftAmountTrend[]>([]);
+const trendChartOption = computed(() => {
+	if (trendList.value.length === 0) return {};
+	const xData = trendList.value.map((item) => item.label || '');
+	const receiveData = trendList.value.map((item) => Number(item.receiveAmount || 0));
+	const giveData = trendList.value.map((item) => Number(item.giveAmount || 0));
+	const gapData = trendList.value.map((item) => Number(item.receiveAmount || 0) - Number(item.giveAmount || 0));
+
+	return {
+		tooltip: {
+			trigger: 'axis',
+			axisPointer: { type: 'shadow' },
+			confine: true,
+		},
+		legend: {
+			data: ['收礼', '随礼', '顺逆差'],
+			top: 0,
+			itemWidth: 10,
+			itemHeight: 10,
+			textStyle: { fontSize: 11 },
+		},
+		grid: {
+			left: '3%',
+			right: '3%',
+			bottom: '3%',
+			top: '36px',
+			outerBoundsMode: 'same',
+		},
+		xAxis: {
+			type: 'category',
+			data: xData,
+			axisLabel: { fontSize: 10, interval: 0 },
+		},
+		yAxis: [
+			{
+				type: 'value',
+				splitLine: { lineStyle: { type: 'dashed', color: '#f1f5f9' } },
+				axisLabel: { fontSize: 10 },
+			},
+			{
+				type: 'value',
+				show: false,
+			},
+		],
+		series: [
+			{
+				name: '收礼',
+				type: 'bar',
+				barWidth: 10,
+				data: receiveData,
+				itemStyle: { color: '#10b981', borderRadius: [3, 3, 0, 0] },
+			},
+			{
+				name: '随礼',
+				type: 'bar',
+				barWidth: 10,
+				data: giveData,
+				itemStyle: { color: '#f59e0b', borderRadius: [3, 3, 0, 0] },
+			},
+			{
+				name: '顺逆差',
+				type: 'line',
+				yAxisIndex: 1,
+				smooth: true,
+				data: gapData,
+				itemStyle: { color: '#3b82f6' },
+				lineStyle: { width: 2 },
+				symbolSize: 4,
+			},
+		],
+	};
+});
+
 // 矩阵数据
 const matrixList = ref<GiftPersonBalance[]>([]);
 const matrixLoading = ref(false);
@@ -193,14 +316,34 @@ const searchKeyword = ref('');
 const showCalculator = ref(false);
 const selectedPerson = ref<GiftPersonBalance | null>(null);
 
+const circleOptions = [
+	{ label: '全部圈子', value: 'all' },
+	{ label: '亲属圈', value: 'RELATIVES' },
+	{ label: '同事情', value: 'COLLEAGUE' },
+	{ label: '好友圈', value: 'FRIEND' },
+	{ label: '同学情', value: 'CLASSMATE' },
+];
+const selectedCircle = ref('all');
+
+const handleSelectCircle = (val: string) => {
+	triggerHaptic('selection');
+	selectedCircle.value = val;
+};
+
 const filteredMatrixList = computed(() => {
 	const kw = searchKeyword.value.trim().toLowerCase();
-	if (!kw) return matrixList.value;
-	return matrixList.value.filter(
-		(item) =>
+	const circle = selectedCircle.value;
+	return matrixList.value.filter((item) => {
+		const matchKw =
+			!kw ||
 			item.personName.toLowerCase().includes(kw) ||
-			(item.relationTypeName && item.relationTypeName.toLowerCase().includes(kw)),
-	);
+			(item.relationTypeName && item.relationTypeName.toLowerCase().includes(kw));
+		const matchCircle =
+			circle === 'all' ||
+			item.relationType === circle ||
+			(circle === 'RELATIVES' && (item.relationTypeName?.includes('亲') || item.relationType?.includes('亲')));
+		return matchKw && matchCircle;
+	});
 });
 
 const matrixAlertCount = computed(() => {
@@ -269,6 +412,17 @@ const loadOverview = async () => {
 	];
 };
 
+const loadTrend = async () => {
+	try {
+		const { code, data } = await getGiftAnalysisTrend();
+		if ((code === '200' || code === '00000') && Array.isArray(data)) {
+			trendList.value = data;
+		}
+	} catch {
+		trendList.value = [];
+	}
+};
+
 const loadMatrix = async () => {
 	matrixLoading.value = true;
 	try {
@@ -285,6 +439,7 @@ const loadMatrix = async () => {
 
 onMounted(() => {
 	void loadOverview();
+	void loadTrend();
 	void loadMatrix();
 });
 </script>
@@ -298,6 +453,7 @@ onMounted(() => {
 }
 
 .report-card,
+.trend-card,
 .matrix-card,
 .rank-card {
 	background: #fff;
@@ -305,6 +461,39 @@ onMounted(() => {
 	box-shadow: 0 6px 18px rgba(32, 152, 238, 0.08);
 	padding: 16px;
 	margin-bottom: 14px;
+}
+
+.trend-card {
+	.trend-card__header {
+		margin-bottom: 8px;
+		.title-with-badge {
+			display: flex;
+			flex-direction: column;
+			gap: 4px;
+			h3 {
+				margin: 0;
+				font-size: 16px;
+				font-weight: 700;
+				color: #0f172a;
+			}
+			.trend-subtitle {
+				font-size: 11px;
+				color: #94a3b8;
+			}
+		}
+	}
+
+	.empty-trend {
+		text-align: center;
+		font-size: 12px;
+		color: #94a3b8;
+		padding: 24px 0;
+	}
+
+	.trend-chart-box {
+		width: 100%;
+		margin-top: 4px;
+	}
 }
 
 .report-card {
@@ -360,6 +549,40 @@ onMounted(() => {
 		:deep(.van-search) {
 			padding: 0 8px;
 			background: transparent;
+		}
+	}
+
+	.circle-chips-bar {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		overflow-x: auto;
+		white-space: nowrap;
+		padding-bottom: 8px;
+		margin-bottom: 8px;
+		-webkit-overflow-scrolling: touch;
+		&::-webkit-scrollbar {
+			display: none;
+		}
+
+		.circle-chip {
+			display: inline-flex;
+			align-items: center;
+			padding: 4px 10px;
+			border-radius: 14px;
+			font-size: 12px;
+			background: #f1f5f9;
+			color: #64748b;
+			cursor: pointer;
+			transition: all 0.2s;
+			user-select: none;
+
+			&.active {
+				background: #2563eb;
+				color: #ffffff;
+				font-weight: 600;
+				box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+			}
 		}
 	}
 
