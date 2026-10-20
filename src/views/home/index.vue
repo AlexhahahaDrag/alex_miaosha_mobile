@@ -1,51 +1,150 @@
 <template>
 	<div class="home-container">
-		<!-- Section 1: 数据概览 / 欢迎卡片 -->
-		<section class="data-overview">
-			<div
-				v-if="visibleStats.length > 0"
-				class="overview-card"
-			>
-				<div class="overview-header">
-					<div class="overview-header-left">
-						<span class="overview-indicator"></span>
-						<h2 class="overview-title">最近保存动态</h2>
+		<!-- Section 1: 角色动态态势卡片 (Role-Aware Dashboard Card) -->
+		<section
+			class="role-dashboard-section"
+			data-testid="dash-mobile-role-card"
+		>
+			<div class="role-card-wrapper">
+				<div class="role-card-header">
+					<div class="user-info-box">
+						<span class="user-greeting">{{ timeGreeting }}，{{ displayName }}</span>
+						<div class="tags-row">
+							<span
+								class="role-badge"
+								:class="roleClass"
+							>{{ roleTagText }}</span>
+							<span
+								v-if="orgName"
+								class="org-chip"
+							>{{ orgName }}</span>
+						</div>
 					</div>
-					<span class="overview-subtitle">实时同步</span>
+					<div class="date-badge">
+						<span class="date-text">{{ todayText }}</span>
+					</div>
 				</div>
-				<div class="overview-content">
-					<div
-						v-for="(stat, index) in visibleStats"
-						:key="stat.label"
-						class="stat-item"
-						:class="{ 'has-divider': index > 0 }"
-					>
-						<span class="stat-label">{{ stat.label }}</span>
-						<span
-							class="stat-value"
-							:style="{ color: stat.color || '#191b23' }"
+
+				<!-- 核心指标大盘 (动态聚合) -->
+				<div class="role-kpi-grid">
+					<!-- 普通/家庭用户视角：礼金净结余 + 收礼 + 随礼 + 待办提醒 -->
+					<template v-if="isUserRole">
+						<div
+							class="kpi-box main"
+							data-testid="dash-mobile-kpi-balance"
 						>
-							{{ stat.value }}
-						</span>
-					</div>
+							<div class="kpi-label">礼金净结余</div>
+							<div
+								class="kpi-val"
+								:class="{ positive: giftOverview.netAmount >= 0, negative: giftOverview.netAmount < 0 }"
+							>
+								<span class="currency">¥</span>
+								<span class="num">{{ (giftOverview.netAmount || 0).toLocaleString() }}</span>
+							</div>
+							<div class="kpi-sub">共记录 {{ giftOverview.recordCount || 0 }} 笔流水</div>
+						</div>
+						<div class="kpi-box">
+							<div class="kpi-label">累计收礼</div>
+							<div class="kpi-val receive">
+								<span class="currency">¥</span>
+								<span class="num">{{ (giftOverview.receiveAmount || 0).toLocaleString() }}</span>
+							</div>
+							<div class="kpi-sub">礼入人情</div>
+						</div>
+						<div class="kpi-box">
+							<div class="kpi-label">随礼支出</div>
+							<div class="kpi-val expense">
+								<span class="currency">¥</span>
+								<span class="num">{{
+									((giftOverview.giveAmount || 0) + (giftOverview.returnAmount || 0)).toLocaleString()
+								}}</span>
+							</div>
+							<div class="kpi-sub">人情往还</div>
+						</div>
+						<div
+							class="kpi-box click-box"
+							data-testid="dash-mobile-kpi-remind"
+							@click="handleRemindClick"
+						>
+							<div class="kpi-label">到期与备忘</div>
+							<div class="kpi-val remind">
+								<span class="num">{{ unreadSummaryCount }}</span>
+								<span class="unit">条待办</span>
+							</div>
+							<div class="kpi-sub">点击查看通知 ></div>
+						</div>
+					</template>
+
+					<!-- 管理员视角：机构成员 + 待办巡检 + 服务状态 -->
+					<template v-else>
+						<div class="kpi-box main">
+							<div class="kpi-label">管辖机构/家庭</div>
+							<div class="kpi-val admin-val">
+								<span class="num text-sm">{{ orgName || '平台总管' }}</span>
+							</div>
+							<div class="kpi-sub">组织权限体系受控</div>
+						</div>
+						<div
+							class="kpi-box click-box"
+							data-testid="dash-mobile-kpi-remind"
+							@click="handleRemindClick"
+						>
+							<div class="kpi-label">待办到期通知</div>
+							<div class="kpi-val remind">
+								<span class="num">{{ unreadSummaryCount }}</span>
+								<span class="unit">条未读</span>
+							</div>
+							<div class="kpi-sub">XXL-Job 定时巡检 ></div>
+						</div>
+						<div class="kpi-box">
+							<div class="kpi-label">集群微服务</div>
+							<div class="kpi-val receive">
+								<span class="num">5</span>
+								<span class="unit">/ 5 在线</span>
+							</div>
+							<div class="kpi-sub">全栈探针正常</div>
+						</div>
+					</template>
+				</div>
+
+				<!-- 快捷行动条：一键 AI 智能记账 + 随礼记账 -->
+				<div class="action-capsules-row">
+					<button
+						class="capsule-btn ai-btn"
+						data-testid="dash-mobile-btn-ai-ledger"
+						@click="handleAiLedgerClick"
+					>
+						<span class="sparkle">✨</span>
+						<span class="text">AI 智能流式记账</span>
+					</button>
+					<button
+						class="capsule-btn ghost-btn"
+						data-testid="dash-mobile-btn-add-gift"
+						@click="handleAddGiftClick"
+					>
+						<svg-icon
+							name="gift"
+							color="#0058be"
+						/>
+						<span class="text">随礼记一笔</span>
+					</button>
 				</div>
 			</div>
 
-			<!-- 暂无保存记录时的欢迎横幅 -->
+			<!-- 模块保存动态 (若有) -->
 			<div
-				v-else
-				class="welcome-banner"
+				v-if="visibleStats.length > 0"
+				class="sub-stats-scroller"
 			>
-				<div class="welcome-icon-box">
-					<svg-icon
-						name="dashboard"
-						class="welcome-icon"
-						color="var(--primary-color, #1989fa)"
-					/>
-				</div>
-				<div class="welcome-text-box">
-					<h3 class="welcome-title">欢迎使用 Alex 移动工作台</h3>
-					<p class="welcome-date">{{ todayText }} · 祝您工作顺利</p>
+				<div class="sub-stats-title">近期保存动态：</div>
+				<div class="sub-stats-chips">
+					<span
+						v-for="stat in visibleStats"
+						:key="stat.label"
+						class="mini-chip"
+					>
+						{{ stat.label }}: {{ stat.value }}
+					</span>
 				</div>
 			</div>
 		</section>
@@ -119,6 +218,11 @@
 				description="未找到相关功能或模块"
 			/>
 		</div>
+		<!-- AI 智能记账 ActionSheet 抽屉 -->
+		<finance-ai-sheet
+			v-model:show="showAiSheet"
+			@success="handleAiRecordSuccess"
+		/>
 	</div>
 </template>
 
@@ -128,9 +232,13 @@ import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
 import { useDashboardStore } from '@/store/modules/dashboard/dashboard';
 import { useTabBarStore } from '@/store/modules/tabbar';
+import { useUserStore } from '@/store/modules/user/user';
 import { routes } from '@/router';
 import { formatDate } from '@/utils/dayjs';
 import { getSysMessageSummary } from '@/views/message/api';
+import { getGiftAnalysisOverview } from '@/views/finance/gift/analysis/api';
+import { triggerHaptic } from '@/utils/haptics';
+import FinanceAiSheet from '@/views/finance/financeManager/components/FinanceAiSheet.vue';
 
 const router = useRouter();
 const dashboardStore = useDashboardStore();
@@ -287,11 +395,110 @@ useTabBar({
 });
 
 const tabBarStore = useTabBarStore();
+const userStore = useUserStore();
+
+const isSuperAdmin = computed(() => {
+	return Boolean(
+		userStore.getSuperAdmin ||
+		userStore.roleInfo?.roleCode === 'super_super' ||
+		userStore.getPermissionContext?.superAdmin,
+	);
+});
+
+const isOrgAdmin = computed(() => {
+	if (isSuperAdmin.value) return false;
+	const code = (userStore.roleInfo?.roleCode || '').toLowerCase();
+	const name = userStore.roleInfo?.roleName || '';
+	return code.includes('admin') || name.includes('管理') || name.includes('主管');
+});
+
+const isUserRole = computed(() => !isSuperAdmin.value && !isOrgAdmin.value);
+
+const roleTagText = computed(() => {
+	if (isSuperAdmin.value) return '超级管理员';
+	if (isOrgAdmin.value) return userStore.roleInfo?.roleName || '机构主管';
+	return '家庭与随礼记账';
+});
+
+const roleClass = computed(() => {
+	if (isSuperAdmin.value) return 'role-super';
+	if (isOrgAdmin.value) return 'role-admin';
+	return 'role-user';
+});
+
+const displayName = computed(() => {
+	return userStore.getUserInfo?.nickName || userStore.getUserInfo?.userName || 'Alex 用户';
+});
+
+const orgName = computed(() => {
+	return userStore.getOrgInfo?.orgName || userStore.getUserInfo?.orgName || '';
+});
+
+const timeGreeting = computed(() => {
+	const hour = new Date().getHours();
+	if (hour < 6) return '凌晨好';
+	if (hour < 12) return '早上好';
+	if (hour < 14) return '中午好';
+	if (hour < 19) return '下午好';
+	return '晚上好';
+});
+
+const giftOverview = ref({
+	recordCount: 0,
+	receiveAmount: 0,
+	giveAmount: 0,
+	returnAmount: 0,
+	netAmount: 0,
+});
+const unreadSummaryCount = ref(0);
+const showAiSheet = ref(false);
+
+const fetchGiftStats = async () => {
+	try {
+		const { code, data } = await getGiftAnalysisOverview();
+		if ((code === '200' || code === '00000') && data) {
+			const receive = Number(data.receiveAmount || 0);
+			const give = Number(data.giveAmount || 0);
+			const ret = Number(data.returnAmount || 0);
+			const net = Number(data.netAmount ?? receive - give - ret);
+			giftOverview.value = {
+				recordCount: Number(data.recordCount || 0),
+				receiveAmount: receive,
+				giveAmount: give,
+				returnAmount: ret,
+				netAmount: net,
+			};
+		}
+	} catch {
+		// 安全兜底
+	}
+};
+
+const handleAiLedgerClick = () => {
+	triggerHaptic('light');
+	showAiSheet.value = true;
+};
+
+const handleAddGiftClick = () => {
+	triggerHaptic('selection');
+	router.push('/finance/gift/record');
+};
+
+const handleRemindClick = () => {
+	triggerHaptic('selection');
+	router.push('/message');
+};
+
+const handleAiRecordSuccess = () => {
+	fetchGiftStats();
+	refreshMessageUnreadBadge();
+};
 
 const refreshMessageUnreadBadge = async () => {
 	try {
 		const { code, data } = await getSysMessageSummary();
 		if (code == '200' && data) {
+			unreadSummaryCount.value = data.unreadTotal || 0;
 			tabBarStore.setTabBadge('message', data.unreadTotal || 0);
 		}
 	} catch {
@@ -300,10 +507,12 @@ const refreshMessageUnreadBadge = async () => {
 };
 
 onMounted(() => {
+	fetchGiftStats();
 	refreshMessageUnreadBadge();
 });
 
 onActivated(() => {
+	fetchGiftStats();
 	refreshMessageUnreadBadge();
 });
 
@@ -480,125 +689,242 @@ watch(
 	overflow-x: hidden;
 }
 
-/* ─── Section 1: 数据概览 / 欢迎卡片 ─── */
-.data-overview {
+/* ─── Section 1: 角色动态态势卡片 ─── */
+.role-dashboard-section {
 	margin-bottom: 14px;
 }
 
-.overview-card {
-	background-color: var(--card-bg, #ffffff);
-	border-radius: var(--border-radius-lg, 12px);
-	box-shadow: 0 2px 12px rgba(30, 41, 59, 0.04);
-	padding: 14px 16px;
-	border: 1px solid var(--border-color, rgba(194, 198, 214, 0.25));
+.role-card-wrapper {
+	background: linear-gradient(135deg, #ffffff 0%, #f6f8fc 100%);
+	border-radius: var(--border-radius-lg, 14px);
+	padding: 16px;
+	border: 1px solid var(--border-color, rgba(194, 198, 214, 0.3));
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
 }
 
-.overview-header {
+.role-card-header {
 	display: flex;
 	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 12px;
+	align-items: flex-start;
+	margin-bottom: 14px;
 }
 
-.overview-header-left {
+.user-info-box {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.user-greeting {
+	font-size: 16px;
+	font-weight: 700;
+	color: var(--text-primary, #191b23);
+}
+
+.tags-row {
 	display: flex;
 	align-items: center;
 	gap: 6px;
 }
 
-.overview-indicator {
-	width: 4px;
-	height: 14px;
-	background-color: var(--primary-color, #1989fa);
-	border-radius: 2px;
-}
-
-.overview-title {
-	font-size: 15px;
-	font-weight: 600;
-	color: var(--text-primary, #191b23);
-	margin: 0;
-	line-height: 20px;
-}
-
-.overview-subtitle {
+.role-badge {
 	font-size: 11px;
-	color: var(--text-tertiary, #969799);
-}
+	font-weight: 600;
+	padding: 2px 8px;
+	border-radius: 9999px;
+	line-height: 16px;
 
-.overview-content {
-	display: flex;
-	flex-direction: column;
-	gap: 2px;
-}
+	&.role-super {
+		background-color: #f3e8ff;
+		color: #7e22ce;
+		border: 1px solid #d8b4fe;
+	}
 
-.stat-item {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 10px 2px;
+	&.role-admin {
+		background-color: #e0f2fe;
+		color: #0369a1;
+		border: 1px solid #7dd3fc;
+	}
 
-	&.has-divider {
-		border-top: 1px solid var(--border-color, rgba(194, 198, 214, 0.2));
+	&.role-user {
+		background-color: #ecfdf5;
+		color: #047857;
+		border: 1px solid #a7f3d0;
 	}
 }
 
-.stat-label {
-	font-size: 13px;
+.org-chip {
+	font-size: 11px;
+	color: #64748b;
+	background: #f1f5f9;
+	padding: 2px 8px;
+	border-radius: 6px;
+	max-width: 140px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.date-badge {
+	font-size: 11px;
+	color: #94a3b8;
 	font-weight: 500;
-	color: var(--text-secondary, #505f76);
 }
 
-.stat-value {
-	font-size: 13px;
-	font-weight: 600;
+.role-kpi-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 10px;
+	margin-bottom: 14px;
 }
 
-/* 欢迎横幅 */
-.welcome-banner {
-	background: linear-gradient(135deg, rgba(25, 137, 250, 0.08) 0%, rgba(139, 92, 246, 0.06) 100%);
-	border: 1px solid rgba(25, 137, 250, 0.15);
-	border-radius: var(--border-radius-lg, 12px);
-	padding: 14px 16px;
+.kpi-box {
+	background: #ffffff;
+	border-radius: 10px;
+	padding: 10px 12px;
+	border: 1px solid rgba(226, 232, 240, 0.8);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+
+	&.main {
+		grid-column: span 2;
+		background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%);
+		border-color: #bfdbfe;
+	}
+
+	&.click-box {
+		cursor: pointer;
+		transition: all 0.2s ease;
+		&:active {
+			transform: scale(0.97);
+			background-color: #f8fafc;
+		}
+	}
+}
+
+.kpi-label {
+	font-size: 11px;
+	color: #64748b;
+	margin-bottom: 4px;
+}
+
+.kpi-val {
+	font-size: 16px;
+	font-weight: 700;
+	color: #1e293b;
 	display: flex;
-	align-items: center;
-	gap: 12px;
+	align-items: baseline;
+	gap: 2px;
+
+	.currency {
+		font-size: 12px;
+		font-weight: 600;
+	}
+
+	.num {
+		font-size: 18px;
+	}
+
+	.unit {
+		font-size: 11px;
+		font-weight: 500;
+		color: #64748b;
+		margin-left: 2px;
+	}
+
+	&.positive {
+		color: #16a34a;
+	}
+
+	&.negative {
+		color: #dc2626;
+	}
+
+	&.receive {
+		color: #059669;
+	}
+
+	&.expense {
+		color: #ea580c;
+	}
+
+	&.remind {
+		color: #2563eb;
+	}
+
+	&.admin-val {
+		font-size: 14px;
+		color: #1e40af;
+	}
 }
 
-.welcome-icon-box {
-	width: 40px;
-	height: 40px;
-	background-color: var(--card-bg, #ffffff);
-	border-radius: 50%;
+.kpi-sub {
+	font-size: 10px;
+	color: #94a3b8;
+	margin-top: 4px;
+}
+
+.action-capsules-row {
+	display: flex;
+	gap: 10px;
+}
+
+.capsule-btn {
+	flex: 1;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	box-shadow: 0 2px 8px rgba(25, 137, 250, 0.15);
-	flex-shrink: 0;
-}
-
-.welcome-icon {
-	width: 22px;
-	height: 22px;
-}
-
-.welcome-text-box {
-	display: flex;
-	flex-direction: column;
-	gap: 2px;
-}
-
-.welcome-title {
-	font-size: 15px;
+	gap: 6px;
+	padding: 9px 12px;
+	border-radius: 9999px;
+	font-size: 13px;
 	font-weight: 600;
-	color: var(--text-primary, #191b23);
-	margin: 0;
+	border: none;
+	cursor: pointer;
+	transition: all 0.2s ease;
+
+	&:active {
+		transform: scale(0.96);
+	}
+
+	&.ai-btn {
+		background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+		color: #ffffff;
+		box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+	}
+
+	&.ghost-btn {
+		background: #ffffff;
+		color: #0058be;
+		border: 1px solid #bfdbfe;
+	}
 }
 
-.welcome-date {
-	font-size: 12px;
-	color: var(--text-secondary, #646566);
-	margin: 0;
+.sub-stats-scroller {
+	margin-top: 10px;
+	padding: 8px 12px;
+	background: #ffffff;
+	border-radius: 8px;
+	border: 1px solid rgba(226, 232, 240, 0.7);
+}
+
+.sub-stats-title {
+	font-size: 11px;
+	color: #94a3b8;
+	margin-bottom: 4px;
+}
+
+.sub-stats-chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+.mini-chip {
+	font-size: 11px;
+	color: #475569;
+	background: #f1f5f9;
+	padding: 2px 6px;
+	border-radius: 4px;
 }
 
 /* ─── Section 2: 搜索栏 ─── */
