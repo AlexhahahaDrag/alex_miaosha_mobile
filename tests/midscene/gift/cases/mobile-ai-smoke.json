@@ -89,5 +89,12 @@
 		"route": "/finance/gift/analysis",
 		"level": "flow",
 		"persona": "gift_admin"
+	},
+	{
+		"caseId": "GIFT-E2E-MOBILE-GRAPH-HAPTIC",
+		"title": "移动端走势/人脉星阵切换与触觉微振动探针断言",
+		"route": "/finance/gift/analysis",
+		"level": "flow",
+		"persona": "gift_admin"
 	}
 ]

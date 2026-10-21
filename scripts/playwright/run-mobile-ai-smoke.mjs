@@ -430,6 +430,20 @@ async function setupRouteMocks(page) {
 				});
 			}
 
+			if (pathname.includes('/gift-analysis/trend')) {
+				return fulfillEncrypted(route, {
+					code: '200',
+					data: [
+						{ label: '2026-05', giveAmount: 300, receiveAmount: 800 },
+						{ label: '2026-06', giveAmount: 600, receiveAmount: 600 },
+						{ label: '2026-07', giveAmount: 400, receiveAmount: 1200 },
+						{ label: '2026-08', giveAmount: 700, receiveAmount: 900 },
+						{ label: '2026-09', giveAmount: 500, receiveAmount: 1500 },
+						{ label: '2026-10', giveAmount: 800, receiveAmount: 1800 },
+					],
+				});
+			}
+
 			if (
 				pathname.includes('/gift-analysis/ai/recommend-return-gift') ||
 				pathname.includes('/ai-copilot/gift-return-recommendation')
@@ -1127,6 +1141,52 @@ async function executeCase(page, c, runtime) {
 				await closeIcon.click();
 				await popup.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
 			}
+			break;
+		}
+
+		case 'GIFT-E2E-MOBILE-GRAPH-HAPTIC': {
+			await page.goto(`${runtime.baseUrl}#/finance/gift/analysis`);
+			await page.waitForLoadState('networkidle').catch(() => {});
+
+			// 1. 断言走势卡片与走势图渲染
+			const trendCard = page.locator('[data-testid="gift-mobile-trend-card"]').first();
+			await trendCard.waitFor({ state: 'visible', timeout: 10000 });
+
+			const trendChart = page.locator('[data-testid="gift-mobile-trend-chart"]').first();
+			await trendChart.waitFor({ state: 'visible', timeout: 8000 });
+
+			// 2. 记录切换前触觉振动探针计数
+			const initialHapticCount = await page.evaluate(() => window.__giftVibrateCount || 0);
+
+			// 3. 点击切换至「人脉」图谱
+			const toggle = page.locator('[data-testid="mobile-trend-tab-toggle"]').first();
+			await toggle.waitFor({ state: 'visible', timeout: 5000 });
+			const graphBtn = toggle.locator('.toggle-btn:has-text("人脉")').first();
+			await graphBtn.waitFor({ state: 'visible', timeout: 5000 });
+			await graphBtn.click();
+
+			// 4. 断言触觉探针递增（微振动已触发）
+			await page.waitForFunction(
+				(prev) => (window.__giftVibrateCount || 0) > prev,
+				initialHapticCount,
+				{ timeout: 3000 },
+			);
+			const postHapticCount = await page.evaluate(() => window.__giftVibrateCount || 0);
+			if (postHapticCount <= initialHapticCount) {
+				throw new Error(
+					`移动端人脉切换触觉探针未捕获到微振动: 前=${initialHapticCount}, 后=${postHapticCount}`,
+				);
+			}
+
+			// 5. 断言人脉星阵图表已挂载渲染
+			const graphChart = page.locator('[data-testid="gift-mobile-graph-chart"]').first();
+			await graphChart.waitFor({ state: 'visible', timeout: 8000 });
+
+			// 6. 切回「走势」并验证图表还原
+			const trendBtn = toggle.locator('.toggle-btn:has-text("走势")').first();
+			await trendBtn.waitFor({ state: 'visible', timeout: 5000 });
+			await trendBtn.click();
+			await trendChart.waitFor({ state: 'visible', timeout: 5000 });
 			break;
 		}
 
