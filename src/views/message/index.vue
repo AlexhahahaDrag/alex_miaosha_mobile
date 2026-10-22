@@ -22,6 +22,15 @@
 				<div class="hero-actions">
 					<button
 						type="button"
+						class="action-chip"
+						data-testid="mobile-message-btn-notice-config"
+						@click="showNoticeConfig = true"
+					>
+						<van-icon name="setting-o" />
+						<span>偏好</span>
+					</button>
+					<button
+						type="button"
 						class="action-chip primary"
 						data-testid="mobile-message-btn-read-all"
 						:disabled="summary.unreadTotal <= 0"
@@ -248,11 +257,18 @@
 				</div>
 			</div>
 		</van-popup>
+
+		<!-- 通知偏好设置抽屉 -->
+		<user-notice-config-popup
+			v-model="showNoticeConfig"
+			@saved="fetchSummary"
+		/>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { showConfirmDialog, showFailToast, showSuccessToast } from 'vant';
+import UserNoticeConfigPopup from '@/views/message/components/UserNoticeConfigPopup.vue';
 import { useNavBar, type NavBarConfig } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
 import { useTabBarStore } from '@/store/modules/tabbar';
@@ -287,6 +303,7 @@ const triggerHaptic = (duration: number = 15) => {
 const activeTab = ref<MessageType>('ALL');
 const onlyUnread = ref<boolean>(false);
 const keyword = ref<string>('');
+const showNoticeConfig = ref<boolean>(false);
 
 const messageList = ref<SysMessageInfoData[]>([]);
 const loading = ref<boolean>(false);

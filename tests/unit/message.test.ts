@@ -4,6 +4,9 @@ import {
 	MESSAGE_CATEGORY_TABS,
 	resolveMessageBadgeMeta,
 	resolveMobileMessageJumpRoute,
+	NOTICE_BIZ_META_MAP,
+	isSubNoticeVetoed,
+	type UserNoticeConfigData,
 } from '@/views/message/config';
 
 describe('Mobile Message Center Utilities', () => {
@@ -115,5 +118,82 @@ describe('Mobile Message Center Utilities', () => {
 			'CARD_EXPIRE',
 			'SYSTEM',
 		]);
+	});
+});
+
+describe('User Notice Configuration & Global Veto', () => {
+	it('NOTICE_BIZ_META_MAP 应包含完整的 8 大业务项元数据', () => {
+		const expectedCodes = [
+			'GLOBAL',
+			'GIFT_EVENT',
+			'GIFT_RETURN',
+			'COUPON',
+			'PREPAID_CARD',
+			'BUDGET_OVER',
+			'FINANCE_REPORT',
+			'SYSTEM',
+		];
+		for (const code of expectedCodes) {
+			expect(NOTICE_BIZ_META_MAP[code]).toBeDefined();
+			expect(NOTICE_BIZ_META_MAP[code].code).toBe(code);
+			expect(NOTICE_BIZ_META_MAP[code].title).toBeTruthy();
+			expect(NOTICE_BIZ_META_MAP[code].icon).toBeTruthy();
+			expect(NOTICE_BIZ_META_MAP[code].badgeBg).toBeTruthy();
+			expect(NOTICE_BIZ_META_MAP[code].badgeColor).toBeTruthy();
+		}
+	});
+
+	it('isSubNoticeVetoed 在无 GLOBAL 配置时应安全返回 false', () => {
+		const configs: UserNoticeConfigData[] = [
+			{ noticeCode: 'COUPON', internalEnabled: true, wechatEnabled: true },
+		];
+		expect(isSubNoticeVetoed(configs, 'internal')).toBe(false);
+		expect(isSubNoticeVetoed(configs, 'wechat')).toBe(false);
+	});
+
+	it('isSubNoticeVetoed 应准确反映 GLOBAL 站内信一票否决', () => {
+		const configs: UserNoticeConfigData[] = [
+			{ noticeCode: 'GLOBAL', internalEnabled: false, wechatEnabled: true },
+			{ noticeCode: 'COUPON', internalEnabled: true, wechatEnabled: true },
+		];
+		expect(isSubNoticeVetoed(configs, 'internal')).toBe(true);
+		expect(isSubNoticeVetoed(configs, 'wechat')).toBe(false);
+	});
+
+	it('isSubNoticeVetoed 应准确反映 GLOBAL 微信服务号一票否决', () => {
+		const configs: UserNoticeConfigData[] = [
+			{ noticeCode: 'GLOBAL', internalEnabled: true, wechatEnabled: false },
+			{ noticeCode: 'GIFT_EVENT', internalEnabled: true, wechatEnabled: true },
+		];
+		expect(isSubNoticeVetoed(configs, 'internal')).toBe(false);
+		expect(isSubNoticeVetoed(configs, 'wechat')).toBe(true);
+	});
+
+	it('isSubNoticeVetoed 在 GLOBAL 双开时允许子项正常受控', () => {
+		const configs: UserNoticeConfigData[] = [
+			{ noticeCode: 'GLOBAL', internalEnabled: true, wechatEnabled: true },
+		];
+		expect(isSubNoticeVetoed(configs, 'internal')).toBe(false);
+		expect(isSubNoticeVetoed(configs, 'wechat')).toBe(false);
+	});
+
+	it('normalizeMessageIds 应准确处理 UserNoticeConfigData 的 Long 型 ID', () => {
+		const raw = {
+			code: '200',
+			data: [
+				{
+					id: 1847162769425887234n,
+					userId: 1001,
+					noticeCode: 'GLOBAL',
+					internalEnabled: true,
+					wechatEnabled: false,
+				},
+			],
+		};
+		const normalized = normalizeMessageIds(raw);
+		expect(normalized.data[0].id).toBe('1847162769425887234');
+		expect(typeof normalized.data[0].id).toBe('string');
+		expect(normalized.data[0].userId).toBe('1001');
+		expect(typeof normalized.data[0].userId).toBe('string');
 	});
 });

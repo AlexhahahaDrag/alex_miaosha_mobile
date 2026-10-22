@@ -150,6 +150,20 @@
 							<div class="item-label">选择您喜欢的主题风格</div>
 						</template>
 					</van-cell>
+					<van-cell
+						is-link
+						center
+						data-testid="rbac-user-entry-notice-config"
+						@click="openNoticeConfig"
+					>
+						<template #icon>
+							<div class="item-icon blue"><van-icon name="bell" /></div>
+						</template>
+						<template #title>
+							<div class="item-title">消息提醒偏好</div>
+							<div class="item-label">站内信与微信服务号推送开关</div>
+						</template>
+					</van-cell>
 				</van-cell-group>
 			</div>
 
@@ -277,6 +291,7 @@
 		/>
 
 		<theme-popup v-model:show="showThemePopup" />
+		<user-notice-config-popup v-model="showNoticeConfigPopup" />
 	</div>
 </template>
 
@@ -284,6 +299,7 @@
 import { showToast } from 'vant';
 import logout from '@/views/user/logout/index.vue';
 import ThemePopup from '@/views/user/components/ThemePopup.vue';
+import UserNoticeConfigPopup from '@/views/message/components/UserNoticeConfigPopup.vue';
 import type { UserManagerData } from '@/views/user/userManager/config';
 import { useUserStore } from '@/store/modules/user/user';
 import { useNavBar } from '@/composables/useNavBar';
@@ -325,6 +341,7 @@ const logoutInfo = (v: boolean) => {
 };
 
 const showThemePopup = ref<boolean>(false);
+const showNoticeConfigPopup = ref<boolean>(false);
 
 const goSecurity = () => {
 	handleInteraction();
@@ -333,6 +350,10 @@ const goSecurity = () => {
 const openTheme = () => {
 	handleInteraction();
 	showThemePopup.value = true;
+};
+const openNoticeConfig = () => {
+	handleInteraction();
+	showNoticeConfigPopup.value = true;
 };
 
 const handleInteraction = () => {

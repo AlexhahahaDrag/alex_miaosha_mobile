@@ -204,3 +204,106 @@ export const resolveMobileMessageJumpRoute = (item: SysMessageInfoData): string 
 	}
 	return '';
 };
+
+export interface UserNoticeConfigData {
+	id?: string;
+	userId?: string;
+	noticeCode: string;
+	noticeName?: string;
+	noticeDesc?: string;
+	internalEnabled: boolean;
+	wechatEnabled: boolean;
+}
+
+export interface NoticeBizMeta {
+	code: string;
+	icon: string;
+	badgeBg: string;
+	badgeColor: string;
+	title: string;
+	desc: string;
+}
+
+export const NOTICE_BIZ_META_MAP: Record<string, NoticeBizMeta> = {
+	GLOBAL: {
+		code: 'GLOBAL',
+		icon: 'setting-o',
+		badgeBg: '#e8f4ff',
+		badgeColor: '#1989fa',
+		title: '全局通知总控',
+		desc: '一票否决权：关闭后将彻底禁用对应渠道的所有业务提醒',
+	},
+	GIFT_EVENT: {
+		code: 'GIFT_EVENT',
+		icon: 'calendar-o',
+		badgeBg: '#fff7e6',
+		badgeColor: '#ff976a',
+		title: '重大礼金喜事',
+		desc: '喜事临近倒计时（D-3/D-1/当天）智能提醒',
+	},
+	GIFT_RETURN: {
+		code: 'GIFT_RETURN',
+		icon: 'gold-coin-o',
+		badgeBg: '#ffe8e8',
+		badgeColor: '#ee0a24',
+		title: '人情往来回礼',
+		desc: '亲友人情往来顺逆差与喜事待回礼智能预警',
+	},
+	COUPON: {
+		code: 'COUPON',
+		icon: 'coupon-o',
+		badgeBg: '#fffbe8',
+		badgeColor: '#ed6a0c',
+		title: '消费券到期',
+		desc: '优惠券临近失效防漏核销提醒',
+	},
+	PREPAID_CARD: {
+		code: 'PREPAID_CARD',
+		icon: 'credit-pay',
+		badgeBg: '#e8ffea',
+		badgeColor: '#07c160',
+		title: '预付卡与猫超',
+		desc: '猫超卡及多店铺预付卡有效期与余额提醒',
+	},
+	BUDGET_OVER: {
+		code: 'BUDGET_OVER',
+		icon: 'balance-pay',
+		badgeBg: '#ffe8ec',
+		badgeColor: '#ee0a24',
+		title: '预算超支预警',
+		desc: '月度家庭或个人支出预算超额时强提醒',
+	},
+	FINANCE_REPORT: {
+		code: 'FINANCE_REPORT',
+		icon: 'bar-chart-o',
+		badgeBg: '#f0e8ff',
+		badgeColor: '#7232dd',
+		title: '财务收支简报',
+		desc: '月度人情收支与资产分析汇总报表推送',
+	},
+	SYSTEM: {
+		code: 'SYSTEM',
+		icon: 'volume-o',
+		badgeBg: '#f2f3f5',
+		badgeColor: '#646566',
+		title: '系统公告提醒',
+		desc: '安全登录、版本更新与重要系统消息通知',
+	},
+};
+
+/**
+ * 判定子业务项在特定渠道（internal 或 wechat）是否已被 GLOBAL 全局总控一票否决
+ */
+export function isSubNoticeVetoed(
+	configs: UserNoticeConfigData[],
+	channel: 'internal' | 'wechat',
+): boolean {
+	const globalConfig = configs.find((item) => item.noticeCode === 'GLOBAL');
+	if (!globalConfig) {
+		return false;
+	}
+	if (channel === 'internal') {
+		return !globalConfig.internalEnabled;
+	}
+	return !globalConfig.wechatEnabled;
+}
