@@ -283,7 +283,7 @@ const displayCategoryList = computed(() => {
 .pocket-money-card {
 	position: relative;
 	margin: 8px 12px 6px;
-	padding: 10px 14px;
+	padding: 10px 12px;
 	background: linear-gradient(180deg, #ffffff 0%, #fafcff 100%);
 	border-radius: 16px;
 	box-shadow:
@@ -320,47 +320,61 @@ const displayCategoryList = computed(() => {
 		.pocket-money-title {
 			display: flex;
 			align-items: center;
-			gap: 7px;
-			font-size: 13.5px;
+			gap: 6px;
+			font-size: 13px;
 			font-weight: 600;
 			color: #0f172a;
+			white-space: nowrap;
+			flex-shrink: 0;
 
 			.title-icon-box {
-				width: 28px;
-				height: 28px;
-				border-radius: 8px;
+				width: 24px;
+				height: 24px;
+				border-radius: 7px;
 				background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
 				display: flex;
 				align-items: center;
 				justify-content: center;
 				box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.8);
+				flex-shrink: 0;
 
 				.title-icon {
-					font-size: 15px;
+					font-size: 13.5px;
 					color: #2563eb;
 				}
 			}
 
 			.title-text {
 				letter-spacing: -0.2px;
+				white-space: nowrap;
+				flex-shrink: 0;
 			}
 
 			.health-badge {
 				display: inline-flex;
 				align-items: center;
-				gap: 4.5px;
-				font-size: 10.5px;
+				gap: 4px;
+				font-size: 10px;
 				font-weight: 600;
-				padding: 1.5px 7px;
-				border-radius: 12px;
+				padding: 1px 6px;
+				border-radius: 10px;
 				border: 1px solid;
 				line-height: 1.35;
+				white-space: nowrap;
+				flex-shrink: 0;
 
 				.health-dot {
-					width: 5px;
-					height: 5px;
+					width: 4.5px;
+					height: 4.5px;
 					border-radius: 50%;
 					display: inline-block;
+				}
+
+				@media (max-width: 365px) {
+					span:not(.health-dot) {
+						display: none;
+					}
+					padding: 3px;
 				}
 			}
 		}
@@ -368,16 +382,22 @@ const displayCategoryList = computed(() => {
 		.pocket-money-summary {
 			display: flex;
 			align-items: center;
-			gap: 8px;
+			gap: 6px;
+			white-space: nowrap;
+			flex-shrink: 0;
 
 			.summary-metric {
 				display: flex;
 				align-items: baseline;
-				gap: 4px;
+				gap: 3.5px;
+				white-space: nowrap;
+				flex-shrink: 0;
 
 				.metric-label {
-					font-size: 11px;
+					font-size: 10.5px;
 					color: #64748b;
+					white-space: nowrap;
+					flex-shrink: 0;
 				}
 
 				.metric-val {
@@ -387,12 +407,14 @@ const displayCategoryList = computed(() => {
 						BlinkMacSystemFont,
 						Roboto,
 						sans-serif;
-					font-size: 15px;
+					font-size: 14.5px;
 					font-weight: 700;
 					letter-spacing: -0.3px;
+					white-space: nowrap;
+					flex-shrink: 0;
 
 					.currency-symbol {
-						font-size: 12px;
+						font-size: 11px;
 						font-weight: 600;
 						margin-right: 0.5px;
 					}
@@ -408,27 +430,30 @@ const displayCategoryList = computed(() => {
 			}
 
 			.percent-pill {
-				font-size: 10.5px;
+				font-size: 10px;
 				font-weight: 600;
 				color: #475569;
 				background: #f1f5f9;
-				padding: 1.5px 6.5px;
-				border-radius: 10px;
+				padding: 1.5px 5.5px;
+				border-radius: 9px;
 				letter-spacing: -0.2px;
+				white-space: nowrap;
+				flex-shrink: 0;
 			}
 
 			.toggle-arrow-btn {
-				width: 20px;
-				height: 20px;
+				width: 18px;
+				height: 18px;
 				border-radius: 50%;
 				display: flex;
 				align-items: center;
 				justify-content: center;
 				background: transparent;
+				flex-shrink: 0;
 				transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
 				.toggle-arrow {
-					font-size: 11px;
+					font-size: 10.5px;
 					color: #94a3b8;
 				}
 			}
