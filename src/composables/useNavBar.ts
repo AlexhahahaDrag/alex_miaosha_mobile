@@ -1,3 +1,4 @@
+import { getCurrentScope, onScopeDispose, type MaybeRefOrGetter } from 'vue';
 import { useNavBarStore } from '@/store/modules/navbar';
 
 export interface NavBarConfig {
@@ -12,7 +13,7 @@ export interface NavBarConfig {
 	onRightClick?: () => void;
 }
 
-export function useNavBar(config?: NavBarConfig) {
+export function useNavBar(config?: MaybeRefOrGetter<NavBarConfig | undefined>) {
 	const navBarStore = useNavBarStore();
 
 	const setNavBar = (newConfig: NavBarConfig) => {
@@ -46,18 +47,22 @@ export function useNavBar(config?: NavBarConfig) {
 		navBarStore.showNavBar();
 	};
 
-	// 如果传入了配置，在组件挂载时设置
-	onMounted(() => {
-		if (config) {
-			setNavBar(config);
-		}
-	});
+	// 响应式监听配置变化（兼容静态配置、Ref 或 Getter 函数）
+	if (config !== undefined) {
+		watchEffect(() => {
+			const resolved = toValue(config);
+			if (resolved) {
+				setNavBar(resolved);
+			}
+		});
+	}
 
-	// 组件卸载时重置NavBar（可选）
-	onUnmounted(() => {
-		// 可以选择在这里重置NavBar，或者让下一个页面来设置
-		// navBarStore.resetNavBar();
-	});
+	// 生命周期闭环：作用域销毁时重置右侧事件句柄，杜绝悬挂闭包导致内存泄漏
+	if (getCurrentScope()) {
+		onScopeDispose(() => {
+			navBarStore.setRightClickHandler(null);
+		});
+	}
 
 	return {
 		setNavBar,

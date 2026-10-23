@@ -1,3 +1,4 @@
+import type { MaybeRefOrGetter } from 'vue';
 import { getGiftPersonRelationOptions } from '@/views/finance/gift/person/api';
 import {
 	FALLBACK_GIFT_RELATION_OPTIONS,
@@ -27,13 +28,16 @@ export function useGiftRelationOptions() {
 
 	const quickRelations = computed(() => presetOptions.value.slice(0, 3));
 
-	const isPresetRelationType = (relation?: string) =>
-		matchPresetRelationType(relation, presetOptions.value);
+	const isPresetRelationType = (relation?: MaybeRefOrGetter<string | undefined>) =>
+		matchPresetRelationType(toValue(relation), presetOptions.value);
 
-	const relationLabel = (relation?: string) => resolveRelationLabel(relation, presetOptions.value);
+	const relationLabel = (relation?: MaybeRefOrGetter<string | undefined>) =>
+		resolveRelationLabel(toValue(relation), presetOptions.value);
 
-	const resolveFilterRelationType = (presetId: string) =>
-		resolvePresetCode(presetId, presetOptions.value);
+	const resolveFilterRelationType = (presetId: MaybeRefOrGetter<string | undefined>) => {
+		const val = toValue(presetId);
+		return val ? resolvePresetCode(val, presetOptions.value) : undefined;
+	};
 
 	const mapRelationToFormFields = (data: GiftPersonInfo = {}): GiftPersonFormState =>
 		mapRelationFields(data, customOptions.value, presetOptions.value);
