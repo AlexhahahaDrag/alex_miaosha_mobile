@@ -96,13 +96,16 @@
 							</div>
 							<div class="kpi-sub">XXL-Job 定时巡检 ></div>
 						</div>
-						<div class="kpi-box">
+						<div
+							class="kpi-box"
+							data-testid="dash-mobile-kpi-services"
+						>
 							<div class="kpi-label">集群微服务</div>
 							<div class="kpi-val receive">
-								<span class="num">5</span>
-								<span class="unit">/ 5 在线</span>
+								<span class="num">{{ onlineServiceCount }}</span>
+								<span class="unit">/ {{ totalServiceCount }} 在线</span>
 							</div>
-							<div class="kpi-sub">全栈探针正常</div>
+							<div class="kpi-sub">{{ serviceHealthSub }}</div>
 						</div>
 					</template>
 				</div>
@@ -237,6 +240,7 @@ import { routes } from '@/router';
 import { formatDate } from '@/utils/dayjs';
 import { getSysMessageSummary } from '@/views/message/api';
 import { getGiftAnalysisOverview } from '@/views/finance/gift/analysis/api';
+import { getMicroServicesHealth } from '@/views/home/api';
 import { triggerHaptic } from '@/utils/haptics';
 import FinanceAiSheet from '@/views/finance/financeManager/components/FinanceAiSheet.vue';
 
@@ -506,14 +510,40 @@ const refreshMessageUnreadBadge = async () => {
 	}
 };
 
+const onlineServiceCount = ref(6);
+const totalServiceCount = ref(6);
+const serviceHealthSub = computed(() =>
+	onlineServiceCount.value === totalServiceCount.value
+		? '全栈探针正常'
+		: `${onlineServiceCount.value}/${totalServiceCount.value} 节点在线`,
+);
+
+const fetchServiceHealth = async () => {
+	try {
+		const { code, data } = await getMicroServicesHealth();
+		if ((code === '200' || code === '00000') && Array.isArray(data) && data.length > 0) {
+			totalServiceCount.value = data.length;
+			onlineServiceCount.value = data.filter((s) => s.status === 'UP').length;
+		}
+	} catch {
+		// 容灾保持默认
+	}
+};
+
 onMounted(() => {
 	fetchGiftStats();
 	refreshMessageUnreadBadge();
+	if (!isUserRole.value) {
+		void fetchServiceHealth();
+	}
 });
 
 onActivated(() => {
 	fetchGiftStats();
 	refreshMessageUnreadBadge();
+	if (!isUserRole.value) {
+		void fetchServiceHealth();
+	}
 });
 
 // 交互反馈及路由跳转
