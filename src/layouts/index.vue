@@ -2,8 +2,8 @@
 	<div class="layout-container">
 		<!-- 全局NavBar -->
 		<nav-bar
-			v-if="navBarStore.getNavBarInfo.visible"
-			:info="navBarStore.getNavBarInfo"
+			v-if="navBarInfo.visible"
+			:info="navBarInfo"
 			@click-right="handleRightClick"
 		/>
 
@@ -11,7 +11,7 @@
 		<div
 			class="content-container"
 			:class="{
-				'with-tabbar': tabBarStore.getTabBarInfo.visible,
+				'with-tabbar': tabBarInfo.visible,
 			}"
 		>
 			<router-view />
@@ -19,20 +19,24 @@
 
 		<!-- 全局TabBar -->
 		<tab-bar
-			v-if="tabBarStore.getTabBarInfo.visible"
-			v-bind="tabBarStore.getTabBarInfo"
+			v-if="tabBarInfo.visible"
+			v-bind="tabBarInfo"
 		/>
 	</div>
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from 'pinia';
 import { useNavBarStore } from '@/store/modules/navbar';
 import { useTabBarStore } from '@/store/modules/tabbar';
 
 const navBarStore = useNavBarStore();
 const tabBarStore = useTabBarStore();
+const { getNavBarInfo: navBarInfo, getRightClickHandler } = storeToRefs(navBarStore);
+const { getTabBarInfo: tabBarInfo } = storeToRefs(tabBarStore);
+
 const handleRightClick = () => {
-	const handler = navBarStore.getRightClickHandler;
+	const handler = getRightClickHandler.value;
 	if (handler) {
 		handler();
 	}

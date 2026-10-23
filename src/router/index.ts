@@ -188,7 +188,8 @@ const addRouter = () => {
 			userStore.changeRouteStatus(true);
 			return;
 		}
-		userStore.getMenuInfo.forEach((item: MenuInfoData) => {
+		const clonedMenus: MenuInfoData[] = structuredClone(toRaw(userStore.getMenuInfo));
+		clonedMenus.forEach((item: MenuInfoData) => {
 			if (judgePermission(getStringField(item, 'permissionCode'), access)) {
 				const newRouter = getChildren(item, access);
 				if (newRouter.name && !router.hasRoute(newRouter.name)) {

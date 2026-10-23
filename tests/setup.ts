@@ -40,6 +40,19 @@ if (typeof globalThis.navigator === 'undefined') {
 	});
 }
 
+if (typeof (globalThis as any).window === 'undefined') {
+	Object.defineProperty(globalThis, 'window', {
+		value: {
+			localStorage: (globalThis as any).localStorage,
+			crypto: (globalThis as any).crypto,
+			addEventListener: () => {},
+			removeEventListener: () => {},
+			location: { reload: () => {} },
+		},
+		writable: true,
+	});
+}
+
 if (typeof window !== 'undefined') {
 	Object.defineProperty(window, 'matchMedia', {
 		writable: true,
