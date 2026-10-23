@@ -65,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, type PropType } from 'vue';
+import type { PropType } from 'vue';
 import { useUserStore } from '@/store/modules/user/user';
 import { usePermission } from '@/composables/usePermission';
 import { formatTime } from '@/utils/dayjs';

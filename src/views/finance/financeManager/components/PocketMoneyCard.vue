@@ -169,7 +169,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
 import type { FinanceBudgetStatusVo } from '@/views/finance/financeManager/config';
 
 interface Props {
