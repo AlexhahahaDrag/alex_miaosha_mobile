@@ -4,8 +4,9 @@
 			<header class="login-header">
 				<div class="logo-box">
 					<div class="logo-inner">
-						<van-icon
-							name="points"
+						<img
+							src="/logo.svg"
+							alt="logo"
 							class="logo-icon"
 						/>
 					</div>
@@ -191,9 +192,18 @@ const onSubmit = async () => {
 		margin: 0 auto 8px;
 		border: 1px solid rgba(255, 255, 255, 0.8);
 
+		.logo-inner {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 100%;
+			height: 100%;
+		}
+
 		.logo-icon {
-			font-size: 24px;
-			color: #2563eb;
+			width: 34px;
+			height: 34px;
+			display: block;
 		}
 	}
 
