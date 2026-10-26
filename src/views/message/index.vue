@@ -261,7 +261,7 @@
 		<!-- 通知偏好设置抽屉 -->
 		<user-notice-config-popup
 			v-model="showNoticeConfig"
-			@saved="fetchSummary"
+			@saved="loadSummary"
 		/>
 	</div>
 </template>

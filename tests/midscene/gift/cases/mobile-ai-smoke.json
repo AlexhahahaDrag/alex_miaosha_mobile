@@ -1,100 +1,114 @@
 [
-	{
-		"caseId": "GIFT-AI-MOBILE-001",
-		"title": "移动端自然语言快速记礼与智能要素抽取",
-		"route": "/finance/gift/record",
-		"level": "flow",
-		"persona": "gift_admin"
-	},
-	{
-		"caseId": "GIFT-AI-MOBILE-002",
-		"title": "移动端场景贺词一键复制与触觉振动探针断言",
-		"route": "/finance/gift/record",
-		"level": "flow",
-		"persona": "gift_admin"
-	},
-	{
-		"caseId": "GIFT-E2E-MOBILE-QUICK-RECORD",
-		"title": "移动端快速记礼弹窗全流程与 Picker 联动",
-		"route": "/finance/gift/record",
-		"level": "flow",
-		"persona": "gift_admin"
-	},
-	{
-		"caseId": "GIFT-E2E-MOBILE-PERSON-PROFILE",
-		"title": "移动端亲友档案详情与净值统计展示",
-		"route": "/finance/gift/person/giftPersonDetail?id=101",
-		"level": "flow",
-		"persona": "gift_admin"
-	},
-	{
-		"caseId": "FINANCE-E2E-MOBILE-POCKET-BUDGET",
-		"title": "移动端零花钱卡片展开与预算设置全流程",
-		"route": "/finance/financeManager",
-		"level": "flow",
-		"persona": "gift_admin"
-	},
-	{
-		"caseId": "FINANCE-E2E-MOBILE-KEYPAD-RECORD",
-		"title": "移动端九宫格触觉反馈与数字键盘极速记账",
-		"route": "/finance/financeManager/financeManagerDetail",
-		"level": "flow",
-		"persona": "gift_admin"
-	},
-	{
-		"caseId": "GIFT-AI-MOBILE-BUDGET-001",
-		"title": "移动端零花钱预算 AI 智能测算与三档推荐采纳",
-		"route": "/finance/financeManager/budgetManage",
-		"level": "flow",
-		"persona": "gift_admin"
-	},
-	{
-		"caseId": "GIFT-AI-MOBILE-BUDGET-002",
-		"title": "移动端零花钱口语化指令解析回填与触觉振动",
-		"route": "/finance/financeManager/budgetManage",
-		"level": "flow",
-		"persona": "gift_admin"
-	},
-	{
-		"caseId": "BUDGET-MOBILE-STATUS-OVER",
-		"title": "移动端零花钱卡片超支状态机判定与负数超支展示",
-		"route": "/finance/financeManager",
-		"level": "flow",
-		"persona": "gift_admin"
-	},
-	{
-		"caseId": "RBAC-MOBILE-MEMBER-READONLY-NOTICE",
-		"title": "移动端普通成员预算只读模式与横幅提示",
-		"route": "/finance/financeManager/budgetManage",
-		"level": "flow",
-		"persona": "family_member"
-	},
-	{
-		"caseId": "FINANCE-AI-MOBILE-LEDGER-001",
-		"title": "移动端自然语言记账 ActionSheet 与键盘联动回填",
-		"route": "/finance/financeManager/financeManagerDetail",
-		"level": "flow",
-		"persona": "gift_admin"
-	},
-	{
-		"caseId": "FINANCE-AI-MOBILE-RECEIPT-002",
-		"title": "移动端购物小票识别与条目明细渲染断言",
-		"route": "/finance/financeManager/financeManagerDetail",
-		"level": "flow",
-		"persona": "gift_admin"
-	},
-	{
-		"caseId": "GIFT-E2E-MOBILE-BALANCE-HAPTIC",
-		"title": "移动端人情平衡矩阵卡片、AI回礼速算浮层与触觉振动闭环",
-		"route": "/finance/gift/analysis",
-		"level": "flow",
-		"persona": "gift_admin"
-	},
-	{
-		"caseId": "GIFT-E2E-MOBILE-GRAPH-HAPTIC",
-		"title": "移动端走势/人脉星阵切换与触觉微振动探针断言",
-		"route": "/finance/gift/analysis",
-		"level": "flow",
-		"persona": "gift_admin"
-	}
+  {
+    "caseId": "GIFT-AI-MOBILE-001",
+    "title": "移动端自然语言快速记礼与智能要素抽取",
+    "route": "/finance/gift/record",
+    "level": "flow",
+    "persona": "gift_admin"
+  },
+  {
+    "caseId": "GIFT-AI-MOBILE-002",
+    "title": "移动端场景贺词一键复制与触觉振动探针断言",
+    "route": "/finance/gift/record",
+    "level": "flow",
+    "persona": "gift_admin"
+  },
+  {
+    "caseId": "GIFT-E2E-MOBILE-QUICK-RECORD",
+    "title": "移动端快速记礼弹窗全流程与 Picker 联动",
+    "route": "/finance/gift/record",
+    "level": "flow",
+    "persona": "gift_admin"
+  },
+  {
+    "caseId": "GIFT-E2E-MOBILE-PERSON-PROFILE",
+    "title": "移动端亲友档案详情与净值统计展示",
+    "route": "/finance/gift/person/giftPersonDetail?id=101",
+    "level": "flow",
+    "persona": "gift_admin"
+  },
+  {
+    "caseId": "FINANCE-E2E-MOBILE-POCKET-BUDGET",
+    "title": "移动端零花钱卡片展开与预算设置全流程",
+    "route": "/finance/financeManager",
+    "level": "flow",
+    "persona": "gift_admin"
+  },
+  {
+    "caseId": "FINANCE-E2E-MOBILE-KEYPAD-RECORD",
+    "title": "移动端九宫格触觉反馈与数字键盘极速记账",
+    "route": "/finance/financeManager/financeManagerDetail",
+    "level": "flow",
+    "persona": "gift_admin"
+  },
+  {
+    "caseId": "GIFT-AI-MOBILE-BUDGET-001",
+    "title": "移动端零花钱预算 AI 智能测算与三档推荐采纳",
+    "route": "/finance/financeManager/budgetManage",
+    "level": "flow",
+    "persona": "gift_admin"
+  },
+  {
+    "caseId": "GIFT-AI-MOBILE-BUDGET-002",
+    "title": "移动端零花钱口语化指令解析回填与触觉振动",
+    "route": "/finance/financeManager/budgetManage",
+    "level": "flow",
+    "persona": "gift_admin"
+  },
+  {
+    "caseId": "BUDGET-MOBILE-STATUS-OVER",
+    "title": "移动端零花钱卡片超支状态机判定与负数超支展示",
+    "route": "/finance/financeManager",
+    "level": "flow",
+    "persona": "gift_admin"
+  },
+  {
+    "caseId": "RBAC-MOBILE-MEMBER-READONLY-NOTICE",
+    "title": "移动端普通成员预算只读模式与横幅提示",
+    "route": "/finance/financeManager/budgetManage",
+    "level": "flow",
+    "persona": "family_member"
+  },
+  {
+    "caseId": "FINANCE-AI-MOBILE-LEDGER-001",
+    "title": "移动端自然语言记账 ActionSheet 与键盘联动回填",
+    "route": "/finance/financeManager/financeManagerDetail",
+    "level": "flow",
+    "persona": "gift_admin"
+  },
+  {
+    "caseId": "FINANCE-AI-MOBILE-RECEIPT-002",
+    "title": "移动端购物小票识别与条目明细渲染断言",
+    "route": "/finance/financeManager/financeManagerDetail",
+    "level": "flow",
+    "persona": "gift_admin"
+  },
+  {
+    "caseId": "GIFT-E2E-MOBILE-BALANCE-HAPTIC",
+    "title": "移动端人情平衡矩阵卡片、AI回礼速算浮层与触觉振动闭环",
+    "route": "/finance/gift/analysis",
+    "level": "flow",
+    "persona": "gift_admin"
+  },
+  {
+    "caseId": "GIFT-E2E-MOBILE-GRAPH-HAPTIC",
+    "title": "移动端走势/人脉星阵切换与触觉微振动探针断言",
+    "route": "/finance/gift/analysis",
+    "level": "flow",
+    "persona": "gift_admin"
+  },
+  {
+    "caseId": "MESSAGE-MOBILE-SMOKE-001",
+    "title": "移动端消息中心、胶囊标签切换与全部已读",
+    "route": "/message",
+    "level": "flow",
+    "persona": "gift_admin"
+  },
+  {
+    "caseId": "MESSAGE-MOBILE-SMOKE-002",
+    "title": "移动端渠道偏好弹窗与开关交互",
+    "route": "/message",
+    "level": "flow",
+    "persona": "gift_admin"
+  }
 ]

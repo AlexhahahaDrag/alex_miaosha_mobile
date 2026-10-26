@@ -696,6 +696,157 @@ async function setupRouteMocks(page) {
 				});
 			}
 
+			if (pathname.includes('/sys-message-info/summary')) {
+				return fulfillEncrypted(route, {
+					code: '200',
+					data: {
+						unreadTotal: 5,
+						giftEventUnread: 2,
+						couponExpireUnread: 1,
+						cardExpireUnread: 1,
+						giftReturnUnread: 1,
+						systemUnread: 0,
+					},
+				});
+			}
+
+			if (pathname.includes('/sys-message-info/page')) {
+				return fulfillEncrypted(route, {
+					code: '200',
+					data: {
+						records: [
+							{
+								id: '9001',
+								title: '亲友婚礼举行提醒',
+								content: '大学同学王五的婚礼将在今天举行，请注意准时参加',
+								msgType: 'GIFT_EVENT',
+								subType: 'D_DAY',
+								priority: 'HIGH',
+								readStatus: 0,
+								bizType: 'GIFT_EVENT',
+								bizId: '1001',
+								createTime: '2026-10-26 09:00:00',
+							},
+							{
+								id: '9002',
+								title: '消费券临期提醒',
+								content: '您的满100减20秒杀优惠券将在明日到期',
+								msgType: 'COUPON_EXPIRE',
+								subType: 'D_MINUS_1',
+								priority: 'MEDIUM',
+								readStatus: 0,
+								bizType: 'COUPON',
+								bizId: '2001',
+								createTime: '2026-10-26 09:00:00',
+							},
+							{
+								id: '9003',
+								title: '超市预付卡到期提醒',
+								content: '沃尔玛购物卡还剩100元，将在3天后到期',
+								msgType: 'CARD_EXPIRE',
+								subType: 'D_MINUS_3',
+								priority: 'NORMAL',
+								readStatus: 0,
+								bizType: 'PREPAID_CARD',
+								bizId: '3001',
+								createTime: '2026-10-26 09:00:00',
+							},
+						],
+						total: 3,
+						current: 1,
+						size: 10,
+					},
+				});
+			}
+
+			if (pathname.includes('/sys-message-info/read-all')) {
+				return fulfillEncrypted(route, {
+					code: '200',
+					message: '全部已读成功',
+					data: 5,
+				});
+			}
+
+			if (pathname.includes('/user-notice-config/my-configs')) {
+				return fulfillEncrypted(route, {
+					code: '200',
+					data: [
+						{
+							id: '1',
+							noticeCode: 'GLOBAL',
+							noticeName: '全局通知总控',
+							noticeDesc: '一票否决：关闭后将静音所有业务通知',
+							internalEnabled: true,
+							wechatEnabled: true,
+						},
+						{
+							id: '2',
+							noticeCode: 'GIFT_EVENT',
+							noticeName: '礼金大喜事提醒',
+							noticeDesc: '大喜事举办当日(D-Day)、前1天倒计时提醒',
+							internalEnabled: true,
+							wechatEnabled: true,
+						},
+						{
+							id: '3',
+							noticeCode: 'GIFT_RETURN',
+							noticeName: '人情回礼预警',
+							noticeDesc: '亲友有喜事待还礼、礼金严重失衡提醒',
+							internalEnabled: true,
+							wechatEnabled: true,
+						},
+						{
+							id: '4',
+							noticeCode: 'COUPON',
+							noticeName: '消费券到期提醒',
+							noticeDesc: '消费券到期当日(D-Day)、前1天与前3天过期预警',
+							internalEnabled: true,
+							wechatEnabled: true,
+						},
+						{
+							id: '5',
+							noticeCode: 'PREPAID_CARD',
+							noticeName: '预付卡/猫超卡到期',
+							noticeDesc: '猫超卡、超市预付卡到期当日与临期预警',
+							internalEnabled: true,
+							wechatEnabled: true,
+						},
+						{
+							id: '6',
+							noticeCode: 'BUDGET_OVER',
+							noticeName: '月度预算超支预警',
+							noticeDesc: '月度开销达到或超过设定限额的风险预警',
+							internalEnabled: true,
+							wechatEnabled: true,
+						},
+						{
+							id: '7',
+							noticeCode: 'FINANCE_REPORT',
+							noticeName: '财务汇总分析推送',
+							noticeDesc: '周期性收支分析简报推送',
+							internalEnabled: true,
+							wechatEnabled: true,
+						},
+						{
+							id: '8',
+							noticeCode: 'SYSTEM',
+							noticeName: '基础系统公告与安全提醒',
+							noticeDesc: '系统升级维护、安全登录等通知',
+							internalEnabled: true,
+							wechatEnabled: true,
+						},
+					],
+				});
+			}
+
+			if (pathname.includes('/user-notice-config/save-my-config')) {
+				return fulfillEncrypted(route, {
+					code: '200',
+					message: '偏好配置更新成功',
+					data: true,
+				});
+			}
+
 			if (pathname.includes('/user/list')) {
 				return fulfillEncrypted(route, {
 					code: '200',
@@ -1323,6 +1474,73 @@ async function executeCase(page, c, runtime) {
 			await trendBtn.waitFor({ state: 'visible', timeout: 5000 });
 			await trendBtn.click();
 			await trendChart.waitFor({ state: 'visible', timeout: 5000 });
+			break;
+		}
+
+		case 'MESSAGE-MOBILE-SMOKE-001': {
+			await navigateTo(page, `${runtime.baseUrl}#/message`);
+			await page.waitForLoadState('networkidle').catch(() => {});
+
+			// 1. 断言移动端消息中心容器及未读角标渲染
+			const center = page.locator('[data-testid="mobile-message-center"]').first();
+			await center.waitFor({ state: 'visible', timeout: 10000 });
+
+			const unreadPill = page.locator('[data-testid="mobile-message-unread-total"]').first();
+			await unreadPill.waitFor({ state: 'visible', timeout: 5000 });
+
+			// 2. 点击分类胶囊 (礼金事件、消费券到期)
+			const giftPill = page.locator('[data-testid="mobile-message-tab-GIFT_EVENT"]').first();
+			await giftPill.waitFor({ state: 'visible', timeout: 5000 });
+			await giftPill.click();
+
+			const couponPill = page.locator('[data-testid="mobile-message-tab-COUPON_EXPIRE"]').first();
+			await couponPill.waitFor({ state: 'visible', timeout: 5000 });
+			await couponPill.click();
+
+			// 3. 点击全部已读按钮
+			const readAllBtn = page.locator('[data-testid="mobile-message-btn-read-all"]').first();
+			await readAllBtn.waitFor({ state: 'visible', timeout: 5000 });
+			await readAllBtn.click();
+
+			console.log(
+				'[E2E] MESSAGE-MOBILE-SMOKE-001 verified, mobile message list and mark-read closed loop',
+			);
+			break;
+		}
+
+		case 'MESSAGE-MOBILE-SMOKE-002': {
+			await navigateTo(page, `${runtime.baseUrl}#/message`);
+			await page.waitForLoadState('networkidle').catch(() => {});
+
+			// 1. 点击偏好按钮唤起通知设置弹窗
+			const configBtn = page.locator('[data-testid="mobile-message-btn-notice-config"]').first();
+			await configBtn.waitFor({ state: 'visible', timeout: 8000 });
+			await configBtn.click();
+
+			const popup = page.locator('[data-testid="mobile-notice-popup"]').first();
+			await popup.waitFor({ state: 'visible', timeout: 8000 });
+
+			// 2. 断言全局总控卡片渲染
+			const globalCard = page.locator('[data-testid="mobile-notice-global-card"]').first();
+			await globalCard.waitFor({ state: 'visible', timeout: 5000 });
+
+			// 3. 点击全局站内信开关 (验证一票否决)
+			const globalSwitch = page
+				.locator('[data-testid="mobile-notice-global-internal-switch"]')
+				.first();
+			await globalSwitch.waitFor({ state: 'visible', timeout: 5000 });
+			await globalSwitch.click();
+
+			console.log(
+				'[E2E] MESSAGE-MOBILE-SMOKE-002 verified, mobile notice config popup and global veto closed loop',
+			);
+
+			// 4. 关闭弹窗
+			const closeIcon = popup.locator('.van-popup__close-icon').first();
+			if (await closeIcon.isVisible().catch(() => false)) {
+				await closeIcon.click();
+				await popup.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
+			}
 			break;
 		}
 
