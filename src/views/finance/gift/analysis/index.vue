@@ -255,6 +255,7 @@
 
 <script setup lang="ts">
 import { showFailToast, showToast } from 'vant';
+import GiftAiInsightCard from '@/views/finance/gift/ai/GiftAiInsightCard.vue';
 import { triggerHaptic } from '@/utils/haptics';
 import { getGiftAnalysisOverview, getGiftBalanceMatrix, getGiftAnalysisTrend } from '@/views/finance/gift/analysis/api';
 import GiftReturnCalculatorPopup from '@/views/finance/gift/analysis/components/GiftReturnCalculatorPopup.vue';

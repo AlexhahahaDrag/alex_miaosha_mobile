@@ -237,6 +237,20 @@ async function switchMobilePersona(
 		},
 	);
 	await page.reload();
+	await page.waitForLoadState('networkidle').catch(() => {});
+}
+
+async function navigateTo(page, targetUrl) {
+	await page.goto(targetUrl);
+	const targetHash = targetUrl.includes('#') ? targetUrl.split('#')[1] : null;
+	if (targetHash) {
+		await page.evaluate((h) => {
+			if (!window.location.hash.includes(h)) {
+				window.location.hash = '#' + h;
+			}
+		}, targetHash);
+	}
+	await page.waitForLoadState('domcontentloaded').catch(() => {});
 }
 
 let isBudgetOverStatus = false;
@@ -575,6 +589,53 @@ async function setupRouteMocks(page) {
 				return fulfillEncrypted(route, {
 					code: '200',
 					data: ['餐饮美食', '交通出行', '数码电器', '服饰鞋包', '日用百货'],
+				});
+			}
+
+			if (pathname.includes('/finance-info/ai-parse')) {
+				let text = '';
+				try {
+					const body = route.request().postDataJSON();
+					text = body?.text || '';
+				} catch {
+					text = '';
+				}
+				const isReceipt = text.includes('小票') || text.includes('面包') || text.includes('牛奶');
+				if (isReceipt) {
+					return fulfillEncrypted(route, {
+						code: '200',
+						data: {
+							amount: 79.0,
+							name: '沃尔玛超市购物',
+							typeName: '超市日用',
+							typeCode: '日用',
+							incomeAndExpenses: 'expense',
+							fromSource: 'alipay',
+							fromSourceName: '支付宝',
+							infoDate: '2026-10-26 12:00:00',
+							parseEngine: 'AI_DEEPSEEK',
+							receiptItems: [
+								{ itemName: '鲜牛奶', quantity: 2, unitPrice: 9.25, subtotal: 18.5 },
+								{ itemName: '全麦面包', quantity: 1, unitPrice: 12.0, subtotal: 12.0 },
+								{ itemName: '纸巾', quantity: 3, unitPrice: 10.0, subtotal: 30.0 },
+							],
+						},
+					});
+				}
+				return fulfillEncrypted(route, {
+					code: '200',
+					data: {
+						amount: 128.5,
+						name: '麦当劳汉堡套餐',
+						typeName: '餐饮',
+						typeCode: '餐饮',
+						incomeAndExpenses: 'expense',
+						fromSource: 'wechat',
+						fromSourceName: '微信支付',
+						infoDate: '2026-10-26 12:30:00',
+						parseEngine: 'AI_DEEPSEEK',
+						description: '昨天中午和同事聚餐微信付了128.5元，麦当劳汉堡套餐',
+					},
 				});
 			}
 
@@ -1067,6 +1128,81 @@ async function executeCase(page, c, runtime) {
 			// 7. 点击返回列表回到财务主页并确认零花钱卡片可见
 			await backBtn.click();
 			await pocketCard.waitFor({ state: 'visible', timeout: 8000 });
+			break;
+		}
+
+		case 'FINANCE-AI-MOBILE-LEDGER-001': {
+			await navigateTo(page, `${runtime.baseUrl}#/finance/financeManager/financeManagerDetail`);
+			const openAiBtn = page.locator('[data-testid="mobile-btn-open-ai-sheet"]').first();
+			await openAiBtn.waitFor({ state: 'visible', timeout: 10000 });
+			await openAiBtn.click();
+
+			const sheet = page.locator('[data-testid="sheet-mobile-finance-ai"]').first();
+			await sheet.waitFor({ state: 'visible', timeout: 5000 });
+
+			const mealChip = sheet.locator('.chip-item:has-text("聚餐微信付128.5")').first();
+			await mealChip.waitFor({ state: 'visible', timeout: 3000 });
+			await mealChip.click();
+
+			const doParseBtn = sheet.locator('[data-testid="mobile-btn-do-ai-parse"]').first();
+			await doParseBtn.waitFor({ state: 'visible', timeout: 3000 });
+			await doParseBtn.click();
+
+			const previewCard = sheet.locator('[data-testid="mobile-card-ai-preview"]').first();
+			await previewCard.waitFor({ state: 'visible', timeout: 8000 });
+
+			const applyBtn = sheet.locator('[data-testid="mobile-btn-apply-ai-result"]').first();
+			await applyBtn.waitFor({ state: 'visible', timeout: 3000 });
+			await applyBtn.click();
+
+			await page.waitForFunction(
+				() => {
+					const el = document.querySelector('[data-testid="hero-amount-val"]');
+					return el && el.textContent && el.textContent.includes('128.5');
+				},
+				{ timeout: 5000 },
+			);
+			console.log('[E2E] FINANCE-AI-MOBILE-LEDGER-001 verified, amount=128.5');
+			break;
+		}
+
+		case 'FINANCE-AI-MOBILE-RECEIPT-002': {
+			await navigateTo(page, `${runtime.baseUrl}#/finance/financeManager/financeManagerDetail`);
+			const openAiBtn = page.locator('[data-testid="mobile-btn-open-ai-sheet"]').first();
+			await openAiBtn.waitFor({ state: 'visible', timeout: 10000 });
+			await openAiBtn.click();
+
+			const sheet = page.locator('[data-testid="sheet-mobile-finance-ai"]').first();
+			await sheet.waitFor({ state: 'visible', timeout: 5000 });
+
+			const receiptChip = sheet.locator('.chip-item:has-text("超市小票清单")').first();
+			await receiptChip.waitFor({ state: 'visible', timeout: 3000 });
+			await receiptChip.click();
+
+			const doParseBtn = sheet.locator('[data-testid="mobile-btn-do-ai-parse"]').first();
+			await doParseBtn.waitFor({ state: 'visible', timeout: 3000 });
+			await doParseBtn.click();
+
+			const receiptList = sheet.locator('.receipt-items-list').first();
+			await receiptList.waitFor({ state: 'visible', timeout: 8000 });
+
+			const items = receiptList.locator('.receipt-line');
+			const count = await items.count();
+			if (count < 1) {
+				throw new Error(`Expected mobile receipt items count >= 1, got: ${count}`);
+			}
+			console.log(`[E2E] FINANCE-AI-MOBILE-RECEIPT-002 verified, receipt item count=${count}`);
+
+			const closeBtn = sheet.locator('.van-action-sheet__close').first();
+			if (await closeBtn.isVisible().catch(() => false)) {
+				await closeBtn.click();
+			} else {
+				const overlay = page.locator('.van-overlay').first();
+				if (await overlay.isVisible().catch(() => false)) {
+					await overlay.click({ position: { x: 10, y: 10 } }).catch(() => undefined);
+				}
+			}
+			await sheet.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => undefined);
 			break;
 		}
 

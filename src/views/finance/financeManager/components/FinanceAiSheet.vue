@@ -395,7 +395,7 @@ const handleParse = async () => {
 				text: inputText.value.trim(),
 				belongTo: props.belongTo != null ? String(props.belongTo) : undefined,
 			});
-			if (code === 200 || code === '00000') {
+			if (code === 200 || code === '200' || code === '00000') {
 				parsedResult.value = normalizeParsedResult(data);
 				if (data.reasoning) {
 					streamingThought.value = data.reasoning;
