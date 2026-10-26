@@ -43,13 +43,25 @@
 
 <script lang="ts" setup>
 import { useRouter } from 'vue-router';
-import type { TabBarInfo } from '@/composables/useTabBar';
+
+export interface TabBarItemConfig {
+	name: string;
+	title?: string;
+	icon?: string;
+}
+
+export interface TabBarProps {
+	visible?: boolean;
+	data?: (string | TabBarItemConfig)[];
+	active?: number | string;
+	badges?: Record<string, number | string>;
+}
 
 const router = useRouter();
 
 const curActive = ref<string | number>(0);
 
-const props = defineProps<TabBarInfo>();
+const props = defineProps<TabBarProps>();
 
 const formatBadge = (raw?: number | string): string | undefined => {
 	if (raw === undefined || raw === null || raw === '' || raw === 0 || raw === '0') {
