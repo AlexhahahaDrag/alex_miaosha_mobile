@@ -84,7 +84,7 @@ onMounted(() => {
 	// 初始化时若在浏览器环境，根据视口高度计算合适位置
 	if (typeof window !== 'undefined') {
 		const screenH = window.innerHeight;
-		topPos.value = Math.max(120, screenH - 180);
+		topPos.value = Math.max(120, screenH - 165);
 	}
 });
 
@@ -138,8 +138,8 @@ const handleClick = () => {
 .mobile-ai-floating-bubble {
 	position: fixed;
 	z-index: 990;
-	width: 58px;
-	height: 58px;
+	width: 56px;
+	height: 56px;
 	border-radius: 50%;
 	display: flex;
 	align-items: center;
@@ -147,9 +147,15 @@ const handleClick = () => {
 	cursor: pointer;
 	user-select: none;
 	touch-action: none;
+	opacity: 0.94;
 	transition:
-		transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+		transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+		opacity 0.2s ease,
 		box-shadow 0.2s ease;
+
+	&:hover {
+		opacity: 1;
+	}
 
 	&.is-dragging {
 		transition: none;

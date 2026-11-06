@@ -1,13 +1,19 @@
 <template>
 	<van-swipe-cell
-		class="finance-card-row"
+		:class="['finance-card-row', { 'finance-card-row--bordered': !isLast }]"
 		:disabled="!canDelete"
 	>
 		<div
 			class="finance-card-row__content"
 			@click="handleClick"
 		>
-			<div :class="['finance-card-row__icon', iconToneClass]">
+			<div
+				class="finance-card-row__icon"
+				:style="{
+					backgroundColor: sceneTheme.iconBg,
+					color: sceneTheme.iconColor,
+				}"
+			>
 				<svg-icon
 					v-if="sourceIcon?.label"
 					:name="sourceIcon.label"
@@ -26,16 +32,19 @@
 						{{ displayTitle }}
 					</div>
 					<div
-						v-if="typeLabel"
-						:class="['finance-card-row__tag', amountToneClass]"
+						v-if="shouldShowTypeLabel"
+						class="finance-card-row__tag"
+						:style="{
+							color: sceneTheme.tagText,
+							backgroundColor: sceneTheme.tagBg,
+						}"
 					>
 						{{ typeLabel }}
 					</div>
 				</div>
 
 				<div class="finance-card-row__meta">
-					<span>{{ recordTime }}</span>
-					<span>{{ sourceName }}</span>
+					<span>{{ recordTime }} · {{ displaySubtitle }}</span>
 				</div>
 			</div>
 
@@ -43,9 +52,7 @@
 				<div :class="['finance-card-row__amount', amountToneClass]">
 					{{ formattedAmount }}
 				</div>
-				<div class="finance-card-row__account">
-					{{ accountName }}
-				</div>
+				<div class="finance-card-row__account"> {{ directionPrefix }} {{ accountName }} </div>
 			</div>
 		</div>
 
@@ -75,10 +82,21 @@ import {
 	type FromSourceTransferItem,
 } from '@/views/finance/financeManager/config';
 
+interface SceneTheme {
+	iconColor: string;
+	iconBg: string;
+	tagText: string;
+	tagBg: string;
+}
+
 const props = defineProps({
 	item: {
 		type: Object as PropType<FinanceManagerData>,
 		required: true,
+	},
+	isLast: {
+		type: Boolean,
+		default: false,
 	},
 });
 
@@ -86,10 +104,8 @@ const emit = defineEmits(['click', 'delete']);
 
 const displayTitle = computed(() => {
 	const item = props.item;
-	return item.name || item.description || item.belongToName || '未命名账单';
+	return item.name || '转账';
 });
-
-const typeLabel = computed(() => props.item.typeName || props.item.typeCode || '');
 
 const sourceIcon = computed<FromSourceTransferItem | null>(() => {
 	if (!props.item.fromSource) {
@@ -98,15 +114,78 @@ const sourceIcon = computed<FromSourceTransferItem | null>(() => {
 	return fromSourceTransferList.find((source) => props.item.fromSource?.includes(source.value)) || null;
 });
 
-const sourceName = computed(() => props.item.fromSourceName || sourceIcon.value?.name || '未知来源');
+const sourceName = computed(() => props.item.fromSourceName || sourceIcon.value?.name || '');
+
+const displaySubtitle = computed(() => {
+	const item = props.item;
+	if (item.description && item.description.trim()) {
+		return item.description.trim();
+	}
+	if (sourceName.value && sourceName.value.trim()) {
+		return sourceName.value.trim();
+	}
+	return item.typeName || '日常账单';
+});
+
+const typeLabel = computed(() => props.item.typeName || props.item.typeCode || '');
+
+const shouldShowTypeLabel = computed(() => {
+	if (!typeLabel.value) return false;
+	const title = displayTitle.value.trim().toLowerCase();
+	const type = typeLabel.value.trim().toLowerCase();
+	return title !== type;
+});
+
+const sceneTheme = computed<SceneTheme>(() => {
+	const text =
+		`${props.item.name || ''} ${props.item.description || ''} ${props.item.typeName || ''} ${sourceName.value || ''}`.toLowerCase();
+
+	if (text.includes('话费') || text.includes('通讯') || text.includes('通信') || text.includes('手机')) {
+		return {
+			iconColor: '#F97316',
+			iconBg: '#FFF7ED',
+			tagText: '#EA580C',
+			tagBg: '#FFEDD5',
+		};
+	}
+	if (text.includes('水') || text.includes('用水') || text.includes('水利')) {
+		return {
+			iconColor: '#0284C7',
+			iconBg: '#F0F9FF',
+			tagText: '#0369A1',
+			tagBg: '#E0F2FE',
+		};
+	}
+	if (text.includes('燃气') || text.includes('采暖') || text.includes('天然气') || text.includes('煤气')) {
+		return {
+			iconColor: '#E11D48',
+			iconBg: '#FFF1F2',
+			tagText: '#BE123C',
+			tagBg: '#FFE4E6',
+		};
+	}
+	if (text.includes('电') || text.includes('供电') || text.includes('能源')) {
+		return {
+			iconColor: '#16A34A',
+			iconBg: '#F0FDF4',
+			tagText: '#15803D',
+			tagBg: '#DCFCE7',
+		};
+	}
+	// 银行卡 / 纯资金转账 / 通用
+	return {
+		iconColor: '#6366F1',
+		iconBg: '#EEF2FF',
+		tagText: '#4338CA',
+		tagBg: '#E0F2FE',
+	};
+});
 
 const accountName = computed(() => props.item.belongToName || '个人账户');
 
-const amountToneClass = computed(() => (props.item.incomeAndExpenses === 'income' ? 'is-income' : 'is-expense'));
+const directionPrefix = computed(() => (props.item.incomeAndExpenses === 'income' ? '来自' : '转给'));
 
-const iconToneClass = computed(() =>
-	props.item.incomeAndExpenses === 'income' ? 'finance-card-row__icon--income' : 'finance-card-row__icon--expense',
-);
+const amountToneClass = computed(() => (props.item.incomeAndExpenses === 'income' ? 'is-income' : 'is-expense'));
 
 const formattedAmount = computed(() => {
 	const amount = Number(props.item.amount || 0);
@@ -151,46 +230,43 @@ const onDelete = () => {
 <style lang="less" scoped>
 .finance-card-row {
 	overflow: hidden;
+	background: #ffffff;
 
-	&:not(:last-child) {
-		border-bottom: 1px solid #f1f4f9;
+	&--bordered {
+		border-bottom: 1px solid #f1f5f9;
 	}
 
 	&__content {
 		display: grid;
-		grid-template-columns: 42px minmax(0, 1fr) auto;
+		grid-template-columns: 40px minmax(0, 1fr) auto;
 		gap: 12px;
 		align-items: center;
-		padding: 14px 16px;
-		background: transparent;
+		padding: 12px 14px;
+		background: #ffffff;
+		transition: background-color 0.15s ease;
+
+		&:active {
+			background: #f8fafc;
+		}
 	}
 
 	&__icon {
-		width: 42px;
-		height: 42px;
-		border-radius: 50%;
+		width: 40px;
+		height: 40px;
+		border-radius: 12px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-
-		&--income {
-			background: linear-gradient(135deg, #effbf2 0%, #f8fffa 100%);
-			color: #24a148;
-		}
-
-		&--expense {
-			background: linear-gradient(135deg, #fff1f1 0%, #fff8f8 100%);
-			color: #e5484d;
-		}
+		flex-shrink: 0;
 	}
 
 	&__source-icon {
-		width: 18px;
-		height: 18px;
+		width: 20px;
+		height: 20px;
 	}
 
 	&__fallback-icon {
-		font-size: 18px;
+		font-size: 19px;
 	}
 
 	&__main {
@@ -200,15 +276,15 @@ const onDelete = () => {
 	&__top {
 		display: flex;
 		align-items: center;
-		gap: 8px;
+		gap: 6px;
 	}
 
 	&__title {
 		flex: 0 1 auto;
 		min-width: 0;
-		font-size: 14px;
+		font-size: 15px;
 		font-weight: 600;
-		color: #24324a;
+		color: #1e293b;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
@@ -216,19 +292,19 @@ const onDelete = () => {
 
 	&__tag {
 		flex-shrink: 0;
-		padding: 3px 8px;
+		padding: 2px 7px;
 		border-radius: 999px;
-		font-size: 10px;
+		font-size: 10.5px;
 		font-weight: 600;
+		line-height: 1.2;
 	}
 
 	&__meta {
 		display: flex;
 		align-items: center;
-		gap: 8px;
-		margin-top: 6px;
-		font-size: 11px;
-		color: #8b97ab;
+		margin-top: 4px;
+		font-size: 13px;
+		color: #475569;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -238,20 +314,31 @@ const onDelete = () => {
 		display: flex;
 		flex-direction: column;
 		align-items: flex-end;
-		gap: 6px;
+		gap: 3px;
 		margin-left: 8px;
 	}
 
 	&__amount {
-		font-size: 16px;
+		font-family: 'DIN Alternate', 'Roboto Mono', ui-monospace, SFMono-Regular, monospace;
+		font-variant-numeric: tabular-nums;
+		letter-spacing: -0.02em;
+		font-size: 16.5px;
 		font-weight: 700;
-		line-height: 1;
+		line-height: 1.1;
+
+		&.is-income {
+			color: #059669;
+		}
+
+		&.is-expense {
+			color: #dc2626;
+		}
 	}
 
 	&__account {
 		font-size: 11px;
-		color: #8b97ab;
-		max-width: 88px;
+		color: #64748b;
+		max-width: 100px;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
@@ -261,21 +348,5 @@ const onDelete = () => {
 		height: 100%;
 		border: none;
 	}
-}
-
-.is-income {
-	color: #24a148;
-	background: rgba(36, 161, 72, 0.1);
-}
-
-.is-expense {
-	color: #e5484d;
-	background: rgba(229, 72, 77, 0.1);
-}
-
-.finance-card-row__amount.is-income,
-.finance-card-row__amount.is-expense {
-	background: transparent;
-	padding: 0;
 }
 </style>

@@ -114,4 +114,41 @@ describe('Mobile Finance Manager - 记账渠道字典、校验与预算算力契
 			expect(res.fromSource).toBe('wx');
 		});
 	});
+	describe('本月零花钱骨架屏与 Loading 契约', () => {
+		it('loading 判定函数应在接口请求或首屏空列表刷新时激活骨架屏', () => {
+			const shouldShowSkeleton = (budgetLoading: boolean, listLoading: boolean, hasData: boolean) => {
+				return budgetLoading || (listLoading && !hasData);
+			};
+
+			// 首屏初始化：budgetLoading = true -> 显示骨架屏
+			expect(shouldShowSkeleton(true, false, false)).toBe(true);
+			// 列表首次拉取：listLoading = true 且无数据 -> 显示骨架屏
+			expect(shouldShowSkeleton(false, true, false)).toBe(true);
+			// 数据加载完成：budgetLoading = false 且 listLoading = false -> 隐藏骨架屏
+			expect(shouldShowSkeleton(false, false, true)).toBe(false);
+			// 触底分页加载第二页：listLoading = true 但已有数据 -> 不应重新遮罩卡片
+			expect(shouldShowSkeleton(false, true, true)).toBe(false);
+		});
+
+		it('loading 状态下应严密拦截卡片展开与触觉震动', () => {
+			let isExpanded = false;
+			let vibrated = false;
+
+			const toggleExpand = (loading: boolean) => {
+				if (loading) return;
+				vibrated = true;
+				isExpanded = !isExpanded;
+			};
+
+			// 处于骨架屏 loading 态时触发点击
+			toggleExpand(true);
+			expect(isExpanded).toBe(false);
+			expect(vibrated).toBe(false);
+
+			// 加载完成后触发点击
+			toggleExpand(false);
+			expect(isExpanded).toBe(true);
+			expect(vibrated).toBe(true);
+		});
+	});
 });

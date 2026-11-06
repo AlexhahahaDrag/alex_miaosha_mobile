@@ -2,169 +2,197 @@
 	<!-- 本月零花钱预算卡片 (随列表自然滚动，不吸顶) -->
 	<section
 		class="pocket-money-card"
-		:class="{ 'pocket-money-card--expanded': isBudgetCardExpanded }"
+		:class="{
+			'pocket-money-card--expanded': !loading && isBudgetCardExpanded,
+			'pocket-money-card--loading': loading,
+		}"
 		data-testid="pocket-money-card"
 	>
-		<!-- 紧凑常驻条 (平时仅展示标题、余额与百分比，点击触发折叠/展开) -->
-		<div
-			class="pocket-money-header"
-			data-testid="pocket-money-header"
-			@click="toggleBudgetCardExpand"
-		>
-			<div class="pocket-money-title">
-				<div class="title-icon-box">
-					<van-icon
-						name="balance-o"
-						class="title-icon"
-					/>
+		<!-- 骨架屏态 (1:1 物理高度对齐，零 CLS 抖动，微脉冲质感) -->
+		<template v-if="loading">
+			<div
+				class="pocket-money-skeleton"
+				data-testid="pocket-money-skeleton"
+			>
+				<div class="skeleton-left">
+					<div class="skeleton-box skeleton-icon" />
+					<div class="skeleton-box skeleton-title" />
+					<div class="skeleton-box skeleton-badge" />
 				</div>
-				<span class="title-text">本月零花钱</span>
-				<span
-					v-if="budgetHealthStatus"
-					class="health-badge"
-					data-testid="budget-health-badge"
-					:style="{
-						color: budgetHealthStatus.color,
-						backgroundColor: budgetHealthStatus.bgColor,
-						borderColor: `${budgetHealthStatus.color}33`,
-					}"
-				>
-					<span
-						class="health-dot"
-						:style="{ backgroundColor: budgetHealthStatus.color }"
-					/>
-					<span>{{ budgetHealthStatus.text }}</span>
-				</span>
+				<div class="skeleton-right">
+					<div class="skeleton-box skeleton-metric" />
+					<div class="skeleton-box skeleton-pill" />
+				</div>
 			</div>
+			<!-- 底边骨架微进度条 -->
+			<div class="ambient-progress-track ambient-progress-track--skeleton">
+				<div class="ambient-progress-bar ambient-progress-bar--skeleton" />
+			</div>
+		</template>
 
-			<div class="pocket-money-summary">
-				<div class="summary-metric">
-					<span class="metric-label">剩余</span>
+		<!-- 真实内容展示态 -->
+		<template v-else>
+			<!-- 紧凑常驻条 (平时仅展示标题、余额与百分比，点击触发折叠/展开) -->
+			<div
+				class="pocket-money-header"
+				data-testid="pocket-money-header"
+				@click="toggleBudgetCardExpand"
+			>
+				<div class="pocket-money-title">
+					<div class="title-icon-box">
+						<van-icon
+							name="balance-o"
+							class="title-icon"
+						/>
+					</div>
+					<span class="title-text">本月零花钱</span>
 					<span
-						:class="['metric-val', (budgetStatus?.remainingAmount ?? 0) < 0 ? 'over' : 'remain']"
-						data-testid="metric-remaining-amount"
+						v-if="budgetHealthStatus"
+						class="health-badge"
+						data-testid="budget-health-badge"
+						:style="{
+							color: budgetHealthStatus.color,
+							backgroundColor: budgetHealthStatus.bgColor,
+							borderColor: `${budgetHealthStatus.color}33`,
+						}"
 					>
-						<span class="currency-symbol">{{ (budgetStatus?.remainingAmount ?? 0) < 0 ? '-¥' : '¥' }}</span>{{ formatAmount(Math.abs(budgetStatus?.remainingAmount || 0)) }}
+						<span
+							class="health-dot"
+							:style="{ backgroundColor: budgetHealthStatus.color }"
+						/>
+						<span>{{ budgetHealthStatus.text }}</span>
 					</span>
 				</div>
-				<span class="percent-pill"> {{ budgetStatus?.usagePercent || 0 }}% </span>
-				<div class="toggle-arrow-btn">
-					<van-icon
-						name="arrow-down"
-						class="toggle-arrow"
-					/>
-				</div>
-			</div>
-		</div>
 
-		<!-- 折叠态常驻底边微环境进度条 (Taste-Skill 隐式状态感知) -->
-		<div
-			v-if="!isBudgetCardExpanded && Number(budgetStatus?.budgetAmount || 0) > 0"
-			class="ambient-progress-track"
-		>
-			<div
-				class="ambient-progress-bar"
-				:style="{
-					width: `${Math.max(0, Math.min(100, Number(budgetStatus?.usagePercent || 0)))}%`,
-					backgroundColor: progressColor,
-				}"
-			/>
-		</div>
-
-		<!-- 展开后的完整详细面板 -->
-		<transition name="expand">
-			<div
-				v-show="isBudgetCardExpanded"
-				class="pocket-money-body"
-			>
-				<div class="amount-main">
-					<div class="amount-item amount-card">
-						<div class="amount-label">月度预算</div>
-						<div class="amount-value budget">
-							<span class="amount-currency">¥</span>{{ formatAmount(budgetStatus?.budgetAmount) }}
-						</div>
-					</div>
-					<div
-						class="amount-item amount-card amount-card--clickable"
-						@click.stop="drillDownBudgetMonth"
-					>
-						<div class="amount-label flex items-center justify-center gap-0.5">
-							<span>{{ mobileSpentLabel }}</span>
-							<span class="drill-tag">明细›</span>
-						</div>
-						<div
-							:class="[
-								'amount-value',
-								(budgetStatus?.actualExpense ?? 0) <= 0 ? 'surplus' : budgetStatus?.isOverBudget ? 'over' : 'expense',
-							]"
-							title="点击联动查看当月已计明细"
-						>
-							<span class="amount-currency">{{ (budgetStatus?.actualExpense ?? 0) < 0 ? '-¥' : '¥' }}</span>{{ formatAmount(Math.abs(budgetStatus?.actualExpense || 0)) }}
-						</div>
-					</div>
-					<div class="amount-item amount-card">
-						<div class="amount-label">剩余额度</div>
-						<div :class="['amount-value', (budgetStatus?.remainingAmount ?? 0) < 0 ? 'over' : 'remain']">
-							<span class="amount-currency">{{ (budgetStatus?.remainingAmount ?? 0) < 0 ? '-¥' : '¥' }}</span>{{ formatAmount(Math.abs(budgetStatus?.remainingAmount || 0)) }}
-						</div>
-					</div>
-				</div>
-
-				<van-progress
-					:percentage="Math.max(0, Math.min(100, Number(budgetStatus?.usagePercent || 0)))"
-					:color="progressColor"
-					:pivot-text="`${budgetStatus?.usagePercent || 0}%`"
-					class="pocket-money-progress"
-					stroke-width="6"
-				/>
-
-				<div class="pocket-money-footer">
-					<div class="pocket-money-tags">
-						<span class="tag-desc">统计分类:</span>
-						<template v-if="cleanedCategoryList.length">
-							<van-tag
-								v-for="cat in displayCategoryList"
-								:key="cat"
-								plain
-								round
-								size="small"
-								class="category-tag"
-							>
-								{{ cat }}
-							</van-tag>
-							<button
-								v-if="cleanedCategoryList.length > 4"
-								type="button"
-								class="tag-expand-btn"
-								@click.stop="toggleCategoriesExpand"
-							>
-								{{ isCategoriesExpanded ? '收起 ∧' : `+${cleanedCategoryList.length - 4}项 ∨` }}
-							</button>
-						</template>
+				<div class="pocket-money-summary">
+					<div class="summary-metric">
+						<span class="metric-label">剩余</span>
 						<span
-							v-else
-							class="tag-all"
+							:class="['metric-val', (budgetStatus?.remainingAmount ?? 0) < 0 ? 'over' : 'remain']"
+							data-testid="metric-remaining-amount"
 						>
-							{{ mobileDirectionLabel }}
+							<span class="currency-symbol">{{ (budgetStatus?.remainingAmount ?? 0) < 0 ? '-¥' : '¥' }}</span>{{ formatAmount(Math.abs(budgetStatus?.remainingAmount || 0)) }}
 						</span>
 					</div>
-
-					<van-button
-						v-if="hasViewPermission"
-						size="small"
-						plain
-						round
-						type="primary"
-						icon="setting-o"
-						class="btn-edit-action"
-						data-testid="btn-edit-budget"
-						@click.stop="handleOpenManage"
-					>
-						{{ canEditBudget ? '预算设置' : '预算详情' }}
-					</van-button>
+					<span class="percent-pill"> {{ budgetStatus?.usagePercent || 0 }}% </span>
+					<div class="toggle-arrow-btn">
+						<van-icon
+							name="arrow-down"
+							class="toggle-arrow"
+						/>
+					</div>
 				</div>
 			</div>
-		</transition>
+
+			<!-- 折叠态常驻底边微环境进度条 (Taste-Skill 隐式状态感知) -->
+			<div
+				v-if="!isBudgetCardExpanded && Number(budgetStatus?.budgetAmount || 0) > 0"
+				class="ambient-progress-track"
+			>
+				<div
+					class="ambient-progress-bar"
+					:style="{
+						width: `${Math.max(0, Math.min(100, Number(budgetStatus?.usagePercent || 0)))}%`,
+						backgroundColor: progressColor,
+					}"
+				/>
+			</div>
+
+			<!-- 展开后的完整详细面板 -->
+			<transition name="expand">
+				<div
+					v-show="isBudgetCardExpanded"
+					class="pocket-money-body"
+				>
+					<div class="amount-main">
+						<div class="amount-item amount-card">
+							<div class="amount-label">月度预算</div>
+							<div class="amount-value budget">
+								<span class="amount-currency">¥</span>{{ formatAmount(budgetStatus?.budgetAmount) }}
+							</div>
+						</div>
+						<div
+							class="amount-item amount-card amount-card--clickable"
+							@click.stop="drillDownBudgetMonth"
+						>
+							<div class="amount-label flex items-center justify-center gap-0.5">
+								<span>{{ mobileSpentLabel }}</span>
+								<span class="drill-tag">明细›</span>
+							</div>
+							<div
+								:class="[
+									'amount-value',
+									(budgetStatus?.actualExpense ?? 0) <= 0 ? 'surplus' : budgetStatus?.isOverBudget ? 'over' : 'expense',
+								]"
+								title="点击联动查看当月已计明细"
+							>
+								<span class="amount-currency">{{ (budgetStatus?.actualExpense ?? 0) < 0 ? '-¥' : '¥' }}</span>{{ formatAmount(Math.abs(budgetStatus?.actualExpense || 0)) }}
+							</div>
+						</div>
+						<div class="amount-item amount-card">
+							<div class="amount-label">剩余额度</div>
+							<div :class="['amount-value', (budgetStatus?.remainingAmount ?? 0) < 0 ? 'over' : 'remain']">
+								<span class="amount-currency">{{ (budgetStatus?.remainingAmount ?? 0) < 0 ? '-¥' : '¥' }}</span>{{ formatAmount(Math.abs(budgetStatus?.remainingAmount || 0)) }}
+							</div>
+						</div>
+					</div>
+
+					<van-progress
+						:percentage="Math.max(0, Math.min(100, Number(budgetStatus?.usagePercent || 0)))"
+						:color="progressColor"
+						:pivot-text="`${budgetStatus?.usagePercent || 0}%`"
+						class="pocket-money-progress"
+						stroke-width="6"
+					/>
+
+					<div class="pocket-money-footer">
+						<div class="pocket-money-tags">
+							<span class="tag-desc">统计分类:</span>
+							<template v-if="cleanedCategoryList.length">
+								<van-tag
+									v-for="cat in displayCategoryList"
+									:key="cat"
+									plain
+									round
+									size="small"
+									class="category-tag"
+								>
+									{{ cat }}
+								</van-tag>
+								<button
+									v-if="cleanedCategoryList.length > 4"
+									type="button"
+									class="tag-expand-btn"
+									@click.stop="toggleCategoriesExpand"
+								>
+									{{ isCategoriesExpanded ? '收起 ∧' : `+${cleanedCategoryList.length - 4}项 ∨` }}
+								</button>
+							</template>
+							<span
+								v-else
+								class="tag-all"
+							>
+								{{ mobileDirectionLabel }}
+							</span>
+						</div>
+
+						<van-button
+							v-if="hasViewPermission"
+							size="small"
+							plain
+							round
+							type="primary"
+							icon="setting-o"
+							class="btn-edit-action"
+							data-testid="btn-edit-budget"
+							@click.stop="handleOpenManage"
+						>
+							{{ canEditBudget ? '预算设置' : '预算详情' }}
+						</van-button>
+					</div>
+				</div>
+			</transition>
+		</template>
 	</section>
 </template>
 
@@ -175,11 +203,13 @@ interface Props {
 	budgetStatus: FinanceBudgetStatusVo | null;
 	canEditBudget?: boolean;
 	hasViewPermission?: boolean;
+	loading?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
 	canEditBudget: false,
 	hasViewPermission: false,
+	loading: false,
 });
 
 const emit = defineEmits<{
@@ -191,6 +221,7 @@ const isBudgetCardExpanded = ref<boolean>(false);
 const isCategoriesExpanded = ref<boolean>(false);
 
 const toggleBudgetCardExpand = () => {
+	if (props.loading) return;
 	if (navigator.vibrate) navigator.vibrate(20);
 	isBudgetCardExpanded.value = !isBudgetCardExpanded.value;
 };
@@ -282,20 +313,93 @@ const displayCategoryList = computed(() => {
 .pocket-money-card {
 	position: relative;
 	margin: 8px 12px 6px;
-	padding: 10px 12px;
-	background: linear-gradient(180deg, #ffffff 0%, #fafcff 100%);
+	padding: 11px 14px;
+	background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
 	border-radius: 16px;
 	box-shadow:
-		0 1px 3px rgba(0, 0, 0, 0.02),
-		0 4px 12px rgba(22, 119, 255, 0.04);
-	border: 1px solid rgba(226, 232, 240, 0.85);
+		0 1px 3px rgba(15, 23, 42, 0.04),
+		0 4px 16px rgba(59, 130, 246, 0.08);
+	border: 1px solid rgba(191, 219, 254, 0.85);
 	overflow: hidden;
 	transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 
+	&--loading {
+		pointer-events: none;
+		user-select: none;
+	}
+
+	.pocket-money-skeleton {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		min-height: 28px;
+
+		.skeleton-left {
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			flex-shrink: 0;
+
+			.skeleton-icon {
+				width: 24px;
+				height: 24px;
+				border-radius: 7px;
+			}
+
+			.skeleton-title {
+				width: 62px;
+				height: 15px;
+				border-radius: 4px;
+			}
+
+			.skeleton-badge {
+				width: 48px;
+				height: 16px;
+				border-radius: 8px;
+			}
+		}
+
+		.skeleton-right {
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			flex-shrink: 0;
+
+			.skeleton-metric {
+				width: 68px;
+				height: 15px;
+				border-radius: 4px;
+			}
+
+			.skeleton-pill {
+				width: 32px;
+				height: 17px;
+				border-radius: 10px;
+			}
+		}
+
+		.skeleton-box {
+			background: rgba(147, 197, 253, 0.45);
+			animation: shimmer-pulse 1.6s ease-in-out infinite;
+		}
+	}
+
+	.ambient-progress-track--skeleton {
+		background: rgba(191, 219, 254, 0.5);
+
+		.ambient-progress-bar--skeleton {
+			width: 45%;
+			height: 100%;
+			border-radius: 0 2px 2px 0;
+			background: linear-gradient(90deg, rgba(96, 165, 250, 0.4) 0%, rgba(59, 130, 246, 0.7) 100%);
+			animation: shimmer-pulse 1.6s ease-in-out infinite;
+		}
+	}
+
 	&--expanded {
-		padding: 12px 14px 14px;
-		box-shadow: 0 4px 20px rgba(22, 119, 255, 0.07);
-		border-color: rgba(147, 197, 253, 0.45);
+		padding: 13px 14px 15px;
+		box-shadow: 0 4px 20px rgba(59, 130, 246, 0.12);
+		border-color: rgba(147, 197, 253, 0.9);
 
 		.toggle-arrow-btn {
 			transform: rotate(180deg);
@@ -330,7 +434,7 @@ const displayCategoryList = computed(() => {
 				width: 24px;
 				height: 24px;
 				border-radius: 7px;
-				background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+				background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
 				display: flex;
 				align-items: center;
 				justify-content: center;
@@ -339,7 +443,7 @@ const displayCategoryList = computed(() => {
 
 				.title-icon {
 					font-size: 13.5px;
-					color: #2563eb;
+					color: #4f46e5;
 				}
 			}
 
@@ -400,12 +504,8 @@ const displayCategoryList = computed(() => {
 				}
 
 				.metric-val {
-					font-family:
-						'DIN Alternate',
-						-apple-system,
-						BlinkMacSystemFont,
-						Roboto,
-						sans-serif;
+					font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'DIN Alternate', monospace;
+					font-variant-numeric: tabular-nums;
 					font-size: 14.5px;
 					font-weight: 700;
 					letter-spacing: -0.3px;
@@ -622,5 +722,15 @@ const displayCategoryList = computed(() => {
 .expand-leave-to {
 	max-height: 0;
 	opacity: 0;
+}
+
+@keyframes shimmer-pulse {
+	0%,
+	100% {
+		opacity: 0.55;
+	}
+	50% {
+		opacity: 0.95;
+	}
 }
 </style>

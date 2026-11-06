@@ -17,26 +17,30 @@
 						@clear="onCancel"
 					/>
 				</form>
-				<van-button
-					type="primary"
-					plain
-					icon="filter-o"
+				<button
+					type="button"
 					class="search-shell__filter-btn"
+					aria-label="筛选"
 					@click="onToggleFilterPanel"
-				/>
-				<van-button
-					type="success"
-					icon="fire-o"
-					class="search-shell__ai-btn ml-1"
+				>
+					<van-icon name="filter-o" />
+				</button>
+				<button
+					type="button"
+					class="search-shell__ai-btn"
 					data-testid="mobile-btn-index-ai-ledger"
 					@click="showAiSheet = true"
 				>
-					AI记账
-				</van-button>
+					<van-icon
+						name="fire-o"
+						class="search-shell__ai-icon"
+					/>
+					<span>AI记账</span>
+				</button>
 			</div>
 
 			<div class="quick-time-bar">
-				<div class="quick-time-bar__list">
+				<div class="quick-time-bar__tray">
 					<button
 						v-for="item in quickTimeOptions"
 						:key="item.value"
@@ -101,6 +105,7 @@
 		>
 			<!-- ① 独立拆解的本月零花钱卡片子组件 -->
 			<pocket-money-card
+				:loading="budgetLoading || (loading && !dataSource.length)"
 				:budget-status="budgetStatus"
 				:can-edit-budget="canEditBudget"
 				:has-view-permission="hasPermission(['finance:financeManager:budget:view', 'finance:financeManager:budget:edit'])"
@@ -158,25 +163,34 @@
 					>
 						<header class="date-group__header">
 							<div class="date-group__title">
-								<span>{{ formatHeaderDate(group.date) }}</span>
+								<span class="date-group__date-text">{{ formatHeaderDate(group.date) }}</span>
 								<span class="date-group__weekday">{{ getWeekdayLabel(group.date) }}</span>
 							</div>
 							<div class="date-group__summary">
-								<span v-if="Number(group.expense) > 0">支出 {{ formatCurrency(group.expense) }}</span>
-								<span v-if="Number(group.income) > 0">收入 {{ formatCurrency(group.income) }}</span>
+								<span
+									v-if="Number(group.expense) > 0"
+									class="summary-expense"
+								>支出 {{ formatCurrency(group.expense) }}</span>
+								<span
+									v-if="Number(group.income) > 0"
+									class="summary-income"
+								>收入 {{ formatCurrency(group.income) }}</span>
 							</div>
 						</header>
 
 						<div class="date-group__body">
-							<transition-group name="list">
-								<finance-card
-									v-for="item in group.items"
-									:key="item.id"
-									:item="item"
-									@click="handleCardClick"
-									@delete="onDeleteFinance"
-								/>
-							</transition-group>
+							<div class="date-group__card">
+								<transition-group name="list">
+									<finance-card
+										v-for="(item, itemIndex) in group.items"
+										:key="item.id"
+										:item="item"
+										:is-last="itemIndex === group.items.length - 1"
+										@click="handleCardClick"
+										@delete="onDeleteFinance"
+									/>
+								</transition-group>
+							</div>
 						</div>
 					</section>
 				</div>
@@ -203,9 +217,6 @@
 			:belong-to="searchInfo.belongTo"
 			@apply="onApplyAiFromIndex"
 		/>
-
-		<!-- AI 悬浮球入口 (支持拖拽吸附与微触觉反馈) -->
-		<mobile-ai-floating-bubble @click="showAiSheet = true" />
 	</div>
 </template>
 
@@ -215,7 +226,6 @@ import { useRoute, useRouter } from 'vue-router';
 import FinanceCard from '@/views/finance/financeManager/components/FinanceCard.vue';
 import PocketMoneyCard from '@/views/finance/financeManager/components/PocketMoneyCard.vue';
 import FinanceAiSheet from '@/views/finance/financeManager/components/FinanceAiSheet.vue';
-import MobileAiFloatingBubble from '@/views/finance/financeManager/components/MobileAiFloatingBubble.vue';
 import type {
 	UniversalFinanceAiParseVo,
 	FinanceManagerData,
@@ -339,7 +349,10 @@ const drillDownBudgetMonth = () => {
 	showSuccessToast('已联动筛选本月明细');
 };
 
+const budgetLoading = ref<boolean>(false);
+
 const loadBudgetStatus = async () => {
+	budgetLoading.value = true;
 	try {
 		const { code, data } = await getBudgetStatus(currentMonthStr.value, searchInfo.value.belongTo);
 		if (code === '200' && data) {
@@ -348,6 +361,8 @@ const loadBudgetStatus = async () => {
 		}
 	} catch (e) {
 		console.error('获取零花钱预算状态失败:', e);
+	} finally {
+		budgetLoading.value = false;
 	}
 };
 
@@ -531,7 +546,7 @@ onMounted(() => {
 .finance-manager-page {
 	padding-bottom: 74px;
 	min-height: 100vh;
-	background-color: var(--page-bg, #f4f6fa);
+	background-color: #f1f5f9;
 }
 
 .page-search {
@@ -539,8 +554,8 @@ onMounted(() => {
 	top: 0;
 	z-index: 20;
 	padding: 10px 12px 8px;
-	background: var(--card-bg, #ffffff);
-	box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+	background: #ffffff;
+	box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
 
 	.search-shell {
 		display: flex;
@@ -553,6 +568,12 @@ onMounted(() => {
 
 		.search-bar {
 			padding: 0;
+
+			:deep(.van-search__content) {
+				background: #ffffff;
+				border: 1px solid #e2e8f0;
+				border-radius: 999px;
+			}
 		}
 
 		&__filter-btn {
@@ -560,47 +581,89 @@ onMounted(() => {
 			height: 38px;
 			padding: 0;
 			border-radius: 12px;
-			font-size: 16px;
-			border-color: #dbeafe;
-			color: #2563eb;
-			background: #eff6ff;
+			font-size: 17px;
+			border: 1px solid rgba(226, 232, 240, 0.9);
+			color: #475569;
+			background: #f8fafc;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			cursor: pointer;
+			transition: all 0.2s ease;
+
+			&:active {
+				background: #f1f5f9;
+				color: #4f46e5;
+				transform: scale(0.96);
+			}
+		}
+
+		&__ai-btn {
+			height: 38px;
+			padding: 0 12px;
+			border-radius: 12px;
+			font-size: 13px;
+			font-weight: 600;
+			color: #4338ca;
+			background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+			border: 1px solid rgba(199, 210, 254, 0.8);
+			box-shadow: 0 1px 2px rgba(79, 70, 229, 0.06);
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			gap: 4px;
+			cursor: pointer;
+			white-space: nowrap;
+			transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+			.search-shell__ai-icon {
+				font-size: 15px;
+				color: #4f46e5;
+			}
+
+			&:active {
+				transform: scale(0.96);
+				background: #e0e7ff;
+			}
 		}
 	}
 
 	.quick-time-bar {
-		margin-top: 10px;
-		overflow-x: auto;
-		-webkit-overflow-scrolling: touch;
+		margin-top: 8px;
 
-		&::-webkit-scrollbar {
-			display: none;
-		}
-
-		&__list {
-			display: flex;
-			align-items: center;
-			gap: 8px;
-			padding-bottom: 2px;
+		&__tray {
+			display: grid;
+			grid-auto-flow: column;
+			grid-auto-columns: minmax(0, 1fr);
+			gap: 4px;
+			padding: 3px;
+			background: #f1f5f9;
+			border-radius: 14px;
 		}
 
 		.quick-time-chip {
-			border: 1px solid #e2e8f0;
-			background: #f8fafc;
+			border: 0;
+			background: transparent;
 			color: #64748b;
-			border-radius: 16px;
+			border-radius: 11px;
 			font-size: 12px;
+			font-weight: 500;
 			line-height: 1;
-			padding: 7px 12px;
+			padding: 7px 4px;
+			text-align: center;
 			cursor: pointer;
 			white-space: nowrap;
-			transition: all 0.2s ease;
+			transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
 			&--active {
-				color: #ffffff;
-				background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-				border-color: #2563eb;
+				color: #4338ca;
+				background: #ffffff;
 				font-weight: 600;
-				box-shadow: 0 2px 6px rgba(37, 99, 235, 0.28);
+				box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08);
+			}
+
+			&:active:not(&--active) {
+				background: rgba(255, 255, 255, 0.6);
 			}
 		}
 	}
@@ -623,7 +686,7 @@ onMounted(() => {
 			border: none;
 			background: transparent;
 			font-size: 12px;
-			color: #2563eb;
+			color: #4f46e5;
 			cursor: pointer;
 			padding: 0 4px;
 		}
@@ -632,46 +695,60 @@ onMounted(() => {
 
 .refresh-info {
 	min-height: calc(100vh - 180px);
+
+	:deep(.list-wrapper) {
+		padding: 0 !important;
+	}
 }
 
 .card-list {
-	padding: 6px 12px 16px;
+	padding: 4px 12px 20px;
 
 	.date-group {
-		margin-bottom: 12px;
+		margin-bottom: 14px;
 
 		&__header {
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
 			padding: 8px 4px 6px;
-			font-size: 12px;
-			color: #64748b;
 		}
 
 		&__title {
 			display: flex;
 			align-items: center;
 			gap: 6px;
+			font-size: 14px;
 			font-weight: 600;
-			color: #334155;
+			color: #1e293b;
 		}
 
 		&__weekday {
-			font-weight: normal;
-			color: #94a3b8;
+			font-size: 12px;
+			font-weight: 500;
+			color: #64748b;
 		}
 
 		&__summary {
 			display: flex;
-			gap: 8px;
-			font-size: 11px;
+			align-items: center;
+			gap: 10px;
+			font-size: 12px;
+			font-family: 'DIN Alternate', ui-monospace, SFMono-Regular, monospace;
+			font-variant-numeric: tabular-nums;
+			color: #64748b;
 		}
 
 		&__body {
-			display: flex;
-			flex-direction: column;
-			gap: 8px;
+			.date-group__card {
+				background: #ffffff;
+				border-radius: 16px;
+				box-shadow:
+					0 1px 3px rgba(15, 23, 42, 0.04),
+					0 4px 16px rgba(15, 23, 42, 0.03);
+				border: 1px solid rgba(226, 232, 240, 0.8);
+				overflow: hidden;
+			}
 		}
 	}
 }

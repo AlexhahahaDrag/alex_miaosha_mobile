@@ -271,19 +271,31 @@ import type {
 } from '@/views/finance/financeManager/config';
 import { triggerHaptic } from '@/utils/haptics';
 
-const props = defineProps<{
-	modelValue: boolean;
+interface FinanceAiSheetProps {
+	modelValue?: boolean;
+	show?: boolean;
 	belongTo?: string | number;
-}>();
+}
+
+const props = withDefaults(defineProps<FinanceAiSheetProps>(), {
+	modelValue: undefined,
+	show: undefined,
+	belongTo: undefined,
+});
 
 const emit = defineEmits<{
 	(e: 'update:modelValue', val: boolean): void;
+	(e: 'update:show', val: boolean): void;
 	(e: 'apply', result: UniversalFinanceAiParseVo): void;
+	(e: 'success', result: UniversalFinanceAiParseVo): void;
 }>();
 
 const visible = computed({
-	get: () => props.modelValue,
-	set: (val: boolean) => emit('update:modelValue', val),
+	get: () => (props.modelValue !== undefined ? props.modelValue : (props.show ?? false)),
+	set: (val: boolean) => {
+		emit('update:modelValue', val);
+		emit('update:show', val);
+	},
 });
 
 const scene = ref<UniversalFinanceAiParseReq['scene']>('AUTO_DETECT');
@@ -425,6 +437,7 @@ const handleApply = () => {
 	if (!parsedResult.value) return;
 	triggerHaptic('light');
 	emit('apply', parsedResult.value);
+	emit('success', parsedResult.value);
 	visible.value = false;
 };
 

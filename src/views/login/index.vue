@@ -1,60 +1,78 @@
 <template>
 	<div class="login-container">
+		<!-- 顶部柔和 Indigo 环境微光球 (Taste-Skill Soft UI 氛围层) -->
+		<div
+			class="ambient-orb ambient-orb--indigo"
+			aria-hidden="true"
+		></div>
+		<div
+			class="ambient-orb ambient-orb--violet"
+			aria-hidden="true"
+		></div>
+
 		<div class="login-content">
 			<header class="login-header">
 				<div class="logo-box">
-					<div class="logo-inner">
-						<img
-							src="/logo.svg"
-							alt="logo"
-							class="logo-icon"
-						/>
-					</div>
+					<img
+						src="/logo.svg"
+						alt="logo"
+						class="logo-icon"
+					/>
 				</div>
 				<h1 class="brand-title">alex系统管理平台</h1>
-				<p class="brand-subtitle">企业级通用管理终端</p>
+				<div class="brand-badge">
+					<span class="brand-badge__dot"></span>
+					<span class="brand-badge__text">企业级通用管理终端</span>
+				</div>
 			</header>
 
 			<main class="login-card">
 				<div class="card-inner">
-					<div class="card-glow"></div>
 					<van-form
-						@submit="onSubmit"
 						class="login-form"
+						@submit="onSubmit"
 					>
 						<div class="form-fields">
 							<div class="field-group">
 								<label
 									for="login-username"
 									class="field-label"
-								>用户名</label>
+								>
+									用户名
+								</label>
 								<van-field
 									id="login-username"
 									v-model="loginForm.username"
 									name="username"
+									data-testid="mobile-login-username"
 									placeholder="请输入用户名"
 									left-icon="manager"
-									class="glass-field"
+									clearable
+									class="soft-field"
 									:rules="[{ required: true, message: '请输入用户名' }]"
 								/>
 							</div>
+
 							<div class="field-group">
 								<label
 									for="login-password"
 									class="field-label"
-								>密码</label>
+								>
+									密码
+								</label>
 								<van-field
 									id="login-password"
 									v-model="loginForm.password"
 									:type="showPassword ? 'text' : 'password'"
 									name="password"
+									data-testid="mobile-login-password"
 									placeholder="请输入密码"
 									left-icon="lock"
 									:right-icon="showPassword ? 'eye-o' : 'closed-eye'"
-									class="glass-field"
-									@click-right-icon="showPassword = !showPassword"
-									:rules="[{ required: true, message: '请输入密码' }]"
+									class="soft-field"
 									autocomplete="on"
+									:rules="[{ required: true, message: '请输入密码' }]"
+									@click-right-icon="showPassword = !showPassword"
 								/>
 							</div>
 						</div>
@@ -65,8 +83,11 @@
 								block
 								type="primary"
 								native-type="submit"
+								data-testid="mobile-login-submit"
 								class="login-btn"
 								:loading="submitLoading"
+								loading-type="circular"
+								loading-size="18px"
 								loading-text="验证中..."
 							>
 								安全登录
@@ -74,9 +95,24 @@
 						</div>
 
 						<div class="form-links">
-							<span class="link-item">忘记密码？</span>
-							<div class="link-divider"></div>
-							<span class="link-item">注册账号</span>
+							<button
+								type="button"
+								class="link-btn"
+								data-testid="mobile-login-forgot"
+							>
+								忘记密码？
+							</button>
+							<span
+								class="link-divider"
+								aria-hidden="true"
+							></span>
+							<button
+								type="button"
+								class="link-btn link-btn--primary"
+								data-testid="mobile-login-register"
+							>
+								注册账号
+							</button>
 						</div>
 					</van-form>
 				</div>
@@ -88,7 +124,7 @@
 					<span class="dot">·</span>
 					<span>安全协议</span>
 				</div>
-				<p class="copyright">2026 Alex 系统架构。保留所有权利。</p>
+				<p class="copyright">2026 Alex 系统架构 · 保留所有权利</p>
 			</footer>
 		</div>
 	</div>
@@ -152,11 +188,35 @@ const onSubmit = async () => {
 	height: 100dvh;
 	width: 100%;
 	box-sizing: border-box;
-	background: radial-gradient(circle at center, #f0f7ff 0%, #f8fafc 100%);
+	background-color: #f8fafc;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	overflow: hidden;
+}
+
+.ambient-orb {
+	position: absolute;
+	border-radius: 9999px;
+	filter: blur(48px);
+	pointer-events: none;
+	z-index: 1;
+
+	&--indigo {
+		top: -60px;
+		left: -40px;
+		width: 240px;
+		height: 240px;
+		background: radial-gradient(circle, rgba(79, 106, 246, 0.14) 0%, rgba(79, 106, 246, 0) 70%);
+	}
+
+	&--violet {
+		bottom: 10%;
+		right: -50px;
+		width: 220px;
+		height: 220px;
+		background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, rgba(139, 92, 246, 0) 70%);
+	}
 }
 
 .login-content {
@@ -167,7 +227,7 @@ const onSubmit = async () => {
 	height: 100%;
 	min-height: 0;
 	box-sizing: border-box;
-	padding: max(16px, env(safe-area-inset-top)) clamp(24px, 8vw, 40px) max(14px, env(safe-area-inset-bottom));
+	padding: max(18px, env(safe-area-inset-top)) clamp(22px, 6vw, 36px) max(16px, env(safe-area-inset-bottom));
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -177,28 +237,21 @@ const onSubmit = async () => {
 
 .login-header {
 	text-align: center;
-	margin-bottom: clamp(18px, 4vh, 32px);
+	margin-bottom: clamp(20px, 3.8vh, 30px);
 	flex-shrink: 0;
 
 	.logo-box {
-		width: 48px;
-		height: 48px;
-		background: rgba(255, 255, 255, 0.6);
-		backdrop-filter: blur(10px);
-		border-radius: 14px;
+		width: 56px;
+		height: 56px;
+		background: #ffffff;
+		border-radius: 18px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		margin: 0 auto 8px;
-		border: 1px solid rgba(255, 255, 255, 0.8);
-
-		.logo-inner {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			width: 100%;
-			height: 100%;
-		}
+		margin: 0 auto 12px;
+		box-shadow:
+			0 10px 25px -5px rgba(79, 106, 246, 0.16),
+			0 2px 6px rgba(15, 23, 42, 0.04);
 
 		.logo-icon {
 			width: 34px;
@@ -208,19 +261,35 @@ const onSubmit = async () => {
 	}
 
 	.brand-title {
-		font-size: 20px;
+		font-size: 22px;
 		font-weight: 800;
-		color: #1e293b;
-		margin-bottom: 2px;
-		letter-spacing: 0;
+		color: #0f172a;
+		margin: 0 0 8px;
+		letter-spacing: -0.3px;
+		line-height: 1.25;
 	}
 
-	.brand-subtitle {
-		font-size: 11px;
-		color: #64748b;
-		font-weight: 500;
-		text-transform: uppercase;
-		letter-spacing: 1.5px;
+	.brand-badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		padding: 4px 12px;
+		border-radius: 9999px;
+		background: rgba(79, 106, 246, 0.1);
+		color: #4f46e5;
+
+		&__dot {
+			width: 6px;
+			height: 6px;
+			border-radius: 9999px;
+			background: #4f6af6;
+		}
+
+		&__text {
+			font-size: 11px;
+			font-weight: 600;
+			letter-spacing: 0.5px;
+		}
 	}
 }
 
@@ -228,59 +297,90 @@ const onSubmit = async () => {
 	width: 100%;
 	flex-shrink: 0;
 	position: relative;
-	background: rgba(255, 255, 255, 0.7);
-	backdrop-filter: blur(24px);
-	border-radius: 28px;
-	border: 1px solid rgba(255, 255, 255, 0.6);
-	box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.05);
-	padding: 4px;
+	background: #ffffff;
+	border-radius: 24px;
+	border: none;
+	box-shadow:
+		0 12px 32px -8px rgba(15, 23, 42, 0.06),
+		0 2px 10px rgba(15, 23, 42, 0.03);
 
 	.card-inner {
-		padding: 16px 20px;
-		z-index: 2;
-	}
-
-	.card-glow {
-		position: absolute;
-		top: -50px;
-		right: -50px;
-		width: 100px;
-		height: 100px;
-		background: radial-gradient(circle, rgba(37, 99, 235, 0.05) 0%, transparent 70%);
-		pointer-events: none;
+		padding: 22px 20px 18px;
 	}
 }
 
 .form-fields {
 	display: flex;
 	flex-direction: column;
-	gap: 12px;
+	gap: 14px;
 }
 
 .field-group {
 	.field-label {
 		display: block;
-		font-size: 10px;
-		font-weight: 700;
-		color: #64748b;
-		text-transform: uppercase;
-		letter-spacing: 1px;
-		margin-left: 8px;
-		margin-bottom: 4px;
+		font-size: 12px;
+		font-weight: 600;
+		color: #475569;
+		margin-left: 4px;
+		margin-bottom: 6px;
 	}
 
-	.glass-field {
-		background: rgba(255, 255, 255, 0.5);
-		border: 1px solid #e2e8f0;
+	.soft-field {
+		background: #f8fafc;
+		border: 1.5px solid transparent;
 		border-radius: 16px;
-		padding: 10px 14px;
+		padding: 11px 14px;
+		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
-		:deep(.van-field__control) {
-			font-size: 15px;
+		&:focus-within {
+			background: #ffffff;
+			border-color: rgba(79, 106, 246, 0.45);
+			box-shadow: 0 0 0 4px rgba(79, 106, 246, 0.1);
+
+			:deep(.van-field__left-icon) {
+				color: #4f46e5;
+			}
 		}
 
 		:deep(.van-field__left-icon) {
+			margin-right: 10px;
+			color: #94a3b8;
 			font-size: 18px;
+			display: flex;
+			align-items: center;
+			transition: color 0.2s ease;
+		}
+
+		:deep(.van-field__right-icon) {
+			color: #94a3b8;
+			font-size: 17px;
+			display: flex;
+			align-items: center;
+		}
+
+		:deep(.van-field__control) {
+			font-size: 15px;
+			font-weight: 500;
+			color: #0f172a;
+			background: transparent !important;
+
+			&::placeholder {
+				color: #94a3b8;
+				font-weight: 400;
+			}
+
+			/* 彻底消除浏览器自动填充浅蓝矩形底色穿帮 */
+			&:-webkit-autofill,
+			&:-webkit-autofill:hover,
+			&:-webkit-autofill:focus,
+			&:-webkit-autofill:active {
+				-webkit-text-fill-color: #0f172a !important;
+				-webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+				box-shadow: 0 0 0 1000px transparent inset !important;
+				background-color: transparent !important;
+				background-clip: content-box !important;
+				transition: background-color 99999s ease-in-out 0s;
+			}
 		}
 
 		&::after {
@@ -290,13 +390,46 @@ const onSubmit = async () => {
 }
 
 .form-action {
-	margin-top: 16px;
+	margin-top: 20px;
 
 	.login-btn {
 		height: 48px;
-		font-size: 16px;
-		font-weight: 700;
-		background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+		border-radius: 16px !important;
+		border: none !important;
+		font-size: 15px;
+		font-weight: 600;
+		letter-spacing: 0.5px;
+		color: #ffffff !important;
+		background: linear-gradient(135deg, #4f6af6 0%, #6366f1 100%) !important;
+		box-shadow: 0 8px 20px -4px rgba(79, 106, 246, 0.35);
+		transition:
+			transform 0.15s ease,
+			box-shadow 0.2s ease;
+
+		&:active {
+			transform: scale(0.985);
+		}
+
+		:deep(.van-button__content) {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			gap: 6px;
+			line-height: 1;
+		}
+
+		:deep(.van-loading) {
+			display: inline-flex;
+			align-items: center;
+			color: #ffffff !important;
+		}
+
+		:deep(.van-button__loading-text) {
+			margin-left: 6px;
+			font-size: 15px;
+			font-weight: 600;
+			color: #ffffff;
+		}
 	}
 }
 
@@ -304,42 +437,69 @@ const onSubmit = async () => {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	margin-top: 12px;
+	margin-top: 14px;
+	gap: 4px;
 
-	.link-item {
+	.link-btn {
+		border: none;
+		background: transparent;
 		font-size: 12px;
-		color: #2563eb;
+		font-weight: 500;
+		color: #64748b;
+		padding: 6px 10px;
+		border-radius: 10px;
+		cursor: pointer;
+		transition:
+			color 0.15s ease,
+			background-color 0.15s ease;
+
+		&:active {
+			background-color: #f1f5f9;
+			color: #0f172a;
+		}
+
+		&--primary {
+			color: #4f46e5;
+			font-weight: 600;
+
+			&:active {
+				background-color: rgba(79, 106, 246, 0.08);
+				color: #4338ca;
+			}
+		}
 	}
 
 	.link-divider {
 		width: 1px;
-		height: 10px;
+		height: 12px;
 		background: #e2e8f0;
-		margin: 0 8px;
 	}
 }
 
 .login-footer {
 	text-align: center;
-	margin-top: clamp(14px, 4vh, 24px);
+	margin-top: clamp(18px, 4vh, 28px);
 	flex-shrink: 0;
 
 	.footer-links {
 		display: flex;
 		justify-content: center;
+		align-items: center;
 		gap: 8px;
 		margin-bottom: 4px;
-		color: #94a3b8;
-		font-size: 10px;
+		color: #64748b;
+		font-size: 11px;
+		font-weight: 500;
 
 		.dot {
-			opacity: 0.5;
+			color: #cbd5e1;
 		}
 	}
 
 	.copyright {
-		font-size: 9px;
-		color: #cbd5e1;
+		margin: 0;
+		font-size: 10px;
+		color: #94a3b8;
 	}
 }
 
@@ -353,25 +513,21 @@ const onSubmit = async () => {
 		margin-bottom: 14px;
 
 		.logo-box {
-			width: 42px;
-			height: 42px;
-			margin-bottom: 6px;
+			width: 46px;
+			height: 46px;
+			margin-bottom: 8px;
 		}
 
 		.brand-title {
-			font-size: 18px;
-		}
-
-		.brand-subtitle {
-			font-size: 10px;
+			font-size: 19px;
 		}
 	}
 
 	.login-card {
-		border-radius: 22px;
+		border-radius: 20px;
 
 		.card-inner {
-			padding: 14px 18px;
+			padding: 16px 18px 14px;
 		}
 	}
 
@@ -380,13 +536,13 @@ const onSubmit = async () => {
 	}
 
 	.field-group {
-		.glass-field {
-			padding: 8px 12px;
+		.soft-field {
+			padding: 9px 12px;
 		}
 	}
 
 	.form-action {
-		margin-top: 14px;
+		margin-top: 16px;
 
 		.login-btn {
 			height: 44px;
@@ -411,8 +567,8 @@ const onSubmit = async () => {
 		margin-bottom: 10px;
 
 		.logo-box {
-			width: 36px;
-			height: 36px;
+			width: 40px;
+			height: 40px;
 		}
 	}
 }
