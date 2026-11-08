@@ -476,7 +476,10 @@ onMounted(() => {
 <style lang="less" scoped>
 .transaction-history {
 	width: 100%;
-	min-height: 100vh;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
 	position: relative;
 }
 
@@ -512,10 +515,16 @@ onMounted(() => {
 }
 
 .main-content {
-	padding: 10px;
+	flex: 1;
+	min-height: 0;
+	padding: 10px 10px 72px;
 	display: flex;
 	flex-direction: column;
 	gap: 24px;
+	:deep(.common-pull-refresh-wrapper) {
+		flex: 1;
+		min-height: 0;
+	}
 	background: linear-gradient(to bottom, #f2f3f5, #f2f3f5);
 }
 

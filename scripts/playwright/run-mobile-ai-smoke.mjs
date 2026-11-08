@@ -124,7 +124,7 @@ const mockMenus = [
 				id: '601',
 				name: 'financeManager',
 				title: '收支记账',
-				path: '/finance/financeManager',
+				path: '/selfFinance/financeManager',
 				component: '/src/views/finance/financeManager/index.vue',
 				permissionCode: 'finance:financeManager:query',
 			},
@@ -132,16 +132,16 @@ const mockMenus = [
 				id: '602',
 				name: 'financeBudgetManage',
 				title: '预算管理',
-				path: '/finance/financeManager/budgetManage',
-				component: '/src/views/finance/financeManager/budgetManage/index.vue',
+				path: '/selfFinance/financeManager/budgetManage',
+				component: '/src/views/selfFinance/financeManager/budgetManage/index.vue',
 				permissionCode: 'finance:financeManager:budget:view',
 			},
 			{
 				id: '603',
 				name: 'financeManagerDetail',
 				title: '记账明细',
-				path: '/finance/financeManager/financeManagerDetail',
-				component: '/src/views/finance/financeManager/financeManagerDetail/index.vue',
+				path: '/selfFinance/financeManager/financeManagerDetail',
+				component: '/src/views/selfFinance/financeManager/financeManagerDetail/index.vue',
 				permissionCode: 'finance:financeManager:add',
 			},
 		],
@@ -1021,7 +1021,7 @@ async function executeCase(page, c, runtime) {
 
 		case 'GIFT-AI-MOBILE-BUDGET-001': {
 			isBudgetOverStatus = false;
-			await page.goto(`${runtime.baseUrl}#/finance/financeManager/budgetManage`);
+			await page.goto(`${runtime.baseUrl}#/selfFinance/financeManager/budgetManage`);
 
 			// 1. 等待适度推荐胶囊就绪（组件挂载时自闭环测算）
 			const moderateCell = page.locator('[data-testid="btn-mobile-apply-moderate"]').first();
@@ -1050,7 +1050,7 @@ async function executeCase(page, c, runtime) {
 
 		case 'GIFT-AI-MOBILE-BUDGET-002': {
 			isBudgetOverStatus = false;
-			await page.goto(`${runtime.baseUrl}#/finance/financeManager/budgetManage`);
+			await page.goto(`${runtime.baseUrl}#/selfFinance/financeManager/budgetManage`);
 
 			// 1. 展开口语指令区
 			const cmdInput = page.locator('[data-testid="mobile-ai-command-input"]').first();
@@ -1092,7 +1092,7 @@ async function executeCase(page, c, runtime) {
 		case 'BUDGET-MOBILE-STATUS-OVER': {
 			isBudgetOverStatus = true;
 			await page.goto(`${runtime.baseUrl}#/dashboard`);
-			await page.goto(`${runtime.baseUrl}#/finance/financeManager`);
+			await page.goto(`${runtime.baseUrl}#/selfFinance/financeManager`);
 
 			// 1. 等待零花钱大盘卡片渲染
 			const card = page.locator('[data-testid="pocket-money-card"]').first();
@@ -1119,7 +1119,7 @@ async function executeCase(page, c, runtime) {
 		}
 
 		case 'FINANCE-E2E-MOBILE-POCKET-BUDGET': {
-			await page.goto(`${runtime.baseUrl}#/finance/financeManager`);
+			await page.goto(`${runtime.baseUrl}#/selfFinance/financeManager`);
 
 			// 1. 等待零花钱卡片出现
 			const pocketCard = page.locator('[data-testid="pocket-money-card"]').first();
@@ -1170,7 +1170,7 @@ async function executeCase(page, c, runtime) {
 		}
 
 		case 'FINANCE-E2E-MOBILE-KEYPAD-RECORD': {
-			await page.goto(`${runtime.baseUrl}#/finance/financeManager/financeManagerDetail`);
+			await page.goto(`${runtime.baseUrl}#/selfFinance/financeManager/financeManagerDetail`);
 
 			// 1. 等待分类九宫格渲染
 			const foodCategory = page.locator('[data-testid="category-cell-餐饮"]').first();
@@ -1225,7 +1225,7 @@ async function executeCase(page, c, runtime) {
 
 		case 'RBAC-MOBILE-MEMBER-READONLY-NOTICE': {
 			// 1. 访问收支记账主页
-			await page.goto(`${runtime.baseUrl}#/finance/financeManager`);
+			await page.goto(`${runtime.baseUrl}#/selfFinance/financeManager`);
 
 			// 2. 展开零花钱卡片，断言按钮文案为“预算详情”（非管理员不可编辑）
 			const pocketCard = page.locator('[data-testid="pocket-money-card"]').first();
@@ -1283,7 +1283,7 @@ async function executeCase(page, c, runtime) {
 		}
 
 		case 'FINANCE-AI-MOBILE-LEDGER-001': {
-			await navigateTo(page, `${runtime.baseUrl}#/finance/financeManager/financeManagerDetail`);
+			await navigateTo(page, `${runtime.baseUrl}#/selfFinance/financeManager/financeManagerDetail`);
 			const openAiBtn = page.locator('[data-testid="mobile-btn-open-ai-sheet"]').first();
 			await openAiBtn.waitFor({ state: 'visible', timeout: 10000 });
 			await openAiBtn.click();
@@ -1318,7 +1318,7 @@ async function executeCase(page, c, runtime) {
 		}
 
 		case 'FINANCE-AI-MOBILE-RECEIPT-002': {
-			await navigateTo(page, `${runtime.baseUrl}#/finance/financeManager/financeManagerDetail`);
+			await navigateTo(page, `${runtime.baseUrl}#/selfFinance/financeManager/financeManagerDetail`);
 			const openAiBtn = page.locator('[data-testid="mobile-btn-open-ai-sheet"]').first();
 			await openAiBtn.waitFor({ state: 'visible', timeout: 10000 });
 			await openAiBtn.click();

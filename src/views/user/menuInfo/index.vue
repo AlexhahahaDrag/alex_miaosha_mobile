@@ -29,6 +29,7 @@ import { showFailToast } from 'vant';
 import { useNavBar } from '@/composables/useNavBar';
 import { getMenuInfoTree } from '@/views/user/menuInfo/api';
 import type { MenuInfoData } from '@/views/user/menuInfo/config';
+import MenuTreeItem from '@/views/user/menuInfo/menuTreeItem.vue';
 
 const router = useRouter();
 const route = useRoute();

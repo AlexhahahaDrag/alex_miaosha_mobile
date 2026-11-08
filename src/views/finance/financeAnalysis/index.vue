@@ -71,6 +71,9 @@ import type { UserManagerData } from '@/views/user/userManager/api';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
 import { triggerHaptic } from '@/utils/haptics';
+import Overview from '@/views/finance/financeAnalysis/financeAnalysisDetail/overview.vue';
+import IncomeAnalysis from '@/views/finance/financeAnalysis/financeAnalysisDetail/incomeAnalysis.vue';
+import IncomeDetail from '@/views/finance/financeAnalysis/financeAnalysisDetail/incomeDetail.vue';
 
 const route = useRoute();
 

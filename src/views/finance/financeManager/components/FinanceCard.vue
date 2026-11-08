@@ -319,9 +319,6 @@ const onDelete = () => {
 	}
 
 	&__amount {
-		font-family: 'DIN Alternate', 'Roboto Mono', ui-monospace, SFMono-Regular, monospace;
-		font-variant-numeric: tabular-nums;
-		letter-spacing: -0.02em;
 		font-size: 16.5px;
 		font-weight: 700;
 		line-height: 1.1;

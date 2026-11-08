@@ -35,7 +35,8 @@
 			v-else
 			v-model:loading="listLoading"
 			:finished="finished"
-			:immediate-check="true"
+			:offset="offset"
+			:immediate-check="immediateCheck"
 			:finished-text="finishedText"
 			@load="onLoad"
 		>
@@ -95,11 +96,37 @@ const props = defineProps({
 		type: String,
 		default: '- 已经到底啦 -',
 	},
+	offset: {
+		type: [Number, String],
+		default: 50,
+	},
+	immediateCheck: {
+		type: Boolean,
+		default: true,
+	},
 });
 
+const internalLoading = ref(props.modelValue);
+
+watch(
+	() => props.modelValue,
+	async (val) => {
+		if (val) {
+			internalLoading.value = true;
+			return;
+		}
+		await nextTick();
+		await nextTick();
+		internalLoading.value = props.modelValue;
+	},
+);
+
 const listLoading = computed({
-	get: () => props.modelValue,
-	set: (val) => emit('update:modelValue', val),
+	get: () => internalLoading.value,
+	set: (val) => {
+		internalLoading.value = val;
+		emit('update:modelValue', val);
+	},
 });
 
 // [Methods]

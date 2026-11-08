@@ -1,5 +1,6 @@
 <template>
 	<div class="finance-detail-container">
+		<!-- 只读权限拦截提示条 -->
 		<div
 			v-if="formInfo.id && !canEditRecord"
 			class="detail-readonly-banner"
@@ -11,203 +12,301 @@
 			<span>此账单由家庭成员记入，仅创建人与家庭管理员可修改</span>
 		</div>
 
-		<!-- 1. 顶部收支分段切换 (Segmented Tabs) 与 AI 智能记账快捷入口 -->
-		<div class="segment-wrapper flex justify-between items-center">
-			<div class="segment-bar">
-				<button
-					type="button"
-					:class="['segment-tab', { active: formInfo.incomeAndExpenses === 'expense' }]"
-					@click="switchDirection('expense')"
-				>
-					<span class="tab-dot dot-expense"></span>
-					支出
-				</button>
-				<button
-					type="button"
-					:class="['segment-tab', { active: formInfo.incomeAndExpenses === 'income' }]"
-					@click="switchDirection('income')"
-				>
-					<span class="tab-dot dot-income"></span>
-					收入
-				</button>
-			</div>
-			<button
-				type="button"
-				class="ai-quick-btn"
-				data-testid="mobile-btn-open-ai-sheet"
-				@click="showAiSheet = true"
-			>
-				<van-icon
-					name="fire-o"
-					class="mr-1 text-orange-500"
-				/>
-				<span>AI 识别记账</span>
-			</button>
-		</div>
-
-		<!-- 2. 金额看板与快速辅助信息 (Hero Amount & Quick Bar) -->
-		<div
-			class="amount-hero-card"
-			:class="formInfo.incomeAndExpenses === 'income' ? 'mode-income' : 'mode-expense'"
-		>
-			<div class="amount-digits-line">
-				<span class="currency-prefix">{{ formInfo.incomeAndExpenses === 'income' ? '+¥' : '-¥' }}</span>
-				<span
-					class="amount-val"
-					:class="{ 'is-zero': !amountStr }"
-					data-testid="hero-amount-val"
-				>
-					{{ amountStr || '0.00' }}
-				</span>
-				<span class="cursor-caret"></span>
-			</div>
-
-			<!-- 辅助标签栏：所选分类、日期快捷、支付方式、名称备注 -->
-			<div class="quick-meta-row">
-				<div
-					class="meta-pill category-pill"
-					@click="scrollToCategories"
-				>
-					<van-icon
-						name="apps-o"
-						class="pill-icon"
-					/>
-					<span class="pill-text">{{ formInfo.typeCode || '未选分类' }}</span>
-				</div>
-
-				<div
-					class="meta-pill date-pill"
-					@click="chooseDate"
-				>
-					<van-icon
-						name="calendar-o"
-						class="pill-icon"
-					/>
-					<span class="pill-text">{{ displayDateLabel }}</span>
-				</div>
-
-				<div
-					class="meta-pill source-pill"
-					@click="choose('fromSource')"
-				>
-					<van-icon
-						name="credit-pay"
-						class="pill-icon"
-					/>
-					<span class="pill-text">{{ nameRefMap.fromSource.value || '微信' }}</span>
-				</div>
-
-				<div
-					class="meta-pill name-pill"
-					@click="showNameInput = !showNameInput"
-				>
-					<van-icon
-						name="edit"
-						class="pill-icon"
-					/>
-					<span class="pill-text">{{ formInfo.name || '备注/名称' }}</span>
-				</div>
-			</div>
-
-			<!-- 内联轻量备注输入（可选展开） -->
-			<div
-				v-if="showNameInput"
-				class="inline-name-box"
-			>
-				<van-field
-					v-model="formInfo.name"
-					placeholder="输入记录名称或备注"
-					clearable
-					class="custom-inline-field"
-				>
-					<template #button>
-						<van-button
-							size="small"
-							type="primary"
-							round
-							@click="showNameInput = false"
+		<!-- 主体可滚动区（为置底 Sticky 操作栏留出安全内边距） -->
+		<div class="page-content-scroll">
+			<!-- 1. 顶部核心聚焦区 (Hero Card) -->
+			<div class="hero-card">
+				<!-- 顶部行：分段控制器 (支出 | 收入) + AI 智能填单微胶囊 -->
+				<div class="hero-top-row">
+					<div class="segmented-control">
+						<button
+							type="button"
+							:class="['segment-item', { active: formInfo.incomeAndExpenses === 'expense' }]"
+							@click="canEditRecord && onDirectionChange('expense')"
 						>
-							完成
-						</van-button>
-					</template>
-				</van-field>
-			</div>
-		</div>
-
-		<!-- 3. 中间可滚动区域：分类九宫格网格 + 高级设置折叠 -->
-		<div
-			class="scroll-body-wrapper"
-			ref="scrollContainerRef"
-		>
-			<finance-category-grid
-				v-model="formInfo.typeCode"
-				:direction="formInfo.incomeAndExpenses"
-				:dynamic-categories="dynamicCategories"
-				@select="onSelectCategory"
-			/>
-
-			<!-- 高级选项收折卡片 (所属人、状态等) -->
-			<div class="advanced-card">
-				<div
-					class="advanced-header"
-					@click="showAdvanced = !showAdvanced"
-				>
-					<div class="adv-left">
-						<van-icon
-							name="setting-o"
-							class="adv-icon"
-						/>
-						<span>高级设置 (归属人、状态)</span>
+							支出
+						</button>
+						<button
+							type="button"
+							:class="['segment-item', { active: formInfo.incomeAndExpenses === 'income' }]"
+							@click="canEditRecord && onDirectionChange('income')"
+						>
+							收入
+						</button>
 					</div>
-					<van-icon
-						:name="showAdvanced ? 'arrow-up' : 'arrow-down'"
-						class="arrow-icon"
+
+					<button
+						type="button"
+						class="ai-capsule-btn"
+						data-testid="mobile-btn-open-ai-sheet"
+						@click="onNavigateToAiLedger"
+					>
+						<span class="ai-sparkle">✨</span>
+						<span>AI 填单</span>
+					</button>
+				</div>
+
+				<!-- 大号等宽金融金额直输 -->
+				<div class="amount-hero-box">
+					<span :class="['currency-symbol', { 'income-symbol': formInfo.incomeAndExpenses === 'income' }]">¥</span>
+					<input
+						v-model="formInfo.amount"
+						type="number"
+						step="0.01"
+						placeholder="0.00"
+						:readonly="!canEditRecord"
+						class="amount-input-control"
 					/>
 				</div>
 
-				<div
-					v-if="showAdvanced"
-					class="advanced-body"
-				>
-					<van-cell-group inset>
-						<van-cell
-							title="归属人"
-							is-link
-							:value="nameRefMap.belongTo.value || '当前用户'"
-							@click="choose('belongTo')"
-						/>
-						<van-cell
-							title="账目状态"
-							is-link
-							:value="nameRefMap.isValid.value || '有效'"
-							@click="choose('isValid')"
-						/>
-						<van-cell
-							title="完整业务时间"
-							is-link
-							:value="nameRefMap.infoDate.value"
-							@click="chooseDate"
-						/>
-					</van-cell-group>
+				<!-- 行内无边框轻量备注 / 账单名称 -->
+				<div class="remark-input-box">
+					<input
+						v-model="formInfo.name"
+						type="text"
+						placeholder="输入账单名称或备注 (选填)..."
+						:readonly="!canEditRecord"
+						class="remark-input-control"
+					/>
 				</div>
+			</div>
+
+			<!-- 2. 点选详情 Inset List 卡片 (Card 2) -->
+			<div class="detail-inset-card">
+				<!-- 2.1 类别胶囊矩阵 (去噪：移除右上角重复文本回显) -->
+				<div class="inset-section">
+					<div class="section-label-bar">
+						<span class="section-label">类别</span>
+					</div>
+					<div class="category-pills-wrap">
+						<button
+							v-for="cat in currentPresetCategories"
+							:key="cat.name"
+							type="button"
+							:class="['pill-btn', { active: formInfo.typeCode === cat.name }]"
+							@click="canEditRecord && selectCategory(cat.name)"
+						>
+							<span
+								v-if="cat.emoji"
+								class="pill-emoji"
+							>{{ cat.emoji }}</span>
+							<span>{{ cat.name }}</span>
+						</button>
+
+						<!-- 自定义分类虚线胶囊 -->
+						<button
+							v-if="canEditRecord"
+							type="button"
+							class="pill-btn custom-pill"
+							@click="showCustomCatDialog = true"
+						>
+							<van-icon
+								name="plus"
+								class="custom-icon"
+							/>
+							<span>自定义</span>
+						</button>
+					</div>
+				</div>
+
+				<!-- 2.2 支付方式横向平铺胶囊 (去噪：移除右上角重复文本回显) -->
+				<div class="inset-section">
+					<div class="section-label-bar">
+						<span class="section-label">支付方式</span>
+					</div>
+					<div class="payment-pills-row">
+						<button
+							type="button"
+							:class="['pay-pill-btn', 'pay-wx', { active: formInfo.fromSource === 'wx' }]"
+							@click="canEditRecord && selectPayment('wx', '微信')"
+						>
+							<van-icon
+								name="wechat-pay"
+								class="pay-icon icon-wx"
+							/>
+							<span>微信</span>
+						</button>
+						<button
+							type="button"
+							:class="['pay-pill-btn', 'pay-zfb', { active: formInfo.fromSource === 'zfb' }]"
+							@click="canEditRecord && selectPayment('zfb', '支付宝')"
+						>
+							<van-icon
+								name="alipay"
+								class="pay-icon icon-zfb"
+							/>
+							<span>支付宝</span>
+						</button>
+						<button
+							type="button"
+							:class="['pay-pill-btn', 'pay-yhk', { active: formInfo.fromSource === 'yhk' }]"
+							@click="canEditRecord && selectPayment('yhk', '银行卡')"
+						>
+							<van-icon
+								name="card"
+								class="pay-icon icon-yhk"
+							/>
+							<span>银行卡</span>
+						</button>
+						<button
+							type="button"
+							:class="['pay-pill-btn', 'pay-other', { active: isOtherPayment }]"
+							@click="canEditRecord && choose('fromSource')"
+						>
+							<span>其他</span>
+							<van-icon
+								name="arrow-down"
+								class="arrow-tiny"
+							/>
+						</button>
+					</div>
+				</div>
+
+				<!-- 2.3 紧凑列表行 1：交易时间 (今天/昨天 快捷小胶囊 + 点击呼出完整日历) -->
+				<div class="inset-row">
+					<span class="row-label">交易时间</span>
+					<div class="row-value-group">
+						<div class="quick-date-pills">
+							<button
+								type="button"
+								:class="['quick-pill-btn', { active: isTodayDate }]"
+								@click.stop="canEditRecord && setQuickDate('today')"
+							>
+								今天
+							</button>
+							<button
+								type="button"
+								:class="['quick-pill-btn', { active: isYesterdayDate }]"
+								@click.stop="canEditRecord && setQuickDate('yesterday')"
+							>
+								昨天
+							</button>
+						</div>
+						<div
+							class="date-display-trigger"
+							@click="canEditRecord && chooseDate()"
+						>
+							<span class="date-text">{{ nameRefMap.infoDate.value }}</span>
+							<van-icon
+								name="arrow"
+								class="row-arrow"
+							/>
+						</div>
+					</div>
+				</div>
+
+				<!-- 2.4 紧凑列表行 2：账单归属 (独立拆分，双人直选胶囊 + 超过2人提供 '···' 更多) -->
+				<div class="inset-row">
+					<span class="row-label">账单归属</span>
+					<div class="row-value-group">
+						<div class="user-pills-group">
+							<button
+								v-for="user in primaryUsers"
+								:key="user.id"
+								type="button"
+								:class="['user-pill-btn', { active: isSelectedUser(user.id) }]"
+								@click="canEditRecord && selectBelongTo(user)"
+							>
+								<van-icon
+									name="user-o"
+									class="user-pill-icon"
+								/>
+								<span>{{ user.nickName || user.username }}</span>
+							</button>
+
+							<!-- 机构成员超过 2 人时：提供下拉选择全员胶囊 -->
+							<button
+								v-if="(hasMoreUsers || isOtherUserSelected) && canEditRecord"
+								type="button"
+								:class="['user-pill-btn', 'user-dropdown-pill', { active: isOtherUserSelected }]"
+								title="下拉选择全部成员"
+								@click="choose('belongTo')"
+							>
+								<van-icon
+									name="user-o"
+									class="user-pill-icon"
+								/>
+								<span>{{ otherUserLabel }}</span>
+								<van-icon
+									name="arrow-down"
+									class="dropdown-arrow-icon"
+								/>
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<!-- 2.5 紧凑列表行 3：记录状态 (独立拆分，微缩分段控制器 Mini Segmented: ● 有效 | 无效) -->
+				<div class="inset-row">
+					<span class="row-label">记录状态</span>
+					<div class="row-value-group">
+						<div class="mini-segmented-control">
+							<button
+								type="button"
+								:class="['mini-segment-item', { active: formInfo.isValid === '1' }]"
+								@click="canEditRecord && setRecordStatus('1')"
+							>
+								<span class="status-dot dot-valid"></span>
+								<span>有效</span>
+							</button>
+							<button
+								type="button"
+								:class="['mini-segment-item', { active: formInfo.isValid === '0' }]"
+								@click="canEditRecord && setRecordStatus('0')"
+							>
+								<span>无效</span>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- 3. 底部操作栏（跟随页面自然流排布，不固定在底部） -->
+			<div class="bottom-action-panel">
+				<div
+					v-if="canEditRecord"
+					class="bottom-action-row"
+				>
+					<button
+						v-if="!formInfo.id"
+						type="button"
+						class="btn-secondary"
+						:disabled="loading || continueLoading"
+						@click="handleContinueSubmit"
+					>
+						<van-loading
+							v-if="continueLoading"
+							size="16px"
+						/>
+						<template v-else>
+							<van-icon
+								name="plus"
+								class="btn-icon"
+							/>
+							<span>确认再记一笔</span>
+						</template>
+					</button>
+					<button
+						type="button"
+						class="btn-primary"
+						:disabled="loading || continueLoading"
+						@click="() => onSubmit()"
+					>
+						<van-loading
+							v-if="loading"
+							size="16px"
+							color="#ffffff"
+						/>
+						<template v-else>
+							<span>提交记录</span>
+						</template>
+					</button>
+				</div>
+				<div class="bottom-tips"> 请仔细核对账单明细，保存后实时计入个人/家庭财务报表 </div>
 			</div>
 		</div>
 
-		<!-- 4. 底部定制记账数字键盘 -->
-		<finance-keypad
-			v-model="amountStr"
-			:loading="loading"
-			:is-edit="!!formInfo.id"
-			:can-edit="canEditRecord"
-			:date-shortcut-text="isToday ? '今天' : keypadDateShort"
-			@change-amount="(val) => (formInfo.amount = val)"
-			@date-click="chooseDate"
-			@save-and-continue="handleSaveAndContinue"
-			@save-and-finish="handleSaveAndFinish"
-			@reset="resetFormToInitial"
-		/>
-
-		<!-- 弹窗组件 -->
+		<!-- 弹窗选择组件 -->
 		<select-pop
 			:info="popInfo"
 			@select-info="selectInfo"
@@ -219,151 +318,219 @@
 			@cancel-date-info="cancelDateInfo"
 		/>
 
-		<!-- AI 智能记账抽屉 -->
-		<finance-ai-sheet
-			v-model="showAiSheet"
-			:belong-to="formInfo.belongTo"
-			@apply="onApplyAiResult"
-		/>
+		<!-- 自定义分类录入轻量弹窗 -->
+		<van-dialog
+			v-model:show="showCustomCatDialog"
+			title="自定义分类"
+			show-cancel-button
+			@confirm="onConfirmCustomCategory"
+		>
+			<div class="custom-cat-dialog-content">
+				<van-field
+					v-model="customCategoryInput"
+					placeholder="输入分类名称 (如: 宠物用品、打车出行)"
+					maxlength="10"
+					autofocus
+					clearable
+					class="custom-cat-field"
+				/>
+			</div>
+		</van-dialog>
 	</div>
 </template>
 
 <script setup lang="ts">
+import type { Dayjs } from 'dayjs';
 import { showFailToast, showSuccessToast } from 'vant';
-import FinanceAiSheet from '@/views/finance/financeManager/components/FinanceAiSheet.vue';
-import {
-	rulesRef,
-	type UniversalFinanceAiParseVo,
-	type FinanceManagerData,
-} from '@/views/finance/financeManager/config';
-import FinanceCategoryGrid from '@/views/finance/financeManager/financeManagerDetail/components/FinanceCategoryGrid.vue';
+import { getListName, type DictFieldConfig } from '@/views/common/config';
+import { rulesRef, type FinanceManagerData } from '@/views/finance/financeManager/config';
 import {
 	expensePresets,
 	incomePresets,
+	getCategoryVisualItem,
 	type CategoryItem,
 } from '@/views/finance/financeManager/financeManagerDetail/types';
-import FinanceKeypad from '@/views/finance/financeManager/financeManagerDetail/components/FinanceKeypad.vue';
-import { getListName, type DictFieldConfig } from '@/views/common/config';
 import { getDictList } from '@/views/finance/dict/api';
 import { getUserManagerList } from '@/views/user/userManager/api';
 import { useUserStore } from '@/store/modules/user/user';
-import type { Info } from '@/components/pop/selectPop.vue';
-import { datePickerFormatter, formatDayjs, formatDate, formatMonth, nowDayjs, type Dayjs } from '@/utils/dayjs';
+import type { Info } from '@/views/common/pop/selectPop.vue';
+import { datePickerFormatter, formatDayjs, nowDayjs } from '@/utils/dayjs';
 import type { DatePickerInfo } from '@/utils/common';
 import type { DictInfo } from '@/views/finance/dict/api';
 import type { UserManagerData } from '@/views/user/userManager/config';
-import {
-	addFinanceManger,
-	editFinanceManger,
-	getFinanceMangerDetail,
-	getBudgetCategories,
-} from '@/views/finance/financeManager/api';
-import { useNavBar } from '@/composables/useNavBar';
-import { usePermission } from '@/composables/usePermission';
+import { addFinanceManger, editFinanceManger, getFinanceMangerDetail } from '@/views/finance/financeManager/api';
+import { useNavBar, type NavBarConfig } from '@/composables/useNavBar';
 import { getRoutePathByName } from '@/utils/router';
 import { useTabBar } from '@/composables/useTabBar';
-import { triggerHaptic } from '@/utils/haptics';
-import { recordCategoryUsage } from '@/views/finance/financeManager/financeManagerDetail/composables/useCategoryFrequency';
 import { useDashboardStore } from '@/store/modules/dashboard/dashboard';
+import { usePermission } from '@/composables/usePermission';
+import { triggerHaptic } from '@/utils/haptics';
 
 const route = useRoute();
 const router = useRouter();
-const userStore = useUserStore();
-const userInfo = userStore?.getUserInfo;
+const userInfo = useUserStore()?.getUserInfo;
 const dashboardStore = useDashboardStore();
-const { hasPermission, isSuperAdmin } = usePermission();
+const { hasRole, hasPermission } = usePermission();
 
-const canEditRecord = computed(() => {
-	if (!formInfo.value.id) {
-		return hasPermission('finance:financeManager:add');
-	}
-	if (!hasPermission('finance:financeManager:edit')) {
-		return false;
-	}
-	const roleCode = userStore.getRoleInfo?.roleCode || '';
-	if (isSuperAdmin.value || roleCode === 'admin' || roleCode === 'family_admin') {
-		return true;
-	}
-	const myId = userInfo?.id;
-	return myId !== undefined && String(formInfo.value.belongTo) === String(myId);
-});
-
-// 导航栏配置
-useNavBar({
-	title: route?.query?.id ? (canEditRecord.value ? '编辑账单' : '账单详情') : '记一笔',
+// 导航栏响应式配置规范
+const navBarConfig = ref<Pick<NavBarConfig, 'title' | 'rightButton' | 'leftPath' | 'visible'>>({
+	title: (route?.meta?.title as string) || (route?.query?.id ? '编辑财务记录' : '新增财务记录'),
 	leftPath: getRoutePathByName(router, 'financeManager'),
 	visible: true,
 });
+useNavBar(navBarConfig);
 
-useTabBar({
-	visible: false,
+// 隐藏底部 TabBar
+useTabBar({ visible: false });
+
+const getLeftPath = computed(() => {
+	return getRoutePathByName(router, 'financeManager');
 });
 
-const getLeftPath = computed(() => getRoutePathByName(router, 'financeManager'));
+// 表单核心数据模型
+const formInfo = ref<FinanceManagerData>({
+	name: '',
+	typeCode: '餐饮',
+	amount: undefined,
+	isValid: '1',
+	incomeAndExpenses: 'expense',
+	infoDate: nowDayjs(),
+	belongTo: userInfo?.id ? (userInfo.id as never) : (0 as never),
+	fromSource: 'wx',
+});
 
-const formInfo = ref<FinanceManagerData>({});
 const loading = ref<boolean>(false);
-const amountStr = ref<string>('');
-const showNameInput = ref<boolean>(false);
-const showAdvanced = ref<boolean>(false);
-const scrollContainerRef = ref<HTMLElement | null>(null);
+const continueLoading = ref<boolean>(false);
 
-const showAiSheet = ref<boolean>(false);
+// 只读权限判断（家庭账单防护）
+const canEditRecord = computed(() => {
+	if (!formInfo.value.id) return true;
+	const currentUserId = String(userInfo?.id || '');
+	const isOwner = String(formInfo.value.belongTo || '') === currentUserId;
+	const isHouseholdAdmin = hasRole('admin') || hasRole('super') || hasPermission('finance:record:admin');
+	return isOwner || isHouseholdAdmin;
+});
 
-const onApplyAiResult = (parsed: UniversalFinanceAiParseVo) => {
-	if (!parsed) return;
-	if (parsed.amount) {
-		formInfo.value.amount = Number(parsed.amount);
-		amountStr.value = String(parsed.amount);
-	}
-	if (parsed.name) {
-		formInfo.value.name = parsed.name;
-	}
-	if (parsed.incomeAndExpenses) {
-		formInfo.value.incomeAndExpenses = parsed.incomeAndExpenses;
-		nameRefMap.incomeAndExpenses.value = parsed.incomeAndExpenses === 'income' ? '收入' : '支出';
-	}
-	if (parsed.typeCode) {
-		formInfo.value.typeCode = parsed.typeCode;
-	}
-	if (parsed.fromSource) {
-		formInfo.value.fromSource = parsed.fromSource;
-		nameRefMap.fromSource.value = parsed.fromSourceName || parsed.fromSource;
-	}
-	if (parsed.belongTo) {
-		formInfo.value.belongTo = Number(parsed.belongTo);
-		if (parsed.belongToName) {
-			nameRefMap.belongTo.value = parsed.belongToName;
-		}
-	}
-	if (parsed.infoDate) {
-		formInfo.value.infoDate = formatDayjs(parsed.infoDate);
-		nameRefMap.infoDate.value = formatDate(parsed.infoDate);
-	}
-	showSuccessToast('已将 AI 识别内容填入，确认无误后点击确定保存');
+// 字段文本显示映射
+const nameRefMap = {
+	fromSource: ref<string>('微信'),
+	incomeAndExpenses: ref<string>('支出'),
+	isValid: ref<string>('有效'),
+	belongTo: ref<string>(userInfo?.nickName || userInfo?.username || ''),
+	infoDate: ref<string>(nowDayjs().format('YYYY年MM月DD日')),
 };
 
-// 历史/动态分类列表
-const dynamicCategories = ref<string[]>([]);
+// 预设与动态分类整合
+const customCategories = ref<string[]>([]);
+const showCustomCatDialog = ref<boolean>(false);
+const customCategoryInput = ref<string>('');
 
-const isToday = computed(() => {
-	const cur = formatDayjs(formInfo.value.infoDate);
-	return cur.isSame(nowDayjs(), 'day');
+const currentPresetCategories = computed<CategoryItem[]>(() => {
+	const presets = formInfo.value.incomeAndExpenses === 'income' ? incomePresets : expensePresets;
+	const list: CategoryItem[] = [...presets];
+
+	if (customCategories.value.length) {
+		for (const name of customCategories.value) {
+			if (!list.some((item) => item.name === name)) {
+				list.push(getCategoryVisualItem(name, formInfo.value.incomeAndExpenses === 'income'));
+			}
+		}
+	}
+
+	if (formInfo.value.typeCode && !list.some((item) => item.name === formInfo.value.typeCode)) {
+		list.unshift(getCategoryVisualItem(formInfo.value.typeCode, formInfo.value.incomeAndExpenses === 'income'));
+	}
+
+	return list;
 });
 
-const keypadDateShort = computed(() => {
-	const cur = formatDayjs(formInfo.value.infoDate);
-	return cur.format('M/D');
+// 选择记账分类（支持名称联动与免填回退）
+const selectCategory = (name: string) => {
+	triggerHaptic('click');
+	const prevCategory = formInfo.value.typeCode;
+	formInfo.value.typeCode = name;
+	if (!formInfo.value.name || formInfo.value.name === prevCategory) {
+		formInfo.value.name = name;
+	}
+};
+
+// 添加自定义分类
+const onConfirmCustomCategory = () => {
+	const trimmed = customCategoryInput.value.trim();
+	if (!trimmed) {
+		showFailToast('分类名称不能为空');
+		return;
+	}
+	if (!customCategories.value.includes(trimmed)) {
+		customCategories.value.push(trimmed);
+	}
+	selectCategory(trimmed);
+	customCategoryInput.value = '';
+	triggerHaptic('success');
+};
+
+// 选择支付方式
+const selectPayment = (code: string, name: string) => {
+	triggerHaptic('click');
+	formInfo.value.fromSource = code;
+	nameRefMap.fromSource.value = name;
+};
+
+// 是否属于“其他”支付渠道
+const isOtherPayment = computed(() => {
+	return !['wx', 'zfb', 'yhk'].includes(formInfo.value.fromSource || '');
 });
 
-const displayDateLabel = computed(() => {
-	if (isToday.value) return '今天';
-	return formInfo.value.infoDate ? formatDate(formInfo.value.infoDate) : '今天';
+// 是否是当天
+const isTodayDate = computed(() => {
+	if (!formInfo.value.infoDate) return true;
+	return formatDayjs(formInfo.value.infoDate).isSame(nowDayjs(), 'day');
 });
 
-// 字典与弹窗配置
+// 是否是昨天
+const isYesterdayDate = computed(() => {
+	if (!formInfo.value.infoDate) return false;
+	return formatDayjs(formInfo.value.infoDate).isSame(nowDayjs().subtract(1, 'day'), 'day');
+});
+
+// 快捷切换日期 (今天 / 昨天)
+const setQuickDate = (target: 'today' | 'yesterday') => {
+	triggerHaptic('click');
+	const now = nowDayjs();
+	const targetDay = target === 'today' ? now : now.subtract(1, 'day');
+	formInfo.value.infoDate = targetDay;
+	nameRefMap.infoDate.value = targetDay.format('YYYY年MM月DD日');
+	chooseDateInfo.value.selectValue = targetDay;
+};
+
+// 状态直切 (有效 / 无效)
+const setRecordStatus = (status: '1' | '0') => {
+	triggerHaptic('click');
+	formInfo.value.isValid = status;
+	nameRefMap.isValid.value = status === '1' ? '有效' : '无效';
+};
+
+// 切换收支方向
+const onDirectionChange = (dir: 'expense' | 'income') => {
+	triggerHaptic('click');
+	formInfo.value.incomeAndExpenses = dir;
+	nameRefMap.incomeAndExpenses.value = dir === 'income' ? '收入' : '支出';
+
+	const presets = dir === 'income' ? incomePresets : expensePresets;
+	if (!presets.some((p) => p.name === formInfo.value.typeCode)) {
+		const defaultName = presets[0]?.name || (dir === 'income' ? '工资' : '餐饮');
+		const prevCat = formInfo.value.typeCode;
+		formInfo.value.typeCode = defaultName;
+		if (!formInfo.value.name || formInfo.value.name === prevCat) {
+			formInfo.value.name = defaultName;
+		}
+	}
+};
+
+// 字典选择弹窗状态
 const popInfo = ref<Info>({ showFlag: false });
 
+// 统一字典字段映射配置
 const dictFieldConfig: DictFieldConfig<FinanceManagerData>[] = [
 	{
 		key: 'fromSource',
@@ -371,13 +538,6 @@ const dictFieldConfig: DictFieldConfig<FinanceManagerData>[] = [
 		rule: rulesRef.fromSource,
 		belongTo: 'pay_way',
 		formKey: 'fromSource' as keyof FinanceManagerData,
-	},
-	{
-		key: 'incomeAndExpenses',
-		labelName: '收支类型',
-		rule: rulesRef.incomeAndExpenses,
-		belongTo: 'income_expense_type',
-		formKey: 'incomeAndExpenses' as keyof FinanceManagerData,
 	},
 	{
 		key: 'isValid',
@@ -388,6 +548,7 @@ const dictFieldConfig: DictFieldConfig<FinanceManagerData>[] = [
 	},
 ];
 
+// 动态字典 Info 映射
 const dictInfoMap = dictFieldConfig.reduce(
 	(acc, config) => {
 		acc[config.key] = ref<Info>({
@@ -405,6 +566,7 @@ const dictInfoMap = dictFieldConfig.reduce(
 	{} as Record<string, Ref<Info>>,
 );
 
+// 归属人选择配置
 const belongToInfo = ref<Info>({
 	label: 'belongTo',
 	labelName: '属于',
@@ -416,22 +578,77 @@ const belongToInfo = ref<Info>({
 	selectValue: formInfo.value.belongTo,
 });
 
-const nameRefMap = {
-	fromSource: ref<string>('微信'),
-	incomeAndExpenses: ref<string>('支出'),
-	isValid: ref<string>('有效'),
-	belongTo: ref<string>(''),
-	infoDate: ref<string>(''),
+// 计算常用双人列表（优先保证当前人在首位）
+const primaryUsers = computed<UserManagerData[]>(() => {
+	const rawList = belongToInfo.value.list || [];
+	if (!rawList.length) {
+		const defaultUser: UserManagerData = {
+			id: userInfo?.id || '0',
+			nickName: userInfo?.nickName || userInfo?.username || '当前用户',
+			username: userInfo?.username || '',
+		} as UserManagerData;
+		return [defaultUser];
+	}
+
+	const currentUserId = String(userInfo?.id || '');
+	const sorted = [...rawList].sort((a, b) => {
+		const aIsCurrent = String(a.id) === currentUserId ? -1 : 0;
+		const bIsCurrent = String(b.id) === currentUserId ? -1 : 0;
+		return aIsCurrent - bIsCurrent;
+	});
+
+	return sorted.slice(0, 2);
+});
+
+// 机构成员总数是否多于 2 人
+const hasMoreUsers = computed(() => {
+	return (belongToInfo.value.list || []).length > 2;
+});
+
+// 当前选中的人是否不在前 2 位常用人中
+const isOtherUserSelected = computed(() => {
+	const currentBelongTo = String(formInfo.value.belongTo || '');
+	return !primaryUsers.value.some((u) => String(u.id) === currentBelongTo);
+});
+
+// 下拉全员胶囊文案（若选中的是第 3 人及以后，显示该人员姓名；否则显示 '更多'）
+const otherUserLabel = computed(() => {
+	if (isOtherUserSelected.value && nameRefMap.belongTo.value) {
+		return nameRefMap.belongTo.value;
+	}
+	return '更多';
+});
+
+// 判断归属人是否被选中
+const isSelectedUser = (userId: string | number | undefined) => {
+	return String(formInfo.value.belongTo || '') === String(userId || '');
 };
 
+// 单击直选归属人
+const selectBelongTo = (user: UserManagerData) => {
+	triggerHaptic('click');
+	formInfo.value.belongTo = (user.id as never) || (0 as never);
+	nameRefMap.belongTo.value = user.nickName || user.username || '';
+};
+
+// 触发选择弹窗
 const choose = (type: string) => {
 	const info = dictInfoMap[type] || (type === 'belongTo' ? belongToInfo : null);
 	if (info) {
+		if (type === 'belongTo') {
+			info.value.selectValue = formInfo.value.belongTo;
+		} else {
+			const config = dictFieldConfig.find((c) => c.key === type);
+			if (config) {
+				info.value.selectValue = formInfo.value[config.formKey];
+			}
+		}
 		popInfo.value = info.value;
 		popInfo.value.showFlag = true;
 	}
 };
 
+// 选择器确认回调
 const selectInfo = (type: string, value: string, name: string) => {
 	popInfo.value.showFlag = false;
 	const info = dictInfoMap[type];
@@ -442,15 +659,17 @@ const selectInfo = (type: string, value: string, name: string) => {
 			nameRefMap[config.key as keyof typeof nameRefMap].value = name;
 		}
 	} else if (type === 'belongTo') {
-		formInfo.value.belongTo = Number(value);
+		formInfo.value.belongTo = (value as never) || (0 as never);
 		nameRefMap.belongTo.value = name;
 	}
 };
 
+// 选择器取消回调
 const cancelInfo = () => {
 	popInfo.value.showFlag = false;
 };
 
+// 日期选择配置
 const chooseDateInfo = ref<DatePickerInfo<Dayjs>>({
 	label: 'infoDate',
 	labelName: '业务日期',
@@ -460,101 +679,106 @@ const chooseDateInfo = ref<DatePickerInfo<Dayjs>>({
 	formatter: datePickerFormatter,
 });
 
+// 打开日期选择弹窗
 const chooseDate = () => {
 	chooseDateInfo.value.showFlag = true;
 };
 
+// 确认日期选择
 const selectDateInfo = (date: Dayjs, dateName: string) => {
 	const now = nowDayjs();
-	const selected = formatDayjs(date).hour(now.hour()).minute(now.minute()).second(now.second());
-	formInfo.value.infoDate = selected;
+	formInfo.value.infoDate = formatDayjs(date).hour(now.hour()).minute(now.minute()).second(now.second());
 	nameRefMap.infoDate.value = dateName;
 	chooseDateInfo.value.showFlag = false;
 };
 
+// 取消日期选择
 const cancelDateInfo = () => {
 	chooseDateInfo.value.showFlag = false;
 };
 
-// 交互操作
-const switchDirection = (dir: 'expense' | 'income') => {
-	if (formInfo.value.incomeAndExpenses === dir) return;
-	navigator.vibrate?.(10);
-	formInfo.value.incomeAndExpenses = dir;
-	nameRefMap.incomeAndExpenses.value = dir === 'income' ? '收入' : '支出';
-	const currentList = dir === 'income' ? incomePresets : expensePresets;
-	const match = currentList.find((c) => c.name === formInfo.value.typeCode);
-	if (!match) {
-		formInfo.value.typeCode = currentList[0]?.name || '';
-		if (!formInfo.value.name || formInfo.value.name.trim() === '') {
-			formInfo.value.name = formInfo.value.typeCode;
-		}
+// 表单前置校验（自动缺省懒人填充名称）
+const validateForm = (): boolean => {
+	if (
+		formInfo.value.amount === undefined ||
+		formInfo.value.amount === null ||
+		formInfo.value.amount === ('' as unknown)
+	) {
+		showFailToast('请输入记账金额！');
+		return false;
 	}
-};
-
-const onSelectCategory = (cat: CategoryItem) => {
-	if (!formInfo.value.name || formInfo.value.name.trim() === '') {
-		formInfo.value.name = cat.name;
+	const num = Number(formInfo.value.amount);
+	if (Number.isNaN(num) || num <= 0) {
+		showFailToast('金额必须大于 0！');
+		return false;
 	}
-};
-
-const scrollToCategories = () => {
-	scrollContainerRef.value?.scrollTo({ top: 0, behavior: 'smooth' });
-};
-
-const resetFormToInitial = () => {
-	amountStr.value = '';
-	formInfo.value.amount = 0;
-};
-
-const validateAndPrepareSubmit = (): boolean => {
 	if (!formInfo.value.typeCode) {
-		triggerHaptic('warning');
-		showFailToast('请点选一个记账分类！');
+		showFailToast('请选择记账分类！');
 		return false;
 	}
-	const amt = Number(amountStr.value);
-	if (!amt || amt <= 0) {
-		triggerHaptic('warning');
-		showFailToast('请输入有效的账单金额！');
-		return false;
-	}
-	formInfo.value.amount = amt;
+	// 懒人记账：未手动填写名称时，自动回退取分类名称
 	if (!formInfo.value.name || !formInfo.value.name.trim()) {
 		formInfo.value.name = formInfo.value.typeCode;
 	}
 	return true;
 };
 
-const handleSaveAndContinue = async () => {
-	if (!validateAndPrepareSubmit()) return;
-	loading.value = true;
+// 清理重置表单为新增默认状态（供再记一笔复用）
+const resetFormFields = () => {
+	formInfo.value = {
+		name: '',
+		typeCode: '餐饮',
+		amount: undefined,
+		isValid: '1',
+		incomeAndExpenses: 'expense',
+		infoDate: nowDayjs(),
+		belongTo: userInfo?.id ? (userInfo.id as never) : (0 as never),
+		fromSource: 'wx',
+	};
+	nameRefMap.fromSource.value = '微信';
+	nameRefMap.incomeAndExpenses.value = '支出';
+	nameRefMap.isValid.value = '有效';
+	nameRefMap.belongTo.value =
+		getListName<UserManagerData>(belongToInfo.value.list || [], formInfo.value.belongTo, 'id', 'nickName') ||
+		userInfo?.nickName ||
+		userInfo?.username ||
+		'';
+	nameRefMap.infoDate.value = nowDayjs().format('YYYY年MM月DD日');
+};
+
+// 提交并再记一笔（校验 -> 接口提交 -> 成功提示 -> 重置表单继续记账）
+const handleContinueSubmit = async () => {
+	triggerHaptic('click');
+	if (!validateForm()) return;
+
+	continueLoading.value = true;
 	try {
-		const { code, message } = await addFinanceManger(formInfo.value);
-		if (code === '200') {
-			showSuccessToast('已保存，请记下一笔');
-			triggerHaptic('success');
-			if (formInfo.value.typeCode) {
-				recordCategoryUsage(formInfo.value.typeCode);
-			}
-			dashboardStore.updateSaveTime('财务信息');
-			amountStr.value = '';
-			formInfo.value.amount = 0;
-			formInfo.value.name = '';
-		} else {
-			triggerHaptic('error');
-			showFailToast(message || '保存失败，请稍后重试');
+		let api = addFinanceManger;
+		if (formInfo.value.id) {
+			api = editFinanceManger;
 		}
-	} catch (e: unknown) {
-		triggerHaptic('error');
-		showFailToast((e as Error)?.message || '网络异常，保存失败');
+		const { code, message } = await api(formInfo.value);
+		if (code === '200') {
+			showSuccessToast(message || '保存成功，请继续记下一笔');
+			dashboardStore.updateSaveTime('财务信息');
+			triggerHaptic('success');
+			resetFormFields();
+		} else {
+			showFailToast(message || '保存失败，请联系管理员！');
+		}
+	} catch (error) {
+		console.error('确认再记一笔失败:', error);
+		showFailToast('保存失败，请重试');
 	} finally {
-		loading.value = false;
+		continueLoading.value = false;
 	}
 };
 
-const handleSaveAndFinish = async () => {
-	if (!validateAndPrepareSubmit()) return;
+// 提交保存表单并返回列表
+const onSubmit = async () => {
+	triggerHaptic('click');
+	if (!validateForm()) return;
+
 	loading.value = true;
 	try {
 		let api = addFinanceManger;
@@ -564,44 +788,43 @@ const handleSaveAndFinish = async () => {
 		const { code, message } = await api(formInfo.value);
 		if (code === '200') {
 			showSuccessToast(message || '保存成功!');
-			triggerHaptic('success');
-			if (formInfo.value.typeCode) {
-				recordCategoryUsage(formInfo.value.typeCode);
-			}
 			dashboardStore.updateSaveTime('财务信息');
 			router.push({ path: getLeftPath.value });
 		} else {
-			triggerHaptic('error');
-			showFailToast(message || '保存失败，请联系管理员!');
+			showFailToast(message || '保存失败，请联系管理员！');
 		}
-	} catch (e: unknown) {
-		triggerHaptic('error');
-		showFailToast((e as Error)?.message || '网络异常，保存失败');
 	} finally {
 		loading.value = false;
 	}
 };
 
+// 字典列表映射初始化
 const getDictInfoList = async (data: DictInfo[]) => {
 	dictFieldConfig.forEach((config) => {
 		const info = dictInfoMap[config.key];
 		if (info) {
 			info.value.list = data.filter((item: DictInfo) => item.belongTo === config.belongTo);
-			nameRefMap[config.key as keyof typeof nameRefMap].value = getListName<DictInfo>(
-				info.value.list || [],
-				formInfo.value[config.formKey] as string,
-				'typeCode',
-				'typeName',
-			);
+			const val = formInfo.value[config.formKey] as string;
+			const matchedName = getListName<DictInfo>(info.value.list || [], val, 'typeCode', 'typeName');
+			if (matchedName) {
+				nameRefMap[config.key as keyof typeof nameRefMap].value = matchedName;
+			} else if (config.key === 'isValid') {
+				nameRefMap.isValid.value = val === '0' ? '无效' : '有效';
+			} else if (config.key === 'fromSource') {
+				nameRefMap.fromSource.value = val === 'wx' ? '微信' : val || '';
+			}
 		}
 	});
 };
 
+// 归属人列表初始化
 const getUserInfoList = async (data: UserManagerData[]) => {
 	belongToInfo.value.list = data;
-	nameRefMap.belongTo.value = getListName<UserManagerData>(data, formInfo.value.belongTo, 'id', 'nickName');
+	const matchedName = getListName<UserManagerData>(data, formInfo.value.belongTo, 'id', 'nickName');
+	nameRefMap.belongTo.value = matchedName || userInfo?.nickName || userInfo?.username || '';
 };
 
+// 初始化日期文本显示
 const initInfoDate = (infoDate: Dayjs) => {
 	if (infoDate) {
 		nameRefMap.infoDate.value = infoDate.format('YYYY年MM月DD日');
@@ -609,76 +832,55 @@ const initInfoDate = (infoDate: Dayjs) => {
 	}
 };
 
-const init = async () => {
-	const id: string = route?.query?.id as string;
-	const currentMonth = formatMonth();
-	loading.value = true;
+// 响应式填单支持
+const onNavigateToAiLedger = () => {
+	triggerHaptic('click');
+	router.push({
+		path: '/finance/aiLedger',
+	});
+};
 
+// 页面数据初始化
+const init = async () => {
+	const id = route?.query?.id as string;
 	try {
-		const [detailRes, userRes, dictRes, catRes] = await Promise.all([
-			id ? getFinanceMangerDetail(id) : Promise.resolve({ code: '200', data: {} as FinanceManagerData }),
+		const [userRes, dictRes] = await Promise.all([
 			getUserManagerList({}),
 			getDictList('pay_way,income_expense_type,is_valid'),
-			getBudgetCategories(currentMonth),
 		]);
 
-		// 动态类别
-		if (catRes.code === '200' && Array.isArray(catRes.data)) {
-			dynamicCategories.value = catRes.data.filter(
-				(c) => c && c !== '支出' && c !== '收入' && c !== 'expense' && c !== 'income' && c !== '转账',
-			);
-		}
+		const { data: userData } = userRes;
+		const { data: dictData } = dictRes;
 
 		if (id) {
-			if (detailRes.code === '200' && detailRes.data) {
-				formInfo.value = { ...detailRes.data };
-				formInfo.value.infoDate = formatDayjs(detailRes.data.infoDate);
-				if (detailRes.data.amount) {
-					amountStr.value = String(detailRes.data.amount);
-				}
+			const { code, data, message } = await getFinanceMangerDetail(id);
+			if (code === '200' && data) {
+				formInfo.value = data;
+				formInfo.value.infoDate = formatDayjs(formInfo.value.infoDate);
+				navBarConfig.value.title = '编辑财务记录';
 			} else {
-				showFailToast((detailRes as { message?: string })?.message || '查询详情失败，请联系管理员！');
+				showFailToast(message || '查询详情失败，请联系管理员!');
 			}
 		} else {
-			// 新增默认值
 			formInfo.value = {
 				isValid: '1',
 				incomeAndExpenses: 'expense',
 				infoDate: nowDayjs(),
-				belongTo: userInfo?.id !== undefined ? Number(userInfo.id) : 0,
+				belongTo: userInfo?.id ? (userInfo.id as never) : (0 as never),
 				fromSource: 'wx',
 				typeCode: '餐饮',
-				name: '餐饮',
+				name: '',
 			};
+			navBarConfig.value.title = '新增财务记录';
 		}
 
-		getUserInfoList(userRes?.data || []);
-		getDictInfoList(dictRes?.data || []);
+		// 确保在 formInfo 初始化完毕后执行字典与归属人名称映射
+		getUserInfoList(userData || []);
+		getDictInfoList(dictData || []);
 		initInfoDate((formInfo.value?.infoDate as Dayjs) || nowDayjs());
-
-		// 确保支付方式与收支状态显示名称对齐
-		if (!nameRefMap.fromSource.value) {
-			nameRefMap.fromSource.value = '微信';
-		}
-		if (!nameRefMap.incomeAndExpenses.value) {
-			nameRefMap.incomeAndExpenses.value = formInfo.value.incomeAndExpenses === 'income' ? '收入' : '支出';
-		}
-
-		// 若从列表页 AI 记账跳转进入，消费并自动回填
-		try {
-			const cachedAiStr = sessionStorage.getItem('alex_mobile_ai_parsed_ledger');
-			if (cachedAiStr) {
-				sessionStorage.removeItem('alex_mobile_ai_parsed_ledger');
-				const parsedVo = JSON.parse(cachedAiStr) as UniversalFinanceAiParseVo;
-				onApplyAiResult(parsedVo);
-			}
-		} catch (e) {
-			console.warn('Load cached AI ledger failed:', e);
-		}
-	} catch {
-		showFailToast('初始化失败，请联系管理员！');
-	} finally {
-		loading.value = false;
+	} catch (error) {
+		console.error('初始化财务明细失败:', error);
+		showFailToast('加载财务数据失败，请重试');
 	}
 };
 
@@ -689,259 +891,601 @@ onMounted(() => {
 
 <style lang="less" scoped>
 .finance-detail-container {
-	display: flex;
-	flex-direction: column;
-	height: 100vh;
-	overflow: hidden;
+	padding: 0;
+	min-height: 100%;
 	background-color: #f8fafc;
+	position: relative;
 	box-sizing: border-box;
-}
-
-// 1. 顶部收支切换
-.segment-wrapper {
-	flex-shrink: 0;
-	padding: 8px 16px 4px;
-	display: flex;
-	justify-content: center;
-	background-color: #f8fafc;
-
-	.segment-bar {
-		display: flex;
-		background: #e2e8f0;
-		padding: 3px;
-		border-radius: 20px;
-		width: 190px;
-
-		.segment-tab {
-			flex: 1;
-			border: none;
-			background: transparent;
-			padding: 5px 0;
-			border-radius: 17px;
-			font-size: 14px;
-			font-weight: 500;
-			color: #64748b;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			gap: 6px;
-			cursor: pointer;
-			transition: all 0.2s ease;
-
-			.tab-dot {
-				width: 6px;
-				height: 6px;
-				border-radius: 50%;
-
-				&.dot-expense {
-					background-color: #ef4444;
-				}
-
-				&.dot-income {
-					background-color: #10b981;
-				}
-			}
-
-			&.active {
-				background: #ffffff;
-				color: #0f172a;
-				font-weight: 600;
-				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-			}
-		}
-	}
-}
-
-// 2. 金额看板
-.amount-hero-card {
-	flex-shrink: 0;
-	margin: 6px 16px 8px;
-	padding: 12px 16px 10px;
-	border-radius: 16px;
-	background: #ffffff;
-	border: 1px solid #f1f5f9;
-	box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
-	transition: background-color 0.3s ease;
-
-	&.mode-expense {
-		border-color: #fee2e2;
-		background: linear-gradient(180deg, #fffafa 0%, #ffffff 100%);
-	}
-
-	&.mode-income {
-		border-color: #dcfce7;
-		background: linear-gradient(180deg, #f7fee7 0%, #ffffff 100%);
-	}
-
-	.amount-digits-line {
-		display: flex;
-		align-items: baseline;
-		justify-content: center;
-		height: 48px;
-		line-height: 48px;
-
-		.currency-prefix {
-			font-size: 24px;
-			font-weight: 700;
-			color: #0f172a;
-			margin-right: 4px;
-		}
-
-		.amount-val {
-			font-size: 38px;
-			font-weight: 700;
-			font-variant-numeric: tabular-nums;
-			color: #0f172a;
-			letter-spacing: -0.5px;
-
-			&.is-zero {
-				color: #94a3b8;
-			}
-		}
-
-		.cursor-caret {
-			display: inline-block;
-			width: 2px;
-			height: 30px;
-			background-color: #3b82f6;
-			margin-left: 3px;
-			animation: caret-blink 1s infinite;
-		}
-	}
-
-	.quick-meta-row {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 6px;
-		margin-top: 8px;
-		flex-wrap: wrap;
-
-		.meta-pill {
-			display: inline-flex;
-			align-items: center;
-			gap: 4px;
-			padding: 3px 8px;
-			border-radius: 12px;
-			background: #f1f5f9;
-			font-size: 12px;
-			color: #475569;
-			cursor: pointer;
-			max-width: 90px;
-
-			.pill-icon {
-				font-size: 13px;
-				color: #64748b;
-			}
-
-			.pill-text {
-				overflow: hidden;
-				text-overflow: ellipsis;
-				white-space: nowrap;
-			}
-
-			&:active {
-				background: #e2e8f0;
-			}
-
-			&.category-pill {
-				background: #eff6ff;
-				color: #2563eb;
-				font-weight: 500;
-
-				.pill-icon {
-					color: #2563eb;
-				}
-			}
-		}
-	}
-
-	.inline-name-box {
-		margin-top: 8px;
-		padding-top: 6px;
-		border-top: 1px dashed #e2e8f0;
-
-		.custom-inline-field {
-			padding: 4px 8px;
-			background: #f8fafc;
-			border-radius: 8px;
-		}
-	}
-}
-
-// 3. 中间可滚动区域
-.scroll-body-wrapper {
-	flex: 1;
-	overflow-y: auto;
-	padding: 0 16px 12px;
-	-webkit-overflow-scrolling: touch;
-
-	.advanced-card {
-		margin-top: 10px;
-		background: #ffffff;
-		border-radius: 12px;
-		border: 1px solid #f1f5f9;
-		overflow: hidden;
-
-		.advanced-header {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			padding: 10px 14px;
-			cursor: pointer;
-			background: #fafafa;
-
-			.adv-left {
-				display: flex;
-				align-items: center;
-				gap: 6px;
-				font-size: 12px;
-				color: #64748b;
-				font-weight: 500;
-
-				.adv-icon {
-					font-size: 14px;
-				}
-			}
-
-			.arrow-icon {
-				font-size: 12px;
-				color: #94a3b8;
-			}
-		}
-
-		.advanced-body {
-			padding: 6px 0;
-		}
-	}
-}
-
-@keyframes caret-blink {
-	0%,
-	100% {
-		opacity: 1;
-	}
-	50% {
-		opacity: 0;
-	}
 }
 
 .detail-readonly-banner {
 	display: flex;
 	align-items: center;
 	gap: 6px;
-	padding: 10px 14px;
-	margin-bottom: 12px;
-	background-color: #fffbe6;
-	border: 1px solid #ffe58f;
-	border-radius: 8px;
-	color: #d46b08;
-	font-size: 13px;
+	padding: 8px 16px;
+	background: #fffbeb;
+	border-bottom: 1px solid #fef3c7;
+	color: #b45309;
+	font-size: 12px;
 	line-height: 1.4;
 
 	.banner-icon {
-		font-size: 16px;
+		font-size: 15px;
+		color: #f59e0b;
 		flex-shrink: 0;
+	}
+}
+
+.page-content-scroll {
+	padding: 12px 14px calc(24px + env(safe-area-inset-bottom));
+	box-sizing: border-box;
+}
+
+// 1. 顶部核心聚焦区 (Hero Card)
+.hero-card {
+	background: #ffffff;
+	border: 1px solid rgba(226, 232, 240, 0.85);
+	border-radius: 18px;
+	padding: 14px 16px 12px;
+	box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+	margin-bottom: 12px;
+
+	.hero-top-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 12px;
+
+		.segmented-control {
+			background: #f1f5f9;
+			padding: 3px;
+			border-radius: 10px;
+			display: inline-flex;
+			gap: 2px;
+
+			.segment-item {
+				padding: 4px 14px;
+				font-size: 12.5px;
+				font-weight: 500;
+				color: #64748b;
+				border-radius: 8px;
+				border: none;
+				background: transparent;
+				cursor: pointer;
+				transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+
+				&.active {
+					background: #ffffff;
+					color: #0f172a;
+					font-weight: 600;
+					box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+				}
+			}
+		}
+
+		.ai-capsule-btn {
+			display: inline-flex;
+			align-items: center;
+			gap: 4px;
+			padding: 4px 10px;
+			background: rgba(255, 255, 255, 0.9);
+			border: 1px solid #e2e8f0;
+			border-radius: 9999px;
+			font-size: 11.5px;
+			font-weight: 500;
+			color: #334155;
+			box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+			cursor: pointer;
+			transition: all 0.15s ease;
+
+			.ai-sparkle {
+				font-size: 12px;
+			}
+
+			&:active {
+				background: #f8fafc;
+				border-color: #cbd5e1;
+				transform: scale(0.97);
+			}
+		}
+	}
+
+	.amount-hero-box {
+		display: flex;
+		align-items: baseline;
+		padding: 4px 0 10px;
+		border-bottom: 1px solid #f1f5f9;
+
+		.currency-symbol {
+			font-size: 26px;
+			font-weight: 600;
+			color: #94a3b8;
+			margin-right: 6px;
+			user-select: none;
+			transition: color 0.15s ease;
+
+			&.income-symbol {
+				color: #059669;
+			}
+		}
+
+		.amount-input-control {
+			width: 100%;
+			border: none;
+			outline: none;
+			background: transparent;
+			font-size: 36px;
+			font-weight: 700;
+			color: #0f172a;
+			font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+			letter-spacing: -0.02em;
+
+			&::placeholder {
+				color: #cbd5e1;
+				font-weight: 500;
+			}
+		}
+	}
+
+	.remark-input-box {
+		padding-top: 10px;
+
+		.remark-input-control {
+			width: 100%;
+			border: none;
+			outline: none;
+			background: transparent;
+			font-size: 13.5px;
+			color: #334155;
+			line-height: 1.5;
+
+			&::placeholder {
+				color: #94a3b8;
+				font-weight: 400;
+			}
+		}
+	}
+}
+
+// 2. 点选详情 Inset List 卡片 (Card 2)
+.detail-inset-card {
+	background: #ffffff;
+	border: 1px solid rgba(226, 232, 240, 0.85);
+	border-radius: 18px;
+	padding: 0 16px;
+	box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+
+	.inset-section {
+		padding: 14px 0 10px;
+		border-bottom: 1px solid #f1f5f9;
+
+		.section-label-bar {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			margin-bottom: 10px;
+
+			.section-label {
+				font-size: 12px;
+				font-weight: 600;
+				color: #94a3b8;
+				letter-spacing: 0.02em;
+				text-transform: uppercase;
+			}
+		}
+
+		.category-pills-wrap {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 8px;
+
+			.pill-btn {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				padding: 6px 11px;
+				font-size: 12.5px;
+				font-weight: 500;
+				border-radius: 10px;
+				background: #f8fafc;
+				border: 1px solid #e2e8f0;
+				color: #475569;
+				cursor: pointer;
+				transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+
+				.pill-emoji {
+					font-size: 14px;
+					line-height: 1;
+				}
+
+				&:active {
+					transform: scale(0.96);
+				}
+
+				&.active {
+					background: #0f172a;
+					border-color: #0f172a;
+					color: #ffffff;
+					font-weight: 600;
+					box-shadow: 0 2px 6px rgba(15, 23, 42, 0.15);
+				}
+
+				&.custom-pill {
+					border: 1px dashed #cbd5e1;
+					background: transparent;
+					color: #64748b;
+
+					.custom-icon {
+						font-size: 12px;
+					}
+				}
+			}
+		}
+
+		.payment-pills-row {
+			display: grid;
+			grid-template-columns: repeat(4, 1fr);
+			gap: 8px;
+
+			.pay-pill-btn {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				padding: 7px 4px;
+				border-radius: 10px;
+				background: #f8fafc;
+				border: 1px solid #e2e8f0;
+				font-size: 12px;
+				font-weight: 500;
+				color: #475569;
+				cursor: pointer;
+				transition: all 0.15s ease;
+				gap: 3px;
+
+				.pay-icon {
+					font-size: 18px;
+				}
+
+				.arrow-tiny {
+					font-size: 10px;
+				}
+
+				&:active {
+					transform: scale(0.96);
+				}
+
+				&.pay-wx.active {
+					background: #ecfdf5;
+					border-color: #a7f3d0;
+					color: #047857;
+					font-weight: 600;
+					box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.3);
+
+					.icon-wx {
+						color: #059669;
+					}
+				}
+
+				&.pay-zfb.active {
+					background: #f0f9ff;
+					border-color: #bae6fd;
+					color: #0369a1;
+					font-weight: 600;
+					box-shadow: 0 0 0 1px rgba(14, 165, 233, 0.3);
+
+					.icon-zfb {
+						color: #0284c7;
+					}
+				}
+
+				&.pay-yhk.active {
+					background: #eef2ff;
+					border-color: #c7d2fe;
+					color: #4338ca;
+					font-weight: 600;
+					box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.3);
+
+					.icon-yhk {
+						color: #4f46e5;
+					}
+				}
+
+				&.pay-other.active {
+					background: #f8fafc;
+					border-color: #94a3b8;
+					color: #0f172a;
+					font-weight: 600;
+				}
+			}
+		}
+	}
+
+	.inset-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 13px 0;
+		border-bottom: 1px solid #f1f5f9;
+
+		&:last-child {
+			border-bottom: none;
+		}
+
+		.row-label {
+			font-size: 13.5px;
+			font-weight: 500;
+			color: #475569;
+		}
+
+		.row-value-group {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+
+			.quick-date-pills {
+				display: inline-flex;
+				gap: 4px;
+
+				.quick-pill-btn {
+					font-size: 11.5px;
+					font-weight: 500;
+					padding: 2.5px 8px;
+					border-radius: 6px;
+					background: #f1f5f9;
+					border: 1px solid transparent;
+					color: #64748b;
+					cursor: pointer;
+					transition: all 0.15s ease;
+
+					&.active {
+						background: #e2e8f0;
+						color: #0f172a;
+						font-weight: 600;
+					}
+
+					&:active {
+						transform: scale(0.96);
+					}
+				}
+			}
+
+			.date-display-trigger {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				cursor: pointer;
+				padding: 2px 0;
+
+				.date-text {
+					font-size: 13.5px;
+					font-weight: 500;
+					color: #0f172a;
+				}
+
+				.row-arrow {
+					font-size: 12px;
+					color: #cbd5e1;
+				}
+
+				&:active {
+					opacity: 0.75;
+				}
+			}
+
+			.user-pills-group {
+				display: inline-flex;
+				align-items: center;
+				gap: 6px;
+
+				.user-pill-btn {
+					display: inline-flex;
+					align-items: center;
+					gap: 4px;
+					font-size: 12px;
+					font-weight: 500;
+					padding: 4px 12px;
+					border-radius: 9999px;
+					background: #f1f5f9;
+					border: 1px solid transparent;
+					color: #475569;
+					cursor: pointer;
+					transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+
+					.user-pill-icon {
+						font-size: 11px;
+					}
+
+					&.active {
+						background: #0f172a;
+						color: #ffffff;
+						font-weight: 600;
+						box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
+					}
+
+					&:active {
+						transform: scale(0.96);
+					}
+				}
+
+				.user-dropdown-pill {
+					display: inline-flex;
+					align-items: center;
+					gap: 3px;
+					font-size: 12px;
+					font-weight: 500;
+					padding: 4px 10px;
+					border-radius: 9999px;
+					background: #f1f5f9;
+					border: 1px solid #e2e8f0;
+					color: #475569;
+					cursor: pointer;
+					transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+
+					.dropdown-arrow-icon {
+						font-size: 10px;
+						color: #94a3b8;
+						margin-left: 1px;
+					}
+
+					&:active {
+						transform: scale(0.96);
+					}
+
+					&.active {
+						background: #0f172a;
+						border-color: #0f172a;
+						color: #ffffff;
+						font-weight: 600;
+						box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
+
+						.dropdown-arrow-icon {
+							color: #cbd5e1;
+						}
+					}
+				}
+			}
+
+			.mini-segmented-control {
+				background: #f1f5f9;
+				padding: 2.5px;
+				border-radius: 8px;
+				display: inline-flex;
+				align-items: center;
+				gap: 2px;
+
+				.mini-segment-item {
+					display: inline-flex;
+					align-items: center;
+					gap: 4px;
+					padding: 3px 10px;
+					font-size: 12px;
+					font-weight: 500;
+					color: #94a3b8;
+					border-radius: 6px;
+					border: none;
+					background: transparent;
+					cursor: pointer;
+					transition: all 0.15s ease;
+
+					.status-dot {
+						width: 5px;
+						height: 5px;
+						border-radius: 50%;
+
+						&.dot-valid {
+							background: #10b981;
+						}
+					}
+
+					&.active {
+						background: #ffffff;
+						color: #0f172a;
+						font-weight: 600;
+						box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+
+						&:has(.dot-valid) {
+							color: #059669;
+						}
+					}
+
+					&:active {
+						opacity: 0.8;
+					}
+				}
+			}
+		}
+	}
+}
+
+// 3. 底部操作栏 (跟随页面自然流排布，不固定在视口底部)
+.bottom-action-panel {
+	margin-top: 18px;
+	padding: 0 2px 8px;
+
+	.bottom-action-row {
+		display: flex;
+		gap: 10px;
+		margin-bottom: 8px;
+
+		.btn-secondary {
+			flex: 1;
+			height: 46px;
+			border-radius: 12px;
+			background: #ffffff;
+			border: 1px solid #e2e8f0;
+			color: #334155;
+			font-size: 14px;
+			font-weight: 600;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 6px;
+			cursor: pointer;
+			transition: all 0.15s ease;
+
+			.btn-icon {
+				font-size: 14px;
+				color: #475569;
+			}
+
+			&:active {
+				background: #f8fafc;
+				transform: scale(0.985);
+			}
+
+			&:disabled {
+				opacity: 0.6;
+			}
+		}
+
+		.btn-primary {
+			flex: 1;
+			height: 46px;
+			border-radius: 12px;
+			background: #0f172a;
+			border: 1px solid #0f172a;
+			color: #ffffff;
+			font-size: 14px;
+			font-weight: 600;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			box-shadow: 0 2px 8px rgba(15, 23, 42, 0.2);
+			cursor: pointer;
+			transition: all 0.15s ease;
+
+			&:active {
+				background: #1e293b;
+				transform: scale(0.985);
+			}
+
+			&:disabled {
+				opacity: 0.6;
+			}
+		}
+	}
+
+	.bottom-tips {
+		text-align: center;
+		font-size: 10.5px;
+		color: #94a3b8;
+		line-height: 1.4;
+	}
+}
+
+.custom-cat-dialog-content {
+	padding: 16px;
+
+	:deep(.custom-cat-field) {
+		background: #f8fafc;
+		border-radius: 10px;
+		border: 1px solid #e2e8f0;
+		padding: 8px 12px;
+
+		.van-field__control {
+			font-size: 14px;
+		}
 	}
 }
 </style>

@@ -388,7 +388,10 @@ onMounted(() => {
 
 <style lang="less" scoped>
 .role-permission-page {
-	min-height: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
 	background: #f6f8fb;
 	padding: 12px;
 	box-sizing: border-box;
@@ -445,6 +448,8 @@ onMounted(() => {
 }
 
 .permission-refresh {
+	flex: 1;
+	min-height: 0;
 	margin-top: 12px;
 }
 

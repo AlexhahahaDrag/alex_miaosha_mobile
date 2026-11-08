@@ -20,10 +20,12 @@ export interface TabBarInfo {
 	badges?: Record<string, number | string>;
 }
 
-export const useTabBar = (config: Partial<TabBarInfo>) => {
+export const useTabBar = (config?: Partial<TabBarInfo>) => {
 	const tabBarStore = useTabBarStore();
 	const updateTabBar = () => {
-		tabBarStore.setTabBarInfo(config);
+		if (config) {
+			tabBarStore.setTabBarInfo(config);
+		}
 	};
 
 	onMounted(() => {
@@ -33,4 +35,9 @@ export const useTabBar = (config: Partial<TabBarInfo>) => {
 	onActivated(() => {
 		updateTabBar();
 	});
+
+	return {
+		setTabBarVisible: (visible: boolean) => tabBarStore.setVisible(visible),
+		setTabBarInfo: (info: Partial<TabBarInfo>) => tabBarStore.setTabBarInfo(info),
+	};
 };

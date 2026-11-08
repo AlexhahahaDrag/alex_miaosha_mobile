@@ -49,6 +49,7 @@ import { useNavBar } from '@/composables/useNavBar';
 import CommonPullRefresh from '@/components/common/CommonPullRefresh.vue';
 import CommonList from '@/components/common/CommonList.vue';
 import GiftRecordCard from '@/views/finance/gift/components/GiftRecordCard.vue';
+import GiftAiInsightCard from '@/views/finance/gift/ai/GiftAiInsightCard.vue';
 import { getGiftRecordPage } from '@/views/finance/gift/record/api';
 import type { GiftRecordInfo } from '@/views/finance/gift/config';
 import { formatMoney } from '@/views/finance/gift/config';

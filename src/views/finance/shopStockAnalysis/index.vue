@@ -22,19 +22,19 @@
 			title="店总览"
 			name="1"
 		>
-			<ShopStockOverview v-bind="props"></ShopStockOverview>
+			<shop-stock-overview v-bind="props"></shop-stock-overview>
 		</van-tab>
 		<van-tab
 			title="店收支分析"
 			name="2"
 		>
-			<ShopStockInfoAnalysis v-bind="props"></ShopStockInfoAnalysis>
+			<shop-stock-info-analysis v-bind="props"></shop-stock-info-analysis>
 		</van-tab>
 		<van-tab
 			title="店收支明细"
 			name="3"
 		>
-			<ShopStockAnalysisDetail v-bind="props"></ShopStockAnalysisDetail>
+			<shop-stock-analysis-detail v-bind="props"></shop-stock-analysis-detail>
 		</van-tab>
 	</van-tabs>
 	<date-pop
@@ -46,7 +46,9 @@
 </template>
 
 <script lang="ts" setup>
-import { useRoute } from 'vue-router';
+import ShopStockOverview from '@/views/finance/shopStockAnalysis/shopStockAnalysisDetail/shopStockOverview.vue';
+import ShopStockInfoAnalysis from '@/views/finance/shopStockAnalysis/shopStockAnalysisDetail/shopStockInfoAnalysis.vue';
+import ShopStockAnalysisDetail from '@/views/finance/shopStockAnalysis/shopStockAnalysisDetail/shopStockAnalysisDetail.vue';
 import { useNavBar } from '@/composables/useNavBar';
 import { datePickerFormatter, formatMonth, nowDayjs, type Dayjs } from '@/utils/dayjs';
 import type { DatePickerInfo } from '@/utils/common';

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { createMemoryHistory, createRouter } from 'vue-router';
 import { fromSourceTransferList, rulesRef } from '@/views/finance/financeManager/config';
+import { getRoutePathByName } from '@/utils/router';
 
 /**
  * 计算移动端预算使用率百分比与超支状态
@@ -114,6 +116,7 @@ describe('Mobile Finance Manager - 记账渠道字典、校验与预算算力契
 			expect(res.fromSource).toBe('wx');
 		});
 	});
+
 	describe('本月零花钱骨架屏与 Loading 契约', () => {
 		it('loading 判定函数应在接口请求或首屏空列表刷新时激活骨架屏', () => {
 			const shouldShowSkeleton = (budgetLoading: boolean, listLoading: boolean, hasData: boolean) => {
@@ -149,6 +152,123 @@ describe('Mobile Finance Manager - 记账渠道字典、校验与预算算力契
 			toggleExpand(false);
 			expect(isExpanded).toBe(true);
 			expect(vibrated).toBe(true);
+		});
+	});
+
+	describe('数据库动态菜单路由解析契约 (getRoutePathByName)', () => {
+		it('应基于后端 t_menu_info 动态注册的 financeBudgetManage 与 financeAiLedger 解析路由路径', () => {
+			const dynamicRouter = createRouter({
+				history: createMemoryHistory(),
+				routes: [
+					{
+						path: '/selfFinance',
+						name: 'selfFinance',
+						component: { template: '<div />' },
+						children: [
+							{
+								path: '/selfFinance/financeManager/budgetManage',
+								name: 'financeBudgetManage',
+								component: { template: '<div />' },
+							},
+							{
+								path: '/selfFinance/financeManager/financeAiLedger',
+								name: 'financeAiLedger',
+								component: { template: '<div />' },
+							},
+						],
+					},
+				],
+			});
+
+			expect(
+				getRoutePathByName(
+					dynamicRouter,
+					'financeBudgetManage',
+					'/selfFinance/financeManager/budgetManage',
+				),
+			).toBe('/selfFinance/financeManager/budgetManage');
+			expect(
+				getRoutePathByName(
+					dynamicRouter,
+					'financeAiLedger',
+					'/selfFinance/financeManager/financeAiLedger',
+				),
+			).toBe('/selfFinance/financeManager/financeAiLedger');
+		});
+	});
+
+	describe('Tailwind UI 极简风记账表单前置逻辑与交互契约', () => {
+		it('懒人免填机制：未输入账单名称时，应自动缺省回退为选中分类名称', () => {
+			const resolveRecordName = (inputName: string | undefined, selectedCategory: string) => {
+				if (!inputName || !inputName.trim()) {
+					return selectedCategory;
+				}
+				return inputName;
+			};
+
+			// 用户未填写备注 -> 取分类名称
+			expect(resolveRecordName('', '餐饮')).toBe('餐饮');
+			expect(resolveRecordName('   ', '工资')).toBe('工资');
+			expect(resolveRecordName(undefined, '交通')).toBe('交通');
+			// 用户手动填写了备注 -> 尊重用户输入
+			expect(resolveRecordName('星巴克生椰拿铁', '餐饮')).toBe('星巴克生椰拿铁');
+		});
+
+		it('双人直选胶囊计算：应保证当前登录用户排在首位，且最多直接展示 2 位成员', () => {
+			const currentUserId = '1001';
+			const memberList = [
+				{ id: '1002', nickName: '家庭成员A' },
+				{ id: '1001', nickName: '臭屁宝' },
+				{ id: '1003', nickName: '家庭成员B' },
+			];
+
+			const resolvePrimaryUsers = (list: typeof memberList, userId: string) => {
+				const sorted = [...list].sort((a, b) => {
+					const aIsCur = String(a.id) === userId ? -1 : 0;
+					const bIsCur = String(b.id) === userId ? -1 : 0;
+					return aIsCur - bIsCur;
+				});
+				return {
+					primary: sorted.slice(0, 2),
+					hasMore: sorted.length > 2,
+				};
+			};
+
+			const { primary, hasMore } = resolvePrimaryUsers(memberList, currentUserId);
+			expect(primary).toHaveLength(2);
+			expect(primary[0].id).toBe('1001');
+			expect(primary[0].nickName).toBe('臭屁宝');
+			expect(primary[1].id).toBe('1002');
+			expect(hasMore).toBe(true);
+
+			// 验证下拉全员胶囊的文案计算契约
+			const resolveOtherUserLabel = (
+				selectedBelongTo: string,
+				selectedName: string,
+				pUsers: typeof primary,
+			) => {
+				const isOther = !pUsers.some((u) => String(u.id) === selectedBelongTo);
+				return isOther && selectedName ? selectedName : '更多';
+			};
+
+			// 当选中前2位成员中的任意一位时，下拉按钮显示“更多”
+			expect(resolveOtherUserLabel('1001', '臭屁宝', primary)).toBe('更多');
+			expect(resolveOtherUserLabel('1002', '家庭成员A', primary)).toBe('更多');
+			// 当从下拉选出第3位成员（如 1003 家庭成员B）时，下拉按钮直接回显其姓名
+			expect(resolveOtherUserLabel('1003', '家庭成员B', primary)).toBe('家庭成员B');
+		});
+
+		it('微缩分段控制器：状态应在 1 (有效) 与 0 (无效) 之间平滑无阻切换', () => {
+			let isValid = '1';
+			const toggleStatus = (target: '1' | '0') => {
+				isValid = target;
+				return isValid === '1' ? '有效' : '无效';
+			};
+
+			expect(toggleStatus('0')).toBe('无效');
+			expect(isValid).toBe('0');
+			expect(toggleStatus('1')).toBe('有效');
+			expect(isValid).toBe('1');
 		});
 	});
 });

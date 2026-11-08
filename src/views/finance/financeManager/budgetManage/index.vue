@@ -99,11 +99,12 @@
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-import { useRouter } from 'vue-router';
 import BudgetAiAssistantCard from '@/views/finance/financeManager/budgetManage/components/BudgetAiAssistantCard.vue';
 import BudgetCategorySelector from '@/views/finance/financeManager/budgetManage/components/BudgetCategorySelector.vue';
 import BudgetSimulationCard from '@/views/finance/financeManager/budgetManage/components/BudgetSimulationCard.vue';
-import { useNavBar } from '@/composables/useNavBar';
+import { useNavBar, type NavBarConfig } from '@/composables/useNavBar';
+import { useTabBar } from '@/composables/useTabBar';
+import { getRoutePathByName } from '@/utils/router';
 import { usePermission } from '@/composables/usePermission';
 import { formatMonth, getMonthRange } from '@/utils/dayjs';
 import {
@@ -117,10 +118,18 @@ import type { FinanceManagerData } from '@/views/finance/financeManager/config';
 const router = useRouter();
 const { hasPermission } = usePermission();
 
-useNavBar({
+const getFinanceManagerRoutePath = (): string =>
+	getRoutePathByName(router, 'financeManager', '/selfFinance/financeManager');
+
+const info = ref<Pick<NavBarConfig, 'title' | 'rightButton' | 'leftPath' | 'visible'>>({
 	title: '零花钱预算管理',
-	leftPath: '/finance/financeManager',
+	leftPath: getFinanceManagerRoutePath(),
 	visible: true,
+});
+useNavBar(info);
+
+useTabBar({
+	visible: false,
 });
 
 const canEditBudget = computed(() => hasPermission('finance:financeManager:budget:edit'));
@@ -330,7 +339,7 @@ const onSaveBudget = async () => {
 
 		if (code === '200') {
 			showSuccessToast('预算保存成功');
-			router.back();
+			navigateBackToFinanceManager();
 		} else {
 			showFailToast(message || '保存预算失败');
 		}
@@ -341,8 +350,16 @@ const onSaveBudget = async () => {
 	}
 };
 
+const navigateBackToFinanceManager = () => {
+	if (typeof window !== 'undefined' && window.history.length > 1) {
+		router.back();
+		return;
+	}
+	router.replace({ path: getFinanceManagerRoutePath() });
+};
+
 const onCancel = () => {
-	router.back();
+	navigateBackToFinanceManager();
 };
 
 onMounted(() => {

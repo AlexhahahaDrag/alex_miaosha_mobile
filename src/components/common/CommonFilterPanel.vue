@@ -3,29 +3,31 @@
 		v-show="show"
 		class="common-filter-panel"
 	>
-		<div
-			v-for="section in sections"
-			:key="section.key"
-			class="filter-section"
-		>
-			<div class="filter-label">
-				<van-icon
-					v-if="section.icon"
-					:name="section.icon"
-					class="label-icon"
-				/>
-				{{ section.label }}
-			</div>
-			<div class="chip-group">
-				<button
-					v-for="option in section.options"
-					:key="`${section.key}-${option.value}`"
-					type="button"
-					:class="['chip', { 'chip--active': isSelected(section, option.value) }]"
-					@click="onSelect(section, option.value)"
-				>
-					{{ option.text || option.label }}
-				</button>
+		<div class="filter-sections-scroll">
+			<div
+				v-for="section in sections"
+				:key="section.key"
+				class="filter-section"
+			>
+				<div class="filter-label">
+					<van-icon
+						v-if="section.icon"
+						:name="section.icon"
+						class="label-icon"
+					/>
+					{{ section.label }}
+				</div>
+				<div class="chip-group">
+					<button
+						v-for="option in section.options"
+						:key="`${section.key}-${option.value}`"
+						type="button"
+						:class="['chip', { 'chip--active': isSelected(section, option.value) }]"
+						@click="onSelect(section, option.value)"
+					>
+						{{ option.text || option.label }}
+					</button>
+				</div>
 			</div>
 		</div>
 
@@ -101,11 +103,52 @@ const onSelect = (section: FilterSection, value: unknown) => {
 
 <style scoped lang="less">
 .common-filter-panel {
-	margin: 0 14px 10px;
-	padding: 14px;
+	display: flex;
+	flex-direction: column;
+	flex-shrink: 1;
+	min-height: 0;
+	max-height: min(54vh, calc(100vh - 230px));
+	margin: 8px 12px 10px;
+	padding: 14px 8px 14px 14px;
 	background: #ffffff;
 	border-radius: 18px;
 	box-shadow: 0 8px 24px rgba(15, 56, 120, 0.06);
+	overflow: hidden;
+
+	@supports (height: 100dvh) {
+		max-height: min(54dvh, calc(100dvh - 230px));
+	}
+}
+
+.filter-sections-scroll {
+	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
+	overflow-x: hidden;
+	padding-right: 6px;
+	-webkit-overflow-scrolling: touch;
+	overscroll-behavior: contain;
+	scrollbar-width: thin;
+	scrollbar-color: #cbd5e1 #f8fafc;
+
+	&::-webkit-scrollbar {
+		width: 5px;
+	}
+
+	&::-webkit-scrollbar-track {
+		background: #f8fafc;
+		border-radius: 999px;
+	}
+
+	&::-webkit-scrollbar-thumb {
+		background: #cbd5e1;
+		border-radius: 999px;
+	}
+
+	&::-webkit-scrollbar-thumb:hover,
+	&::-webkit-scrollbar-thumb:active {
+		background: #94a3b8;
+	}
 }
 
 .filter-section {
@@ -155,10 +198,14 @@ const onSelect = (section: FilterSection, value: unknown) => {
 }
 
 .filter-actions {
+	flex-shrink: 0;
 	display: grid;
 	grid-template-columns: 96px 1fr;
 	gap: 10px;
-	margin-top: 16px;
+	margin-top: 12px;
+	padding-top: 12px;
+	padding-right: 6px;
+	border-top: 1px solid #f1f5f9;
 }
 
 .action-btn {

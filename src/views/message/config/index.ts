@@ -182,13 +182,18 @@ export const resolveMessageBadgeMeta = (item: SysMessageInfoData): MessageBadgeM
  */
 export const resolveMobileMessageJumpRoute = (item: SysMessageInfoData): string => {
 	if (item.bizType === 'BUDGET' || item.msgType === 'BUDGET') {
-		return '/finance/financeManager/budgetManage';
+		return '/selfFinance/financeManager/budgetManage';
 	}
 	if (item.bizType === 'GIFT_RETURN' || item.msgType === 'GIFT_RETURN') {
 		return '/finance/gift/analysis';
 	}
 	if (item.jumpUrl && item.jumpUrl.trim()) {
-		return item.jumpUrl.trim();
+		const rawUrl = item.jumpUrl.trim();
+		if (rawUrl === '/finance/accountRecordInfo') return '/selfFinance/accountRecordInfo';
+		if (rawUrl === '/finance/financeManager') return '/selfFinance/financeManager';
+		if (rawUrl === '/finance/financeManager/budgetManage')
+			return '/selfFinance/financeManager/budgetManage';
+		return rawUrl;
 	}
 	if (item.bizType === 'GIFT_EVENT' || item.msgType === 'GIFT_EVENT') {
 		return '/finance/gift/event';
@@ -197,7 +202,7 @@ export const resolveMobileMessageJumpRoute = (item: SysMessageInfoData): string 
 		return '/cpn-coupon/cpn-coupon-info';
 	}
 	if (item.bizType === 'ACCOUNT_RECORD') {
-		return '/finance/accountRecordInfo';
+		return '/selfFinance/accountRecordInfo';
 	}
 	if (item.bizType === 'PREPAID_CARD' || item.msgType === 'CARD_EXPIRE') {
 		return '/selfFinance/prepaidCardInfoT';

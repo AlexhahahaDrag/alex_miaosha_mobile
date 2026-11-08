@@ -76,7 +76,7 @@ describe('零花钱与预算管理权限矩阵契约', () => {
 		expect(canAccessPermission(set, 'finance:financeManager:budget:edit', superAdmin)).toBe(true);
 	});
 
-	it('二级独立路由 /finance/financeManager/budgetManage 访问准入校验', () => {
+	it('二级独立路由 /selfFinance/financeManager/budgetManage 访问准入校验', () => {
 		// 家庭成员允许准入 (挂载 budget:view)
 		expect(
 			canAccessRoutePermission('finance:financeManager:budget:view', {

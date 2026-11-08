@@ -29,7 +29,7 @@
 					type="button"
 					class="search-shell__ai-btn"
 					data-testid="mobile-btn-index-ai-ledger"
-					@click="showAiSheet = true"
+					@click="onNavigateToAiLedger"
 				>
 					<van-icon
 						name="fire-o"
@@ -98,6 +98,7 @@
 
 		<!-- 下拉刷新与列表流容器 -->
 		<common-pull-refresh
+			id="finance-manager-scroll"
 			ref="pullRefresh"
 			v-model="isRefresh"
 			class="refresh-info"
@@ -207,37 +208,23 @@
 		/>
 
 		<van-back-top
-			target="#finance-manager-list"
+			target="#finance-manager-scroll"
 			:bottom="100"
-		/>
-
-		<!-- AI 智能记账抽屉 -->
-		<finance-ai-sheet
-			v-model="showAiSheet"
-			:belong-to="searchInfo.belongTo"
-			@apply="onApplyAiFromIndex"
 		/>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { showFailToast, showSuccessToast } from 'vant';
-import { useRoute, useRouter } from 'vue-router';
 import FinanceCard from '@/views/finance/financeManager/components/FinanceCard.vue';
 import PocketMoneyCard from '@/views/finance/financeManager/components/PocketMoneyCard.vue';
-import FinanceAiSheet from '@/views/finance/financeManager/components/FinanceAiSheet.vue';
-import type {
-	UniversalFinanceAiParseVo,
-	FinanceManagerData,
-	FinanceBudgetStatusVo,
-} from '@/views/finance/financeManager/config';
+import type { FinanceManagerData, FinanceBudgetStatusVo } from '@/views/finance/financeManager/config';
 import { useFinanceFilter } from '@/views/finance/financeManager/composables/useFinanceFilter';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
 import { usePermission } from '@/composables/usePermission';
 import type { PageInfo } from '@/views/common/config';
 import { deleteFinanceManager, getFinanceMangerPage, getBudgetStatus } from '@/views/finance/financeManager/api';
-import type { ResponseBody } from '@/types/api';
 import { formatHeaderDate, formatDate, formatMonth, formatDayjs } from '@/utils/dayjs';
 import { getRoutePathByName } from '@/utils/router';
 import { useDashboardStore } from '@/store/modules/dashboard/dashboard';
@@ -266,23 +253,17 @@ const loading = ref(true);
 const dataSource = ref<FinanceManagerData[]>([]);
 const finished = ref<boolean>(false);
 const isRefresh = ref<boolean>(false);
+const fetchingPage = ref<boolean>(false);
 const budgetStatus = ref<FinanceBudgetStatusVo | null>(null);
 
 const currentMonthStr = computed(() => formatMonth());
 const canEditBudget = computed(() => hasPermission('finance:financeManager:budget:edit'));
 const canAddFinance = computed(() => hasPermission('finance:financeManager:add'));
 
-const showAiSheet = ref<boolean>(false);
-
-const onApplyAiFromIndex = (parsed: UniversalFinanceAiParseVo) => {
-	if (!parsed) return;
-	// 将解析结果转存并带参跳转至详情页，利用路由或 session 自动装配
-	try {
-		sessionStorage.setItem('alex_mobile_ai_parsed_ledger', JSON.stringify(parsed));
-	} catch (e) {
-		console.warn('Storage save failed:', e);
-	}
-	router.push({ path: getDetailRoutePath() });
+const onNavigateToAiLedger = () => {
+	triggerHaptic('light');
+	const path = getRoutePathByName(router, 'financeAiLedger', '/selfFinance/financeManager/financeAiLedger');
+	router.push({ path });
 };
 
 // 挂载筛选组合式函数
@@ -308,7 +289,11 @@ const {
 	onSearch();
 });
 
-const getDetailRoutePath = (): string => getRoutePathByName(router, 'financeManagerDetail');
+const getDetailRoutePath = (): string =>
+	getRoutePathByName(router, 'financeManagerDetail', '/selfFinance/financeManager/financeManagerDetail');
+
+const getBudgetRoutePath = (): string =>
+	getRoutePathByName(router, 'financeBudgetManage', '/selfFinance/financeManager/budgetManage');
 
 const getDetailRoute = (id?: string) => ({
 	path: getDetailRoutePath(),
@@ -340,7 +325,7 @@ useTabBar({
 
 const onOpenBudgetManage = () => {
 	triggerHaptic('medium');
-	router.push({ path: '/finance/financeManager/budgetManage' });
+	router.push({ path: getBudgetRoutePath() });
 };
 
 const drillDownBudgetMonth = () => {
@@ -373,6 +358,7 @@ const resetData = () => {
 };
 
 const getFinancePage = async (param: FinanceManagerData, cur: PageInfo) => {
+	fetchingPage.value = true;
 	if (!isRefresh.value) {
 		loading.value = true;
 	}
@@ -392,28 +378,27 @@ const getFinancePage = async (param: FinanceManagerData, cur: PageInfo) => {
 		delete query.infoDateEnd;
 	}
 
-	const { code, data, message } = await getFinanceMangerPage(query, cur?.current || 1, cur?.pageSize || 10)
-		.catch((error: ResponseBody) => {
-			throw error;
-		})
-		.finally(() => {
-			loading.value = false;
-			isRefresh.value = false;
-		});
+	try {
+		const { code, data, message } = await getFinanceMangerPage(query, cur?.current || 1, cur?.pageSize || 10);
 
-	if (code === '200') {
-		if (cur?.current === 1) {
-			dataSource.value = data?.records || [];
-			saveFinanceOfflineSnapshot(dataSource.value, data?.total || 0);
-		} else {
-			dataSource.value = [...dataSource.value, ...(data?.records || [])];
+		if (code === '200') {
+			if (cur?.current === 1) {
+				dataSource.value = data?.records || [];
+				saveFinanceOfflineSnapshot(dataSource.value, data?.total || 0);
+			} else {
+				dataSource.value = [...dataSource.value, ...(data?.records || [])];
+			}
+			setTotal(data?.total || 0);
+			finished.value = !data?.records?.length || (pagination.total || 0) <= dataSource.value.length;
+			return;
 		}
-		setTotal(data?.total || 0);
-		finished.value = (pagination.total || 0) <= dataSource.value.length;
-		return;
-	}
 
-	showFailToast(message || '查询账单失败');
+		showFailToast(message || '查询账单失败');
+	} finally {
+		fetchingPage.value = false;
+		loading.value = false;
+		isRefresh.value = false;
+	}
 };
 
 const onSearch = () => {
@@ -433,7 +418,7 @@ const onRefreshData = () => {
 };
 
 const onLoadMore = () => {
-	if (isRefresh.value) return;
+	if (isRefresh.value || finished.value || fetchingPage.value) return;
 	if (dataSource.value.length > 0) {
 		nextPage();
 	}
@@ -524,6 +509,7 @@ onMounted(() => {
 	if (cachedSnapshot && cachedSnapshot.records.length > 0) {
 		dataSource.value = cachedSnapshot.records;
 		setTotal(cachedSnapshot.total || cachedSnapshot.records.length);
+		fetchingPage.value = false;
 		loading.value = false;
 	}
 	const cachedBudget = loadBudgetOfflineSnapshot();
@@ -544,14 +530,18 @@ onMounted(() => {
 
 <style lang="less" scoped>
 .finance-manager-page {
-	padding-bottom: 74px;
-	min-height: 100vh;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+
 	background-color: #f1f5f9;
 }
 
 .page-search {
 	position: sticky;
 	top: 0;
+	flex-shrink: 0;
 	z-index: 20;
 	padding: 10px 12px 8px;
 	background: #ffffff;
@@ -694,7 +684,8 @@ onMounted(() => {
 }
 
 .refresh-info {
-	min-height: calc(100vh - 180px);
+	flex: 1;
+	min-height: 0;
 
 	:deep(.list-wrapper) {
 		padding: 0 !important;

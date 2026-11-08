@@ -88,8 +88,8 @@
 </template>
 
 <script lang="ts" setup>
-import { useRouter, useRoute } from 'vue-router';
 import { showFailToast } from 'vant';
+import ShopOrderCard from '@/views/finance/shopOrder/components/ShopOrderCard.vue';
 import type { ShopOrderData } from '@/views/finance/shopOrder/config';
 import { getShopOrderPage } from '@/views/finance/shopOrder/api';
 import { useNavBar } from '@/composables/useNavBar';

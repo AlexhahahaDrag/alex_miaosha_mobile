@@ -78,7 +78,7 @@ describe('Mobile Message Center Utilities', () => {
 			'/cpn-coupon/cpn-coupon-info',
 		);
 		expect(resolveMobileMessageJumpRoute({ msgType: 'CARD_EXPIRE', bizType: 'ACCOUNT_RECORD' })).toBe(
-			'/finance/accountRecordInfo',
+			'/selfFinance/accountRecordInfo',
 		);
 		expect(resolveMobileMessageJumpRoute({ msgType: 'CARD_EXPIRE', bizType: 'PREPAID_CARD' })).toBe(
 			'/selfFinance/prepaidCardInfoT',
@@ -87,7 +87,7 @@ describe('Mobile Message Center Utilities', () => {
 			'/finance/gift/analysis',
 		);
 		expect(resolveMobileMessageJumpRoute({ msgType: 'BUDGET', bizType: 'BUDGET' })).toBe(
-			'/finance/financeManager/budgetManage',
+			'/selfFinance/financeManager/budgetManage',
 		);
 		expect(resolveMobileMessageJumpRoute({ msgType: 'SYSTEM', bizType: 'SYSTEM' })).toBe('');
 	});

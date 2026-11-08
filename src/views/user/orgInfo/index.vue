@@ -131,6 +131,7 @@ import { getOrgInfoPage, getOrgInfoTree, deleteOrgInfo, updateOrgInfo } from '@/
 import { getUserManagerList } from '@/views/user/userManager/api';
 import type { PageInfo } from '@/views/common/config';
 import type { UserManagerData } from '@/views/user/userManager/config';
+import OrgTreeItem from '@/views/user/orgInfo/orgTreeItem.vue';
 
 const router = useRouter();
 const route = useRoute();
