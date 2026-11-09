@@ -152,6 +152,85 @@ export const fromSourceTransferList: FromSourceTransferItem[] = [
 	{ value: 'other', label: '', name: '其他' },
 ];
 
+export const categoryEmojiMap: Record<string, string> = {
+	转账: '🔄',
+	餐饮: '🍱',
+	美食: '🍱',
+	饭: '🍚',
+	外卖: '🥡',
+	买菜: '🥬',
+	菜: '🥬',
+	日常交通: '🚗',
+	交通: '🚗',
+	出行: '🚕',
+	打车: '🚕',
+	地铁: '🚇',
+	加油: '⛽',
+	日用百货: '🛒',
+	日用: '🛒',
+	杂物: '📦',
+	超市: '🏪',
+	购物: '🛍️',
+	服饰: '👔',
+	剪发: '💇',
+	理发: '💇',
+	美发: '💇',
+	美容: '💄',
+	护肤: '🧴',
+	水费: '💧',
+	水: '💧',
+	电费: '⚡',
+	燃气费: '🔥',
+	取暖: '🔥',
+	生活缴费: '🧾',
+	物业: '🏘️',
+	话费: '📱',
+	通讯: '📱',
+	网费: '🌐',
+	零食: '🍿',
+	水果: '🍎',
+	饮品: '☕',
+	咖啡: '☕',
+	奶茶: '🧋',
+	工资: '💰',
+	奖金: '🧧',
+	年金: '📈',
+	理财: '📈',
+	投资: '📈',
+	保险: '🛡️',
+	礼金: '🎁',
+	红包: '🧧',
+	房租: '🏠',
+	住房: '🏠',
+	房贷: '🏦',
+	公司: '🏢',
+	办公: '🏢',
+	数码: '🎧',
+	耳机: '🎧',
+	医疗: '💊',
+	看病: '🏥',
+	娱乐: '🎮',
+	电影: '🎬',
+	运动: '🏃',
+	健身: '🏋️',
+	教育: '📚',
+	学习: '📚',
+	旅行: '✈️',
+	酒店: '🏨',
+	宠物: '🐾',
+};
+
+export const getCategoryEmoji = (name?: string): string => {
+	if (!name) return '🏷️';
+	if (categoryEmojiMap[name]) return categoryEmojiMap[name];
+	for (const [key, emoji] of Object.entries(categoryEmojiMap)) {
+		if (name.includes(key)) {
+			return emoji;
+		}
+	}
+	return '🏷️';
+};
+
 export const rulesRef = reactive({
 	name: [
 		{

@@ -1,4 +1,4 @@
-﻿import type { Dayjs } from '@/utils/dayjs';
+import type { Dayjs } from '@/utils/dayjs';
 
 export interface ItemInfo {
 	name: string;
@@ -11,6 +11,8 @@ export interface FinanceDetail {
 	typeCode?: string;
 	typeName?: string;
 	amount?: number;
+	incomeAmount?: number;
+	expenseAmount?: number;
 	fromSource?: string;
 	fromSourceName?: string;
 	isValid?: string;
