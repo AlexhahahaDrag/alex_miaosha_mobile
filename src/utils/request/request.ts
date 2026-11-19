@@ -37,7 +37,20 @@ const requestFile = axios.create({
 
 request.defaults.headers.post['Content-Type'] = 'application/json';
 
-const redirectToLogin = () => {
+const AUTH_WHITE_LIST = ['/user/login', '/user/captcha', '/user/register'];
+
+const isAuthWhiteListUrl = (url?: string): boolean => {
+	if (!url) return false;
+	return AUTH_WHITE_LIST.some((path) => url.includes(path));
+};
+
+const redirectToLogin = (clearAuth = false) => {
+	if (clearAuth) {
+		const userStore = useUserStore();
+		if (userStore.getToken) {
+			userStore.resetState();
+		}
+	}
 	if (router.currentRoute.value.name !== 'login') {
 		void router.push({ name: 'login' });
 	}
@@ -48,8 +61,8 @@ const errorHandler = async (error: AxiosError): Promise<unknown> => {
 
 	if (error.response) {
 		const { status, headers } = error.response;
-		if (status === 403) {
-			redirectToLogin();
+		if (status === 401 || status === 403) {
+			redirectToLogin(true);
 			return Promise.reject(error);
 		}
 
@@ -78,7 +91,7 @@ const requestHandler = (
 
 	if (token) {
 		config.headers.Authorization = token;
-	} else {
+	} else if (!isAuthWhiteListUrl(config.url)) {
 		redirectToLogin();
 	}
 
@@ -96,7 +109,7 @@ const requestHandlerFile = (
 
 	if (token) {
 		config.headers.Authorization = token;
-	} else {
+	} else if (!isAuthWhiteListUrl(config.url)) {
 		redirectToLogin();
 	}
 
@@ -113,8 +126,8 @@ const responseHandler = async (response: AxiosResponse<unknown>) => {
 		resData = decrypt(data as string);
 	}
 
-	if (resData?.code == 403) {
-		redirectToLogin();
+	if (resData?.code == 401 || resData?.code == 403) {
+		redirectToLogin(true);
 		return Promise.reject(resData);
 	}
 

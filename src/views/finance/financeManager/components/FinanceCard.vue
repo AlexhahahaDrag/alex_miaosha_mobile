@@ -52,7 +52,7 @@
 				<div :class="['finance-card-row__amount', amountToneClass]">
 					{{ formattedAmount }}
 				</div>
-				<div class="finance-card-row__account"> {{ directionPrefix }} {{ accountName }} </div>
+				<div class="finance-card-row__account">{{ accountName }}</div>
 			</div>
 		</div>
 
@@ -183,14 +183,14 @@ const sceneTheme = computed<SceneTheme>(() => {
 
 const accountName = computed(() => props.item.belongToName || '个人账户');
 
-const directionPrefix = computed(() => (props.item.incomeAndExpenses === 'income' ? '来自' : '转给'));
-
 const amountToneClass = computed(() => (props.item.incomeAndExpenses === 'income' ? 'is-income' : 'is-expense'));
 
 const formattedAmount = computed(() => {
-	const amount = Number(props.item.amount || 0);
-	const prefix = props.item.incomeAndExpenses === 'income' ? '' : '-';
-	return `${prefix}¥${amount.toFixed(2)}`;
+	const amount = Math.abs(Number(props.item.amount || 0));
+	const parts = amount.toFixed(2).split('.');
+	parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+	const prefix = props.item.incomeAndExpenses === 'income' ? '+' : '-';
+	return `${prefix}¥${parts.join('.')}`;
 });
 
 const recordTime = computed(() => {
@@ -319,16 +319,17 @@ const onDelete = () => {
 	}
 
 	&__amount {
-		font-size: 16.5px;
-		font-weight: 700;
+		font-size: 16px;
+		font-weight: 800;
 		line-height: 1.1;
+		font-variant-numeric: tabular-nums;
 
 		&.is-income {
 			color: #059669;
 		}
 
 		&.is-expense {
-			color: #dc2626;
+			color: #e11d48;
 		}
 	}
 

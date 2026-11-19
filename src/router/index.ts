@@ -119,6 +119,18 @@ export const routes: MenuDataItem[] = [
 ];
 
 const BASE_ROUTE_COUNT = routes.length;
+const BASE_ROUTE_NAMES = new Set<string>([
+	'home',
+	'dashboard',
+	'message',
+	'messageManager',
+	'myself',
+	'about',
+	'myselfInfo',
+	'login',
+]);
+
+export const routesVersion = ref<number>(0);
 
 const router = createRouter({
 	history: createWebHashHistory(),
@@ -126,32 +138,65 @@ const router = createRouter({
 });
 
 let dynamicRouter = [] as RouteRecordRaw[];
+let menuLoadPromise: Promise<boolean> | null = null;
+
+const removeDynamicRoutesFromRouter = () => {
+	dynamicRouter.forEach((route) => {
+		if (route.name && router.hasRoute(route.name)) {
+			router.removeRoute(route.name);
+		}
+	});
+	// 兜底清除可能残留的非底座命名路由，防止 router.hasRoute 误判导致 routes.push 被跳过
+	router.getRoutes().forEach((record) => {
+		if (record.name && !BASE_ROUTE_NAMES.has(String(record.name)) && router.hasRoute(record.name)) {
+			router.removeRoute(record.name);
+		}
+	});
+	dynamicRouter = [];
+};
+
+const ensureMenusLoaded = async (userStore: ReturnType<typeof useUserStore>): Promise<boolean> => {
+	if (userStore.getMenuInfo?.length) {
+		return true;
+	}
+	if (!menuLoadPromise) {
+		menuLoadPromise = (async () => {
+			try {
+				const { code, data, message: messageInfo } = await getUserMenusApi();
+				if (code == '200' && data?.length) {
+					userStore.setMenuInfo(data);
+					return true;
+				}
+				showFailToast(messageInfo || '加载菜单失败');
+				userStore.resetState();
+				return false;
+			} catch (error: unknown) {
+				console.error('加载用户菜单失败：', error);
+				showFailToast('加载菜单失败，请重新登录');
+				userStore.resetState();
+				return false;
+			} finally {
+				menuLoadPromise = null;
+			}
+		})();
+	}
+	return menuLoadPromise;
+};
 
 router.beforeEach(async (to) => {
 	const userStore = useUserStore();
 	if (to.path == '/login') {
+		if (userStore.getToken) {
+			return { path: '/' };
+		}
 		return true;
 	}
 
 	if (userStore.getToken) {
 		if (!userStore.getRouteStatus || routes.length <= BASE_ROUTE_COUNT) {
-			dynamicRouter = [];
-			if (!userStore.getMenuInfo?.length) {
-				try {
-					const { code, data, message: messageInfo } = await getUserMenusApi();
-					if (code == '200' && data?.length) {
-						userStore.setMenuInfo(data);
-					} else {
-						showFailToast(messageInfo || '加载菜单失败');
-						userStore.resetState();
-						return { name: 'login' };
-					}
-				} catch (error: unknown) {
-					console.error('加载用户菜单失败：', error);
-					showFailToast('加载菜单失败，请重新登录');
-					userStore.resetState();
-					return { name: 'login' };
-				}
+			const loaded = await ensureMenusLoaded(userStore);
+			if (!loaded) {
+				return { name: 'login' };
 			}
 			addRouter();
 			if (routes.length > BASE_ROUTE_COUNT) {
@@ -180,19 +225,24 @@ const hasAnyRouteAccess = (access: RouteAccessOptions): boolean =>
 	!!access.permissionList?.length;
 
 const addRouter = () => {
+	removeDynamicRoutesFromRouter();
 	routes.splice(BASE_ROUTE_COUNT);
 	const userStore = useUserStore();
 	if (userStore.getMenuInfo?.length) {
 		const access = buildRouteAccess(userStore);
 		if (!hasAnyRouteAccess(access)) {
 			userStore.changeRouteStatus(true);
+			routesVersion.value += 1;
 			return;
 		}
 		const clonedMenus: MenuInfoData[] = structuredClone(toRaw(userStore.getMenuInfo));
 		clonedMenus.forEach((item: MenuInfoData) => {
 			if (judgePermission(getStringField(item, 'permissionCode'), access)) {
 				const newRouter = getChildren(item, access);
-				if (newRouter.name && !router.hasRoute(newRouter.name)) {
+				if (newRouter.name) {
+					if (router.hasRoute(newRouter.name)) {
+						router.removeRoute(newRouter.name);
+					}
 					router.addRoute(newRouter);
 					dynamicRouter.push(newRouter);
 					routes.push(newRouter);
@@ -201,6 +251,7 @@ const addRouter = () => {
 		});
 	}
 	userStore.changeRouteStatus(true);
+	routesVersion.value += 1;
 };
 
 interface PermissionItem {
@@ -277,14 +328,10 @@ const judgePermission = (permissionCode: string | undefined, access: RouteAccess
 	canAccessRoutePermission(permissionCode, access);
 
 export const refreshRouter = () => {
-	dynamicRouter.forEach((route) => {
-		if (route.name) {
-			router.removeRoute(route.name);
-		}
-	});
-	dynamicRouter = [];
+	removeDynamicRoutesFromRouter();
 	routes.splice(BASE_ROUTE_COUNT);
 	useUserStore().changeRouteStatus(false);
+	routesVersion.value += 1;
 };
 
 export default router;

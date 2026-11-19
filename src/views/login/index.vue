@@ -1,17 +1,23 @@
 <template>
-	<div class="login-container">
-		<!-- 顶部柔和 Indigo 环境微光球 (Taste-Skill Soft UI 氛围层) -->
+	<div
+		class="login-container"
+		:class="[`theme-${themeGender}`]"
+		:data-theme-gender="themeGender"
+		data-testid="mobile-login-theme"
+	>
+		<!-- 可爱风背景云朵 / 泡泡氛围层 -->
 		<div
-			class="ambient-orb ambient-orb--indigo"
+			class="cute-backdrop"
 			aria-hidden="true"
-		></div>
-		<div
-			class="ambient-orb ambient-orb--violet"
-			aria-hidden="true"
-		></div>
+		>
+			<div class="float-bubble float-bubble--1"></div>
+			<div class="float-bubble float-bubble--2"></div>
+			<div class="float-bubble float-bubble--3"></div>
+		</div>
 
-		<div class="login-content">
-			<header class="login-header">
+		<!-- 顶部品牌栏 -->
+		<header class="brand-bar">
+			<div class="brand-left">
 				<div class="logo-box">
 					<img
 						src="/logo.svg"
@@ -19,114 +25,407 @@
 						class="logo-icon"
 					/>
 				</div>
-				<h1 class="brand-title">alex系统管理平台</h1>
-				<div class="brand-badge">
-					<span class="brand-badge__dot"></span>
-					<span class="brand-badge__text">企业级通用管理终端</span>
-				</div>
-			</header>
+				<span class="brand-name">Alex 管理平台</span>
+			</div>
+			<span class="date-pill">{{ todayText }}</span>
+		</header>
 
-			<main class="login-card">
-				<div class="card-inner">
-					<van-form
-						class="login-form"
-						@submit="onSubmit"
+		<!-- 中部：Q版萌宠交互舞台 + 软萌圆角登录卡 -->
+		<main class="login-stage">
+			<!-- 趴在卡片顶部的 Q 版小萝卜（卜卜）SVG（支持密码捂眼 / 明文偷看 + 性别专属配饰） -->
+			<div
+				class="mascot-stage"
+				:class="{
+					'is-covering': isPasswordFocused && !showPassword,
+					'is-peeking': isPasswordFocused && showPassword,
+				}"
+				aria-hidden="true"
+			>
+				<svg
+					class="mascot-svg"
+					viewBox="0 0 160 132"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<defs>
+						<radialGradient
+							id="carrotBodyGrad"
+							cx="45%"
+							cy="35%"
+							r="65%"
+						>
+							<stop
+								offset="0%"
+								stop-color="#FB923C"
+							/>
+							<stop
+								offset="58%"
+								stop-color="#F97316"
+							/>
+							<stop
+								offset="100%"
+								stop-color="#EA580C"
+							/>
+						</radialGradient>
+						<linearGradient
+							id="leafGradLeft"
+							x1="0"
+							y1="0"
+							x2="1"
+							y2="1"
+						>
+							<stop
+								offset="0%"
+								stop-color="#A3E635"
+							/>
+							<stop
+								offset="100%"
+								stop-color="#65A30D"
+							/>
+						</linearGradient>
+						<linearGradient
+							id="leafGradCenter"
+							x1="0"
+							y1="0"
+							x2="0"
+							y2="1"
+						>
+							<stop
+								offset="0%"
+								stop-color="#BEF264"
+							/>
+							<stop
+								offset="100%"
+								stop-color="#65A30D"
+							/>
+						</linearGradient>
+					</defs>
+
+					<!-- 顶部三片波浪嫩绿萝卜叶 -->
+					<g class="carrot-leaves">
+						<!-- 左叶 -->
+						<path
+							d="M74 42 C 66 31, 51 28, 48 18 C 46 11, 54 6, 61 10 C 68 14, 71 27, 77 40 Z"
+							fill="url(#leafGradLeft)"
+						/>
+						<path
+							d="M55 15 Q 64 25 74 38"
+							stroke="#4D7C0F"
+							stroke-width="1.6"
+							stroke-linecap="round"
+							stroke-opacity="0.55"
+						/>
+						<!-- 右叶 -->
+						<path
+							d="M86 42 C 94 31, 109 28, 112 18 C 114 11, 106 6, 99 10 C 92 14, 89 27, 83 40 Z"
+							fill="url(#leafGradLeft)"
+						/>
+						<path
+							d="M105 15 Q 96 25 86 38"
+							stroke="#4D7C0F"
+							stroke-width="1.6"
+							stroke-linecap="round"
+							stroke-opacity="0.55"
+						/>
+						<!-- 中叶（最高） -->
+						<path
+							d="M78 40 C 73 25, 68 12, 74 5 C 79 0, 86 2, 88 9 C 90 17, 84 28, 82 40 Z"
+							fill="url(#leafGradCenter)"
+						/>
+						<path
+							d="M80 9 Q 81 22 80 37"
+							stroke="#4D7C0F"
+							stroke-width="1.6"
+							stroke-linecap="round"
+							stroke-opacity="0.55"
+						/>
+					</g>
+
+					<!-- 萝卜圆滚滚橙色身体（上窄下圆梨形） -->
+					<path
+						d="M80 37 C 102 37, 126 62, 126 92 C 126 114, 108 126, 80 126 C 52 126, 34 114, 34 92 C 34 62, 58 37, 80 37 Z"
+						fill="url(#carrotBodyGrad)"
+					/>
+					<!-- 额头柔和高光 -->
+					<ellipse
+						cx="64"
+						cy="56"
+						rx="12"
+						ry="6"
+						transform="rotate(-24 64 56)"
+						fill="#FFFFFF"
+						fill-opacity="0.18"
+					/>
+
+					<!-- 女生专属：小花发卡 + 粉嫩腮红 -->
+					<g v-if="themeGender === 'female'">
+						<ellipse
+							cx="48"
+							cy="86"
+							rx="8"
+							ry="4.5"
+							fill="#FDA4AF"
+							fill-opacity="0.65"
+						/>
+						<ellipse
+							cx="112"
+							cy="86"
+							rx="8"
+							ry="4.5"
+							fill="#FDA4AF"
+							fill-opacity="0.65"
+						/>
+						<!-- 粉色蝴蝶结发卡在右耳/叶侧 -->
+						<g transform="translate(103, 46) rotate(16)">
+							<path
+								d="M0 0 L-8 -5 L-8 5 Z"
+								fill="#FB7185"
+							/>
+							<path
+								d="M0 0 L8 -5 L8 5 Z"
+								fill="#FB7185"
+							/>
+							<circle
+								cx="0"
+								cy="0"
+								r="3"
+								fill="#FFE4E6"
+							/>
+						</g>
+					</g>
+
+					<!-- 男生专属：清爽天际蓝小领结 -->
+					<g
+						v-else-if="themeGender === 'male'"
+						transform="translate(80, 114)"
 					>
-						<div class="form-fields">
-							<div class="field-group">
-								<label
-									for="login-username"
-									class="field-label"
-								>
-									用户名
-								</label>
-								<van-field
-									id="login-username"
-									v-model="loginForm.username"
-									name="username"
-									data-testid="mobile-login-username"
-									placeholder="请输入用户名"
-									left-icon="manager"
-									clearable
-									class="soft-field"
-									:rules="[{ required: true, message: '请输入用户名' }]"
-								/>
-							</div>
+						<path
+							d="M0 0 L-11 -6 L-11 6 Z"
+							fill="#3B82F6"
+						/>
+						<path
+							d="M0 0 L11 -6 L11 6 Z"
+							fill="#3B82F6"
+						/>
+						<circle
+							cx="0"
+							cy="0"
+							r="3.8"
+							fill="#DBEAFE"
+						/>
+					</g>
 
-							<div class="field-group">
-								<label
-									for="login-password"
-									class="field-label"
-								>
-									密码
-								</label>
-								<van-field
-									id="login-password"
-									v-model="loginForm.password"
-									:type="showPassword ? 'text' : 'password'"
-									name="password"
-									data-testid="mobile-login-password"
-									placeholder="请输入密码"
-									left-icon="lock"
-									:right-icon="showPassword ? 'eye-o' : 'closed-eye'"
-									class="soft-field"
-									autocomplete="on"
-									:rules="[{ required: true, message: '请输入密码' }]"
-									@click-right-icon="showPassword = !showPassword"
-								/>
-							</div>
-						</div>
+					<!-- 标志性大白椭圆眼眶 + 亮蓝瞳孔 -->
+					<g class="carrot-eyes">
+						<!-- 左眼 -->
+						<ellipse
+							cx="69"
+							cy="72"
+							rx="9.5"
+							ry="13"
+							fill="#FFFFFF"
+						/>
+						<ellipse
+							cx="70"
+							cy="73"
+							rx="5.4"
+							ry="8.6"
+							fill="#0284C7"
+						/>
+						<circle
+							cx="68.5"
+							cy="69"
+							r="2.1"
+							fill="#FFFFFF"
+						/>
+						<!-- 右眼 -->
+						<ellipse
+							cx="91"
+							cy="72"
+							rx="9.5"
+							ry="13"
+							fill="#FFFFFF"
+						/>
+						<ellipse
+							cx="90"
+							cy="73"
+							rx="5.4"
+							ry="8.6"
+							fill="#0284C7"
+						/>
+						<circle
+							cx="88.5"
+							cy="69"
+							r="2.1"
+							fill="#FFFFFF"
+						/>
+					</g>
 
-						<div class="form-action">
-							<van-button
-								round
-								block
-								type="primary"
-								native-type="submit"
-								data-testid="mobile-login-submit"
-								class="login-btn"
-								:loading="submitLoading"
-								loading-type="circular"
-								loading-size="18px"
-								loading-text="验证中..."
-							>
-								安全登录
-							</van-button>
-						</div>
+					<!-- 标志性波浪 w 小黑嘴 -->
+					<path
+						d="M68 91 C 70 97, 77 97, 80 91 C 83 97, 90 97, 92 91"
+						stroke="#111827"
+						stroke-width="3.4"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					/>
 
-						<div class="form-links">
-							<button
-								type="button"
-								class="link-btn"
-								data-testid="mobile-login-forgot"
-							>
-								忘记密码？
-							</button>
-							<span
-								class="link-divider"
-								aria-hidden="true"
-							></span>
-							<button
-								type="button"
-								class="link-btn link-btn--primary"
-								data-testid="mobile-login-register"
-							>
-								注册账号
-							</button>
+					<!-- 互动橙色小短手（聚焦密码时抬起捂眼） -->
+					<g class="paw paw--left">
+						<ellipse
+							cx="39"
+							cy="113"
+							rx="12.5"
+							ry="10"
+							fill="#FB923C"
+							stroke="#FFFFFF"
+							stroke-width="2.2"
+						/>
+					</g>
+					<g class="paw paw--right">
+						<ellipse
+							cx="121"
+							cy="113"
+							rx="12.5"
+							ry="10"
+							fill="#FB923C"
+							stroke="#FFFFFF"
+							stroke-width="2.2"
+						/>
+					</g>
+				</svg>
+			</div>
+
+			<!-- 糖果圆角主卡片 -->
+			<section class="cute-card">
+				<div
+					v-if="isRememberedMode"
+					class="remembered-hero"
+					data-testid="mobile-login-remembered"
+				>
+					<div class="avatar-badge">
+						<span class="avatar-letter">{{ avatarInitial }}</span>
+					</div>
+					<div class="hero-copy">
+						<div class="hero-tag-row">
+							<h1 class="hero-title">{{ timeGreeting }}，{{ displayRememberedName }}</h1>
+							<span class="gender-pill">{{ genderThemeLabel }}</span>
 						</div>
-					</van-form>
+						<p class="hero-sub">输入密码继续进入个人空间</p>
+					</div>
 				</div>
-			</main>
 
-			<footer class="login-footer">
-				<div class="footer-links">
-					<span>隐私政策</span>
-					<span class="dot">·</span>
-					<span>安全协议</span>
+				<div
+					v-else
+					class="standard-hero"
+				>
+					<h1 class="hero-title">{{ timeGreeting }}，欢迎回家</h1>
+					<p class="hero-sub">使用您的 Alex 账号登录管理中心</p>
 				</div>
-				<p class="copyright">2026 Alex 系统架构 · 保留所有权利</p>
-			</footer>
-		</div>
+
+				<van-form
+					class="login-form"
+					@submit="onSubmit"
+				>
+					<div class="form-fields">
+						<div
+							v-if="!isRememberedMode"
+							class="field-group"
+						>
+							<label
+								for="login-username"
+								class="field-label"
+							>
+								用户名
+							</label>
+							<van-field
+								id="login-username"
+								v-model="loginForm.username"
+								name="username"
+								data-testid="mobile-login-username"
+								placeholder="请输入用户名"
+								left-icon="manager"
+								clearable
+								autocomplete="username"
+								class="soft-field"
+								:rules="[{ required: true, message: '请输入用户名' }]"
+							/>
+						</div>
+
+						<div class="field-group">
+							<label
+								for="login-password"
+								class="field-label"
+							>
+								密码
+							</label>
+							<van-field
+								id="login-password"
+								v-model="loginForm.password"
+								:type="showPassword ? 'text' : 'password'"
+								name="password"
+								data-testid="mobile-login-password"
+								placeholder="请输入密码"
+								left-icon="lock"
+								:right-icon="showPassword ? 'eye-o' : 'closed-eye'"
+								class="soft-field"
+								autocomplete="current-password"
+								:rules="[{ required: true, message: '请输入密码' }]"
+								@focus="isPasswordFocused = true"
+								@blur="isPasswordFocused = false"
+								@click-right-icon="showPassword = !showPassword"
+							/>
+						</div>
+					</div>
+
+					<div class="form-options">
+						<van-checkbox
+							v-model="rememberAccount"
+							icon-size="16px"
+							:checked-color="themeAccentColor"
+							class="remember-checkbox"
+						>
+							记住登录账号
+						</van-checkbox>
+						<button
+							v-if="isRememberedMode"
+							type="button"
+							class="switch-account-link"
+							data-testid="mobile-login-switch-account"
+							@click="handleSwitchAccount"
+						>
+							切换账号
+						</button>
+					</div>
+
+					<div class="form-action">
+						<van-button
+							round
+							block
+							type="primary"
+							native-type="submit"
+							data-testid="mobile-login-submit"
+							class="login-btn"
+							:loading="submitLoading"
+							loading-type="circular"
+							loading-size="18px"
+							loading-text="登录中..."
+						>
+							<span>登录</span>
+							<van-icon
+								v-if="!submitLoading"
+								name="arrow"
+								class="btn-arrow"
+							/>
+						</van-button>
+					</div>
+				</van-form>
+			</section>
+		</main>
+
+		<footer class="login-footer">
+			<p class="copyright">© 2026 Alex</p>
+		</footer>
 	</div>
 </template>
 
@@ -136,14 +435,162 @@ import type { LoginForm } from '@/views/login/config';
 import type { LoginParams } from '@/views/login/api';
 import { useUserStore } from '@/store/modules/user/user';
 import { useNavBar } from '@/composables/useNavBar';
+import { formatDate } from '@/utils/dayjs';
+import { decrypt, encrypt } from '@/utils/crypto';
 
 const router = useRouter();
 const userStore = useUserStore();
 useNavBar({ visible: false });
 
-const loginForm = ref<LoginForm>({ username: '', password: '' });
+const LAST_PROFILE_KEY = 'alex_mobile_last_profile';
+const LAST_USERNAME_KEY = 'alex_mobile_last_username';
+
+type GenderTheme = 'male' | 'female' | 'neutral';
+
+interface SavedUserProfile {
+	username: string;
+	nickName?: string;
+	gender?: string;
+	password?: string;
+}
+
+const encodeSavedPassword = (raw?: string): string => {
+	if (!raw) return '';
+	try {
+		return encrypt({ v: raw });
+	} catch {
+		return raw;
+	}
+};
+
+const decodeSavedPassword = (stored?: string): string => {
+	if (!stored) return '';
+	try {
+		const res = decrypt(stored) as { v?: string } | string | number | null;
+		if (res && typeof res === 'object' && typeof res.v === 'string') {
+			return res.v;
+		}
+		if (typeof res === 'string' || typeof res === 'number') {
+			return String(res);
+		}
+		return stored;
+	} catch {
+		return stored;
+	}
+};
+
+const resolveGenderTheme = (gender?: string): GenderTheme => {
+	const g = String(gender || '').trim();
+	if (g === '1') return 'male';
+	if (g === '2') return 'female';
+	return 'neutral';
+};
+
+const readSavedProfile = (): SavedUserProfile | null => {
+	try {
+		const raw = localStorage.getItem(LAST_PROFILE_KEY);
+		if (raw) {
+			const parsed = JSON.parse(raw) as SavedUserProfile;
+			if (parsed?.username) {
+				return {
+					...parsed,
+					password: decodeSavedPassword(parsed.password),
+				};
+			}
+		}
+		const legacyName = localStorage.getItem(LAST_USERNAME_KEY)?.trim();
+		if (legacyName) {
+			return { username: legacyName };
+		}
+		return null;
+	} catch {
+		return null;
+	}
+};
+
+const saveLastProfile = (profile: SavedUserProfile) => {
+	try {
+		const username = profile.username.trim();
+		if (!username) return;
+		localStorage.setItem(LAST_USERNAME_KEY, username);
+		localStorage.setItem(
+			LAST_PROFILE_KEY,
+			JSON.stringify({
+				username,
+				nickName: profile.nickName || username,
+				gender: profile.gender || '',
+				password: encodeSavedPassword(profile.password),
+			}),
+		);
+	} catch {
+		// 忽略隐私模式存储限制
+	}
+};
+
+const clearSavedProfile = () => {
+	try {
+		localStorage.removeItem(LAST_USERNAME_KEY);
+		localStorage.removeItem(LAST_PROFILE_KEY);
+	} catch {
+		// 忽略隐私模式存储限制
+	}
+};
+
+const savedProfile = ref<SavedUserProfile | null>(readSavedProfile());
+const forceSwitchAccount = ref<boolean>(false);
+const rememberAccount = ref<boolean>(true);
+const isPasswordFocused = ref<boolean>(false);
+
+const rememberedUsername = computed(() => savedProfile.value?.username || '');
+const rememberedPassword = computed(() => savedProfile.value?.password || '');
+const displayRememberedName = computed(() => savedProfile.value?.nickName || savedProfile.value?.username || '');
+
+const isRememberedMode = computed(() => Boolean(rememberedUsername.value) && !forceSwitchAccount.value);
+
+const themeGender = computed<GenderTheme>(() => {
+	if (!isRememberedMode.value) return 'neutral';
+	return resolveGenderTheme(savedProfile.value?.gender);
+});
+
+const genderThemeLabel = computed(() => {
+	if (themeGender.value === 'male') return '蓝调卜卜';
+	if (themeGender.value === 'female') return '甜心卜卜';
+	return '元气卜卜';
+});
+
+const themeAccentColor = computed(() => {
+	if (themeGender.value === 'male') return '#3b82f6';
+	if (themeGender.value === 'female') return '#fb7185';
+	return '#f97316';
+});
+
+const avatarInitial = computed(() => {
+	const name = displayRememberedName.value.trim();
+	return name ? name.slice(0, 1).toUpperCase() : 'A';
+});
+
+const loginForm = ref<LoginForm>({
+	username: rememberedUsername.value || '',
+	password: rememberedPassword.value || '',
+});
 const submitLoading = ref<boolean>(false);
 const showPassword = ref<boolean>(false);
+
+const handleSwitchAccount = () => {
+	forceSwitchAccount.value = true;
+	loginForm.value.username = '';
+	loginForm.value.password = '';
+};
+
+const todayText = computed(() => formatDate(new Date(), 'MM月DD日'));
+const timeGreeting = computed(() => {
+	const hour = new Date().getHours();
+	if (hour < 6) return '凌晨好';
+	if (hour < 12) return '早上好';
+	if (hour < 14) return '中午好';
+	if (hour < 19) return '下午好';
+	return '晚上好';
+});
 
 const onSubmit = async () => {
 	if (submitLoading.value) return;
@@ -152,16 +599,36 @@ const onSubmit = async () => {
 		navigator.vibrate(50);
 	}
 
+	const activeUsername = isRememberedMode.value ? rememberedUsername.value : loginForm.value.username.trim();
+
 	submitLoading.value = true;
 	try {
 		const param: LoginParams = {
 			type: 'account',
-			username: loginForm.value.username,
+			username: activeUsername,
 			password: loginForm.value.password,
-			isRememberMe: true,
+			isRememberMe: rememberAccount.value,
 		};
 		const res = await userStore.login(param);
 		if (res) {
+			if (rememberAccount.value) {
+				const loggedUser = userStore.getUserInfo as {
+					username?: string;
+					nickName?: string;
+					gender?: string;
+				} | null;
+				const nextProfile: SavedUserProfile = {
+					username: loggedUser?.username || activeUsername,
+					nickName: loggedUser?.nickName || activeUsername,
+					gender: loggedUser?.gender,
+					password: loginForm.value.password,
+				};
+				saveLastProfile(nextProfile);
+				savedProfile.value = nextProfile;
+			} else {
+				clearSavedProfile();
+				savedProfile.value = null;
+			}
 			showSuccessToast('登录成功');
 			router.push('/');
 		}
@@ -183,130 +650,268 @@ const onSubmit = async () => {
 }
 
 .login-container {
+	--accent-start: #fb923c;
+	--accent-end: #f97316;
+	--accent-color: #f97316;
+	--accent-soft: rgba(249, 115, 22, 0.14);
+	--accent-shadow: rgba(249, 115, 22, 0.34);
+
 	position: relative;
 	height: 100vh;
 	height: 100dvh;
 	width: 100%;
 	box-sizing: border-box;
-	background-color: #f8fafc;
+	background: linear-gradient(165deg, #ffedd5 0%, #fff7ed 46%, #fef3c7 100%);
 	display: flex;
 	flex-direction: column;
-	align-items: center;
+	justify-content: space-between;
 	overflow: hidden;
+	transition: background 0.35s ease;
+
+	&.theme-male {
+		--accent-start: #3b82f6;
+		--accent-end: #6366f1;
+		--accent-color: #3b82f6;
+		--accent-soft: rgba(59, 130, 246, 0.12);
+		--accent-shadow: rgba(59, 130, 246, 0.36);
+		background: linear-gradient(165deg, #dbeafe 0%, #eff6ff 48%, #e0f2fe 100%);
+	}
+
+	&.theme-female {
+		--accent-start: #fb7185;
+		--accent-end: #f43f5e;
+		--accent-color: #f43f5e;
+		--accent-soft: rgba(251, 113, 133, 0.14);
+		--accent-shadow: rgba(244, 63, 94, 0.34);
+		background: linear-gradient(165deg, #ffe4e6 0%, #fdf2f8 48%, #fff7ed 100%);
+	}
 }
 
-.ambient-orb {
+.cute-backdrop {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	overflow: hidden;
+	z-index: 1;
+}
+
+.float-bubble {
 	position: absolute;
 	border-radius: 9999px;
-	filter: blur(48px);
-	pointer-events: none;
-	z-index: 1;
+	background: rgba(255, 255, 255, 0.55);
 
-	&--indigo {
-		top: -60px;
-		left: -40px;
-		width: 240px;
-		height: 240px;
-		background: radial-gradient(circle, rgba(79, 106, 246, 0.14) 0%, rgba(79, 106, 246, 0) 70%);
+	&--1 {
+		top: -36px;
+		right: -28px;
+		width: 150px;
+		height: 150px;
 	}
-
-	&--violet {
-		bottom: 10%;
-		right: -50px;
-		width: 220px;
-		height: 220px;
-		background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, rgba(139, 92, 246, 0) 70%);
+	&--2 {
+		top: 18%;
+		left: -44px;
+		width: 120px;
+		height: 120px;
+	}
+	&--3 {
+		bottom: 12%;
+		right: -24px;
+		width: 96px;
+		height: 96px;
 	}
 }
 
-.login-content {
+.brand-bar {
 	position: relative;
-	z-index: 10;
+	z-index: 5;
 	width: 100%;
-	max-width: 400px;
-	height: 100%;
-	min-height: 0;
+	max-width: 420px;
+	margin: 0 auto;
+	padding: max(18px, env(safe-area-inset-top)) clamp(20px, 5.5vw, 28px) 0;
 	box-sizing: border-box;
-	padding: max(18px, env(safe-area-inset-top)) clamp(22px, 6vw, 36px) max(16px, env(safe-area-inset-bottom));
 	display: flex;
-	flex-direction: column;
-	justify-content: center;
 	align-items: center;
-	overflow: hidden;
-}
-
-.login-header {
-	text-align: center;
-	margin-bottom: clamp(20px, 3.8vh, 30px);
+	justify-content: space-between;
 	flex-shrink: 0;
 
+	.brand-left {
+		display: flex;
+		align-items: center;
+		gap: 9px;
+	}
+
 	.logo-box {
-		width: 56px;
-		height: 56px;
+		width: 34px;
+		height: 34px;
 		background: #ffffff;
-		border-radius: 18px;
+		border-radius: 12px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		margin: 0 auto 12px;
-		box-shadow:
-			0 10px 25px -5px rgba(79, 106, 246, 0.16),
-			0 2px 6px rgba(15, 23, 42, 0.04);
+		box-shadow: 0 6px 14px -4px rgba(15, 23, 42, 0.1);
 
 		.logo-icon {
-			width: 34px;
-			height: 34px;
+			width: 21px;
+			height: 21px;
 			display: block;
 		}
 	}
 
-	.brand-title {
-		font-size: 22px;
-		font-weight: 800;
+	.brand-name {
+		font-size: 15px;
+		font-weight: 700;
 		color: #0f172a;
-		margin: 0 0 8px;
-		letter-spacing: -0.3px;
-		line-height: 1.25;
+		letter-spacing: -0.01em;
 	}
 
-	.brand-badge {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-		padding: 4px 12px;
+	.date-pill {
+		font-size: 11px;
+		font-weight: 600;
+		color: var(--accent-color);
+		background: rgba(255, 255, 255, 0.88);
+		padding: 4px 10px;
 		border-radius: 9999px;
-		background: rgba(79, 106, 246, 0.1);
-		color: #4f46e5;
+		font-variant-numeric: tabular-nums;
+		box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+	}
+}
 
-		&__dot {
-			width: 6px;
-			height: 6px;
-			border-radius: 9999px;
-			background: #4f6af6;
+.login-stage {
+	position: relative;
+	z-index: 10;
+	width: 100%;
+	max-width: 420px;
+	margin: auto;
+	padding: 0 clamp(20px, 5.5vw, 28px);
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.mascot-stage {
+	position: relative;
+	width: 160px;
+	height: 118px;
+	margin-bottom: -16px;
+	z-index: 12;
+	pointer-events: none;
+
+	.mascot-svg {
+		width: 100%;
+		height: 132px;
+		display: block;
+		filter: drop-shadow(0 8px 14px rgba(15, 23, 42, 0.09));
+	}
+
+	.paw {
+		transform-box: fill-box;
+		transform-origin: center;
+		transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+	}
+
+	&.is-covering {
+		.paw--left {
+			transform: translate(26px, -40px) rotate(14deg);
 		}
+		.paw--right {
+			transform: translate(-26px, -40px) rotate(-14deg);
+		}
+	}
 
-		&__text {
-			font-size: 11px;
-			font-weight: 600;
-			letter-spacing: 0.5px;
+	&.is-peeking {
+		.paw--left {
+			transform: translate(26px, -40px) rotate(14deg);
+		}
+		.paw--right {
+			transform: translate(-14px, -18px) rotate(-8deg);
 		}
 	}
 }
 
-.login-card {
-	width: 100%;
-	flex-shrink: 0;
+.cute-card {
 	position: relative;
-	background: #ffffff;
-	border-radius: 24px;
-	border: none;
+	z-index: 11;
+	width: 100%;
+	background: rgba(255, 255, 255, 0.96);
+	backdrop-filter: blur(12px);
+	border-radius: 28px;
+	padding: 28px 22px 24px;
+	box-sizing: border-box;
 	box-shadow:
-		0 12px 32px -8px rgba(15, 23, 42, 0.06),
-		0 2px 10px rgba(15, 23, 42, 0.03);
+		0 18px 40px -12px rgba(15, 23, 42, 0.1),
+		0 2px 8px rgba(15, 23, 42, 0.04);
+}
 
-	.card-inner {
-		padding: 22px 20px 18px;
+.remembered-hero {
+	display: flex;
+	align-items: center;
+	gap: 13px;
+	margin-bottom: 20px;
+
+	.avatar-badge {
+		width: 50px;
+		height: 50px;
+		border-radius: 17px;
+		background: linear-gradient(135deg, var(--accent-start) 0%, var(--accent-end) 100%);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+		box-shadow: 0 10px 20px -6px var(--accent-shadow);
+
+		.avatar-letter {
+			font-size: 20px;
+			font-weight: 800;
+			color: #ffffff;
+		}
 	}
+
+	.hero-copy {
+		min-width: 0;
+		flex: 1;
+	}
+
+	.hero-tag-row {
+		display: flex;
+		align-items: center;
+		gap: 7px;
+		margin-bottom: 3px;
+	}
+
+	.gender-pill {
+		font-size: 10px;
+		font-weight: 700;
+		padding: 2px 8px;
+		border-radius: 9999px;
+		background: var(--accent-soft);
+		color: var(--accent-color);
+		white-space: nowrap;
+		flex-shrink: 0;
+	}
+}
+
+.standard-hero {
+	margin-bottom: 20px;
+	text-align: center;
+}
+
+.hero-title {
+	font-size: 20px;
+	font-weight: 800;
+	color: #0f172a;
+	margin: 0;
+	letter-spacing: -0.02em;
+	line-height: 1.25;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.hero-sub {
+	margin: 4px 0 0;
+	font-size: 12px;
+	color: #64748b;
+	line-height: 1.4;
 }
 
 .form-fields {
@@ -328,17 +933,19 @@ const onSubmit = async () => {
 	.soft-field {
 		background: #f8fafc;
 		border: 1.5px solid transparent;
-		border-radius: 16px;
-		padding: 11px 14px;
+		border-radius: 15px;
+		padding: 12px 14px;
 		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
 		&:focus-within {
 			background: #ffffff;
-			border-color: rgba(79, 106, 246, 0.45);
-			box-shadow: 0 0 0 4px rgba(79, 106, 246, 0.1);
+			border-color: var(--accent-color);
+			box-shadow:
+				0 6px 18px -6px var(--accent-soft),
+				0 0 0 4px var(--accent-soft);
 
 			:deep(.van-field__left-icon) {
-				color: #4f46e5;
+				color: var(--accent-color);
 			}
 		}
 
@@ -393,21 +1000,46 @@ const onSubmit = async () => {
 	margin-top: 20px;
 
 	.login-btn {
+		position: relative;
+		overflow: hidden;
 		height: 48px;
-		border-radius: 16px !important;
+		border-radius: 18px !important;
 		border: none !important;
 		font-size: 15px;
-		font-weight: 600;
-		letter-spacing: 0.5px;
+		font-weight: 700;
+		letter-spacing: 0.6px;
 		color: #ffffff !important;
-		background: linear-gradient(135deg, #4f6af6 0%, #6366f1 100%) !important;
-		box-shadow: 0 8px 20px -4px rgba(79, 106, 246, 0.35);
+		background: linear-gradient(135deg, var(--accent-start) 0%, var(--accent-end) 100%) !important;
+		box-shadow:
+			inset 0 1px 0 rgba(255, 255, 255, 0.25),
+			0 10px 24px -6px var(--accent-shadow);
 		transition:
 			transform 0.15s ease,
 			box-shadow 0.2s ease;
 
+		&::after {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: -100%;
+			width: 60%;
+			height: 100%;
+			background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.22) 50%, transparent 100%);
+			transform: skewX(-20deg);
+			animation: btnShimmer 4.2s ease-in-out infinite;
+		}
+
 		&:active {
-			transform: scale(0.985);
+			transform: scale(0.98);
+		}
+
+		.btn-arrow {
+			font-size: 14px;
+			transition: transform 0.2s ease;
+		}
+
+		&:active .btn-arrow {
+			transform: translateX(3px);
 		}
 
 		:deep(.van-button__content) {
@@ -433,143 +1065,95 @@ const onSubmit = async () => {
 	}
 }
 
-.form-links {
+.form-options {
 	display: flex;
-	justify-content: center;
 	align-items: center;
+	justify-content: space-between;
 	margin-top: 14px;
-	gap: 4px;
+	padding: 0 2px;
 
-	.link-btn {
-		border: none;
-		background: transparent;
-		font-size: 12px;
-		font-weight: 500;
-		color: #64748b;
-		padding: 6px 10px;
-		border-radius: 10px;
-		cursor: pointer;
-		transition:
-			color 0.15s ease,
-			background-color 0.15s ease;
-
-		&:active {
-			background-color: #f1f5f9;
-			color: #0f172a;
-		}
-
-		&--primary {
-			color: #4f46e5;
-			font-weight: 600;
-
-			&:active {
-				background-color: rgba(79, 106, 246, 0.08);
-				color: #4338ca;
-			}
+	.remember-checkbox {
+		:deep(.van-checkbox__label) {
+			font-size: 12px;
+			color: #64748b;
+			font-weight: 500;
 		}
 	}
 
-	.link-divider {
-		width: 1px;
-		height: 12px;
-		background: #e2e8f0;
+	.switch-account-link {
+		border: none;
+		background: transparent;
+		padding: 2px 4px;
+		font-size: 12px;
+		font-weight: 600;
+		color: var(--accent-color);
+		cursor: pointer;
+
+		&:active {
+			opacity: 0.7;
+		}
 	}
 }
 
 .login-footer {
+	width: 100%;
+	padding-bottom: max(16px, env(safe-area-inset-bottom));
 	text-align: center;
-	margin-top: clamp(18px, 4vh, 28px);
 	flex-shrink: 0;
-
-	.footer-links {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		gap: 8px;
-		margin-bottom: 4px;
-		color: #64748b;
-		font-size: 11px;
-		font-weight: 500;
-
-		.dot {
-			color: #cbd5e1;
-		}
-	}
 
 	.copyright {
 		margin: 0;
-		font-size: 10px;
+		font-size: 11px;
 		color: #94a3b8;
 	}
 }
 
-@media (max-height: 620px) {
-	.login-content {
-		padding-top: 12px;
-		padding-bottom: 10px;
+@media (max-height: 640px) {
+	.mascot-stage {
+		transform: scale(0.88);
+		transform-origin: bottom center;
+		margin-bottom: -18px;
 	}
 
-	.login-header {
+	.cute-card {
+		padding: 24px 18px 20px;
+	}
+
+	.remembered-hero,
+	.standard-hero {
 		margin-bottom: 14px;
-
-		.logo-box {
-			width: 46px;
-			height: 46px;
-			margin-bottom: 8px;
-		}
-
-		.brand-title {
-			font-size: 19px;
-		}
-	}
-
-	.login-card {
-		border-radius: 20px;
-
-		.card-inner {
-			padding: 16px 18px 14px;
-		}
 	}
 
 	.form-fields {
 		gap: 10px;
 	}
 
-	.field-group {
-		.soft-field {
-			padding: 9px 12px;
-		}
-	}
-
 	.form-action {
-		margin-top: 16px;
+		margin-top: 14px;
 
 		.login-btn {
 			height: 44px;
 		}
 	}
+}
 
-	.form-links {
-		margin-top: 10px;
+@keyframes btnShimmer {
+	0%,
+	55% {
+		left: -100%;
 	}
-
-	.login-footer {
-		margin-top: 12px;
+	100% {
+		left: 160%;
 	}
 }
 
-@media (max-height: 540px) {
-	.login-footer {
+@media (max-height: 520px) {
+	.mascot-stage {
 		display: none;
 	}
 
-	.login-header {
-		margin-bottom: 10px;
-
-		.logo-box {
-			width: 40px;
-			height: 40px;
-		}
+	.login-footer {
+		display: none;
 	}
 }
 </style>

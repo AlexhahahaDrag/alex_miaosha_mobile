@@ -9,7 +9,7 @@
 				>
 					<van-search
 						v-model="searchInfo.bigTypeCode"
-						placeholder="搜索账单、商家名或备注"
+						placeholder="搜索账单或备注"
 						shape="round"
 						background="transparent"
 						class="search-bar"
@@ -32,10 +32,10 @@
 					@click="onNavigateToAiLedger"
 				>
 					<van-icon
-						name="fire-o"
+						name="edit"
 						class="search-shell__ai-icon"
 					/>
-					<span>AI记账</span>
+					<span>AI 记账</span>
 				</button>
 			</div>
 
@@ -130,27 +130,27 @@
 						v-for="groupIndex in 2"
 						:key="groupIndex"
 						class="skeleton-group"
+						data-testid="finance-list-skeleton"
 					>
 						<div class="skeleton-date-header">
-							<van-skeleton
-								title
-								:row="0"
-							/>
+							<div class="shimmer-bar sk-w-88 sk-h-14"></div>
+							<div class="shimmer-bar sk-w-96 sk-h-12"></div>
 						</div>
-						<div
-							v-for="itemIndex in 3"
-							:key="itemIndex"
-							class="skeleton-card"
-						>
-							<div class="skeleton-card__icon"></div>
-							<div class="skeleton-card__main">
-								<van-skeleton
-									title
-									:row="2"
-								/>
-							</div>
-							<div class="skeleton-card__side">
-								<van-skeleton :row="2" />
+						<div class="skeleton-group-card">
+							<div
+								v-for="itemIndex in 3"
+								:key="itemIndex"
+								class="skeleton-row"
+							>
+								<div class="shimmer-bar sk-icon"></div>
+								<div class="skeleton-row__main">
+									<div class="shimmer-bar sk-w-96 sk-h-14"></div>
+									<div class="shimmer-bar sk-w-132 sk-h-11 sk-mt-6"></div>
+								</div>
+								<div class="skeleton-row__side">
+									<div class="shimmer-bar sk-w-68 sk-h-14"></div>
+									<div class="shimmer-bar sk-w-48 sk-h-11 sk-mt-6"></div>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -202,7 +202,7 @@
 		<van-calendar
 			v-model:show="showCustomDatePicker"
 			type="range"
-			color="#1677ff"
+			color="#4f6af6"
 			:max-date="new Date()"
 			@confirm="onConfirmCustomDate"
 		/>
@@ -316,9 +316,9 @@ useTabBar({
 	visible: true,
 	data: [
 		{ name: 'dashboard', title: '首页', icon: 'homepage' },
-		{ name: 'financeManager', title: '财务', icon: 'finance' },
-		{ name: 'financeAnalysis', title: '分析', icon: 'financeAnalysis' },
-		{ name: 'myself', title: '个人', icon: 'user' },
+		{ name: 'financeManager', title: '账单流水', icon: 'finance' },
+		{ name: 'financeAnalysis', title: '收支分析', icon: 'financeAnalysis' },
+		{ name: 'myself', title: '我的', icon: 'user' },
 	],
 	active: 1,
 });
@@ -357,9 +357,9 @@ const resetData = () => {
 	resetPagination();
 };
 
-const getFinancePage = async (param: FinanceManagerData, cur: PageInfo) => {
+const getFinancePage = async (param: FinanceManagerData, cur: PageInfo, options: { silent?: boolean } = {}) => {
 	fetchingPage.value = true;
-	if (!isRefresh.value) {
+	if (!isRefresh.value && !options.silent) {
 		loading.value = true;
 	}
 
@@ -504,9 +504,10 @@ const formatCurrency = (value: number) => {
 const getWeekdayLabel = (date: string) => formatDayjs(date).format('ddd').replace('.', '');
 
 onMounted(() => {
-	// 离线快照秒开：若本地已存有快照，率先秒级呈现场景骨架与最近账单
+	// 离线快照秒开：有快照时静默拉取最新第 1 页并平滑替换，避免先清空数据反闪骨架屏
 	const cachedSnapshot = loadFinanceOfflineSnapshot();
-	if (cachedSnapshot && cachedSnapshot.records.length > 0) {
+	const hasCachedList = Boolean(cachedSnapshot && cachedSnapshot.records.length > 0);
+	if (hasCachedList && cachedSnapshot) {
 		dataSource.value = cachedSnapshot.records;
 		setTotal(cachedSnapshot.total || cachedSnapshot.records.length);
 		fetchingPage.value = false;
@@ -522,8 +523,12 @@ onMounted(() => {
 	if (route.query.fromSource) {
 		searchInfo.value.fromSource = route.query.fromSource as string;
 	}
-	// 发起最新数据网络请求并平滑替换
-	onSearch();
+	if (hasCachedList && !route.query.fromSource) {
+		resetPagination();
+		getFinancePage(searchInfo.value, pagination, { silent: true });
+	} else {
+		onSearch();
+	}
 	loadBudgetStatus();
 });
 </script>
@@ -560,8 +565,8 @@ onMounted(() => {
 			padding: 0;
 
 			:deep(.van-search__content) {
-				background: #ffffff;
-				border: 1px solid #e2e8f0;
+				background: #f1f5f9;
+				border: none;
 				border-radius: 999px;
 			}
 		}
@@ -572,9 +577,9 @@ onMounted(() => {
 			padding: 0;
 			border-radius: 12px;
 			font-size: 17px;
-			border: 1px solid rgba(226, 232, 240, 0.9);
+			border: none;
 			color: #475569;
-			background: #f8fafc;
+			background: #f1f5f9;
 			display: flex;
 			align-items: center;
 			justify-content: center;
@@ -582,8 +587,8 @@ onMounted(() => {
 			transition: all 0.2s ease;
 
 			&:active {
-				background: #f1f5f9;
-				color: #4f46e5;
+				background: #e2e8f0;
+				color: #4f6af6;
 				transform: scale(0.96);
 			}
 		}
@@ -594,10 +599,9 @@ onMounted(() => {
 			border-radius: 12px;
 			font-size: 13px;
 			font-weight: 600;
-			color: #4338ca;
-			background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
-			border: 1px solid rgba(199, 210, 254, 0.8);
-			box-shadow: 0 1px 2px rgba(79, 70, 229, 0.06);
+			color: #4f6af6;
+			background: rgba(79, 106, 246, 0.1);
+			border: none;
 			display: inline-flex;
 			align-items: center;
 			justify-content: center;
@@ -608,12 +612,12 @@ onMounted(() => {
 
 			.search-shell__ai-icon {
 				font-size: 15px;
-				color: #4f46e5;
+				color: #4f6af6;
 			}
 
 			&:active {
 				transform: scale(0.96);
-				background: #e0e7ff;
+				background: rgba(79, 106, 246, 0.18);
 			}
 		}
 	}
@@ -733,11 +737,9 @@ onMounted(() => {
 		&__body {
 			.date-group__card {
 				background: #ffffff;
-				border-radius: 16px;
-				box-shadow:
-					0 1px 3px rgba(15, 23, 42, 0.04),
-					0 4px 16px rgba(15, 23, 42, 0.03);
-				border: 1px solid rgba(226, 232, 240, 0.8);
+				border-radius: 18px;
+				box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+				border: none;
 				overflow: hidden;
 			}
 		}
@@ -745,37 +747,93 @@ onMounted(() => {
 }
 
 .skeleton-group {
-	padding: 10px 12px;
-	margin-bottom: 8px;
+	padding: 6px 12px 8px;
 
 	.skeleton-date-header {
-		width: 120px;
-		margin-bottom: 8px;
-	}
-
-	.skeleton-card {
 		display: flex;
 		align-items: center;
-		padding: 12px;
-		margin-bottom: 8px;
-		background: #ffffff;
-		border-radius: 12px;
-		gap: 10px;
+		justify-content: space-between;
+		padding: 6px 4px 8px;
+	}
 
-		&__icon {
-			width: 36px;
-			height: 36px;
-			border-radius: 10px;
-			background: #f1f5f9;
+	.skeleton-group-card {
+		background: #ffffff;
+		border-radius: 18px;
+		box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+		overflow: hidden;
+	}
+
+	.skeleton-row {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		padding: 12px 14px;
+
+		&:not(:last-child) {
+			border-bottom: 1px solid #f1f5f9;
 		}
 
 		&__main {
 			flex: 1;
+			min-width: 0;
 		}
 
 		&__side {
-			width: 60px;
+			display: flex;
+			flex-direction: column;
+			align-items: flex-end;
+			flex-shrink: 0;
 		}
+	}
+}
+
+.shimmer-bar {
+	border-radius: 6px;
+	background: #e2e8f0;
+	animation: financePulse 1.4s ease-in-out infinite;
+}
+
+.sk-icon {
+	width: 40px;
+	height: 40px;
+	border-radius: 12px;
+	flex-shrink: 0;
+}
+.sk-w-48 {
+	width: 48px;
+}
+.sk-w-68 {
+	width: 68px;
+}
+.sk-w-88 {
+	width: 88px;
+}
+.sk-w-96 {
+	width: 96px;
+}
+.sk-w-132 {
+	width: 132px;
+}
+.sk-h-11 {
+	height: 11px;
+}
+.sk-h-12 {
+	height: 12px;
+}
+.sk-h-14 {
+	height: 14px;
+}
+.sk-mt-6 {
+	margin-top: 6px;
+}
+
+@keyframes financePulse {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.45;
 	}
 }
 </style>

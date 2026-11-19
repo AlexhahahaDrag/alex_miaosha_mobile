@@ -1,0 +1,34 @@
+# ==========================================
+# Antigravity Index Ignore Configuration (Mobile Frontend)
+# ==========================================
+
+# 依赖与打包产物
+node_modules/
+dist/
+dist-ssr/
+.vite/
+
+# 大体积锁定文件 (避免全局代码检索命中几十万行 lockfile)
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+bun.lockb
+
+# 日志与调试文件
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# 测试产物与缓存
+coverage/
+.temp/
+.cache/
+
+# IDE 与操作系统配置
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

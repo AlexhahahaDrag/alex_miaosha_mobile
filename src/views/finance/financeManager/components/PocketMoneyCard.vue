@@ -312,14 +312,12 @@ const displayCategoryList = computed(() => {
 <style scoped lang="less">
 .pocket-money-card {
 	position: relative;
-	margin: 8px 12px 6px;
-	padding: 11px 14px;
-	background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-	border-radius: 16px;
-	box-shadow:
-		0 1px 3px rgba(15, 23, 42, 0.04),
-		0 4px 16px rgba(59, 130, 246, 0.08);
-	border: 1px solid rgba(191, 219, 254, 0.85);
+	margin: 10px 12px 6px;
+	padding: 12px 14px;
+	background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+	border-radius: 18px;
+	box-shadow: 0 4px 16px rgba(79, 106, 246, 0.08);
+	border: none;
 	overflow: hidden;
 	transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 
@@ -379,27 +377,26 @@ const displayCategoryList = computed(() => {
 		}
 
 		.skeleton-box {
-			background: rgba(147, 197, 253, 0.45);
-			animation: shimmer-pulse 1.6s ease-in-out infinite;
+			background: rgba(129, 140, 248, 0.26);
+			animation: shimmer-pulse 1.4s ease-in-out infinite;
 		}
 	}
 
 	.ambient-progress-track--skeleton {
-		background: rgba(191, 219, 254, 0.5);
+		background: rgba(199, 210, 254, 0.45);
 
 		.ambient-progress-bar--skeleton {
 			width: 45%;
 			height: 100%;
 			border-radius: 0 2px 2px 0;
-			background: linear-gradient(90deg, rgba(96, 165, 250, 0.4) 0%, rgba(59, 130, 246, 0.7) 100%);
-			animation: shimmer-pulse 1.6s ease-in-out infinite;
+			background: rgba(99, 102, 241, 0.45);
+			animation: shimmer-pulse 1.4s ease-in-out infinite;
 		}
 	}
 
 	&--expanded {
 		padding: 13px 14px 15px;
-		box-shadow: 0 4px 20px rgba(59, 130, 246, 0.12);
-		border-color: rgba(147, 197, 253, 0.9);
+		box-shadow: 0 6px 20px rgba(79, 106, 246, 0.12);
 
 		.toggle-arrow-btn {
 			transform: rotate(180deg);

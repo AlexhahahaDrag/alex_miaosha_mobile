@@ -1,288 +1,182 @@
 <template>
 	<div class="user-page-container">
-		<!-- Hero Section with Premium Gradient -->
-		<div class="profile-hero">
-			<div class="hero-bg-shapes">
-				<div class="shape shape-1"></div>
-				<div class="shape shape-2"></div>
-			</div>
-
-			<div class="hero-header">
-				<div class="header-title">我的</div>
-				<div class="header-actions">
-					<van-icon
-						name="setting-o"
-						class="settings-icon"
-						data-testid="rbac-user-btn-theme"
-						@click="openTheme"
-					/>
+		<!-- 01 · 个人名片 Indigo Soft UI 卡片 -->
+		<section class="profile-card">
+			<!-- 加载骨架屏 -->
+			<div
+				v-if="loading"
+				class="profile-skeleton"
+				data-testid="user-profile-skeleton"
+			>
+				<div class="sk-top-row">
+					<div class="shimmer-white sk-avatar"></div>
+					<div class="sk-text-col">
+						<div class="shimmer-white sk-w-120 sk-h-20"></div>
+						<div class="shimmer-white sk-w-88 sk-h-12 sk-mt-8"></div>
+					</div>
 				</div>
+				<div class="sk-meta-bar shimmer-white"></div>
 			</div>
 
-			<div class="hero-user-info">
-				<van-skeleton
-					:loading="loading"
-					avatar
-					avatar-size="80"
-					:row="2"
-				>
-					<div class="user-main">
-						<div class="avatar-container">
-							<van-image
-								round
-								width="80"
-								height="80"
-								fit="cover"
-								:src="avatarUrl"
-								class="avatar-img"
-							/>
+			<!-- 真实用户信息 -->
+			<template v-else>
+				<div class="user-main">
+					<div class="avatar-box">
+						<van-image
+							v-if="hasValidAvatar"
+							round
+							width="60"
+							height="60"
+							fit="cover"
+							:src="avatarUrl"
+							class="avatar-img"
+							@error="avatarError = true"
+						/>
+						<div
+							v-else
+							class="avatar-fallback"
+							data-testid="user-avatar-fallback"
+						>
+							{{ avatarInitial }}
 						</div>
-						<div class="user-text">
-							<div class="name-row">
-								<span
-									class="username"
-									data-testid="rbac-user-name"
-								>{{ displayName }}</span>
-								<div class="role-tag">
-									<svg-icon
-										name="shield-check"
-										class="role-icon"
-									/>
-									{{ roleName }}
-								</div>
-							</div>
-							<div class="user-desc">管理平台所有功能与数据</div>
+					</div>
+					<div class="user-text">
+						<div class="name-row">
+							<span
+								class="username"
+								data-testid="rbac-user-name"
+							>{{ displayName }}</span>
+							<span
+								v-if="roleName"
+								class="role-pill"
+							>
+								{{ roleName }}
+							</span>
 						</div>
-						<!-- Decorative Grid dots -->
-						<div class="grid-dots"></div>
-					</div>
-				</van-skeleton>
-			</div>
-
-			<!-- Quick Info Cards -->
-			<div class="quick-info-row">
-				<div class="info-item">
-					<div class="info-icon-box">
-						<svg-icon name="orgManager" />
-					</div>
-					<div class="info-content">
-						<div class="info-label">所属组织</div>
-						<div class="info-value">{{ orgName || '演示组织' }}</div>
+						<div class="user-sub">{{ userSubtitle }}</div>
 					</div>
 				</div>
-				<div class="info-divider"></div>
-				<div class="info-item">
-					<div class="info-icon-box">
-						<svg-icon name="shield-check" />
+
+				<div class="quick-meta-row">
+					<div class="meta-item">
+						<span class="meta-label">所属组织</span>
+						<span class="meta-value">{{ orgName || '未分配' }}</span>
 					</div>
-					<div class="info-content">
-						<div class="info-label">账号状态</div>
-						<div class="info-value status-active">正常</div>
+					<div class="meta-divider"></div>
+					<div class="meta-item">
+						<span class="meta-label">账号状态</span>
+						<span class="meta-value meta-value--active">正常</span>
 					</div>
 				</div>
-			</div>
-		</div>
+			</template>
+		</section>
 
-		<!-- Settings Sections -->
-		<div class="settings-content">
-			<!-- Account Group -->
-			<div class="settings-group">
-				<div class="group-header">
-					<span class="header-bar"></span>
-					<span class="header-text">账户设置</span>
-				</div>
-				<van-cell-group
-					inset
-					class="custom-group"
-				>
-					<van-cell
-						is-link
-						to="/myself/info"
-						center
-						data-testid="rbac-user-entry-profile"
-						@click="handleInteraction"
-					>
-						<template #icon>
-							<div class="item-icon blue"><svg-icon name="user" /></div>
-						</template>
-						<template #title>
-							<div class="item-title">个人信息</div>
-							<div class="item-label">管理您的个人资料</div>
-						</template>
-					</van-cell>
-					<van-cell
-						is-link
-						center
-						data-testid="rbac-user-entry-security"
-						@click="goSecurity"
-					>
-						<template #icon>
-							<div class="item-icon green"><svg-icon name="shield-check" /></div>
-						</template>
-						<template #title>
-							<div class="item-title">账户与安全</div>
-							<div class="item-label">修改密码、绑定手机等</div>
-						</template>
-					</van-cell>
-				</van-cell-group>
+		<!-- 02 · 常用设置 -->
+		<section class="settings-section">
+			<div class="section-header">
+				<span class="section-dot section-dot--indigo"></span>
+				<span class="section-title">常用设置</span>
 			</div>
-
-			<!-- Personalization Group -->
-			<div class="settings-group mt-4">
-				<div class="group-header">
-					<span class="header-bar"></span>
-					<span class="header-text">个性化</span>
-				</div>
-				<van-cell-group
-					inset
-					class="custom-group"
-				>
-					<van-cell
-						is-link
-						center
-						@click="openTheme"
-					>
-						<template #icon>
-							<div class="item-icon amber"><svg-icon name="palette" /></div>
-						</template>
-						<template #title>
-							<div class="item-title">主题设置</div>
-							<div class="item-label">选择您喜欢的主题风格</div>
-						</template>
-					</van-cell>
-					<van-cell
-						is-link
-						center
-						data-testid="rbac-user-entry-notice-config"
-						@click="openNoticeConfig"
-					>
-						<template #icon>
-							<div class="item-icon blue"><van-icon name="bell" /></div>
-						</template>
-						<template #title>
-							<div class="item-title">消息提醒偏好</div>
-							<div class="item-label">站内信与微信服务号推送开关</div>
-						</template>
-					</van-cell>
-				</van-cell-group>
-			</div>
-
-			<!-- System Info Group -->
-			<div class="settings-group mt-4">
-				<div class="group-header">
-					<span class="header-bar"></span>
-					<span class="header-text">系统信息</span>
-				</div>
-				<van-cell-group
-					inset
-					class="custom-group"
-				>
-					<van-cell center>
-						<template #icon>
-							<div class="item-icon light-blue"><svg-icon name="message" /></div>
-						</template>
-						<template #title>
-							<div class="item-title">当前角色</div>
-						</template>
-						<template #value>
-							<span class="value-text primary">{{ roleName }}</span>
-						</template>
-						<template #right-icon><van-icon
-							name="arrow"
-							class="val-arrow"
-						/></template>
-					</van-cell>
-					<van-cell center>
-						<template #icon>
-							<div class="item-icon purple"><svg-icon name="userManager" /></div>
-						</template>
-						<template #title>
-							<div class="item-title">所属组织</div>
-						</template>
-						<template #value>
-							<span class="value-text">{{ orgName || '演示组织' }}</span>
-						</template>
-						<template #right-icon><van-icon
-							name="arrow"
-							class="val-arrow"
-						/></template>
-					</van-cell>
-				</van-cell-group>
-			</div>
-
-			<!-- System Group -->
-			<div class="settings-group mt-4">
-				<div class="group-header">
-					<span class="header-bar"></span>
-					<span class="header-text">系统</span>
-				</div>
-				<van-cell-group
-					inset
-					class="custom-group"
-				>
-					<van-cell
-						is-link
-						center
-						data-testid="rbac-user-entry-about"
-						@click="handleInteraction"
-					>
-						<template #icon>
-							<div class="item-icon sky"><svg-icon name="orderManager" /></div>
-						</template>
-						<template #title>
-							<div class="item-title">关于系统</div>
-							<div class="item-label">了解系统版本与信息</div>
-						</template>
-					</van-cell>
-					<van-cell
-						is-link
-						center
-						data-testid="rbac-user-entry-feedback"
-						@click="handleInteraction"
-					>
-						<template #icon>
-							<div class="item-icon emerald"><svg-icon name="message" /></div>
-						</template>
-						<template #title>
-							<div class="item-title">帮助与反馈</div>
-							<div class="item-label">常见问题与反馈建议</div>
-						</template>
-					</van-cell>
-					<van-cell center>
-						<template #icon>
-							<div class="item-icon violet"><svg-icon name="shopStockBatch" /></div>
-						</template>
-						<template #title>
-							<div class="item-title">版本信息</div>
-						</template>
-						<template #value>
-							<span class="value-text">v1.2.0</span>
-						</template>
-						<template #right-icon><van-icon
-							name="arrow"
-							class="val-arrow"
-						/></template>
-					</van-cell>
-				</van-cell-group>
-			</div>
-
-			<!-- Logout Action -->
-			<div class="logout-container">
-				<van-button
-					block
-					class="logout-btn-premium"
-					data-testid="rbac-user-btn-logout"
-					@click="showLogout"
+			<div class="settings-card">
+				<van-cell
+					is-link
+					to="/myself/info"
+					center
+					class="soft-cell"
+					data-testid="rbac-user-entry-profile"
+					@click="handleInteraction"
 				>
 					<template #icon>
-						<svg-icon
-							name="log-out"
-							class="logout-icon"
-						/>
+						<div class="item-icon item-icon--indigo">
+							<svg-icon name="user" />
+						</div>
 					</template>
-					退出当前账号
-				</van-button>
+					<template #title>
+						<span class="item-title">个人信息</span>
+					</template>
+				</van-cell>
+
+				<van-cell
+					is-link
+					center
+					class="soft-cell"
+					data-testid="rbac-user-btn-theme"
+					@click="openTheme"
+				>
+					<template #icon>
+						<div class="item-icon item-icon--amber">
+							<svg-icon name="palette" />
+						</div>
+					</template>
+					<template #title>
+						<span class="item-title">主题设置</span>
+					</template>
+				</van-cell>
+
+				<van-cell
+					is-link
+					center
+					class="soft-cell"
+					data-testid="rbac-user-entry-notice-config"
+					@click="openNoticeConfig"
+				>
+					<template #icon>
+						<div class="item-icon item-icon--sky">
+							<van-icon name="bell" />
+						</div>
+					</template>
+					<template #title>
+						<span class="item-title">消息提醒偏好</span>
+					</template>
+					<template #value>
+						<span class="cell-value">站内信/微信</span>
+					</template>
+				</van-cell>
 			</div>
+		</section>
+
+		<!-- 03 · 其他 -->
+		<section class="settings-section">
+			<div class="section-header">
+				<span class="section-dot section-dot--slate"></span>
+				<span class="section-title">其他</span>
+			</div>
+			<div class="settings-card">
+				<van-cell
+					center
+					class="soft-cell"
+				>
+					<template #icon>
+						<div class="item-icon item-icon--slate">
+							<svg-icon name="shopStockBatch" />
+						</div>
+					</template>
+					<template #title>
+						<span class="item-title">版本信息</span>
+					</template>
+					<template #value>
+						<span class="cell-value cell-value--mono">v1.2.0</span>
+					</template>
+				</van-cell>
+			</div>
+		</section>
+
+		<!-- 04 · 退出当前账号 -->
+		<div class="logout-container">
+			<van-button
+				block
+				class="logout-btn"
+				data-testid="rbac-user-btn-logout"
+				@click="showLogout"
+			>
+				<template #icon>
+					<svg-icon
+						name="log-out"
+						class="logout-icon"
+					/>
+				</template>
+				退出当前账号
+			</van-button>
 		</div>
 
 		<logout
@@ -296,7 +190,6 @@
 </template>
 
 <script lang="ts" setup>
-import { showToast } from 'vant';
 import logout from '@/views/user/logout/index.vue';
 import ThemePopup from '@/views/user/components/ThemePopup.vue';
 import UserNoticeConfigPopup from '@/views/message/components/UserNoticeConfigPopup.vue';
@@ -323,17 +216,35 @@ const loading = computed(() => !userStore.getUserInfo);
 const userInfo = computed<UserManagerData>(() => userStore.getUserInfo || {});
 
 const displayName = computed(() => userInfo.value?.nickName || userInfo.value?.username || '未登录');
-const avatarUrl = computed(
-	() =>
-		userInfo.value?.avatarUrl ||
-		userInfo.value?.avatar ||
-		'https://img.yzcdn.cn/public_files/2017/10/23/8690bb321356070e0b8c4404d087f8fd.png',
-);
+const avatarError = ref<boolean>(false);
+const avatarUrl = computed(() => {
+	const raw = userInfo.value?.avatarUrl || userInfo.value?.avatar || '';
+	return typeof raw === 'string' ? raw.trim() : '';
+});
+
+watch(avatarUrl, () => {
+	avatarError.value = false;
+});
+
+const hasValidAvatar = computed(() => Boolean(avatarUrl.value) && !avatarError.value);
+const avatarInitial = computed(() => {
+	const name = displayName.value.trim();
+	return name ? name.slice(0, 1).toUpperCase() : 'A';
+});
+
 const roleName = computed(() => userStore.getRoleInfo?.roleName || '');
 const orgName = computed(() => userStore.getOrgInfo?.orgName || userStore.getOrgInfo?.orgAlias || '');
 
+const userSubtitle = computed(() => {
+	const summary = typeof userInfo.value?.summary === 'string' ? userInfo.value.summary.trim() : '';
+	if (summary) return summary;
+	const uname = userInfo.value?.username || '';
+	return uname ? `@${uname}` : 'Alex 账号';
+});
+
 const showLogoutFlag = ref<boolean>(false);
 const showLogout = () => {
+	handleInteraction();
 	showLogoutFlag.value = true;
 };
 const logoutInfo = (v: boolean) => {
@@ -343,10 +254,6 @@ const logoutInfo = (v: boolean) => {
 const showThemePopup = ref<boolean>(false);
 const showNoticeConfigPopup = ref<boolean>(false);
 
-const goSecurity = () => {
-	handleInteraction();
-	showToast('功能即将上线');
-};
 const openTheme = () => {
 	handleInteraction();
 	showThemePopup.value = true;
@@ -358,357 +265,340 @@ const openNoticeConfig = () => {
 
 const handleInteraction = () => {
 	if (navigator.vibrate) {
-		navigator.vibrate(50);
+		navigator.vibrate(40);
 	}
 };
 </script>
 
 <style lang="less" scoped>
 .user-page-container {
-	background-color: var(--bg-color, #f7f9fc);
-	min-height: 100vh;
-	padding-bottom: 80px;
+	background-color: #f1f4fa;
+	min-height: 100%;
+	padding: 14px 16px 24px;
+	box-sizing: border-box;
 }
 
-/* --- Hero Section --- */
-.profile-hero {
-	position: relative;
-	background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-	padding: 20px 20px 80px;
-	overflow: hidden;
-}
-
-.hero-bg-shapes {
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	z-index: 0;
-	pointer-events: none;
-}
-
-.shape {
-	position: absolute;
-	border-radius: 50%;
-	filter: blur(40px);
-}
-
-.shape-1 {
-	width: 200px;
-	height: 200px;
-	background: rgba(255, 255, 255, 0.1);
-	top: -50px;
-	right: -50px;
-}
-
-.shape-2 {
-	width: 150px;
-	height: 150px;
-	background: rgba(59, 130, 246, 0.3);
-	bottom: -20px;
-	left: -20px;
-}
-
-.hero-header {
-	position: relative;
-	z-index: 1;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	margin-bottom: 30px;
-	padding-top: 10px;
-}
-
-.header-title {
-	font-size: 18px;
-	font-weight: 700;
+/* ─── 01 · 个人名片卡 ─── */
+.profile-card {
+	background: linear-gradient(135deg, #4f6af6 0%, #6366f1 58%, #4f46e5 100%);
+	border-radius: 20px;
+	padding: 20px 18px 16px;
 	color: #ffffff;
-}
-
-.header-actions {
-	position: absolute;
-	right: 0;
-}
-
-.settings-icon {
-	font-size: 22px;
-	color: #ffffff;
-	opacity: 0.9;
-}
-
-.hero-user-info {
-	position: relative;
-	z-index: 1;
-	margin-bottom: 30px;
+	box-shadow: 0 12px 28px -6px rgba(79, 106, 246, 0.32);
+	margin-bottom: 18px;
 }
 
 .user-main {
 	display: flex;
 	align-items: center;
-	position: relative;
+	gap: 14px;
+	margin-bottom: 16px;
 }
 
-.avatar-container {
-	padding: 4px;
-	background: rgba(255, 255, 255, 0.2);
-	border-radius: 50%;
-	backdrop-filter: blur(10px);
+.avatar-box {
+	width: 64px;
+	height: 64px;
+	padding: 2px;
+	border-radius: 9999px;
+	background: rgba(255, 255, 255, 0.24);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
 }
 
 .avatar-img {
-	border: 3px solid #ffffff;
-	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+	display: block;
+}
+
+.avatar-fallback {
+	width: 60px;
+	height: 60px;
+	border-radius: 9999px;
+	background: rgba(255, 255, 255, 0.22);
+	border: 1.5px solid rgba(255, 255, 255, 0.55);
+	color: #ffffff;
+	font-size: 24px;
+	font-weight: 800;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .user-text {
-	margin-left: 20px;
+	min-width: 0;
+	flex: 1;
+}
+
+.name-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
+	margin-bottom: 4px;
 }
 
 .username {
-	font-size: 26px;
+	font-size: 21px;
 	font-weight: 800;
 	color: #ffffff;
-	margin-right: 12px;
+	line-height: 1.2;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
-.role-tag {
+.role-pill {
 	display: inline-flex;
 	align-items: center;
-	background: #f59e0b;
-	color: white;
-	padding: 4px 12px;
-	border-radius: 20px;
+	padding: 2px 9px;
+	border-radius: 9999px;
+	background: rgba(255, 255, 255, 0.2);
+	color: #ffffff;
 	font-size: 11px;
-	font-weight: 700;
-	box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
+	font-weight: 600;
+	white-space: nowrap;
 }
 
-.role-icon {
-	width: 12px;
-	height: 12px;
-	margin-right: 4px;
-}
-
-.user-desc {
-	font-size: 13px;
+.user-sub {
+	font-size: 12px;
 	color: rgba(255, 255, 255, 0.8);
-	margin-top: 8px;
-	font-weight: 500;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
-.grid-dots {
-	position: absolute;
-	right: 0;
-	top: 50%;
-	transform: translateY(-50%);
-	width: 48px;
-	height: 32px;
-	background-image: radial-gradient(rgba(255, 255, 255, 0.3) 1.5px, transparent 1.5px);
-	background-size: 8px 8px;
-	opacity: 0.5;
-}
-
-/* --- Quick Info Row --- */
-.quick-info-row {
-	position: relative;
-	z-index: 1;
+.quick-meta-row {
 	display: flex;
 	align-items: center;
-	background: rgba(255, 255, 255, 0.1);
-	backdrop-filter: blur(12px);
-	border: 1px solid rgba(255, 255, 255, 0.15);
-	border-radius: 16px;
-	padding: 16px;
+	background: rgba(255, 255, 255, 0.14);
+	border-radius: 14px;
+	padding: 11px 14px;
 }
 
-.info-item {
+.meta-item {
 	flex: 1;
 	display: flex;
-	align-items: center;
-	padding: 0 8px;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
 }
 
-.info-icon-box {
-	width: 36px;
-	height: 36px;
-	background: rgba(255, 255, 255, 0.1);
-	border-radius: 10px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	margin-right: 12px;
-	color: white;
-	svg {
-		width: 20px;
-		height: 20px;
-	}
-}
-
-.info-label {
+.meta-label {
 	font-size: 11px;
-	color: rgba(255, 255, 255, 0.7);
-	margin-bottom: 2px;
+	color: rgba(255, 255, 255, 0.72);
 }
 
-.info-value {
+.meta-value {
 	font-size: 14px;
 	font-weight: 700;
 	color: #ffffff;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+
+	&--active {
+		color: #6ee7b7;
+	}
 }
 
-.status-active {
-	color: #4ade80;
-}
-
-.info-divider {
+.meta-divider {
 	width: 1px;
-	height: 30px;
-	background: rgba(255, 255, 255, 0.15);
+	height: 24px;
+	background: rgba(255, 255, 255, 0.18);
+	margin: 0 14px;
+	flex-shrink: 0;
 }
 
-/* --- Settings Content --- */
-.settings-content {
-	position: relative;
-	margin-top: -30px;
-	background: #f7f9fc;
-	border-radius: 30px 30px 0 0;
-	padding: 24px 0;
+/* ─── 02 & 03 · 设置分组卡片 ─── */
+.settings-section {
+	margin-bottom: 16px;
 }
 
-.settings-group {
-	margin-bottom: 24px;
-}
-
-.group-header {
+.section-header {
 	display: flex;
 	align-items: center;
-	padding: 0 24px;
-	margin-bottom: 12px;
+	gap: 7px;
+	margin: 0 2px 10px;
 }
 
-.header-bar {
-	width: 4px;
-	height: 16px;
-	background: #2563eb;
-	border-radius: 2px;
-	margin-right: 10px;
+.section-dot {
+	width: 7px;
+	height: 7px;
+	border-radius: 9999px;
+
+	&--indigo {
+		background: #4f6af6;
+	}
+
+	&--slate {
+		background: #94a3b8;
+	}
 }
 
-.header-text {
-	font-size: 16px;
-	font-weight: 800;
-	color: #1e293b;
+.section-title {
+	font-size: 14px;
+	font-weight: 700;
+	color: #0f172a;
 }
 
-.custom-group {
-	margin: 0 !important;
-	border-radius: 20px !important;
+.settings-card {
+	background: #ffffff;
+	border-radius: 18px;
 	overflow: hidden;
+	box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+}
+
+.soft-cell {
+	padding: 14px 16px;
+	background: #ffffff;
+
+	&:not(:last-child)::after {
+		left: 64px;
+		right: 16px;
+		border-bottom-color: #f1f5f9;
+	}
 }
 
 .item-icon {
-	width: 40px;
-	height: 40px;
-	border-radius: 12px;
+	width: 36px;
+	height: 36px;
+	border-radius: 11px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	margin-right: 14px;
+	margin-right: 12px;
+	font-size: 18px;
+	flex-shrink: 0;
+
 	svg {
-		width: 22px;
-		height: 22px;
+		width: 19px;
+		height: 19px;
 	}
 
-	&.blue {
-		background: #eff6ff;
-		color: #2563eb;
+	&--indigo {
+		background: rgba(79, 106, 246, 0.1);
+		color: #4f6af6;
 	}
-	&.green {
-		background: #f0fdf4;
-		color: #16a34a;
-	}
-	&.amber {
-		background: #fffbeb;
+
+	&--amber {
+		background: rgba(245, 158, 11, 0.12);
 		color: #d97706;
 	}
-	&.light-blue {
-		background: #f0f9ff;
-		color: #0ea5e9;
+
+	&--sky {
+		background: rgba(14, 165, 233, 0.12);
+		color: #0284c7;
 	}
-	&.purple {
-		background: #f5f3ff;
-		color: #8b5cf6;
-	}
-	&.sky {
-		background: #f0f9ff;
-		color: #0ea5e9;
-	}
-	&.emerald {
-		background: #ecfdf5;
-		color: #10b981;
-	}
-	&.violet {
-		background: #f5f3ff;
-		color: #7c3aed;
+
+	&--slate {
+		background: #f1f5f9;
+		color: #64748b;
 	}
 }
 
 .item-title {
-	font-size: 15px;
+	font-size: 14px;
 	font-weight: 600;
-	color: #334155;
+	color: #0f172a;
 }
 
-.item-label {
+.cell-value {
 	font-size: 12px;
 	color: #94a3b8;
-	margin-top: 2px;
-}
-
-.value-text {
-	font-size: 14px;
-	color: #64748b;
 	font-weight: 500;
-	&.primary {
-		color: #2563eb;
-		font-weight: 600;
+
+	&--mono {
+		font-variant-numeric: tabular-nums;
 	}
 }
 
-.val-arrow {
-	font-size: 14px;
-	color: #cbd5e1;
-	margin-left: 4px;
-}
-
+/* ─── 04 · 退出按钮 ─── */
 .logout-container {
-	padding: 24px 20px;
+	margin-top: 20px;
 }
 
-.logout-btn-premium {
-	height: 54px;
-	background: #ffffff;
-	border: 1px solid #f1f5f9;
+.logout-btn {
+	height: 48px;
+	background: rgba(244, 63, 94, 0.08);
+	border: none;
 	border-radius: 16px;
-	color: #ef4444;
-	font-size: 16px;
+	color: #e11d48;
+	font-size: 14px;
 	font-weight: 700;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+	transition:
+		transform 0.15s ease,
+		background-color 0.15s ease;
 
 	&:active {
-		background: #fef2f2;
-		transform: scale(0.98);
+		transform: scale(0.985);
+		background: rgba(244, 63, 94, 0.14);
 	}
 }
 
 .logout-icon {
-	width: 20px;
-	height: 20px;
-	margin-right: 8px;
+	width: 18px;
+	height: 18px;
+	margin-right: 6px;
 }
 
-.mt-4 {
-	margin-top: 16px;
+/* ─── 骨架屏 ─── */
+.profile-skeleton {
+	.sk-top-row {
+		display: flex;
+		align-items: center;
+		gap: 14px;
+		margin-bottom: 16px;
+	}
+
+	.sk-avatar {
+		width: 64px;
+		height: 64px;
+		border-radius: 9999px;
+		flex-shrink: 0;
+	}
+
+	.sk-text-col {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.sk-meta-bar {
+		width: 100%;
+		height: 54px;
+		border-radius: 14px;
+	}
+}
+
+.shimmer-white {
+	background: rgba(255, 255, 255, 0.24);
+	border-radius: 8px;
+	animation: userPulse 1.4s ease-in-out infinite;
+}
+
+.sk-w-88 {
+	width: 88px;
+}
+.sk-w-120 {
+	width: 120px;
+}
+.sk-h-12 {
+	height: 12px;
+}
+.sk-h-20 {
+	height: 20px;
+}
+.sk-mt-8 {
+	margin-top: 8px;
+}
+
+@keyframes userPulse {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.45;
+	}
 }
 </style>

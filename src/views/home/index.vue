@@ -25,8 +25,35 @@
 					</div>
 				</div>
 
-				<!-- 核心指标大盘 (动态聚合) -->
-				<div class="role-kpi-grid">
+				<!-- 核心指标大盘 (动态聚合 + 骨架屏防闪烁) -->
+				<div
+					v-if="kpiLoading"
+					class="role-kpi-grid"
+					data-testid="home-kpi-skeleton"
+				>
+					<div
+						v-if="isUserRole"
+						class="kpi-box main"
+					>
+						<div class="shimmer-bar sk-w-64 sk-h-12"></div>
+						<div class="shimmer-bar sk-w-120 sk-h-22 sk-my-6"></div>
+						<div class="shimmer-bar sk-w-88 sk-h-10"></div>
+					</div>
+					<div
+						v-for="idx in isUserRole ? 3 : 2"
+						:key="`home-kpi-sk-${idx}`"
+						class="kpi-box"
+					>
+						<div class="shimmer-bar sk-w-64 sk-h-12"></div>
+						<div class="shimmer-bar sk-w-80 sk-h-20 sk-my-6"></div>
+						<div class="shimmer-bar sk-w-72 sk-h-10"></div>
+					</div>
+				</div>
+
+				<div
+					v-else
+					class="role-kpi-grid"
+				>
 					<!-- 普通/家庭用户视角：礼金净结余 + 收礼 + 随礼 + 待办提醒 -->
 					<template v-if="isUserRole">
 						<div
@@ -41,7 +68,7 @@
 								<span class="currency">¥</span>
 								<span class="num">{{ (giftOverview.netAmount || 0).toLocaleString() }}</span>
 							</div>
-							<div class="kpi-sub">共记录 {{ giftOverview.recordCount || 0 }} 笔流水</div>
+							<div class="kpi-sub">共 {{ giftOverview.recordCount || 0 }} 笔流水</div>
 						</div>
 						<div class="kpi-box">
 							<div class="kpi-label">累计收礼</div>
@@ -49,7 +76,7 @@
 								<span class="currency">¥</span>
 								<span class="num">{{ (giftOverview.receiveAmount || 0).toLocaleString() }}</span>
 							</div>
-							<div class="kpi-sub">礼入人情</div>
+							<div class="kpi-sub">收礼总额</div>
 						</div>
 						<div class="kpi-box">
 							<div class="kpi-label">随礼支出</div>
@@ -59,7 +86,7 @@
 									((giftOverview.giveAmount || 0) + (giftOverview.returnAmount || 0)).toLocaleString()
 								}}</span>
 							</div>
-							<div class="kpi-sub">人情往还</div>
+							<div class="kpi-sub">随礼与回礼</div>
 						</div>
 						<div
 							class="kpi-box click-box"
@@ -71,19 +98,12 @@
 								<span class="num">{{ unreadSummaryCount }}</span>
 								<span class="unit">条待办</span>
 							</div>
-							<div class="kpi-sub">点击查看通知 ></div>
+							<div class="kpi-sub">查看消息 ›</div>
 						</div>
 					</template>
 
-					<!-- 管理员视角：机构成员 + 待办巡检 + 服务状态 -->
+					<!-- 管理员视角：待办通知 + 服务状态（顶部已展示机构徽章，不再重复渲染整行机构卡片） -->
 					<template v-else>
-						<div class="kpi-box main">
-							<div class="kpi-label">管辖机构/家庭</div>
-							<div class="kpi-val admin-val">
-								<span class="num text-sm">{{ orgName || '平台总管' }}</span>
-							</div>
-							<div class="kpi-sub">组织权限体系受控</div>
-						</div>
 						<div
 							class="kpi-box click-box"
 							data-testid="dash-mobile-kpi-remind"
@@ -94,14 +114,17 @@
 								<span class="num">{{ unreadSummaryCount }}</span>
 								<span class="unit">条未读</span>
 							</div>
-							<div class="kpi-sub">XXL-Job 定时巡检 ></div>
+							<div class="kpi-sub">查看消息 ›</div>
 						</div>
 						<div
 							class="kpi-box"
 							data-testid="dash-mobile-kpi-services"
 						>
 							<div class="kpi-label">集群微服务</div>
-							<div class="kpi-val receive">
+							<div
+								class="kpi-val"
+								:class="onlineServiceCount === totalServiceCount ? 'receive' : 'expense'"
+							>
 								<span class="num">{{ onlineServiceCount }}</span>
 								<span class="unit">/ {{ totalServiceCount }} 在线</span>
 							</div>
@@ -110,24 +133,30 @@
 					</template>
 				</div>
 
-				<!-- 快捷行动条：一键 AI 智能记账 + 随礼记账 -->
+				<!-- 快捷行动条：AI 记账 + 随礼记一笔 -->
 				<div class="action-capsules-row">
 					<button
+						type="button"
 						class="capsule-btn ai-btn"
 						data-testid="dash-mobile-btn-ai-ledger"
 						@click="handleAiLedgerClick"
 					>
-						<span class="sparkle">✨</span>
-						<span class="text">AI 智能流式记账</span>
+						<van-icon
+							name="edit"
+							class="btn-vant-icon"
+						/>
+						<span class="text">AI 记账</span>
 					</button>
 					<button
+						type="button"
 						class="capsule-btn ghost-btn"
 						data-testid="dash-mobile-btn-add-gift"
 						@click="handleAddGiftClick"
 					>
 						<svg-icon
+							class="btn-svg-icon"
 							name="gift"
-							color="#0058be"
+							color="#4f6af6"
 						/>
 						<span class="text">随礼记一笔</span>
 					</button>
@@ -139,7 +168,7 @@
 				v-if="visibleStats.length > 0"
 				class="sub-stats-scroller"
 			>
-				<div class="sub-stats-title">近期保存动态：</div>
+				<div class="sub-stats-title">近期保存</div>
 				<div class="sub-stats-chips">
 					<span
 						v-for="stat in visibleStats"
@@ -152,75 +181,112 @@
 			</div>
 		</section>
 
-		<!-- Section 2: 全局功能搜索栏 -->
-		<section
-			v-if="totalItemCount > 6"
-			class="search-section"
-		>
-			<van-search
-				v-model="searchKeyword"
-				placeholder="搜索功能名称或模块..."
-				shape="round"
-				clearable
-				class="menu-search-bar"
-			/>
-		</section>
-
-		<!-- Section 3: 分组业务功能卡片流 (解耦一级与二级) -->
-		<section
-			v-if="filteredMenuGroups.length > 0"
-			class="menu-groups-container"
-		>
-			<div
-				v-for="group in filteredMenuGroups"
-				:key="group.id"
-				class="group-card"
+		<!-- Section 2 & 3: 功能菜单骨架屏（动态路由/菜单加载期间展示） -->
+		<template v-if="menuLoading">
+			<section
+				class="search-section"
+				data-testid="home-menu-skeleton"
 			>
-				<div class="group-header">
-					<div class="group-title-box">
-						<span
-							class="group-color-tag"
-							:style="{ backgroundColor: group.themeColor }"
-						></span>
-						<h2 class="group-title">{{ group.title }}</h2>
-					</div>
-					<span class="group-count">{{ group.items.length }} 项功能</span>
-				</div>
-
-				<div class="group-grid">
-					<div
-						v-for="item in group.items"
-						:key="item.path"
-						class="menu-item-card"
-						:data-testid="'menu-item-' + (item.name || item.title)"
-						@click="handleGridItemClick(item)"
-					>
-						<div
-							class="icon-wrapper"
-							:style="{ backgroundColor: item.bgColor }"
-						>
-							<svg-icon
-								class="homeSvgClass"
-								:name="item.icon"
-								:color="item.color"
-							/>
+				<div class="search-skeleton-bar shimmer-bar"></div>
+			</section>
+			<section class="menu-groups-container">
+				<div
+					v-for="groupIdx in 2"
+					:key="`home-menu-sk-${groupIdx}`"
+					class="group-card"
+				>
+					<div class="group-header">
+						<div class="group-title-box">
+							<div class="shimmer-bar sk-w-4 sk-h-14 sk-rounded-pill"></div>
+							<div class="shimmer-bar sk-w-72 sk-h-14"></div>
 						</div>
-						<span class="homeFontClass">{{ item.title }}</span>
+						<div class="shimmer-bar sk-w-40 sk-h-18 sk-rounded-pill"></div>
+					</div>
+					<div class="group-grid">
+						<div
+							v-for="itemIdx in 4"
+							:key="`home-menu-sk-item-${groupIdx}-${itemIdx}`"
+							class="menu-item-card"
+						>
+							<div class="shimmer-bar sk-w-44 sk-h-44 sk-rounded-14"></div>
+							<div class="shimmer-bar sk-w-48 sk-h-12 sk-mt-2"></div>
+						</div>
 					</div>
 				</div>
-			</div>
-		</section>
+			</section>
+		</template>
 
-		<!-- 搜索无结果时的空状态 -->
-		<div
-			v-else-if="searchKeyword"
-			class="search-empty-box"
-		>
-			<van-empty
-				image="search"
-				description="未找到相关功能或模块"
-			/>
-		</div>
+		<!-- Section 2: 全局功能搜索栏 -->
+		<template v-else>
+			<section
+				v-if="totalItemCount > 6"
+				class="search-section"
+			>
+				<van-search
+					v-model="searchKeyword"
+					placeholder="搜索功能"
+					shape="round"
+					clearable
+					class="menu-search-bar"
+				/>
+			</section>
+
+			<!-- Section 3: 分组业务功能卡片流 (解耦一级与二级) -->
+			<section
+				v-if="filteredMenuGroups.length > 0"
+				class="menu-groups-container"
+			>
+				<div
+					v-for="group in filteredMenuGroups"
+					:key="group.id"
+					class="group-card"
+				>
+					<div class="group-header">
+						<div class="group-title-box">
+							<span
+								class="group-color-tag"
+								:style="{ backgroundColor: group.themeColor }"
+							></span>
+							<h2 class="group-title">{{ group.title }}</h2>
+						</div>
+						<span class="group-count">{{ group.items.length }} 项</span>
+					</div>
+
+					<div class="group-grid">
+						<div
+							v-for="item in group.items"
+							:key="item.path"
+							class="menu-item-card"
+							:data-testid="'menu-item-' + (item.name || item.title)"
+							@click="handleGridItemClick(item)"
+						>
+							<div
+								class="icon-wrapper"
+								:style="{ backgroundColor: item.bgColor }"
+							>
+								<svg-icon
+									class="homeSvgClass"
+									:name="item.icon"
+									:color="item.color"
+								/>
+							</div>
+							<span class="homeFontClass">{{ formatMenuTitle(item.title) }}</span>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- 搜索无结果时的空状态 -->
+			<div
+				v-else-if="searchKeyword"
+				class="search-empty-box"
+			>
+				<van-empty
+					image="search"
+					description="未找到相关功能或模块"
+				/>
+			</div>
+		</template>
 		<!-- AI 智能记账 ActionSheet 抽屉 -->
 		<finance-ai-sheet
 			v-model:show="showAiSheet"
@@ -236,7 +302,8 @@ import { useTabBar } from '@/composables/useTabBar';
 import { useDashboardStore } from '@/store/modules/dashboard/dashboard';
 import { useTabBarStore } from '@/store/modules/tabbar';
 import { useUserStore } from '@/store/modules/user/user';
-import { routes } from '@/router';
+import { routes, routesVersion } from '@/router';
+import type { MenuInfoData } from '@/views/user/menuInfo/config';
 import { formatDate } from '@/utils/dayjs';
 import { getSysMessageSummary } from '@/views/message/api';
 import { getGiftAnalysisOverview } from '@/views/finance/gift/analysis/api';
@@ -271,31 +338,36 @@ const menuGroups = ref<MenuGroup[]>([]);
  */
 const iconConfigMap: Record<string, { icon: string; color: string; bgColor: string }> = {
 	// 用户与权限
-	用户信息: { icon: 'user', color: '#0058be', bgColor: '#d8e2ff' },
+	用户信息: { icon: 'user', color: '#4f6af6', bgColor: '#eef2ff' },
+	用户管理: { icon: 'user', color: '#4f6af6', bgColor: '#eef2ff' },
 	机构管理: { icon: 'orgManager', color: '#8b5cf6', bgColor: '#f5f3ff' },
 	菜单管理: { icon: 'palette', color: '#ec4899', bgColor: '#fdf2f8' },
 	权限信息: { icon: 'shield-check', color: '#10b981', bgColor: '#ecfdf5' },
 	角色管理: { icon: 'userManager', color: '#f59e0b', bgColor: '#fffbeb' },
 	用户: { icon: 'user', color: '#06b6d4', bgColor: '#ecfeff' },
-	角色用户: { icon: 'userManager', color: '#0058be', bgColor: '#d8e2ff' },
+	角色用户: { icon: 'userManager', color: '#4f6af6', bgColor: '#eef2ff' },
 	角色权限: { icon: 'shield-check', color: '#8b5cf6', bgColor: '#f5f3ff' },
-	字典信息: { icon: 'dict', color: '#54647a', bgColor: '#d0e1fb' },
+	字典信息: { icon: 'dict', color: '#64748b', bgColor: '#f1f5f9' },
 
-	// 店铺与财务
-	店财务管理: { icon: 'shopFinance', color: '#0058be', bgColor: '#d8e2ff' },
+	// 店铺与个人财务
+	店财务管理: { icon: 'shopFinance', color: '#4f6af6', bgColor: '#eef2ff' },
 	店财务分析: { icon: 'shopFinanceAnalysis', color: '#8b5cf6', bgColor: '#f5f3ff' },
 	店库存分析: { icon: 'financeAnalysis', color: '#ec4899', bgColor: '#fdf2f8' },
 	店铺库存: { icon: 'shopStock', color: '#10b981', bgColor: '#ecfdf5' },
 	店铺商品: { icon: 'shopProduct', color: '#f59e0b', bgColor: '#fffbeb' },
 	销售单管理: { icon: 'orderManager', color: '#06b6d4', bgColor: '#ecfeff' },
-	商品库存批次: { icon: 'shopStockBatch', color: '#54647a', bgColor: '#d0e1fb' },
+	商品库存批次: { icon: 'shopStockBatch', color: '#64748b', bgColor: '#f1f5f9' },
 	财务信息: { icon: 'finance', color: '#8b5cf6', bgColor: '#f5f3ff' },
-	财务分析: { icon: 'financeAnalysis', color: '#06b6d4', bgColor: '#ecfeff' },
+	账单流水: { icon: 'financeManager', color: '#4f6af6', bgColor: '#eef2ff' },
+	零花钱预算管理: { icon: 'cash', color: '#8b5cf6', bgColor: '#f5f3ff' },
+	财务分析: { icon: 'financeAnalysis', color: '#10b981', bgColor: '#ecfdf5' },
+	收支分析: { icon: 'financeAnalysis', color: '#10b981', bgColor: '#ecfdf5' },
+	账户流水信息: { icon: 'accountRecordInfo', color: '#4f6af6', bgColor: '#eef2ff' },
 
 	// 消费卡与消费券
 	消费卡交易记录: { icon: 'card-transaction', color: '#10b981', bgColor: '#ecfdf5' },
-	消费卡信息: { icon: 'card-info', color: '#0058be', bgColor: '#d8e2ff' },
-	消费券核销记录表: { icon: 'coupon-check', color: '#0058be', bgColor: '#d8e2ff' },
+	消费卡信息: { icon: 'card-info', color: '#4f6af6', bgColor: '#eef2ff' },
+	消费券核销记录表: { icon: 'coupon-check', color: '#4f6af6', bgColor: '#eef2ff' },
 	消费券信息表: { icon: 'coupon', color: '#10b981', bgColor: '#ecfdf5' },
 	用户消费券库存表: { icon: 'coupon', color: '#f59e0b', bgColor: '#fffbeb' },
 
@@ -303,19 +375,22 @@ const iconConfigMap: Record<string, { icon: string; color: string; bgColor: stri
 	商品属性: { icon: 'attribute', color: '#8b5cf6', bgColor: '#f5f3ff' },
 	个人随礼信息: { icon: 'gift', color: '#f59e0b', bgColor: '#fffbeb' },
 	随礼记录: { icon: 'gift', color: '#f59e0b', bgColor: '#fffbeb' },
-	事由管理: { icon: 'order', color: '#0058be', bgColor: '#d8e2ff' },
+	礼金记录: { icon: 'gift', color: '#f59e0b', bgColor: '#fffbeb' },
+	数据概览: { icon: 'shopFinanceAnalysis', color: '#4f6af6', bgColor: '#eef2ff' },
+	统计报表: { icon: 'financeAnalysis', color: '#ec4899', bgColor: '#fdf2f8' },
+	事由管理: { icon: 'order', color: '#4f6af6', bgColor: '#eef2ff' },
 	亲友管理: { icon: 'user', color: '#10b981', bgColor: '#ecfdf5' },
 };
 
 // 预设柔和调色板，为未显式配置颜色的菜单提供优雅视觉
 const PALETTE = [
-	{ color: '#0058be', bgColor: '#d8e2ff' },
+	{ color: '#4f6af6', bgColor: '#eef2ff' },
 	{ color: '#8b5cf6', bgColor: '#f5f3ff' },
 	{ color: '#10b981', bgColor: '#ecfdf5' },
 	{ color: '#f59e0b', bgColor: '#fffbeb' },
 	{ color: '#ec4899', bgColor: '#fdf2f8' },
 	{ color: '#06b6d4', bgColor: '#ecfeff' },
-	{ color: '#54647a', bgColor: '#d0e1fb' },
+	{ color: '#64748b', bgColor: '#f1f5f9' },
 ];
 
 const getIconConfig = (title: string, defaultIcon?: string, index = 0) => {
@@ -329,10 +404,30 @@ const getIconConfig = (title: string, defaultIcon?: string, index = 0) => {
 	}
 	const fallback = PALETTE[index % PALETTE.length];
 	return {
-		name: defaultIcon || 'menu-default',
+		name: defaultIcon || 'attribute',
 		color: fallback.color,
 		bgColor: fallback.bgColor,
 	};
+};
+
+// 移动端网格短标题映射：去除冗余的数据库“表”尾缀与重复词，避免 4 列网格出现孤字换行 (unslop Rule 16/23)
+const MENU_SHORT_TITLE_MAP: Record<string, string> = {
+	消费券核销记录表: '核销记录',
+	消费券信息表: '消费券信息',
+	用户消费券库存表: '用户券库存',
+	零花钱预算管理: '零花钱预算',
+	账户流水信息: '账户流水',
+};
+
+const formatMenuTitle = (rawTitle: string): string => {
+	if (!rawTitle) return '';
+	if (MENU_SHORT_TITLE_MAP[rawTitle]) {
+		return MENU_SHORT_TITLE_MAP[rawTitle];
+	}
+	return rawTitle
+		.replace(/记录表$/, '记录')
+		.replace(/信息表$/, '信息')
+		.replace(/库存表$/, '库存');
 };
 
 // 分组主色调映射
@@ -456,6 +551,7 @@ const giftOverview = ref({
 });
 const unreadSummaryCount = ref(0);
 const showAiSheet = ref(false);
+const kpiLoading = ref(false);
 
 const fetchGiftStats = async () => {
 	try {
@@ -512,11 +608,10 @@ const refreshMessageUnreadBadge = async () => {
 
 const onlineServiceCount = ref(6);
 const totalServiceCount = ref(6);
-const serviceHealthSub = computed(() =>
-	onlineServiceCount.value === totalServiceCount.value
-		? '全栈探针正常'
-		: `${onlineServiceCount.value}/${totalServiceCount.value} 节点在线`,
-);
+const serviceHealthSub = computed(() => {
+	const offlineCount = Math.max(totalServiceCount.value - onlineServiceCount.value, 0);
+	return offlineCount === 0 ? '全部运行正常' : `${offlineCount} 个服务离线`;
+});
 
 const fetchServiceHealth = async () => {
 	try {
@@ -530,20 +625,29 @@ const fetchServiceHealth = async () => {
 	}
 };
 
-onMounted(() => {
-	fetchGiftStats();
-	refreshMessageUnreadBadge();
-	if (!isUserRole.value) {
-		void fetchServiceHealth();
+const loadDashboardKpis = async (showSkeleton = false) => {
+	if (showSkeleton) {
+		kpiLoading.value = true;
 	}
+	try {
+		const tasks: Promise<unknown>[] = [fetchGiftStats(), refreshMessageUnreadBadge()];
+		if (!isUserRole.value) {
+			tasks.push(fetchServiceHealth());
+		}
+		await Promise.all(tasks);
+	} finally {
+		kpiLoading.value = false;
+	}
+};
+
+onMounted(() => {
+	initMenuGroups();
+	void loadDashboardKpis(true);
 });
 
 onActivated(() => {
-	fetchGiftStats();
-	refreshMessageUnreadBadge();
-	if (!isUserRole.value) {
-		void fetchServiceHealth();
-	}
+	initMenuGroups();
+	void loadDashboardKpis(false);
 });
 
 // 交互反馈及路由跳转
@@ -589,6 +693,97 @@ const collectLeafItems = (routeList: RouteRecordRaw[], parentTitle = ''): MenuIt
 	});
 
 	return leaves;
+};
+
+/**
+ * 兜底：当动态路由数组尚未同步完成时，直接从 Pinia userStore.getMenuInfo 组装菜单分组
+ */
+const collectMenuInfoLeaves = (nodes: MenuInfoData[]): MenuItem[] => {
+	const leaves: MenuItem[] = [];
+	nodes.forEach((node, idx) => {
+		const hideInMenu = String(node.hideInMenu ?? '') !== '0';
+		const showInHome = String(node.showInHome ?? '') === '1';
+		if (hideInMenu && !showInHome) {
+			return;
+		}
+		const children = Array.isArray(node.children) ? node.children : [];
+		if (children.length > 0) {
+			leaves.push(...collectMenuInfoLeaves(children));
+		} else if (node.path && node.title) {
+			const title = String(node.title);
+			const iconCfg = getIconConfig(title, node.icon ? String(node.icon) : undefined, idx);
+			leaves.push({
+				name: node.name ? String(node.name) : undefined,
+				title,
+				path: String(node.path),
+				icon: iconCfg.name,
+				color: iconCfg.color,
+				bgColor: iconCfg.bgColor,
+			});
+		}
+	});
+	return leaves;
+};
+
+const buildMenuGroupsFromStore = (menus: MenuInfoData[]): MenuGroup[] => {
+	const resultGroups: MenuGroup[] = [];
+	const orphanItems: MenuItem[] = [];
+	const SYSTEM_NAMES = new Set(['home', 'message', 'myself', 'login', 'dashboard']);
+
+	menus.forEach((top) => {
+		const topName = String(top.name || '');
+		const topPath = String(top.path || '');
+		if (SYSTEM_NAMES.has(topName) || topPath === '/' || topPath.includes('*')) {
+			return;
+		}
+		const topTitle = String(top.title || '');
+		const children = Array.isArray(top.children) ? top.children : [];
+		const isTopShowInHome = String(top.showInHome ?? '') === '1';
+
+		if (children.length > 0) {
+			const hasAnyChildShowInHome = children.some((c) => String(c.showInHome ?? '') === '1');
+			if (isTopShowInHome || hasAnyChildShowInHome) {
+				const targetChildren = isTopShowInHome ? children : children.filter((c) => String(c.showInHome ?? '') === '1');
+				const groupLeaves = collectMenuInfoLeaves(targetChildren);
+				const uniqueLeaves: MenuItem[] = [];
+				const pathSet = new Set<string>();
+				groupLeaves.forEach((leaf) => {
+					if (!pathSet.has(leaf.path)) {
+						pathSet.add(leaf.path);
+						uniqueLeaves.push(leaf);
+					}
+				});
+				if (uniqueLeaves.length > 0) {
+					resultGroups.push({
+						id: topName || topPath,
+						title: topTitle || '快捷服务',
+						themeColor: getGroupThemeColor(topTitle, resultGroups.length),
+						items: uniqueLeaves,
+					});
+				}
+			}
+		} else if (isTopShowInHome && topPath && topTitle) {
+			const iconCfg = getIconConfig(topTitle, top.icon ? String(top.icon) : undefined, orphanItems.length);
+			orphanItems.push({
+				name: topName,
+				title: topTitle,
+				path: topPath,
+				icon: iconCfg.name,
+				color: iconCfg.color,
+				bgColor: iconCfg.bgColor,
+			});
+		}
+	});
+
+	if (orphanItems.length > 0) {
+		resultGroups.push({
+			id: 'common_group',
+			title: '常用功能',
+			themeColor: '#06b6d4',
+			items: orphanItems,
+		});
+	}
+	return resultGroups;
 };
 
 /**
@@ -668,7 +863,18 @@ const initMenuGroups = () => {
 		});
 	}
 
-	menuGroups.value = resultGroups;
+	if (resultGroups.length > 0) {
+		menuGroups.value = resultGroups;
+		return;
+	}
+
+	// 双保险兜底：若路由数组因重登/HMR 尚未同步完成，直接从 Pinia userStore.getMenuInfo 组装分组
+	if (userStore.getMenuInfo?.length) {
+		menuGroups.value = buildMenuGroupsFromStore(userStore.getMenuInfo);
+		return;
+	}
+
+	menuGroups.value = [];
 };
 
 // 统计总功能项数
@@ -698,38 +904,39 @@ const filteredMenuGroups = computed(() => {
 		.filter((group) => group.items.length > 0);
 });
 
-// 初始化与路由动态变化侦听
+const menuLoading = computed(() => kpiLoading.value || (!userStore.getRouteStatus && menuGroups.value.length === 0));
+
+// 初始化与路由动态变化侦听（监听响应式 routesVersion 与 Pinia 菜单/路由就绪状态，彻底消除重登后菜单空白）
 initMenuGroups();
 
 watch(
-	() => router.getRoutes().length,
+	() => [routesVersion.value, userStore.getRouteStatus, userStore.getMenuInfo?.length],
 	() => {
 		initMenuGroups();
 	},
+	{ immediate: true },
 );
 </script>
 
 <style lang="less" scoped>
 .home-container {
-	background-color: var(--bg-color, #f9f9ff);
-	padding: 14px 16px;
+	background-color: #f1f4fa;
+	padding: 14px 16px 20px;
 	box-sizing: border-box;
-	min-height: calc(100vh - 96px);
-	padding-bottom: 90px; /* 留足底部 TabBar 与安全区空间 */
+	min-height: 100%;
 	overflow-x: hidden;
 }
 
-/* ─── Section 1: 角色动态态势卡片 ─── */
+/* ─── Section 1: 角色动态态势卡片 (Soft UI 无边框分层) ─── */
 .role-dashboard-section {
 	margin-bottom: 14px;
 }
 
 .role-card-wrapper {
-	background: linear-gradient(135deg, #ffffff 0%, #f6f8fc 100%);
-	border-radius: var(--border-radius-lg, 14px);
+	background: #ffffff;
+	border-radius: 18px;
 	padding: 16px;
-	border: 1px solid var(--border-color, rgba(194, 198, 214, 0.3));
-	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+	box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
 }
 
 .role-card-header {
@@ -737,59 +944,60 @@ watch(
 	justify-content: space-between;
 	align-items: flex-start;
 	margin-bottom: 14px;
+	gap: 8px;
 }
 
 .user-info-box {
 	display: flex;
 	flex-direction: column;
 	gap: 6px;
+	min-width: 0;
 }
 
 .user-greeting {
 	font-size: 16px;
 	font-weight: 700;
-	color: var(--text-primary, #191b23);
+	color: #0f172a;
 }
 
 .tags-row {
 	display: flex;
 	align-items: center;
 	gap: 6px;
+	flex-wrap: wrap;
 }
 
 .role-badge {
 	font-size: 11px;
 	font-weight: 600;
-	padding: 2px 8px;
+	padding: 2px 9px;
 	border-radius: 9999px;
 	line-height: 16px;
 
 	&.role-super {
-		background-color: #f3e8ff;
-		color: #7e22ce;
-		border: 1px solid #d8b4fe;
+		background-color: rgba(139, 92, 246, 0.12);
+		color: #7c3aed;
 	}
 
 	&.role-admin {
-		background-color: #e0f2fe;
-		color: #0369a1;
-		border: 1px solid #7dd3fc;
+		background-color: rgba(79, 106, 246, 0.12);
+		color: #4f6af6;
 	}
 
 	&.role-user {
-		background-color: #ecfdf5;
-		color: #047857;
-		border: 1px solid #a7f3d0;
+		background-color: rgba(16, 185, 129, 0.12);
+		color: #059669;
 	}
 }
 
 .org-chip {
 	font-size: 11px;
+	font-weight: 500;
 	color: #64748b;
 	background: #f1f5f9;
-	padding: 2px 8px;
-	border-radius: 6px;
-	max-width: 140px;
+	padding: 2px 9px;
+	border-radius: 9999px;
+	max-width: 150px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -799,6 +1007,9 @@ watch(
 	font-size: 11px;
 	color: #94a3b8;
 	font-weight: 500;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+	flex-shrink: 0;
 }
 
 .role-kpi-grid {
@@ -809,64 +1020,67 @@ watch(
 }
 
 .kpi-box {
-	background: #ffffff;
-	border-radius: 10px;
-	padding: 10px 12px;
-	border: 1px solid rgba(226, 232, 240, 0.8);
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+	background: #f8fafc;
+	border-radius: 14px;
+	padding: 12px;
+	min-width: 0;
 
 	&.main {
 		grid-column: span 2;
-		background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%);
-		border-color: #bfdbfe;
+		background: linear-gradient(135deg, rgba(79, 106, 246, 0.08) 0%, #f8fafc 100%);
 	}
 
 	&.click-box {
 		cursor: pointer;
-		transition: all 0.2s ease;
+		transition:
+			transform 0.15s ease,
+			background-color 0.15s ease;
 		&:active {
-			transform: scale(0.97);
-			background-color: #f8fafc;
+			transform: scale(0.98);
+			background-color: #f1f5f9;
 		}
 	}
 }
 
 .kpi-label {
 	font-size: 11px;
+	font-weight: 500;
 	color: #64748b;
 	margin-bottom: 4px;
 }
 
 .kpi-val {
 	font-size: 16px;
-	font-weight: 700;
-	color: #1e293b;
+	font-weight: 800;
+	color: #0f172a;
+	font-variant-numeric: tabular-nums;
 	display: flex;
 	align-items: baseline;
 	gap: 2px;
 
 	.currency {
 		font-size: 12px;
-		font-weight: 600;
+		font-weight: 700;
 	}
 
 	.num {
-		font-size: 18px;
+		font-size: 20px;
+		line-height: 1.15;
 	}
 
 	.unit {
 		font-size: 11px;
-		font-weight: 500;
+		font-weight: 600;
 		color: #64748b;
 		margin-left: 2px;
 	}
 
 	&.positive {
-		color: #16a34a;
+		color: #059669;
 	}
 
 	&.negative {
-		color: #dc2626;
+		color: #e11d48;
 	}
 
 	&.receive {
@@ -874,73 +1088,88 @@ watch(
 	}
 
 	&.expense {
-		color: #ea580c;
+		color: #e11d48;
 	}
 
 	&.remind {
-		color: #2563eb;
-	}
-
-	&.admin-val {
-		font-size: 14px;
-		color: #1e40af;
+		color: #4f6af6;
 	}
 }
 
 .kpi-sub {
-	font-size: 10px;
+	font-size: 11px;
 	color: #94a3b8;
 	margin-top: 4px;
+	font-variant-numeric: tabular-nums;
 }
 
 .action-capsules-row {
-	display: flex;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
 	gap: 10px;
 }
 
 .capsule-btn {
-	flex: 1;
-	display: flex;
+	min-width: 0;
+	height: 40px;
+	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	gap: 6px;
-	padding: 9px 12px;
-	border-radius: 9999px;
+	padding: 0 12px;
+	border-radius: 12px;
 	font-size: 13px;
 	font-weight: 600;
 	border: none;
+	white-space: nowrap;
 	cursor: pointer;
-	transition: all 0.2s ease;
+	transition: transform 0.15s ease;
 
 	&:active {
-		transform: scale(0.96);
+		transform: scale(0.97);
+	}
+
+	.btn-vant-icon {
+		font-size: 15px;
+		flex-shrink: 0;
+	}
+
+	.btn-svg-icon {
+		width: 16px;
+		height: 16px;
+		flex-shrink: 0;
+	}
+
+	.text {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	&.ai-btn {
-		background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+		background: linear-gradient(135deg, #4f6af6 0%, #6366f1 100%);
 		color: #ffffff;
-		box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+		box-shadow: 0 6px 14px -3px rgba(79, 106, 246, 0.32);
 	}
 
 	&.ghost-btn {
-		background: #ffffff;
-		color: #0058be;
-		border: 1px solid #bfdbfe;
+		background: rgba(79, 106, 246, 0.1);
+		color: #4f6af6;
 	}
 }
 
 .sub-stats-scroller {
 	margin-top: 10px;
-	padding: 8px 12px;
+	padding: 10px 12px;
 	background: #ffffff;
-	border-radius: 8px;
-	border: 1px solid rgba(226, 232, 240, 0.7);
+	border-radius: 14px;
+	box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
 }
 
 .sub-stats-title {
 	font-size: 11px;
 	color: #94a3b8;
-	margin-bottom: 4px;
+	margin-bottom: 6px;
 }
 
 .sub-stats-chips {
@@ -953,8 +1182,9 @@ watch(
 	font-size: 11px;
 	color: #475569;
 	background: #f1f5f9;
-	padding: 2px 6px;
-	border-radius: 4px;
+	padding: 2px 8px;
+	border-radius: 9999px;
+	font-variant-numeric: tabular-nums;
 }
 
 /* ─── Section 2: 搜索栏 ─── */
@@ -967,10 +1197,10 @@ watch(
 	background: transparent;
 
 	:deep(.van-search__content) {
-		background-color: var(--card-bg, #ffffff);
-		border: 1px solid var(--border-color, rgba(194, 198, 214, 0.3));
-		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
-		border-radius: 20px;
+		background-color: #ffffff;
+		border: none;
+		box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
+		border-radius: 9999px;
 	}
 }
 
@@ -982,11 +1212,10 @@ watch(
 }
 
 .group-card {
-	background-color: var(--card-bg, #ffffff);
-	border-radius: var(--border-radius-lg, 12px);
-	padding: 14px 14px 16px;
-	box-shadow: 0 2px 10px rgba(30, 41, 59, 0.03);
-	border: 1px solid var(--border-color, rgba(194, 198, 214, 0.25));
+	background-color: #ffffff;
+	border-radius: 18px;
+	padding: 15px 14px 16px;
+	box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
 }
 
 .group-header {
@@ -994,37 +1223,38 @@ watch(
 	justify-content: space-between;
 	align-items: center;
 	margin-bottom: 14px;
-	padding-bottom: 8px;
-	border-bottom: 1px solid var(--border-color, rgba(194, 198, 214, 0.15));
+	padding-bottom: 10px;
+	border-bottom: 1px solid #f1f5f9;
 }
 
 .group-title-box {
 	display: flex;
 	align-items: center;
-	gap: 6px;
+	gap: 7px;
 }
 
 .group-color-tag {
 	width: 4px;
 	height: 14px;
-	border-radius: 2px;
+	border-radius: 9999px;
 }
 
 .group-title {
 	font-size: 14px;
-	font-weight: 600;
-	color: var(--text-primary, #191b23);
+	font-weight: 700;
+	color: #0f172a;
 	margin: 0;
 	line-height: 18px;
 }
 
 .group-count {
 	font-size: 11px;
-	color: var(--text-tertiary, #969799);
-	background-color: var(--bg-color, #f4f5f8);
-	padding: 2px 8px;
-	border-radius: 10px;
-	font-weight: 500;
+	color: #64748b;
+	background-color: #f1f5f9;
+	padding: 2px 9px;
+	border-radius: 9999px;
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
 }
 
 /* 4列紧凑网格系统 */
@@ -1043,23 +1273,22 @@ watch(
 	gap: 6px;
 	cursor: pointer;
 	padding: 4px 2px;
-	border-radius: 8px;
+	border-radius: 10px;
 	transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 
 	&:active {
-		transform: scale(0.92);
+		transform: scale(0.94);
 	}
 }
 
 .icon-wrapper {
 	width: 44px;
 	height: 44px;
-	border-radius: 14px; /* 舒适的微圆角 */
+	border-radius: 14px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	transition: all 0.2s ease;
-	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
 }
 
 .homeSvgClass {
@@ -1070,20 +1299,103 @@ watch(
 .homeFontClass {
 	font-size: 12px;
 	font-weight: 500;
-	color: var(--text-primary, #191b23);
+	color: #1e293b;
 	text-align: center;
-	line-height: 15px;
+	line-height: 16px;
 	letter-spacing: -0.01em;
 	display: -webkit-box;
 	-webkit-line-clamp: 2;
 	-webkit-box-orient: vertical;
 	overflow: hidden;
-	word-break: break-all;
-	max-width: 68px;
+	word-break: keep-all;
+	max-width: 76px;
 }
 
 /* 搜索空状态 */
 .search-empty-box {
 	padding: 20px 0;
+}
+
+.shimmer-bar {
+	border-radius: 6px;
+	background: #e2e8f0;
+	animation: homeKpiPulse 1.4s ease-in-out infinite;
+}
+
+.search-skeleton-bar {
+	width: 100%;
+	height: 36px;
+	border-radius: 9999px;
+}
+
+.sk-w-4 {
+	width: 4px;
+}
+.sk-w-40 {
+	width: 40px;
+}
+.sk-w-44 {
+	width: 44px;
+}
+.sk-w-48 {
+	width: 48px;
+}
+.sk-w-64 {
+	width: 64px;
+}
+.sk-w-72 {
+	width: 72px;
+}
+.sk-w-80 {
+	width: 80px;
+}
+.sk-w-88 {
+	width: 88px;
+}
+.sk-w-120 {
+	width: 120px;
+}
+.sk-h-10 {
+	height: 10px;
+}
+.sk-h-12 {
+	height: 12px;
+}
+.sk-h-14 {
+	height: 14px;
+}
+.sk-h-18 {
+	height: 18px;
+}
+.sk-h-20 {
+	height: 20px;
+}
+.sk-h-22 {
+	height: 22px;
+}
+.sk-h-44 {
+	height: 44px;
+}
+.sk-mt-2 {
+	margin-top: 2px;
+}
+.sk-my-6 {
+	margin: 6px 0;
+}
+.sk-rounded-14 {
+	border-radius: 14px;
+}
+.sk-rounded-pill {
+	border-radius: 9999px;
+}
+
+@keyframes homeKpiPulse {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.45;
+	}
 }
 </style>

@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { triggerHaptic } from '@/utils/haptics';
 
@@ -76,5 +78,47 @@ describe('移动端工作台角色态势卡片与业务聚合测试 (Mobile Home
 
 		triggerHaptic('selection');
 		expect(navigator.vibrate).toHaveBeenCalledWith(10);
+	});
+
+	it('移动端首页 unslop 规约与快捷按钮 SVG 尺寸防溢出契约校验', () => {
+		const homeSource = fs.readFileSync(
+			path.resolve(process.cwd(), 'src/views/home/index.vue'),
+			'utf-8',
+		);
+
+		// 1. 快捷按钮必须显式锁定 btn-svg-icon 16x16 宽高与双列 grid，防止礼盒 SVG 撑爆卡片
+		expect(homeSource).toContain('btn-svg-icon');
+		expect(homeSource).toContain('grid-template-columns: 1fr 1fr');
+		expect(homeSource).toContain('AI 记账');
+		expect(homeSource).not.toContain('AI 智能流式记账');
+
+		// 2. 清理 AI 腔废话文案（unslop Rule 16 / 23 / 26 / 27）
+		expect(homeSource).not.toContain('XXL-Job 定时巡检');
+		expect(homeSource).not.toContain('全栈探针正常');
+		expect(homeSource).not.toContain('组织权限体系受控');
+		expect(homeSource).not.toContain('礼入人情');
+		expect(homeSource).not.toContain('人情往还');
+		expect(homeSource).toContain('查看消息 ›');
+		expect(homeSource).toContain('全部运行正常');
+		expect(homeSource).toContain('个服务离线');
+
+		// 3. 顶部指标与下方功能菜单均具备受控骨架屏，且监听 Pinia 响应式路由就绪状态防止登录后菜单空白
+		expect(homeSource).toContain('data-testid="home-kpi-skeleton"');
+		expect(homeSource).toContain('data-testid="home-menu-skeleton"');
+		expect(homeSource).toContain('userStore.getRouteStatus');
+		expect(homeSource).toContain('routesVersion.value');
+		expect(homeSource).toContain('buildMenuGroupsFromStore');
+		expect(homeSource).toContain('kpiLoading.value = true');
+		expect(homeSource).toContain('kpiLoading.value = false');
+	});
+
+	it('动态路由注册应先卸载残留非底座路由并递增 routesVersion，防止重登时 router.hasRoute 跳过 routes.push', () => {
+		const routerSource = fs.readFileSync(path.resolve(process.cwd(), 'src/router/index.ts'), 'utf-8');
+
+		expect(routerSource).toContain('export const routesVersion');
+		expect(routerSource).toContain('removeDynamicRoutesFromRouter');
+		expect(routerSource).toContain('ensureMenusLoaded');
+		expect(routerSource).not.toContain('if (newRouter.name && !router.hasRoute(newRouter.name))');
+		expect(routerSource).toContain('routesVersion.value += 1');
 	});
 });
