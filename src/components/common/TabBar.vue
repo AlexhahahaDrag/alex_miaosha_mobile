@@ -2,7 +2,7 @@
 	<van-tabbar
 		v-model="curActive"
 		route
-		active-color="#1989fa"
+		:active-color="themeStore.primaryColor"
 		inactive-color="#969799"
 		class="custom-tab-bar"
 		data-testid="app-tabbar"
@@ -15,24 +15,24 @@
 			:key="index"
 			:data-testid="`tab-${item.name}`"
 		>
-			<template #icon="props">
+			<template #icon="slotProps">
 				<van-icon
 					v-if="item.icon && item.icon.startsWith('van-')"
 					:name="item.icon.replace('van-', '')"
-					:color="props.active ? '#1989fa' : '#969799'"
+					:color="slotProps.active ? themeStore.primaryColor : '#969799'"
 					class="tab-icon"
 				/>
 				<svg-icon
 					v-else
 					:name="item.icon"
-					:color="props.active ? '#1989fa' : '#969799'"
+					:color="slotProps.active ? themeStore.primaryColor : '#969799'"
 					class="tab-icon"
 				/>
 			</template>
-			<template #default="props">
+			<template #default="slotProps">
 				<span
 					class="tab-title"
-					:class="{ 'active-title': props.active }"
+					:class="{ 'active-title': slotProps.active }"
 				>
 					{{ item.title }}
 				</span>
@@ -42,7 +42,9 @@
 </template>
 
 <script lang="ts" setup>
-import { useRouter } from 'vue-router';
+import { useThemeStore } from '@/store/modules/theme';
+
+const themeStore = useThemeStore();
 
 export interface TabBarItemConfig {
 	name: string;

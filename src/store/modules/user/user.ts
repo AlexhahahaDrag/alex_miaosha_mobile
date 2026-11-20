@@ -7,6 +7,7 @@ import type { LoginParams } from '@/views/login/api';
 import { piniaPersistConfig } from '@/config/piniaPersist';
 import { refreshRouter } from '@/router';
 import { buildPermissionContext } from '@/utils/permission';
+import { useThemeStore } from '@/store/modules/theme';
 
 const createDefaultState = (): UserState => ({
 	userInfo: null,
@@ -73,6 +74,15 @@ export const useUserStore = defineStore('app-user', {
 		},
 		setUserInfo(admin: UserState['userInfo']) {
 			this.userInfo = admin;
+			if (admin) {
+				try {
+					useThemeStore().syncUserTheme(
+						admin as { id?: string | number; username?: string; gender?: string | number | null },
+					);
+				} catch {
+					// 忽略 Pinia 未激活时的兜底场景
+				}
+			}
 		},
 		setMenuInfo(info: MenuInfoData[] | null | undefined) {
 			this.menuInfo = info ?? null;

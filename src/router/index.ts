@@ -22,6 +22,16 @@ const pageInfo = {
 
 const fallbackView = modules[pageInfo['404']];
 
+const resolveRawComponentPath = (component: string): string => {
+	if (component.startsWith('/src/')) {
+		return component;
+	}
+	if (component.startsWith('/')) {
+		return `/src${component}`;
+	}
+	return `/src/views/${component}`;
+};
+
 const resolveViewComponent = (componentPath?: string | null) => {
 	if (!componentPath) {
 		return markRaw(fallbackView);
@@ -31,7 +41,15 @@ const resolveViewComponent = (componentPath?: string | null) => {
 		return markRaw(Layout);
 	}
 
-	const comp = modules[componentPath] ?? fallbackView;
+	const rawPath = resolveRawComponentPath(componentPath);
+
+	// 向后兼容归一化：将正式环境老数据库中的 /src/views/finance/ 路径无缝映射到现有的 /src/views/selfFinance/，彻底杜绝 404
+	const path = rawPath
+		.replace('/src/views/finance/financeManager', '/src/views/selfFinance/financeManager')
+		.replace('/src/views/finance/financeAnalysis', '/src/views/selfFinance/financeAnalysis')
+		.replace('/src/views/finance/accountRecordInfo', '/src/views/selfFinance/accountRecordInfo');
+
+	const comp = modules[path] ?? modules[rawPath] ?? modules[componentPath] ?? fallbackView;
 	return typeof comp === 'object' && comp !== null ? markRaw(comp) : comp;
 };
 
@@ -323,6 +341,11 @@ const getChildren = (item: MenuInfoData, access: RouteAccessOptions): MenuDataIt
 };
 
 router.afterEach(() => {});
+
+router.onError((error) => {
+	console.error('路由导航异常：', error);
+	showFailToast('页面加载失败，请刷新重试');
+});
 
 const judgePermission = (permissionCode: string | undefined, access: RouteAccessOptions) =>
 	canAccessRoutePermission(permissionCode, access);

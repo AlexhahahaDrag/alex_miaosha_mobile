@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { UniversalFinanceAiParseVo } from '@/views/finance/financeManager/config';
+import type { UniversalFinanceAiParseVo } from '@/views/selfFinance/financeManager/config';
 
 describe('移动端 AI 记账结果数据映射与回填契约测试', () => {
 	it('验证通用 AI 记账结构体解析字段类型与安全默认值', () => {

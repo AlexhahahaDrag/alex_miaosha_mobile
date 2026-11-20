@@ -125,7 +125,7 @@ const mockMenus = [
 				name: 'financeManager',
 				title: '收支记账',
 				path: '/selfFinance/financeManager',
-				component: '/src/views/finance/financeManager/index.vue',
+				component: '/src/views/selfFinance/financeManager/index.vue',
 				permissionCode: 'finance:financeManager:query',
 			},
 			{

@@ -6,7 +6,7 @@ import {
 	loadPieSnapshot,
 	saveTrendSnapshot,
 	loadTrendSnapshot,
-} from '@/views/finance/financeAnalysis/composables/useAnalysisOfflineCache';
+} from '@/views/selfFinance/financeAnalysis/composables/useAnalysisOfflineCache';
 
 describe('useAnalysisOfflineCache - 移动端财务分析大盘离线快照测试', () => {
 	beforeEach(() => {

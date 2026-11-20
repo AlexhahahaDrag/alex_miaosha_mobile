@@ -100,6 +100,7 @@
 
 @mixin text-clamp($lines: 2) {
 	display: -webkit-box;
+	line-clamp: $lines;
 	-webkit-line-clamp: $lines;
 	-webkit-box-orient: vertical;
 	overflow: hidden;

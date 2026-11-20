@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createMemoryHistory, createRouter } from 'vue-router';
-import { fromSourceTransferList, rulesRef } from '@/views/finance/financeManager/config';
+import { fromSourceTransferList, rulesRef } from '@/views/selfFinance/financeManager/config';
 import { getRoutePathByName } from '@/utils/router';
 
 /**

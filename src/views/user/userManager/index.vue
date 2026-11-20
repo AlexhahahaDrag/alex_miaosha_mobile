@@ -207,6 +207,7 @@ import { useNavBar } from '@/composables/useNavBar';
 import type { NavBarConfig } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
 import { useUserStore } from '@/store/modules/user/user';
+import { useThemeStore } from '@/store/modules/theme';
 import { getUserManagerDetail, editUserManager } from '@/views/user/userManager/api';
 import type { UserManagerData } from '@/views/user/userManager/config';
 
@@ -220,6 +221,7 @@ useNavBar(info.value);
 useTabBar({ visible: false });
 
 const userStore = useUserStore();
+const themeStore = useThemeStore();
 
 const rulesRef = reactive({
 	nickName: [{ required: true, message: '请输入昵称' }],
@@ -238,7 +240,19 @@ const themeGender = computed<'male' | 'female' | 'neutral'>(() => {
 	return 'neutral';
 });
 
+watch(
+	() => formInfo.value.gender,
+	(nextGender) => {
+		if (nextGender !== undefined) {
+			themeStore.previewGenderTheme(nextGender);
+		}
+	},
+);
+
 const genderBadgeText = computed(() => {
+	if (themeStore.themeMode === 'custom') {
+		return `${themeStore.activeThemeName} · 专属`;
+	}
 	if (themeGender.value === 'male') return '蓝调卜卜';
 	if (themeGender.value === 'female') return '甜心卜卜';
 	return '';
@@ -331,37 +345,22 @@ onMounted(() => {
 
 <style lang="less" scoped>
 .profile-page {
-	--accent-start: #4f6af6;
-	--accent-end: #6366f1;
-	--accent-color: #4f6af6;
-	--accent-soft: rgba(79, 106, 246, 0.12);
-	--accent-shadow: rgba(79, 106, 246, 0.34);
-	--seg-track: #eef2f9;
+	--accent-start: var(--theme-primary-start, #4f6af6);
+	--accent-end: var(--theme-primary-end, #6366f1);
+	--accent-color: var(--primary-color, #4f6af6);
+	--accent-soft: var(--theme-soft-bg, rgba(79, 106, 246, 0.12));
+	--accent-shadow: var(--theme-shadow-color, rgba(79, 106, 246, 0.34));
+	--seg-track: var(--theme-soft-bg, #eef2f9);
 
-	background: #f1f4fa;
+	background: var(--theme-login-bg, #f1f4fa);
 	min-height: 100%;
 	padding: 14px 16px 24px;
 	box-sizing: border-box;
 	transition: background 0.3s ease;
 
-	&.theme-male {
-		--accent-start: #3b82f6;
-		--accent-end: #6366f1;
-		--accent-color: #3b82f6;
-		--accent-soft: rgba(59, 130, 246, 0.12);
-		--accent-shadow: rgba(59, 130, 246, 0.34);
-		--seg-track: #e0f2fe;
-		background: linear-gradient(165deg, #e0f2fe 0%, #eff6ff 45%, #f8fafc 100%);
-	}
-
+	&.theme-male,
 	&.theme-female {
-		--accent-start: #fb7185;
-		--accent-end: #f43f5e;
-		--accent-color: #f43f5e;
-		--accent-soft: rgba(244, 63, 94, 0.12);
-		--accent-shadow: rgba(244, 63, 94, 0.32);
-		--seg-track: #ffe4e6;
-		background: linear-gradient(165deg, #ffe4e6 0%, #fdf2f8 45%, #fff7ed 100%);
+		background: var(--theme-login-bg);
 	}
 }
 

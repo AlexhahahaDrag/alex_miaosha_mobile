@@ -11,7 +11,7 @@
 
 | 项 | 内容 |
 | :--- | :--- |
-| **涵盖模块** | 1. **消费券**：`src/views/cpn-coupon/cpn-coupon-info`、`src/views/cpn-coupon/cpn-user-coupon-info`<br>2. **储值卡**：`src/views/selfFinance/prepaidCardInfoT`<br>3. **日常记账与预算**：`src/views/finance/financeManager`、`budgetManage`<br>4. **商品与库存**：`src/views/finance/shopProduct`、`shopStock` |
+| **涵盖模块** | 1. **消费券**：`src/views/cpn-coupon/cpn-coupon-info`、`src/views/cpn-coupon/cpn-user-coupon-info`<br>2. **储值卡**：`src/views/selfFinance/prepaidCardInfoT`<br>3. **日常记账与预算**：`src/views/selfFinance/financeManager`、`budgetManage`<br>4. **商品与库存**：`src/views/finance/shopProduct`、`shopStock` |
 | **适配视口** | 390×844 (iPhone 12/13/14 标准视口)，支持安全区与暗黑模式 |
 | **核心触控与动效** | 触觉震动反馈（`navigator.vibrate` / `installHapticProbe` 拦截校验）、滑动卡片（`van-swipe`）、底部动作面板（`van-action-sheet`）、数字键盘（`van-number-keyboard`） |
 | **关键基础设施** | `@alex_miaosha_mobile/src/utils/dayjs` + `getBalanceParts`（大字号金额拆分） + `Long2StringSerializer`（雪花 ID 精度防御） |

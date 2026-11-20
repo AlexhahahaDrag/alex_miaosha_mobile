@@ -11,7 +11,7 @@
 
 | 项 | 内容 |
 | :--- | :--- |
-| **涵盖组件** | 1. **悬浮入口球**：`src/views/finance/financeManager/components/MobileAiFloatingBubble.vue`<br>2. **流式打字机抽屉**：`src/views/finance/financeManager/components/FinanceAiSheet.vue`<br>3. **主页集成点**：`src/views/finance/financeManager/index.vue`<br>4. **API 与类型**：`src/views/finance/financeManager/api/index.ts`、`config/index.ts` |
+| **涵盖组件** | 1. **悬浮入口球**：`src/views/selfFinance/financeManager/components/MobileAiFloatingBubble.vue`<br>2. **流式打字机抽屉**：`src/views/selfFinance/financeManager/components/FinanceAiSheet.vue`<br>3. **主页集成点**：`src/views/selfFinance/financeManager/index.vue`<br>4. **API 与类型**：`src/views/selfFinance/financeManager/api/index.ts`、`config/index.ts` |
 | **适配视口** | 390×844（iPhone 12/13/14 标准视口），兼容 360px~430px 屏幕宽度与底部安全区（`safe-area-inset-bottom`） |
 | **测试分层配比** | 单元测试 (55%) + 集成契约测试 (25%) + AI/E2E 流程测试 (20%) |
 | **核心触控与动效** | 垂直方向拖拽吸附（`touchstart/touchmove/touchend`）、呼吸光晕环、流式打字机逐字渲染、呼吸光标（`.typing-cursor`）、轻柔触觉震动（`navigator.vibrate` / `triggerHaptic`） |

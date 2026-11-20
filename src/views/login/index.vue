@@ -157,61 +157,61 @@
 						fill-opacity="0.18"
 					/>
 
-					<!-- 女生专属：小花发卡 + 粉嫩腮红 -->
+					<!-- 女生专属：小花发卡 + 粉嫩腮红（颜色联动全局 --theme-mascot-* 变量） -->
 					<g v-if="themeGender === 'female'">
 						<ellipse
 							cx="48"
 							cy="86"
 							rx="8"
 							ry="4.5"
-							fill="#FDA4AF"
-							fill-opacity="0.65"
+							fill="var(--theme-mascot-accent, #FDA4AF)"
+							fill-opacity="0.55"
 						/>
 						<ellipse
 							cx="112"
 							cy="86"
 							rx="8"
 							ry="4.5"
-							fill="#FDA4AF"
-							fill-opacity="0.65"
+							fill="var(--theme-mascot-accent, #FDA4AF)"
+							fill-opacity="0.55"
 						/>
-						<!-- 粉色蝴蝶结发卡在右耳/叶侧 -->
+						<!-- 蝴蝶结发卡在右耳/叶侧 -->
 						<g transform="translate(103, 46) rotate(16)">
 							<path
 								d="M0 0 L-8 -5 L-8 5 Z"
-								fill="#FB7185"
+								fill="var(--theme-mascot-accent, #FB7185)"
 							/>
 							<path
 								d="M0 0 L8 -5 L8 5 Z"
-								fill="#FB7185"
+								fill="var(--theme-mascot-accent, #FB7185)"
 							/>
 							<circle
 								cx="0"
 								cy="0"
 								r="3"
-								fill="#FFE4E6"
+								fill="var(--theme-mascot-light, #FFE4E6)"
 							/>
 						</g>
 					</g>
 
-					<!-- 男生专属：清爽天际蓝小领结 -->
+					<!-- 男生或自定义专属：小领结（颜色联动全局 --theme-mascot-* 变量） -->
 					<g
-						v-else-if="themeGender === 'male'"
+						v-else-if="themeGender === 'male' || isCustomLoginTheme"
 						transform="translate(80, 114)"
 					>
 						<path
 							d="M0 0 L-11 -6 L-11 6 Z"
-							fill="#3B82F6"
+							fill="var(--theme-mascot-accent, #3B82F6)"
 						/>
 						<path
 							d="M0 0 L11 -6 L11 6 Z"
-							fill="#3B82F6"
+							fill="var(--theme-mascot-accent, #3B82F6)"
 						/>
 						<circle
 							cx="0"
 							cy="0"
 							r="3.8"
-							fill="#DBEAFE"
+							fill="var(--theme-mascot-light, #DBEAFE)"
 						/>
 					</g>
 
@@ -434,12 +434,14 @@ import { showFailToast, showSuccessToast } from 'vant';
 import type { LoginForm } from '@/views/login/config';
 import type { LoginParams } from '@/views/login/api';
 import { useUserStore } from '@/store/modules/user/user';
+import { useThemeStore, type ThemeMode } from '@/store/modules/theme';
 import { useNavBar } from '@/composables/useNavBar';
 import { formatDate } from '@/utils/dayjs';
 import { decrypt, encrypt } from '@/utils/crypto';
 
 const router = useRouter();
 const userStore = useUserStore();
+const themeStore = useThemeStore();
 useNavBar({ visible: false });
 
 const LAST_PROFILE_KEY = 'alex_mobile_last_profile';
@@ -452,6 +454,8 @@ interface SavedUserProfile {
 	nickName?: string;
 	gender?: string;
 	password?: string;
+	themeMode?: ThemeMode;
+	customColor?: string;
 }
 
 const encodeSavedPassword = (raw?: string): string => {
@@ -519,6 +523,8 @@ const saveLastProfile = (profile: SavedUserProfile) => {
 				username,
 				nickName: profile.nickName || username,
 				gender: profile.gender || '',
+				themeMode: profile.themeMode || themeStore.themeMode,
+				customColor: profile.customColor ?? (themeStore.themeMode === 'custom' ? themeStore.primaryColor : ''),
 				password: encodeSavedPassword(profile.password),
 			}),
 		);
@@ -547,34 +553,40 @@ const displayRememberedName = computed(() => savedProfile.value?.nickName || sav
 
 const isRememberedMode = computed(() => Boolean(rememberedUsername.value) && !forceSwitchAccount.value);
 
-const themeGender = computed<GenderTheme>(() => {
-	if (!isRememberedMode.value) return 'neutral';
-	return resolveGenderTheme(savedProfile.value?.gender);
-});
-
-const genderThemeLabel = computed(() => {
-	if (themeGender.value === 'male') return '蓝调卜卜';
-	if (themeGender.value === 'female') return '甜心卜卜';
-	return '元气卜卜';
-});
-
-const themeAccentColor = computed(() => {
-	if (themeGender.value === 'male') return '#3b82f6';
-	if (themeGender.value === 'female') return '#fb7185';
-	return '#f97316';
-});
-
-const avatarInitial = computed(() => {
-	const name = displayRememberedName.value.trim();
-	return name ? name.slice(0, 1).toUpperCase() : 'A';
-});
-
 const loginForm = ref<LoginForm>({
 	username: rememberedUsername.value || '',
 	password: rememberedPassword.value || '',
 });
 const submitLoading = ref<boolean>(false);
 const showPassword = ref<boolean>(false);
+
+// 当前登录页正在匹配的目标用户名（记住模式取 rememberedUsername，普通模式取已输入的 username）
+const activeTargetUsername = computed(() =>
+	isRememberedMode.value ? rememberedUsername.value : loginForm.value.username.trim(),
+);
+
+// 实时解析登录页主题状态（个人自定义主题优先 -> 性别默认主题次之 -> 元气橙兜底）
+const loginThemeState = computed(() => {
+	const uname = activeTargetUsername.value;
+	const isMatchedSaved = Boolean(uname && savedProfile.value?.username === uname);
+	return themeStore.applyLoginPageTheme({
+		username: uname,
+		gender: isMatchedSaved ? savedProfile.value?.gender : undefined,
+		themeMode: isMatchedSaved ? savedProfile.value?.themeMode : undefined,
+		customColor: isMatchedSaved ? savedProfile.value?.customColor : undefined,
+		isRemembered: isRememberedMode.value,
+	});
+});
+
+const themeGender = computed<GenderTheme>(() => resolveGenderTheme(loginThemeState.value.gender));
+const isCustomLoginTheme = computed(() => loginThemeState.value.mode === 'custom');
+const genderThemeLabel = computed(() => loginThemeState.value.badgeText);
+const themeAccentColor = computed(() => loginThemeState.value.color);
+
+const avatarInitial = computed(() => {
+	const name = displayRememberedName.value.trim();
+	return name ? name.slice(0, 1).toUpperCase() : 'A';
+});
 
 const handleSwitchAccount = () => {
 	forceSwitchAccount.value = true;
@@ -611,16 +623,21 @@ const onSubmit = async () => {
 		};
 		const res = await userStore.login(param);
 		if (res) {
+			const loggedUser = userStore.getUserInfo as {
+				id?: string | number;
+				username?: string;
+				nickName?: string;
+				gender?: string;
+			} | null;
+			themeStore.syncUserTheme(loggedUser);
+
 			if (rememberAccount.value) {
-				const loggedUser = userStore.getUserInfo as {
-					username?: string;
-					nickName?: string;
-					gender?: string;
-				} | null;
 				const nextProfile: SavedUserProfile = {
 					username: loggedUser?.username || activeUsername,
 					nickName: loggedUser?.nickName || activeUsername,
 					gender: loggedUser?.gender,
+					themeMode: themeStore.themeMode,
+					customColor: themeStore.themeMode === 'custom' ? themeStore.primaryColor : '',
 					password: loginForm.value.password,
 				};
 				saveLastProfile(nextProfile);
@@ -650,40 +667,27 @@ const onSubmit = async () => {
 }
 
 .login-container {
-	--accent-start: #fb923c;
-	--accent-end: #f97316;
-	--accent-color: #f97316;
-	--accent-soft: rgba(249, 115, 22, 0.14);
-	--accent-shadow: rgba(249, 115, 22, 0.34);
+	--accent-start: var(--theme-primary-start, #fb923c);
+	--accent-end: var(--theme-primary-end, #f97316);
+	--accent-color: var(--primary-color, #f97316);
+	--accent-soft: var(--theme-soft-bg, rgba(249, 115, 22, 0.14));
+	--accent-shadow: var(--theme-shadow-color, rgba(249, 115, 22, 0.34));
 
 	position: relative;
 	height: 100vh;
 	height: 100dvh;
 	width: 100%;
 	box-sizing: border-box;
-	background: linear-gradient(165deg, #ffedd5 0%, #fff7ed 46%, #fef3c7 100%);
+	background: var(--theme-login-bg, linear-gradient(165deg, #ffedd5 0%, #fff7ed 46%, #fef3c7 100%));
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
 	overflow: hidden;
 	transition: background 0.35s ease;
 
-	&.theme-male {
-		--accent-start: #3b82f6;
-		--accent-end: #6366f1;
-		--accent-color: #3b82f6;
-		--accent-soft: rgba(59, 130, 246, 0.12);
-		--accent-shadow: rgba(59, 130, 246, 0.36);
-		background: linear-gradient(165deg, #dbeafe 0%, #eff6ff 48%, #e0f2fe 100%);
-	}
-
+	&.theme-male,
 	&.theme-female {
-		--accent-start: #fb7185;
-		--accent-end: #f43f5e;
-		--accent-color: #f43f5e;
-		--accent-soft: rgba(251, 113, 133, 0.14);
-		--accent-shadow: rgba(244, 63, 94, 0.34);
-		background: linear-gradient(165deg, #ffe4e6 0%, #fdf2f8 48%, #fff7ed 100%);
+		background: var(--theme-login-bg);
 	}
 }
 

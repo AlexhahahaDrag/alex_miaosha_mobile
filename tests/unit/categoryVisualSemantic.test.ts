@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getCategoryVisualItem } from '@/views/finance/financeManager/financeManagerDetail/types';
+import { getCategoryVisualItem } from '@/views/selfFinance/financeManager/financeManagerDetail/types';
 
 describe('categoryVisualSemantic - 移动端记账分类语义 Emoji 与 Soft UI 色彩系统', () => {
 	it('针对常见生活分类应能精准匹配对应的业务语义 Emoji 与图标', () => {

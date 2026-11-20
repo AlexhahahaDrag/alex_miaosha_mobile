@@ -309,7 +309,7 @@ import { getSysMessageSummary } from '@/views/message/api';
 import { getGiftAnalysisOverview } from '@/views/finance/gift/analysis/api';
 import { getMicroServicesHealth } from '@/views/home/api';
 import { triggerHaptic } from '@/utils/haptics';
-import FinanceAiSheet from '@/views/finance/financeManager/components/FinanceAiSheet.vue';
+import FinanceAiSheet from '@/views/selfFinance/financeManager/components/FinanceAiSheet.vue';
 
 const router = useRouter();
 const dashboardStore = useDashboardStore();
@@ -1304,6 +1304,7 @@ watch(
 	line-height: 16px;
 	letter-spacing: -0.01em;
 	display: -webkit-box;
+	line-clamp: 2;
 	-webkit-line-clamp: 2;
 	-webkit-box-orient: vertical;
 	overflow: hidden;

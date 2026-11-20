@@ -5,9 +5,18 @@
 		round
 		closeable
 		class="theme-popup"
+		data-testid="mobile-theme-popup"
 	>
 		<div class="theme-popup-content">
-			<div class="popup-title">个性化主题</div>
+			<div class="popup-header">
+				<div class="popup-title">个性化主题</div>
+				<span
+					class="mode-badge"
+					data-testid="theme-popup-mode-badge"
+				>
+					{{ themeStore.activeThemeStatusText }}
+				</span>
+			</div>
 
 			<!-- 暗黑模式开关 -->
 			<div class="setting-row">
@@ -29,45 +38,60 @@
 
 			<!-- 主题色选取 -->
 			<div class="color-section">
-				<div class="section-title">系统主题色</div>
+				<div class="section-title">主题色盘（选择后优先按个人设置生效）</div>
 				<div class="color-grid">
-					<div
+					<button
 						v-for="color in presetColors"
 						:key="color.value"
-						class="color-item"
-						:class="{ active: themeStore.primaryColor.toLowerCase() === color.value.toLowerCase() }"
-						:style="{ backgroundColor: color.value }"
-						:title="color.name"
+						type="button"
+						class="color-card"
+						:class="{ active: isColorActive(color.value) }"
+						:data-testid="`theme-color-${color.key}`"
 						@click="onSelectColor(color.value)"
 					>
-						<van-icon
-							v-if="themeStore.primaryColor.toLowerCase() === color.value.toLowerCase()"
-							name="success"
-							class="check-icon"
-						/>
-					</div>
+						<span
+							class="color-swatch"
+							:style="{ backgroundColor: color.value }"
+						>
+							<van-icon
+								v-if="isColorActive(color.value)"
+								name="success"
+								class="check-icon"
+							/>
+						</span>
+						<span class="color-name">{{ color.name }}</span>
+						<span
+							v-if="color.genderHint"
+							class="color-hint"
+						>
+							{{ color.genderHint }}
+						</span>
+					</button>
 
 					<!-- 原生自选调色盘 -->
 					<div
-						class="color-item custom-color-item"
+						class="color-card custom-color-card"
 						:class="{ active: isCustomColor }"
 						title="自定义调色"
 					>
-						<input
-							type="color"
-							class="native-color-input"
-							:value="themeStore.primaryColor"
-							@input="onCustomColorInput"
-						/>
-						<van-icon
-							name="plus"
-							class="custom-icon"
-						/>
+						<span class="color-swatch custom-swatch">
+							<input
+								type="color"
+								class="native-color-input"
+								:value="themeStore.primaryColor"
+								@input="onCustomColorInput"
+							/>
+							<van-icon
+								name="plus"
+								class="custom-icon"
+							/>
+						</span>
+						<span class="color-name">自由取色</span>
 					</div>
 				</div>
 			</div>
 
-			<!-- 恢复默认 -->
+			<!-- 恢复跟随性别默认 -->
 			<div class="reset-wrapper">
 				<van-button
 					plain
@@ -75,9 +99,10 @@
 					round
 					size="small"
 					class="reset-btn"
+					data-testid="theme-btn-reset-gender"
 					@click="onResetDefault"
 				>
-					恢复默认主题
+					恢复跟随性别默认
 				</van-button>
 			</div>
 		</div>
@@ -85,7 +110,8 @@
 </template>
 
 <script setup lang="ts">
-import { useThemeStore, DEFAULT_PRIMARY_COLOR } from '@/store/modules/theme';
+import { useThemeStore, THEME_PRESETS } from '@/store/modules/theme';
+import { useUserStore } from '@/store/modules/user/user';
 
 const props = defineProps<{
 	show: boolean;
@@ -96,20 +122,16 @@ const emit = defineEmits<{
 }>();
 
 const themeStore = useThemeStore();
+const userStore = useUserStore();
 
 const visible = computed({
 	get: () => props.show,
 	set: (val: boolean) => emit('update:show', val),
 });
 
-const presetColors = [
-	{ name: '拂晓蓝', value: '#1989fa' },
-	{ name: '极光绿', value: '#07c160' },
-	{ name: '活力橙', value: '#ff976a' },
-	{ name: '珊瑚红', value: '#ee0a24' },
-	{ name: '极客紫', value: '#7232dd' },
-	{ name: '炫酷青', value: '#13c2c2' },
-];
+const presetColors = THEME_PRESETS;
+
+const isColorActive = (val: string) => themeStore.primaryColor.toLowerCase() === val.toLowerCase();
 
 const isCustomColor = computed(() => {
 	const current = themeStore.primaryColor.toLowerCase();
@@ -129,38 +151,54 @@ const onToggleDark = (val: boolean) => {
 
 const onSelectColor = (color: string) => {
 	triggerHaptic();
-	themeStore.setPrimaryColor(color);
+	themeStore.setCustomPrimaryColor(color);
 };
 
 const onCustomColorInput = (e: Event) => {
 	const val = (e.target as HTMLInputElement).value;
 	if (val) {
-		themeStore.setPrimaryColor(val);
+		themeStore.setCustomPrimaryColor(val);
 	}
 };
 
 const onResetDefault = () => {
 	triggerHaptic();
-	themeStore.setPrimaryColor(DEFAULT_PRIMARY_COLOR);
+	const currentGender = (userStore.getUserInfo as { gender?: string } | null)?.gender;
+	themeStore.resetToGenderDefault(currentGender);
 	themeStore.toggleDark(false);
 };
 </script>
 
 <style scoped lang="less">
 .theme-popup {
-	max-height: 70vh;
+	max-height: 75vh;
 }
 
 .theme-popup-content {
-	padding: 24px 20px 32px;
+	padding: 22px 20px 28px;
+}
+
+.popup-header {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 18px;
 }
 
 .popup-title {
 	font-size: 17px;
+	font-weight: 700;
+	color: var(--text-primary, #0f172a);
+}
+
+.mode-badge {
+	font-size: 11px;
 	font-weight: 600;
-	text-align: center;
-	margin-bottom: 20px;
-	color: var(--text-primary, #323233);
+	padding: 3px 10px;
+	border-radius: 9999px;
+	background: var(--theme-soft-bg, rgba(59, 130, 246, 0.12));
+	color: var(--primary-color, #3b82f6);
 }
 
 .setting-row {
@@ -174,89 +212,117 @@ const onResetDefault = () => {
 		align-items: center;
 		gap: 8px;
 		font-size: 15px;
-		color: var(--text-primary, #323233);
+		font-weight: 500;
+		color: var(--text-primary, #0f172a);
 
 		.row-icon {
 			font-size: 18px;
-			color: var(--primary-color, #1989fa);
+			color: var(--primary-color, #3b82f6);
 		}
 	}
 }
 
 .color-section {
-	margin-top: 10px;
+	margin-top: 8px;
 
 	.section-title {
-		font-size: 14px;
-		color: var(--text-secondary, #646566);
-		margin-bottom: 14px;
+		font-size: 12.5px;
+		font-weight: 500;
+		color: var(--text-secondary, #64748b);
+		margin-bottom: 12px;
 	}
 
 	.color-grid {
-		display: flex;
-		align-items: center;
-		flex-wrap: wrap;
-		gap: 16px;
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 10px;
+	}
+}
+
+.color-card {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 4px;
+	padding: 10px 4px 8px;
+	border-radius: 14px;
+	background: #f8fafc;
+	border: 1.5px solid transparent;
+	cursor: pointer;
+	transition: all 0.2s ease;
+
+	&.active {
+		background: var(--theme-soft-bg, rgba(59, 130, 246, 0.12));
+		border-color: var(--theme-border-color, rgba(59, 130, 246, 0.28));
 	}
 
-	.color-item {
-		position: relative;
-		width: 38px;
-		height: 38px;
-		border-radius: 50%;
+	&:active {
+		transform: scale(0.96);
+	}
+}
+
+.color-swatch {
+	width: 34px;
+	height: 34px;
+	border-radius: 50%;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+	box-shadow: 0 4px 10px rgba(15, 23, 42, 0.1);
+
+	.check-icon {
+		color: #ffffff;
+		font-size: 16px;
+		font-weight: 700;
+	}
+}
+
+.color-name {
+	font-size: 11.5px;
+	font-weight: 600;
+	color: #334155;
+}
+
+.color-hint {
+	font-size: 9.5px;
+	color: #94a3b8;
+	line-height: 1;
+}
+
+.custom-swatch {
+	background: conic-gradient(#f43f5e, #f97316, #eab308, #10b981, #3b82f6, #8b5cf6, #f43f5e);
+	overflow: hidden;
+
+	.native-color-input {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		opacity: 0;
 		cursor: pointer;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
-		transition: transform 0.2s ease;
-
-		&:active {
-			transform: scale(0.92);
-		}
-
-		&.active {
-			outline: 2.5px solid var(--primary-color, #1989fa);
-			outline-offset: 2.5px;
-		}
-
-		.check-icon {
-			color: #ffffff;
-			font-size: 18px;
-			font-weight: bold;
-		}
 	}
 
-	.custom-color-item {
-		background: conic-gradient(from 90deg, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
-		position: relative;
-		overflow: hidden;
-
-		.native-color-input {
-			position: absolute;
-			top: -10px;
-			left: -10px;
-			width: 60px;
-			height: 60px;
-			opacity: 0;
-			cursor: pointer;
-		}
-
-		.custom-icon {
-			color: #ffffff;
-			font-size: 16px;
-			text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
-			pointer-events: none;
-		}
+	.custom-icon {
+		color: #ffffff;
+		font-size: 15px;
+		font-weight: 700;
+		pointer-events: none;
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 	}
 }
 
 .reset-wrapper {
-	margin-top: 28px;
+	margin-top: 22px;
 
 	.reset-btn {
-		color: var(--text-secondary, #646566);
-		border-color: var(--border-color, #ebedf0);
+		height: 38px;
+		font-weight: 600;
+		color: var(--primary-color, #3b82f6);
+		border-color: var(--theme-border-color, rgba(59, 130, 246, 0.28));
+		background: var(--theme-soft-bg, rgba(59, 130, 246, 0.08));
 	}
 }
 </style>

@@ -74,9 +74,9 @@ const emit = defineEmits(['clickRight']);
 	justify-content: center;
 	width: 28px;
 	height: 28px;
-	background-color: rgba(25, 137, 250, 0.1);
+	background-color: var(--theme-soft-bg, rgba(59, 130, 246, 0.12));
 	border-radius: 50%;
-	color: #1989fa;
-	box-shadow: 0 2px 8px rgba(25, 137, 250, 0.2);
+	color: var(--primary-color, #3b82f6);
+	box-shadow: 0 2px 8px var(--theme-focus-ring, rgba(59, 130, 246, 0.14));
 }
 </style>

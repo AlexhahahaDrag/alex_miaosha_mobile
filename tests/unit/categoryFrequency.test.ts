@@ -3,7 +3,7 @@ import {
 	loadCategoryFrequency,
 	recordCategoryUsage,
 	sortCategoriesByFrequency,
-} from '@/views/finance/financeManager/financeManagerDetail/composables/useCategoryFrequency';
+} from '@/views/selfFinance/financeManager/financeManagerDetail/composables/useCategoryFrequency';
 
 describe('useCategoryFrequency - 记账分类频次自适应记忆与排序测试', () => {
 	beforeEach(() => {

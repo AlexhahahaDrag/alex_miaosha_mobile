@@ -91,6 +91,21 @@ export interface RouteAccessOptions {
 	permissionList?: Array<{ permissionCode?: string }>;
 }
 
+const hasCodeWithPrefixFallback = (
+	check: (code: string) => boolean,
+	permissionCode: string,
+): boolean => {
+	if (check(permissionCode)) return true;
+	// 兼容支持 selfFinance 与 finance 前缀平滑互转
+	if (permissionCode.startsWith('selfFinance:')) {
+		return check(permissionCode.replace('selfFinance:', 'finance:'));
+	}
+	if (permissionCode.startsWith('finance:')) {
+		return check(permissionCode.replace('finance:', 'selfFinance:'));
+	}
+	return false;
+};
+
 /** 动态路由注册：store 的 superAdmin / permissionCodes 优先，回落首个 role 的 permissionList */
 export const canAccessRoutePermission = (
 	permissionCode: string | undefined,
@@ -103,11 +118,17 @@ export const canAccessRoutePermission = (
 		return true;
 	}
 	if (options.permissionCodes.length) {
-		return options.permissionCodes.includes(permissionCode);
+		return hasCodeWithPrefixFallback(
+			(code) => options.permissionCodes.includes(code),
+			permissionCode,
+		);
 	}
 	const list = options.permissionList;
 	if (list?.length) {
-		return list.some((item) => item?.permissionCode === permissionCode);
+		return hasCodeWithPrefixFallback(
+			(code) => list.some((item) => item?.permissionCode === code),
+			permissionCode,
+		);
 	}
 	return false;
 };
@@ -139,7 +160,9 @@ export const canAccessPermission = (
 	if (superAdmin) return true;
 	if (!permissionCode) return false;
 	if (Array.isArray(permissionCode)) {
-		return permissionCode.some((code) => permissionSet.has(code));
+		return permissionCode.some((code) =>
+			hasCodeWithPrefixFallback((c) => permissionSet.has(c), code),
+		);
 	}
-	return permissionSet.has(permissionCode);
+	return hasCodeWithPrefixFallback((c) => permissionSet.has(c), permissionCode);
 };

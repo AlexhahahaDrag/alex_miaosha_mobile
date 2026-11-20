@@ -3,7 +3,7 @@ import type {
 	UniversalFinanceAiParseVo,
 	UniversalFinanceAiStageVo,
 	UniversalFinanceAiParseReq,
-} from '@/views/finance/financeManager/config';
+} from '@/views/selfFinance/financeManager/config';
 import { triggerHaptic } from '@/utils/haptics';
 
 /**

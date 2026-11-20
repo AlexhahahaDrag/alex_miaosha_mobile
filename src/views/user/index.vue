@@ -104,12 +104,37 @@
 					@click="openTheme"
 				>
 					<template #icon>
-						<div class="item-icon item-icon--amber">
+						<div class="item-icon item-icon--theme">
 							<svg-icon name="palette" />
 						</div>
 					</template>
 					<template #title>
 						<span class="item-title">主题设置</span>
+					</template>
+					<template #value>
+						<span class="theme-value-wrap">
+							<span class="theme-status-dot"></span>
+							<span class="cell-value">{{ themeStore.activeThemeStatusText }}</span>
+						</span>
+					</template>
+				</van-cell>
+
+				<van-cell
+					v-if="canManageMenu"
+					is-link
+					to="/user/menuInfo"
+					center
+					class="soft-cell"
+					data-testid="rbac-user-entry-menu"
+					@click="handleInteraction"
+				>
+					<template #icon>
+						<div class="item-icon item-icon--indigo">
+							<van-icon name="apps-o" />
+						</div>
+					</template>
+					<template #title>
+						<span class="item-title">个人菜单管理</span>
 					</template>
 				</van-cell>
 
@@ -195,6 +220,8 @@ import ThemePopup from '@/views/user/components/ThemePopup.vue';
 import UserNoticeConfigPopup from '@/views/message/components/UserNoticeConfigPopup.vue';
 import type { UserManagerData } from '@/views/user/userManager/config';
 import { useUserStore } from '@/store/modules/user/user';
+import { useThemeStore } from '@/store/modules/theme';
+import { usePermission } from '@/composables/usePermission';
 import { useNavBar } from '@/composables/useNavBar';
 import { useTabBar } from '@/composables/useTabBar';
 
@@ -212,6 +239,18 @@ useTabBar({
 });
 
 const userStore = useUserStore();
+const themeStore = useThemeStore();
+const { hasPermission, isSuperAdmin } = usePermission();
+
+const canManageMenu = computed(() => isSuperAdmin.value || hasPermission('user:menuInfo'));
+
+onMounted(() => {
+	if (userStore.getUserInfo) {
+		themeStore.syncUserTheme(
+			userStore.getUserInfo as { id?: string | number; username?: string; gender?: string | number | null },
+		);
+	}
+});
 const loading = computed(() => !userStore.getUserInfo);
 const userInfo = computed<UserManagerData>(() => userStore.getUserInfo || {});
 
@@ -280,12 +319,15 @@ const handleInteraction = () => {
 
 /* ─── 01 · 个人名片卡 ─── */
 .profile-card {
-	background: linear-gradient(135deg, #4f6af6 0%, #6366f1 58%, #4f46e5 100%);
+	background: var(--theme-hero-gradient, linear-gradient(135deg, #4f6af6 0%, #6366f1 58%, #4f46e5 100%));
 	border-radius: 20px;
 	padding: 20px 18px 16px;
 	color: #ffffff;
-	box-shadow: 0 12px 28px -6px rgba(79, 106, 246, 0.32);
+	box-shadow: 0 12px 28px -6px var(--theme-shadow-color, rgba(79, 106, 246, 0.32));
 	margin-bottom: 18px;
+	transition:
+		background 0.3s ease,
+		box-shadow 0.3s ease;
 }
 
 .user-main {
@@ -428,7 +470,7 @@ const handleInteraction = () => {
 	border-radius: 9999px;
 
 	&--indigo {
-		background: #4f6af6;
+		background: var(--primary-color, #4f6af6);
 	}
 
 	&--slate {
@@ -476,9 +518,10 @@ const handleInteraction = () => {
 		height: 19px;
 	}
 
-	&--indigo {
-		background: rgba(79, 106, 246, 0.1);
-		color: #4f6af6;
+	&--indigo,
+	&--theme {
+		background: var(--theme-soft-bg, rgba(79, 106, 246, 0.12));
+		color: var(--primary-color, #4f6af6);
 	}
 
 	&--amber {
@@ -501,6 +544,20 @@ const handleInteraction = () => {
 	font-size: 14px;
 	font-weight: 600;
 	color: #0f172a;
+}
+
+.theme-value-wrap {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.theme-status-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--primary-color, #4f6af6);
+	box-shadow: 0 0 0 2px var(--theme-soft-bg, rgba(79, 106, 246, 0.12));
 }
 
 .cell-value {

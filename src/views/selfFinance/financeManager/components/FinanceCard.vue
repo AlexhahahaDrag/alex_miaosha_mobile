@@ -1,0 +1,373 @@
+<template>
+	<van-swipe-cell
+		:class="['finance-card-row', { 'finance-card-row--bordered': !isLast }]"
+		:disabled="!canDelete"
+	>
+		<div
+			class="finance-card-row__content"
+			@click="handleClick"
+		>
+			<div
+				class="finance-card-row__icon"
+				:style="{
+					backgroundColor: sceneTheme.iconBg,
+					color: sceneTheme.iconColor,
+				}"
+			>
+				<svg-icon
+					v-if="sourceIcon?.label"
+					:name="sourceIcon.label"
+					class="finance-card-row__source-icon"
+				/>
+				<van-icon
+					v-else
+					:name="item.incomeAndExpenses === 'income' ? 'down' : 'up'"
+					class="finance-card-row__fallback-icon"
+				/>
+			</div>
+
+			<div class="finance-card-row__main">
+				<div class="finance-card-row__top">
+					<div class="finance-card-row__title">
+						{{ displayTitle }}
+					</div>
+					<div
+						v-if="shouldShowTypeLabel"
+						class="finance-card-row__tag"
+						:style="{
+							color: sceneTheme.tagText,
+							backgroundColor: sceneTheme.tagBg,
+						}"
+					>
+						{{ typeLabel }}
+					</div>
+				</div>
+
+				<div class="finance-card-row__meta">
+					<span>{{ recordTime }} · {{ displaySubtitle }}</span>
+				</div>
+			</div>
+
+			<div class="finance-card-row__side">
+				<div :class="['finance-card-row__amount', amountToneClass]">
+					{{ formattedAmount }}
+				</div>
+				<div class="finance-card-row__account">{{ accountName }}</div>
+			</div>
+		</div>
+
+		<template
+			v-if="canDelete"
+			#right
+		>
+			<van-button
+				class="finance-card-row__delete"
+				square
+				type="danger"
+				text="删除"
+				@click="onDelete"
+			/>
+		</template>
+	</van-swipe-cell>
+</template>
+
+<script setup lang="ts">
+import type { PropType } from 'vue';
+import { useUserStore } from '@/store/modules/user/user';
+import { usePermission } from '@/composables/usePermission';
+import { formatTime } from '@/utils/dayjs';
+import {
+	fromSourceTransferList,
+	type FinanceManagerData,
+	type FromSourceTransferItem,
+} from '@/views/selfFinance/financeManager/config';
+
+interface SceneTheme {
+	iconColor: string;
+	iconBg: string;
+	tagText: string;
+	tagBg: string;
+}
+
+const props = defineProps({
+	item: {
+		type: Object as PropType<FinanceManagerData>,
+		required: true,
+	},
+	isLast: {
+		type: Boolean,
+		default: false,
+	},
+});
+
+const emit = defineEmits(['click', 'delete']);
+
+const displayTitle = computed(() => {
+	const item = props.item;
+	const rawName = item.name?.trim() || '';
+	const desc = item.description?.trim() || '';
+	const category = item.typeName?.trim() || item.typeCode?.trim() || '';
+
+	// 遇到空名称或通用词「转账」时，优先把具体事由/分类提权为主标题，消除满屏“转账”
+	if (!rawName || rawName === '转账') {
+		return desc || category || '转账';
+	}
+	return rawName;
+});
+
+const sourceIcon = computed<FromSourceTransferItem | null>(() => {
+	if (!props.item.fromSource) {
+		return null;
+	}
+	return fromSourceTransferList.find((source) => props.item.fromSource?.includes(source.value)) || null;
+});
+
+const sourceName = computed(() => props.item.fromSourceName || sourceIcon.value?.name || '');
+
+const displaySubtitle = computed(() => {
+	const item = props.item;
+	const title = displayTitle.value.trim().toLowerCase();
+	const candidates = [
+		item.description?.trim(),
+		sourceName.value?.trim(),
+		item.typeName?.trim(),
+		item.name?.trim(),
+	].filter((val): val is string => Boolean(val));
+
+	// 挑选与主标题不重复的首个上下文信息，避免主副行同义重复
+	const distinct = candidates.find((val) => val.toLowerCase() !== title);
+	return distinct || '日常账单';
+});
+
+const typeLabel = computed(() => props.item.typeName || props.item.typeCode || '');
+
+const shouldShowTypeLabel = computed(() => {
+	if (!typeLabel.value) return false;
+	const title = displayTitle.value.trim().toLowerCase();
+	const type = typeLabel.value.trim().toLowerCase();
+	return title !== type;
+});
+
+const sceneTheme = computed<SceneTheme>(() => {
+	const text =
+		`${props.item.name || ''} ${props.item.description || ''} ${props.item.typeName || ''} ${sourceName.value || ''}`.toLowerCase();
+
+	if (text.includes('话费') || text.includes('通讯') || text.includes('通信') || text.includes('手机')) {
+		return {
+			iconColor: '#F97316',
+			iconBg: '#FFF7ED',
+			tagText: '#EA580C',
+			tagBg: '#FFEDD5',
+		};
+	}
+	if (text.includes('水') || text.includes('用水') || text.includes('水利')) {
+		return {
+			iconColor: '#0284C7',
+			iconBg: '#F0F9FF',
+			tagText: '#0369A1',
+			tagBg: '#E0F2FE',
+		};
+	}
+	if (text.includes('燃气') || text.includes('采暖') || text.includes('天然气') || text.includes('煤气')) {
+		return {
+			iconColor: '#E11D48',
+			iconBg: '#FFF1F2',
+			tagText: '#BE123C',
+			tagBg: '#FFE4E6',
+		};
+	}
+	if (text.includes('电') || text.includes('供电') || text.includes('能源')) {
+		return {
+			iconColor: '#16A34A',
+			iconBg: '#F0FDF4',
+			tagText: '#15803D',
+			tagBg: '#DCFCE7',
+		};
+	}
+	// 银行卡 / 纯资金转账 / 通用
+	return {
+		iconColor: '#6366F1',
+		iconBg: '#EEF2FF',
+		tagText: '#4338CA',
+		tagBg: '#E0F2FE',
+	};
+});
+
+const accountName = computed(() => props.item.belongToName || '个人账户');
+
+const LARGE_EXPENSE_THRESHOLD = 500;
+
+const amountToneClass = computed(() => {
+	if (props.item.incomeAndExpenses === 'income') {
+		return 'is-income';
+	}
+	return Math.abs(Number(props.item.amount || 0)) >= LARGE_EXPENSE_THRESHOLD ? 'is-large-expense' : 'is-expense';
+});
+
+const formattedAmount = computed(() => {
+	const amount = Math.abs(Number(props.item.amount || 0));
+	const parts = amount.toFixed(2).split('.');
+	parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+	const prefix = props.item.incomeAndExpenses === 'income' ? '+' : '-';
+	return `${prefix}¥${parts.join('.')}`;
+});
+
+const recordTime = computed(() => {
+	if (!props.item.infoDate) {
+		return '--:--';
+	}
+	return formatTime(props.item.infoDate, 'HH:mm');
+});
+
+const userStore = useUserStore();
+const { hasPermission, isSuperAdmin } = usePermission();
+
+const canDelete = computed(() => {
+	if (!hasPermission('finance:financeManager:delete')) {
+		return false;
+	}
+	const roleCode = userStore.getRoleInfo?.roleCode || '';
+	if (isSuperAdmin.value || roleCode === 'admin' || roleCode === 'family_admin') {
+		return true;
+	}
+	const myId = userStore.getUserInfo?.id;
+	return myId !== undefined && String(props.item.belongTo) === String(myId);
+});
+
+const handleClick = () => {
+	if (typeof navigator !== 'undefined' && navigator.vibrate) {
+		navigator.vibrate(30);
+	}
+	emit('click', props.item);
+};
+
+const onDelete = () => {
+	emit('delete', props.item.id);
+};
+</script>
+
+<style lang="less" scoped>
+.finance-card-row {
+	overflow: hidden;
+	background: #ffffff;
+
+	&--bordered {
+		border-bottom: 1px solid #f1f5f9;
+	}
+
+	&__content {
+		display: grid;
+		grid-template-columns: 40px minmax(0, 1fr) auto;
+		gap: 12px;
+		align-items: center;
+		padding: 12px 14px;
+		background: #ffffff;
+		transition: background-color 0.15s ease;
+
+		&:active {
+			background: #f8fafc;
+		}
+	}
+
+	&__icon {
+		width: 40px;
+		height: 40px;
+		border-radius: 12px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+	}
+
+	&__source-icon {
+		width: 20px;
+		height: 20px;
+	}
+
+	&__fallback-icon {
+		font-size: 19px;
+	}
+
+	&__main {
+		min-width: 0;
+	}
+
+	&__top {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+	}
+
+	&__title {
+		flex: 0 1 auto;
+		min-width: 0;
+		font-size: 15px;
+		font-weight: 600;
+		color: #1e293b;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	&__tag {
+		flex-shrink: 0;
+		padding: 2px 7px;
+		border-radius: 999px;
+		font-size: 10.5px;
+		font-weight: 600;
+		line-height: 1.2;
+	}
+
+	&__meta {
+		display: flex;
+		align-items: center;
+		margin-top: 3px;
+		font-size: 11.5px;
+		color: #94a3b8;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	&__side {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 3px;
+		margin-left: 8px;
+	}
+
+	&__amount {
+		font-size: 16px;
+		font-weight: 800;
+		line-height: 1.1;
+		font-variant-numeric: tabular-nums;
+
+		&.is-income {
+			color: #059669;
+		}
+
+		&.is-expense {
+			color: #0f172a;
+		}
+
+		&.is-large-expense {
+			color: #e11d48;
+		}
+	}
+
+	&__account {
+		font-size: 11px;
+		color: #64748b;
+		max-width: 100px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	&__delete {
+		height: 100%;
+		border: none;
+	}
+}
+</style>
