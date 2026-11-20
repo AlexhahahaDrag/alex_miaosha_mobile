@@ -540,7 +540,7 @@ onMounted(() => {
 	flex-direction: column;
 	overflow: hidden;
 
-	background-color: #f1f5f9;
+	background-color: #f1f4fa;
 }
 
 .page-search {
@@ -548,9 +548,8 @@ onMounted(() => {
 	top: 0;
 	flex-shrink: 0;
 	z-index: 20;
-	padding: 10px 12px 8px;
-	background: #ffffff;
-	box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+	padding: 10px 12px 6px;
+	background: #f1f4fa;
 
 	.search-shell {
 		display: flex;
@@ -565,9 +564,10 @@ onMounted(() => {
 			padding: 0;
 
 			:deep(.van-search__content) {
-				background: #f1f5f9;
+				background: #ffffff;
 				border: none;
 				border-radius: 999px;
+				box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
 			}
 		}
 
@@ -579,7 +579,8 @@ onMounted(() => {
 			font-size: 17px;
 			border: none;
 			color: #475569;
-			background: #f1f5f9;
+			background: #ffffff;
+			box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
 			display: flex;
 			align-items: center;
 			justify-content: center;
@@ -600,7 +601,7 @@ onMounted(() => {
 			font-size: 13px;
 			font-weight: 600;
 			color: #4f6af6;
-			background: rgba(79, 106, 246, 0.1);
+			background: rgba(79, 106, 246, 0.12);
 			border: none;
 			display: inline-flex;
 			align-items: center;
@@ -617,7 +618,7 @@ onMounted(() => {
 
 			&:active {
 				transform: scale(0.96);
-				background: rgba(79, 106, 246, 0.18);
+				background: rgba(79, 106, 246, 0.2);
 			}
 		}
 	}
@@ -631,7 +632,7 @@ onMounted(() => {
 			grid-auto-columns: minmax(0, 1fr);
 			gap: 4px;
 			padding: 3px;
-			background: #f1f5f9;
+			background: #e6ebf5;
 			border-radius: 14px;
 		}
 
@@ -729,9 +730,17 @@ onMounted(() => {
 			align-items: center;
 			gap: 10px;
 			font-size: 12px;
-			font-family: 'DIN Alternate', ui-monospace, SFMono-Regular, monospace;
+			font-weight: 600;
 			font-variant-numeric: tabular-nums;
 			color: #64748b;
+
+			.summary-expense {
+				color: #475569;
+			}
+
+			.summary-income {
+				color: #059669;
+			}
 		}
 
 		&__body {

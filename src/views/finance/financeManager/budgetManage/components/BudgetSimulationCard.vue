@@ -6,29 +6,29 @@
 					name="chart-trending-o"
 					class="simulation-icon"
 				/>
-				<span>实时试算与健康度模拟</span>
+				<span>预算试算</span>
 			</div>
 			<span
 				v-if="budget > 0"
 				:class="['simulation-status', isOver ? 'simulation-status--over' : 'simulation-status--normal']"
 			>
-				{{ isOver ? '预算已透支超额' : `已使用 ${percent}%` }}
+				{{ isOver ? '已超支' : `已用 ${percent}%` }}
 			</span>
 			<span
 				v-else
 				class="simulation-status simulation-status--none"
-			>未设置限额</span>
+			>不限额</span>
 		</div>
 
 		<div class="simulation-grid">
 			<div class="simulation-cell">
-				<div class="cell-label">设定预算</div>
+				<div class="cell-label">预算</div>
 				<div class="cell-val">
-					{{ budget > 0 ? `¥${budget.toFixed(2)}` : '无上限' }}
+					{{ budget > 0 ? `¥${budget.toFixed(2)}` : '不限' }}
 				</div>
 			</div>
 			<div class="simulation-cell">
-				<div class="cell-label">本月已计</div>
+				<div class="cell-label">本月已用</div>
 				<div class="cell-val">
 					<span
 						v-if="simulationLoading"
@@ -38,7 +38,7 @@
 				</div>
 			</div>
 			<div class="simulation-cell">
-				<div class="cell-label">试算结余</div>
+				<div class="cell-label">预计结余</div>
 				<div :class="['cell-val', isOver ? 'cell-val--over' : 'cell-val--remain']">
 					<span
 						v-if="simulationLoading"
@@ -55,7 +55,7 @@
 		>
 			<van-progress
 				:percentage="Math.max(0, Math.min(percent, 100))"
-				:color="isOver ? '#e11d48' : '#1677ff'"
+				:color="isOver ? '#e11d48' : '#4f6af6'"
 				:show-pivot="false"
 				stroke-width="6"
 			/>
@@ -80,11 +80,10 @@ withDefaults(defineProps<Props>(), {
 
 <style scoped lang="less">
 .dialog-simulation-card {
-	background: #f9fafb;
-	border-radius: 10px;
+	background: #f8fafc;
+	border-radius: 12px;
 	padding: 12px;
 	margin-bottom: 12px;
-	border: 1px solid #f0f0f0;
 
 	.simulation-header {
 		display: flex;
@@ -95,35 +94,35 @@ withDefaults(defineProps<Props>(), {
 		.simulation-title {
 			display: flex;
 			align-items: center;
-			gap: 4px;
+			gap: 5px;
 			font-size: 13px;
 			font-weight: 600;
-			color: #374151;
+			color: #0f172a;
 
 			.simulation-icon {
-				color: #1677ff;
+				color: #4f6af6;
 			}
 		}
 
 		.simulation-status {
-			font-size: 12px;
+			font-size: 11px;
 			font-weight: 600;
 			padding: 2px 8px;
-			border-radius: 10px;
+			border-radius: 999px;
 
 			&--normal {
-				background: #e6f4ff;
-				color: #1677ff;
+				background: #eef2ff;
+				color: #4f6af6;
 			}
 
 			&--over {
-				background: #fee2e2;
-				color: #ef4444;
+				background: #fff1f2;
+				color: #e11d48;
 			}
 
 			&--none {
-				background: #e5e7eb;
-				color: #6b7280;
+				background: #e2e8f0;
+				color: #64748b;
 			}
 		}
 	}
@@ -131,44 +130,44 @@ withDefaults(defineProps<Props>(), {
 	.simulation-grid {
 		display: grid;
 		grid-template-columns: repeat(3, 1fr);
-		gap: 6px;
+		gap: 8px;
 		text-align: center;
-		margin-bottom: 10px;
 
 		.simulation-cell {
 			background: #ffffff;
-			border-radius: 6px;
-			padding: 8px 4px;
+			border-radius: 8px;
+			padding: 10px 4px;
 
 			.cell-label {
 				font-size: 11px;
-				color: #9ca3af;
+				color: #94a3b8;
 				margin-bottom: 4px;
 			}
 
 			.cell-val {
 				font-size: 13px;
 				font-weight: 700;
-				color: #1f2937;
+				color: #0f172a;
+				font-variant-numeric: tabular-nums;
 
 				&--remain {
-					color: #10b981;
+					color: #059669;
 				}
 
 				&--over {
-					color: #ef4444;
+					color: #e11d48;
 				}
 			}
 
 			.loading-text {
 				font-size: 11px;
-				color: #9ca3af;
+				color: #94a3b8;
 			}
 		}
 	}
 
 	.simulation-progress-wrap {
-		margin-top: 6px;
+		margin-top: 10px;
 	}
 }
 </style>

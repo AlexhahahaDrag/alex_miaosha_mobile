@@ -104,7 +104,15 @@ const emit = defineEmits(['click', 'delete']);
 
 const displayTitle = computed(() => {
 	const item = props.item;
-	return item.name || '转账';
+	const rawName = item.name?.trim() || '';
+	const desc = item.description?.trim() || '';
+	const category = item.typeName?.trim() || item.typeCode?.trim() || '';
+
+	// 遇到空名称或通用词「转账」时，优先把具体事由/分类提权为主标题，消除满屏“转账”
+	if (!rawName || rawName === '转账') {
+		return desc || category || '转账';
+	}
+	return rawName;
 });
 
 const sourceIcon = computed<FromSourceTransferItem | null>(() => {
@@ -118,13 +126,17 @@ const sourceName = computed(() => props.item.fromSourceName || sourceIcon.value?
 
 const displaySubtitle = computed(() => {
 	const item = props.item;
-	if (item.description && item.description.trim()) {
-		return item.description.trim();
-	}
-	if (sourceName.value && sourceName.value.trim()) {
-		return sourceName.value.trim();
-	}
-	return item.typeName || '日常账单';
+	const title = displayTitle.value.trim().toLowerCase();
+	const candidates = [
+		item.description?.trim(),
+		sourceName.value?.trim(),
+		item.typeName?.trim(),
+		item.name?.trim(),
+	].filter((val): val is string => Boolean(val));
+
+	// 挑选与主标题不重复的首个上下文信息，避免主副行同义重复
+	const distinct = candidates.find((val) => val.toLowerCase() !== title);
+	return distinct || '日常账单';
 });
 
 const typeLabel = computed(() => props.item.typeName || props.item.typeCode || '');
@@ -183,7 +195,14 @@ const sceneTheme = computed<SceneTheme>(() => {
 
 const accountName = computed(() => props.item.belongToName || '个人账户');
 
-const amountToneClass = computed(() => (props.item.incomeAndExpenses === 'income' ? 'is-income' : 'is-expense'));
+const LARGE_EXPENSE_THRESHOLD = 500;
+
+const amountToneClass = computed(() => {
+	if (props.item.incomeAndExpenses === 'income') {
+		return 'is-income';
+	}
+	return Math.abs(Number(props.item.amount || 0)) >= LARGE_EXPENSE_THRESHOLD ? 'is-large-expense' : 'is-expense';
+});
 
 const formattedAmount = computed(() => {
 	const amount = Math.abs(Number(props.item.amount || 0));
@@ -302,9 +321,9 @@ const onDelete = () => {
 	&__meta {
 		display: flex;
 		align-items: center;
-		margin-top: 4px;
-		font-size: 13px;
-		color: #475569;
+		margin-top: 3px;
+		font-size: 11.5px;
+		color: #94a3b8;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -329,6 +348,10 @@ const onDelete = () => {
 		}
 
 		&.is-expense {
+			color: #0f172a;
+		}
+
+		&.is-large-expense {
 			color: #e11d48;
 		}
 	}

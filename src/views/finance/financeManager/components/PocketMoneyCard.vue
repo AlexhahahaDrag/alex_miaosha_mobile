@@ -501,11 +501,10 @@ const displayCategoryList = computed(() => {
 				}
 
 				.metric-val {
-					font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'DIN Alternate', monospace;
 					font-variant-numeric: tabular-nums;
 					font-size: 14.5px;
 					font-weight: 700;
-					letter-spacing: -0.3px;
+					letter-spacing: -0.2px;
 					white-space: nowrap;
 					flex-shrink: 0;
 
@@ -616,11 +615,7 @@ const displayCategoryList = computed(() => {
 				}
 
 				.amount-value {
-					font-family:
-						'DIN Alternate',
-						-apple-system,
-						BlinkMacSystemFont,
-						sans-serif;
+					font-variant-numeric: tabular-nums;
 					font-size: 15px;
 					font-weight: 700;
 					color: #0f172a;

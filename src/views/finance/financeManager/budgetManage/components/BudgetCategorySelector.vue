@@ -2,8 +2,8 @@
 	<div :class="['dialog-category-section', isHighlighted && 'category-highlight-pulse']">
 		<div class="section-header">
 			<div class="section-title">
-				<span>纳入统计分类</span>
-				<span class="selected-count">(已选 {{ categoryCodes.length }} 项)</span>
+				<span>统计分类</span>
+				<span class="selected-count">已选 {{ categoryCodes.length }} 项</span>
 			</div>
 			<div
 				v-if="canEditBudget"
@@ -23,8 +23,8 @@
 			</div>
 		</div>
 
-		<div class="section-sub-label">收支类型 (支持单选或同时勾选)</div>
-		<div class="chip-group">
+		<div class="section-sub-label">统计方向</div>
+		<div class="chip-group chip-group--direction">
 			<div
 				:class="[
 					'chip-item',
@@ -40,7 +40,7 @@
 					name="success"
 					class="chip-check"
 				/>
-				<span>支出 (消费)</span>
+				<span>支出</span>
 			</div>
 			<div
 				:class="[
@@ -62,7 +62,7 @@
 		</div>
 
 		<div class="section-sub-label category-sub-label">
-			<span>账目类别 (提取自上月及本月)</span>
+			<span>账目分类</span>
 			<span
 				v-if="categoriesLoading"
 				class="loading-hint"
@@ -91,7 +91,7 @@
 			v-else-if="!categoriesLoading"
 			class="empty-category-hint"
 		>
-			近两月暂无自定义分类流水
+			近两月暂无分类账单
 		</div>
 	</div>
 </template>
@@ -175,17 +175,23 @@ const clearAllCategories = () => {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		margin-bottom: 8px;
+		margin-bottom: 10px;
 
 		.section-title {
-			font-size: 13px;
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			font-size: 14px;
 			font-weight: 600;
-			color: #1f2937;
+			color: #0f172a;
 
 			.selected-count {
-				color: #1677ff;
-				font-weight: normal;
-				margin-left: 4px;
+				font-size: 11px;
+				color: #4f6af6;
+				background: #eef2ff;
+				font-weight: 600;
+				padding: 2px 7px;
+				border-radius: 999px;
 			}
 		}
 
@@ -194,7 +200,8 @@ const clearAllCategories = () => {
 			align-items: center;
 			gap: 8px;
 			font-size: 12px;
-			color: #1677ff;
+			font-weight: 500;
+			color: #4f6af6;
 
 			.action-btn {
 				cursor: pointer;
@@ -202,35 +209,35 @@ const clearAllCategories = () => {
 			}
 
 			.action-sep {
-				color: #d1d5db;
+				color: #cbd5e1;
 			}
 		}
 	}
 
 	.section-sub-label {
 		font-size: 12px;
-		color: #6b7280;
-		margin-bottom: 6px;
+		color: #64748b;
+		margin-bottom: 8px;
 	}
 
 	.category-sub-label {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		margin-top: 10px;
+		margin-top: 12px;
 
 		.loading-hint {
-			color: #9ca3af;
+			color: #94a3b8;
 			font-size: 11px;
 		}
 	}
 
 	.empty-category-hint {
 		font-size: 12px;
-		color: #9ca3af;
-		padding: 8px;
-		background: #f9fafb;
-		border-radius: 6px;
+		color: #94a3b8;
+		padding: 10px 12px;
+		background: #f8fafc;
+		border-radius: 10px;
 	}
 }
 
@@ -239,40 +246,50 @@ const clearAllCategories = () => {
 	flex-wrap: wrap;
 	gap: 8px;
 
+	&--direction {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+
+		.chip-item {
+			justify-content: center;
+			padding: 8px 12px;
+			border-radius: 10px;
+		}
+	}
+
 	.chip-item {
 		display: inline-flex;
 		align-items: center;
 		gap: 4px;
 		padding: 6px 12px;
-		background: #f3f4f6;
-		border-radius: 16px;
+		background: #f1f5f9;
+		border-radius: 999px;
 		font-size: 12px;
-		color: #4b5563;
+		color: #475569;
 		cursor: pointer;
 		border: 1px solid transparent;
-		transition: all 0.2s ease;
+		transition:
+			background-color 0.2s ease,
+			color 0.2s ease;
 
 		.chip-check {
 			font-size: 12px;
 		}
 
 		&.active {
-			background: #e6f4ff;
-			color: #1677ff;
-			border-color: #91caff;
-			font-weight: 500;
+			background: #eef2ff;
+			color: #4f6af6;
+			font-weight: 600;
 		}
 
 		&--expense.active {
-			background: #fff1f0;
-			color: #f5222d;
-			border-color: #ffa39e;
+			background: #fff1f2;
+			color: #e11d48;
 		}
 
 		&--income.active {
-			background: #f6ffed;
-			color: #52c41a;
-			border-color: #b7eb8f;
+			background: #ecfdf5;
+			color: #059669;
 		}
 
 		&--disabled {

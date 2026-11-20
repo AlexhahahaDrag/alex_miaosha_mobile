@@ -1,24 +1,19 @@
 <template>
-	<div class="ai-budget-card">
-		<!-- 顶部折叠微卡片 (高度约 40px，默认常驻展示核心 AI 摘要，0 视口压迫) -->
+	<div class="ai-budget-row">
+		<!-- 收起态单行入口（融入统一设置卡片） -->
 		<div
 			class="ai-header"
+			data-testid="btn-mobile-toggle-ai"
 			@click="toggleAiExpanded"
 		>
 			<div class="ai-title-wrap">
-				<div class="ai-badge">AI</div>
-				<div class="ai-title-sub">
-					<span class="ai-title">AI 智能助手</span>
-					<template v-if="aiRecommending">
-						<span class="ai-brief-tip animate-pulse">测算中...</span>
-					</template>
-					<template v-else-if="aiRecommendData">
-						<span class="ai-brief-tag"> 适度 ¥{{ (aiRecommendData.moderateAmount || 0).toFixed(0) }} </span>
-					</template>
-					<template v-else>
-						<span class="ai-brief-tip">点击智能测算</span>
-					</template>
-				</div>
+				<span class="ai-title">AI 口语与测算</span>
+				<span
+					v-if="!aiRecommending && aiRecommendData?.moderateAmount"
+					class="ai-brief-tag"
+				>
+					¥{{ (aiRecommendData.moderateAmount || 0).toFixed(0) }}
+				</span>
 			</div>
 			<div
 				class="ai-header-right"
@@ -28,26 +23,19 @@
 					class="ai-action-btn"
 					data-testid="btn-mobile-ai-recommend"
 					:class="{ 'is-loading': aiRecommending }"
-					@click="onFetchAiRecommend"
+					@click="onFetchAiRecommend(true)"
 				>
 					<van-icon
 						name="replay"
 						:class="{ 'spin-icon': aiRecommending }"
 					/>
-					<span>{{ aiRecommendData ? '重测' : '测算' }}</span>
+					<span>{{ aiRecommending ? '测算中' : aiRecommendData ? '重测' : '测算' }}</span>
 				</div>
-				<span class="action-divider">|</span>
-				<div
-					class="ai-toggle-btn"
-					data-testid="btn-mobile-toggle-ai"
+				<van-icon
+					:name="isAiExpanded ? 'arrow-up' : 'arrow-down'"
+					class="toggle-icon"
 					@click="toggleAiExpanded"
-				>
-					<span>{{ isAiExpanded ? '收起' : '口语配置' }}</span>
-					<van-icon
-						:name="isAiExpanded ? 'arrow-up' : 'arrow-down'"
-						class="toggle-icon"
-					/>
-				</div>
+				/>
 			</div>
 		</div>
 
@@ -109,11 +97,11 @@
 					<span
 						v-if="aiRecommendData.isFallback"
 						class="ai-mode-tag ai-mode-tag--fallback"
-					>智能规则</span>
+					>规则测算</span>
 					<span
 						v-else
 						class="ai-mode-tag ai-mode-tag--ai"
-					>大模型洞察</span>
+					>AI 分析</span>
 				</div>
 				<div
 					v-if="aiRecommendData.dailyLimitSuggest"
@@ -133,7 +121,7 @@
 						}"
 						@click="handleApplyTier(aiRecommendData.savingAmount)"
 					>
-						<div class="tier-name">节约档 (85%)</div>
+						<div class="tier-name">节约 85%</div>
 						<div class="tier-val">¥{{ (aiRecommendData.savingAmount || 0).toFixed(0) }}</div>
 					</div>
 					<div
@@ -145,7 +133,7 @@
 						@click="handleApplyTier(aiRecommendData.moderateAmount)"
 					>
 						<span class="recom-badge">推荐</span>
-						<div class="tier-name">适度档 (100%)</div>
+						<div class="tier-name">适度 100%</div>
 						<div class="tier-val">¥{{ (aiRecommendData.moderateAmount || 0).toFixed(0) }}</div>
 					</div>
 					<div
@@ -155,7 +143,7 @@
 						}"
 						@click="handleApplyTier(aiRecommendData.relaxedAmount)"
 					>
-						<div class="tier-name">宽松档 (115%)</div>
+						<div class="tier-name">宽松 115%</div>
 						<div class="tier-val">¥{{ (aiRecommendData.relaxedAmount || 0).toFixed(0) }}</div>
 					</div>
 				</div>
@@ -165,7 +153,7 @@
 					v-if="aiRecommendData.recommendedCategories?.length"
 					class="ai-recom-cats"
 				>
-					<div class="cats-label">建议管控:</div>
+					<div class="cats-label">建议管控</div>
 					<div class="cats-tags">
 						<span
 							v-for="cat in aiRecommendData.recommendedCategories"
@@ -184,21 +172,6 @@
 					</span>
 				</div>
 			</div>
-		</div>
-	</div>
-
-	<!-- 快捷 AI 推荐条 (当有适度档推荐时轻量常驻展示) -->
-	<div
-		v-if="aiRecommendData?.moderateAmount"
-		class="quick-ai-recommend-bar"
-	>
-		<span class="bar-label">AI 建议预算:</span>
-		<div
-			:class="['ai-quick-pill', modelValueAmount === aiRecommendData.moderateAmount && 'active']"
-			@click="handleApplyTier(aiRecommendData.moderateAmount)"
-		>
-			<span class="pill-badge">推荐</span>
-			<span class="pill-amount">¥{{ (aiRecommendData.moderateAmount || 0).toFixed(0) }}</span>
 		</div>
 	</div>
 </template>
@@ -222,6 +195,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
 	(e: 'apply-amount', amount: number): void;
 	(e: 'apply-categories', categories: string[]): void;
+	(e: 'recommend-loaded', moderateAmount: number): void;
 }>();
 
 const isAiExpanded = ref<boolean>(false);
@@ -247,8 +221,8 @@ const applyAiSample = (sample: string) => {
 	onAiParseCommand();
 };
 
-const onFetchAiRecommend = async () => {
-	navigator.vibrate?.(10);
+const onFetchAiRecommend = async (manual = false) => {
+	if (manual) navigator.vibrate?.(10);
 	aiRecommending.value = true;
 	try {
 		const month = props.currentMonthStr;
@@ -261,13 +235,18 @@ const onFetchAiRecommend = async () => {
 		});
 		if (code === '200' && data) {
 			aiRecommendData.value = data;
+			emit('recommend-loaded', Number(data.moderateAmount || 0));
 			isAiExpanded.value = true;
-			showSuccessToast('AI 测算完成');
-		} else {
+			if (manual) {
+				showSuccessToast('AI 测算完成');
+			}
+		} else if (manual) {
 			showFailToast(msg || 'AI 测算服务暂不可用');
 		}
 	} catch (e: any) {
-		showFailToast(e?.message || '获取 AI 推荐失败');
+		if (manual) {
+			showFailToast(e?.message || '获取 AI 推荐失败');
+		}
 	} finally {
 		aiRecommending.value = false;
 	}
@@ -320,99 +299,58 @@ const handleApplyCategories = (categories?: string[]) => {
 };
 
 onMounted(() => {
-	onFetchAiRecommend();
+	onFetchAiRecommend(false);
 });
 
 defineExpose({
-	fetchAiRecommend: onFetchAiRecommend,
+	fetchAiRecommend: () => onFetchAiRecommend(true),
 });
 </script>
 
 <style scoped lang="less">
-.ai-budget-card {
-	background: linear-gradient(135deg, #f0f5ff 0%, #f8faff 50%, #faf5ff 100%);
-	border: 1px solid #d6e4ff;
-	border-radius: 12px;
-	padding: 12px;
-	margin-bottom: 14px;
-
+.ai-budget-row {
 	.ai-header {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+		padding: 14px 16px;
 		cursor: pointer;
 
 		.ai-title-wrap {
 			display: flex;
 			align-items: center;
-			gap: 6px;
+			gap: 8px;
 			flex: 1;
 			min-width: 0;
 
-			.ai-badge {
-				background: #4f46e5;
-				color: #ffffff;
-				font-size: 11px;
-				font-weight: 700;
-				padding: 2px 6px;
-				border-radius: 6px;
-				line-height: 1;
+			.ai-title {
+				font-size: 14px;
+				font-weight: 600;
+				color: #0f172a;
 				flex-shrink: 0;
 			}
 
-			.ai-title-sub {
-				display: flex;
-				align-items: center;
-				gap: 6px;
-				overflow: hidden;
-				text-overflow: ellipsis;
-				white-space: nowrap;
-
-				.ai-title {
-					font-size: 13px;
-					font-weight: 600;
-					color: #1e1b4b;
-					flex-shrink: 0;
-				}
-
-				.ai-brief-tag {
-					font-size: 10px;
-					background: #e0e7ff;
-					color: #4338ca;
-					padding: 1px 5px;
-					border-radius: 4px;
-					font-weight: 500;
-				}
-
-				.ai-brief-tip {
-					font-size: 11px;
-					color: #818cf8;
-				}
+			.ai-brief-tag {
+				font-size: 11px;
+				background: #eef2ff;
+				color: #4f6af6;
+				padding: 2px 7px;
+				border-radius: 999px;
+				font-weight: 600;
+				font-variant-numeric: tabular-nums;
 			}
 		}
 
 		.ai-header-right {
 			display: flex;
 			align-items: center;
-			gap: 6px;
+			gap: 8px;
 			flex-shrink: 0;
 
-			.action-divider {
-				color: #c7d2fe;
-				font-size: 11px;
-			}
-
-			.ai-toggle-btn {
-				display: flex;
-				align-items: center;
-				gap: 2px;
+			.toggle-icon {
 				font-size: 12px;
-				color: #4b5563;
+				color: #94a3b8;
 				cursor: pointer;
-
-				.toggle-icon {
-					font-size: 10px;
-				}
 			}
 		}
 
@@ -421,10 +359,11 @@ defineExpose({
 			align-items: center;
 			gap: 3px;
 			font-size: 12px;
-			color: #4f46e5;
+			font-weight: 500;
+			color: #4f6af6;
 			cursor: pointer;
 			padding: 2px 6px;
-			border-radius: 4px;
+			border-radius: 6px;
 
 			.spin-icon {
 				animation: spin 1s linear infinite;
@@ -433,25 +372,20 @@ defineExpose({
 	}
 
 	.ai-expanded-area {
-		margin-top: 10px;
-		padding-top: 10px;
-		border-top: 1px solid rgba(199, 210, 254, 0.4);
+		padding: 0 16px 16px;
 	}
 
 	.ai-command-wrap {
-		margin-top: 4px;
-
 		.ai-input-box {
 			display: flex;
 			align-items: center;
-			background: #ffffff;
-			border: 1px solid #c7d2fe;
-			border-radius: 8px;
-			padding: 4px 6px 4px 10px;
+			background: #f8fafc;
+			border-radius: 10px;
+			padding: 6px 6px 6px 12px;
 
 			.ai-clear-icon {
 				font-size: 14px;
-				color: #9ca3af;
+				color: #94a3b8;
 				padding: 0 4px;
 				cursor: pointer;
 			}
@@ -461,22 +395,22 @@ defineExpose({
 				border: none;
 				outline: none;
 				font-size: 12px;
-				color: #1f2937;
+				color: #0f172a;
 				background: transparent;
 
 				&::placeholder {
-					color: #9ca3af;
+					color: #94a3b8;
 				}
 			}
 
 			.ai-parse-btn {
-				background: #4f46e5;
+				background: #4f6af6;
 				color: #ffffff;
 				border: none;
-				border-radius: 6px;
+				border-radius: 8px;
 				font-size: 11px;
 				font-weight: 500;
-				padding: 4px 10px;
+				padding: 5px 10px;
 				cursor: pointer;
 
 				&:disabled {
@@ -490,20 +424,19 @@ defineExpose({
 			align-items: center;
 			gap: 6px;
 			flex-wrap: wrap;
-			margin-top: 6px;
+			margin-top: 8px;
 
 			.sample-chip {
-				font-size: 10px;
-				color: #4b5563;
-				background: rgba(255, 255, 255, 0.7);
-				border: 1px solid #e0e7ff;
-				border-radius: 10px;
-				padding: 2px 8px;
+				font-size: 11px;
+				color: #475569;
+				background: #f1f5f9;
+				border-radius: 999px;
+				padding: 3px 9px;
 				cursor: pointer;
 
 				&:active {
 					background: #e0e7ff;
-					color: #3730a3;
+					color: #4f6af6;
 				}
 			}
 		}
@@ -511,9 +444,8 @@ defineExpose({
 
 	.ai-recommend-body {
 		margin-top: 10px;
-		background: rgba(255, 255, 255, 0.85);
-		border: 1px solid #e0e7ff;
-		border-radius: 8px;
+		background: #f8fafc;
+		border-radius: 10px;
 		padding: 10px;
 
 		.ai-advice-header {
@@ -524,21 +456,21 @@ defineExpose({
 
 			.ai-advice-text {
 				font-size: 12px;
-				color: #374151;
+				color: #334155;
 				line-height: 1.5;
 				flex: 1;
 			}
 
 			.ai-mode-tag {
 				font-size: 10px;
-				padding: 1px 6px;
-				border-radius: 4px;
+				padding: 2px 6px;
+				border-radius: 999px;
 				font-weight: 500;
 				flex-shrink: 0;
 
 				&--ai {
-					background: #e0e7ff;
-					color: #4338ca;
+					background: #eef2ff;
+					color: #4f6af6;
 				}
 
 				&--fallback {
@@ -550,55 +482,54 @@ defineExpose({
 
 		.ai-daily-suggest {
 			font-size: 11px;
-			color: #6b7280;
+			color: #64748b;
 			margin-top: 4px;
 
 			.num {
 				font-weight: 600;
-				color: #4f46e5;
+				color: #4f6af6;
+				font-variant-numeric: tabular-nums;
 			}
 		}
 
 		.ai-tier-grid {
 			display: grid;
 			grid-template-columns: repeat(3, 1fr);
-			gap: 6px;
-			margin-top: 8px;
-			padding-top: 8px;
-			border-top: 1px solid #f1f5f9;
+			gap: 8px;
+			margin-top: 10px;
+			padding-top: 10px;
+			border-top: 1px solid #eef2f6;
 
 			.ai-tier-cell {
-				background: #f8fafc;
-				border: 1px solid #e2e8f0;
-				border-radius: 6px;
-				padding: 6px 4px;
+				background: #ffffff;
+				border-radius: 8px;
+				padding: 8px 4px;
 				text-align: center;
 				cursor: pointer;
 				position: relative;
-				transition: all 0.2s;
+				transition:
+					background-color 0.2s ease,
+					color 0.2s ease;
 
 				.tier-name {
-					font-size: 10px;
+					font-size: 11px;
 					color: #64748b;
 				}
 
 				.tier-val {
 					font-size: 13px;
 					font-weight: 700;
-					color: #1e293b;
+					color: #0f172a;
 					margin-top: 2px;
+					font-variant-numeric: tabular-nums;
 				}
 
 				&.active {
 					background: #eef2ff;
-					border-color: #6366f1;
 
-					.tier-name {
-						color: #4f46e5;
-					}
-
+					.tier-name,
 					.tier-val {
-						color: #4338ca;
+						color: #4f6af6;
 					}
 				}
 
@@ -607,11 +538,11 @@ defineExpose({
 						position: absolute;
 						top: -6px;
 						right: 4px;
-						background: #4f46e5;
+						background: #4f6af6;
 						color: #ffffff;
 						font-size: 9px;
-						padding: 1px 4px;
-						border-radius: 4px;
+						padding: 1px 5px;
+						border-radius: 999px;
 						line-height: 1.2;
 					}
 				}
@@ -623,9 +554,9 @@ defineExpose({
 			align-items: center;
 			justify-content: space-between;
 			gap: 6px;
-			margin-top: 8px;
-			padding-top: 8px;
-			border-top: 1px solid #f1f5f9;
+			margin-top: 10px;
+			padding-top: 10px;
+			border-top: 1px solid #eef2f6;
 			font-size: 11px;
 
 			.cats-label {
@@ -641,77 +572,20 @@ defineExpose({
 				flex: 1;
 
 				.cat-tag {
-					background: #e0e7ff;
-					color: #3730a3;
-					padding: 1px 6px;
-					border-radius: 4px;
+					background: #eef2ff;
+					color: #4f6af6;
+					padding: 2px 7px;
+					border-radius: 999px;
 					font-size: 10px;
 					white-space: nowrap;
 				}
 			}
 
 			.apply-cat-btn {
-				color: #4f46e5;
+				color: #4f6af6;
 				font-weight: 600;
 				cursor: pointer;
 				flex-shrink: 0;
-			}
-		}
-	}
-}
-
-.quick-ai-recommend-bar {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	padding: 8px 12px;
-	margin-bottom: 14px;
-	background: #f8faff;
-	border: 1px dashed #c7d2fe;
-	border-radius: 8px;
-
-	.bar-label {
-		font-size: 12px;
-		color: #64748b;
-	}
-
-	.ai-quick-pill {
-		display: inline-flex;
-		align-items: center;
-		gap: 4px;
-		padding: 2px 8px;
-		background: #ffffff;
-		border: 1px solid #c7d2fe;
-		border-radius: 12px;
-		cursor: pointer;
-		transition: all 0.2s;
-
-		.pill-badge {
-			font-size: 9px;
-			background: #4f46e5;
-			color: #ffffff;
-			padding: 1px 4px;
-			border-radius: 3px;
-			line-height: 1.1;
-		}
-
-		.pill-amount {
-			font-size: 12px;
-			font-weight: 700;
-			color: #4f46e5;
-		}
-
-		&.active {
-			background: #4f46e5;
-			border-color: #4f46e5;
-
-			.pill-badge {
-				background: #ffffff;
-				color: #4f46e5;
-			}
-
-			.pill-amount {
-				color: #ffffff;
 			}
 		}
 	}
