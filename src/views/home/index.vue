@@ -5,6 +5,7 @@
 			class="role-dashboard-section"
 			data-testid="dash-mobile-role-card"
 		>
+			<h1 class="van-sr-only">管理中心首页</h1>
 			<div class="role-card-wrapper">
 				<div class="role-card-header">
 					<div class="user-info-box">
@@ -91,7 +92,10 @@
 						<div
 							class="kpi-box click-box"
 							data-testid="dash-mobile-kpi-remind"
+							role="button"
+							tabindex="0"
 							@click="handleRemindClick"
+							@keydown.enter="handleRemindClick"
 						>
 							<div class="kpi-label">到期与备忘</div>
 							<div class="kpi-val remind">
@@ -107,7 +111,10 @@
 						<div
 							class="kpi-box click-box"
 							data-testid="dash-mobile-kpi-remind"
+							role="button"
+							tabindex="0"
 							@click="handleRemindClick"
+							@keydown.enter="handleRemindClick"
 						>
 							<div class="kpi-label">待办到期通知</div>
 							<div class="kpi-val remind">
@@ -258,7 +265,10 @@
 							:key="item.path"
 							class="menu-item-card"
 							:data-testid="'menu-item-' + (item.name || item.title)"
+							role="button"
+							tabindex="0"
 							@click="handleGridItemClick(item)"
+							@keydown.enter="handleGridItemClick(item)"
 						>
 							<div
 								class="icon-wrapper"
@@ -420,7 +430,9 @@ const MENU_SHORT_TITLE_MAP: Record<string, string> = {
 };
 
 const formatMenuTitle = (rawTitle: string): string => {
-	if (!rawTitle) return '';
+	if (!rawTitle) {
+		return '';
+	}
 	if (MENU_SHORT_TITLE_MAP[rawTitle]) {
 		return MENU_SHORT_TITLE_MAP[rawTitle];
 	}
@@ -505,7 +517,9 @@ const isSuperAdmin = computed(() => {
 });
 
 const isOrgAdmin = computed(() => {
-	if (isSuperAdmin.value) return false;
+	if (isSuperAdmin.value) {
+		return false;
+	}
 	const code = (userStore.roleInfo?.roleCode || '').toLowerCase();
 	const name = userStore.roleInfo?.roleName || '';
 	return code.includes('admin') || name.includes('管理') || name.includes('主管');
@@ -514,14 +528,22 @@ const isOrgAdmin = computed(() => {
 const isUserRole = computed(() => !isSuperAdmin.value && !isOrgAdmin.value);
 
 const roleTagText = computed(() => {
-	if (isSuperAdmin.value) return '超级管理员';
-	if (isOrgAdmin.value) return userStore.roleInfo?.roleName || '机构主管';
+	if (isSuperAdmin.value) {
+		return '超级管理员';
+	}
+	if (isOrgAdmin.value) {
+		return userStore.roleInfo?.roleName || '机构主管';
+	}
 	return '家庭与随礼记账';
 });
 
 const roleClass = computed(() => {
-	if (isSuperAdmin.value) return 'role-super';
-	if (isOrgAdmin.value) return 'role-admin';
+	if (isSuperAdmin.value) {
+		return 'role-super';
+	}
+	if (isOrgAdmin.value) {
+		return 'role-admin';
+	}
 	return 'role-user';
 });
 
@@ -535,10 +557,18 @@ const orgName = computed(() => {
 
 const timeGreeting = computed(() => {
 	const hour = new Date().getHours();
-	if (hour < 6) return '凌晨好';
-	if (hour < 12) return '早上好';
-	if (hour < 14) return '中午好';
-	if (hour < 19) return '下午好';
+	if (hour < 6) {
+		return '凌晨好';
+	}
+	if (hour < 12) {
+		return '早上好';
+	}
+	if (hour < 14) {
+		return '中午好';
+	}
+	if (hour < 19) {
+		return '下午好';
+	}
 	return '晚上好';
 });
 
@@ -597,7 +627,7 @@ const handleAiRecordSuccess = () => {
 const refreshMessageUnreadBadge = async () => {
 	try {
 		const { code, data } = await getSysMessageSummary();
-		if (code == '200' && data) {
+		if ((code === '200' || code === '00000') && data) {
 			unreadSummaryCount.value = data.unreadTotal || 0;
 			tabBarStore.setTabBadge('message', data.unreadTotal || 0);
 		}
@@ -640,30 +670,42 @@ const loadDashboardKpis = async (showSkeleton = false) => {
 	}
 };
 
-onMounted(() => {
+onMounted(async () => {
 	initMenuGroups();
-	void loadDashboardKpis(true);
+	await loadDashboardKpis(true);
 });
 
-onActivated(() => {
+onActivated(async () => {
 	initMenuGroups();
-	void loadDashboardKpis(false);
+	await loadDashboardKpis(false);
 });
 
 // 交互反馈及路由跳转
 const handleGridItemClick = (item: MenuItem) => {
-	if (navigator.vibrate) {
-		navigator.vibrate(40);
-	}
+	triggerHaptic('selection');
 	if (item.path) {
 		router.push(item.path);
 	}
 };
 
+const SYSTEM_NAMES = new Set(['home', 'message', 'myself', 'login', 'dashboard']);
+
+const deduplicateMenuItems = (items: MenuItem[]): MenuItem[] => {
+	const unique: MenuItem[] = [];
+	const pathSet = new Set<string>();
+	for (const item of items) {
+		if (!pathSet.has(item.path)) {
+			pathSet.add(item.path);
+			unique.push(item);
+		}
+	}
+	return unique;
+};
+
 /**
  * 递归收集某个节点下的所有有效二级/叶子页面
  */
-const collectLeafItems = (routeList: RouteRecordRaw[], parentTitle = ''): MenuItem[] => {
+const collectLeafItems = (routeList: RouteRecordRaw[]): MenuItem[] => {
 	const leaves: MenuItem[] = [];
 
 	routeList.forEach((r, idx) => {
@@ -675,7 +717,7 @@ const collectLeafItems = (routeList: RouteRecordRaw[], parentTitle = ''): MenuIt
 		const hasValidChildren = Array.isArray(r.children) && r.children.length > 0;
 		if (hasValidChildren) {
 			// 含有子路由，继续递归抓取叶子路由
-			const subLeaves = collectLeafItems(r.children as RouteRecordRaw[], parentTitle || (r.meta?.title as string) || '');
+			const subLeaves = collectLeafItems(r.children as RouteRecordRaw[]);
 			leaves.push(...subLeaves);
 		} else if (r.path && r.meta?.title) {
 			// 叶子节点：可供真实点击的功能页面
@@ -728,7 +770,6 @@ const collectMenuInfoLeaves = (nodes: MenuInfoData[]): MenuItem[] => {
 const buildMenuGroupsFromStore = (menus: MenuInfoData[]): MenuGroup[] => {
 	const resultGroups: MenuGroup[] = [];
 	const orphanItems: MenuItem[] = [];
-	const SYSTEM_NAMES = new Set(['home', 'message', 'myself', 'login', 'dashboard']);
 
 	menus.forEach((top) => {
 		const topName = String(top.name || '');
@@ -744,15 +785,7 @@ const buildMenuGroupsFromStore = (menus: MenuInfoData[]): MenuGroup[] => {
 			const hasAnyChildShowInHome = children.some((c) => String(c.showInHome ?? '') === '1');
 			if (isTopShowInHome || hasAnyChildShowInHome) {
 				const targetChildren = isTopShowInHome ? children : children.filter((c) => String(c.showInHome ?? '') === '1');
-				const groupLeaves = collectMenuInfoLeaves(targetChildren);
-				const uniqueLeaves: MenuItem[] = [];
-				const pathSet = new Set<string>();
-				groupLeaves.forEach((leaf) => {
-					if (!pathSet.has(leaf.path)) {
-						pathSet.add(leaf.path);
-						uniqueLeaves.push(leaf);
-					}
-				});
+				const uniqueLeaves = deduplicateMenuItems(collectMenuInfoLeaves(targetChildren));
 				if (uniqueLeaves.length > 0) {
 					resultGroups.push({
 						id: topName || topPath,
@@ -795,9 +828,6 @@ const initMenuGroups = () => {
 	const resultGroups: MenuGroup[] = [];
 	const orphanItems: MenuItem[] = [];
 
-	// 排除系统底座路由
-	const SYSTEM_NAMES = new Set(['home', 'message', 'myself', 'login', 'dashboard']);
-
 	rawRoutes.forEach((topRoute) => {
 		const topName = String(topRoute.name || '');
 		if (SYSTEM_NAMES.has(topName) || topRoute.path === '/' || topRoute.path.includes('*')) {
@@ -806,7 +836,7 @@ const initMenuGroups = () => {
 
 		const topTitle = (topRoute.meta?.title as string) || '';
 		const children = (topRoute.children || []) as RouteRecordRaw[];
-		const isTopShowInHome = !!topRoute.meta?.showInHome;
+		const isTopShowInHome = Boolean(topRoute.meta?.showInHome);
 
 		if (children.length > 0) {
 			// 一级目录具有子项：提取有效叶子页面
@@ -816,18 +846,7 @@ const initMenuGroups = () => {
 			if (isTopShowInHome || hasAnyChildShowInHome) {
 				// 如果一级标了显示，则展示所有正常子项；否则仅展示标了 showInHome 的子项
 				const targetChildren = isTopShowInHome ? children : children.filter((c) => c.meta?.showInHome);
-
-				const groupLeaves = collectLeafItems(targetChildren, topTitle);
-
-				// 去重（防止路径重复）
-				const uniqueLeaves: MenuItem[] = [];
-				const pathSet = new Set<string>();
-				groupLeaves.forEach((leaf) => {
-					if (!pathSet.has(leaf.path)) {
-						pathSet.add(leaf.path);
-						uniqueLeaves.push(leaf);
-					}
-				});
+				const uniqueLeaves = deduplicateMenuItems(collectLeafItems(targetChildren));
 
 				if (uniqueLeaves.length > 0) {
 					resultGroups.push({
@@ -893,8 +912,7 @@ const filteredMenuGroups = computed(() => {
 		.map((group) => {
 			const isGroupMatched = group.title.toLowerCase().includes(kw);
 			const matchedItems = group.items.filter(
-				(item) =>
-					isGroupMatched || item.title.toLowerCase().includes(kw) || (item.name && item.name.toLowerCase().includes(kw)),
+				(item) => isGroupMatched || item.title.toLowerCase().includes(kw) || item.name?.toLowerCase().includes(kw),
 			);
 			return {
 				...group,
@@ -906,9 +924,7 @@ const filteredMenuGroups = computed(() => {
 
 const menuLoading = computed(() => kpiLoading.value || (!userStore.getRouteStatus && menuGroups.value.length === 0));
 
-// 初始化与路由动态变化侦听（监听响应式 routesVersion 与 Pinia 菜单/路由就绪状态，彻底消除重登后菜单空白）
-initMenuGroups();
-
+// 路由动态变化侦听（immediate: true 首次自动执行，监听响应式 routesVersion 与 Pinia 菜单/路由就绪状态，彻底消除重登后菜单空白）
 watch(
 	() => [routesVersion.value, userStore.getRouteStatus, userStore.getMenuInfo?.length],
 	() => {
@@ -1288,7 +1304,9 @@ watch(
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	transition: all 0.2s ease;
+	transition:
+		background-color 0.2s ease,
+		transform 0.2s ease;
 }
 
 .homeSvgClass {
@@ -1304,9 +1322,9 @@ watch(
 	line-height: 16px;
 	letter-spacing: -0.01em;
 	display: -webkit-box;
-	line-clamp: 2;
-	-webkit-line-clamp: 2;
 	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	line-clamp: 2;
 	overflow: hidden;
 	word-break: keep-all;
 	max-width: 76px;

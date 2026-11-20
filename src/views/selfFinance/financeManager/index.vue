@@ -260,10 +260,10 @@ const currentMonthStr = computed(() => formatMonth());
 const canEditBudget = computed(() => hasPermission('finance:financeManager:budget:edit'));
 const canAddFinance = computed(() => hasPermission('finance:financeManager:add'));
 
-const onNavigateToAiLedger = () => {
+const onNavigateToAiLedger = async () => {
 	triggerHaptic('light');
 	const path = getRoutePathByName(router, 'financeAiLedger', '/selfFinance/financeManager/financeAiLedger');
-	router.push({ path });
+	await router.push({ path });
 };
 
 // 挂载筛选组合式函数
@@ -285,8 +285,8 @@ const {
 	onApplyFilters,
 	getTimePresetLabel,
 	getTimeBoundary,
-} = useFinanceFilter(() => {
-	onSearch();
+} = useFinanceFilter(async () => {
+	await onSearch();
 });
 
 const getDetailRoutePath = (): string =>
@@ -305,9 +305,9 @@ useNavBar({
 	rightIcon: canAddFinance.value ? 'plus' : '',
 	leftPath: '/',
 	visible: true,
-	onRightClick: () => {
+	onRightClick: async () => {
 		if (canAddFinance.value) {
-			router.push({ path: getDetailRoutePath() });
+			await router.push({ path: getDetailRoutePath() });
 		}
 	},
 });
@@ -323,9 +323,9 @@ useTabBar({
 	active: 1,
 });
 
-const onOpenBudgetManage = () => {
+const onOpenBudgetManage = async () => {
 	triggerHaptic('medium');
-	router.push({ path: getBudgetRoutePath() });
+	await router.push({ path: getBudgetRoutePath() });
 };
 
 const drillDownBudgetMonth = () => {
@@ -344,8 +344,8 @@ const loadBudgetStatus = async () => {
 			budgetStatus.value = data;
 			saveBudgetOfflineSnapshot(data);
 		}
-	} catch (e) {
-		console.error('获取零花钱预算状态失败:', e);
+	} catch {
+		// 离线或加载异常时静默降级，不阻断主流水
 	} finally {
 		budgetLoading.value = false;
 	}
@@ -364,10 +364,18 @@ const getFinancePage = async (param: FinanceManagerData, cur: PageInfo, options:
 	}
 
 	const query = { ...param };
-	if (!query.fromSource) delete query.fromSource;
-	if (!query.incomeAndExpenses) delete query.incomeAndExpenses;
-	if (!query.bigTypeCode) delete query.bigTypeCode;
-	if (!query.belongTo) delete query.belongTo;
+	if (!query.fromSource) {
+		delete query.fromSource;
+	}
+	if (!query.incomeAndExpenses) {
+		delete query.incomeAndExpenses;
+	}
+	if (!query.bigTypeCode) {
+		delete query.bigTypeCode;
+	}
+	if (!query.belongTo) {
+		delete query.belongTo;
+	}
 
 	const boundary = getTimeBoundary();
 	if (boundary) {
@@ -401,37 +409,40 @@ const getFinancePage = async (param: FinanceManagerData, cur: PageInfo, options:
 	}
 };
 
-const onSearch = () => {
+const onSearch = async () => {
 	resetData();
-	getFinancePage(searchInfo.value, pagination);
+	await getFinancePage(searchInfo.value, pagination);
 };
 
-const onCancel = () => {
+const onCancel = async () => {
 	searchInfo.value.bigTypeCode = '';
-	onSearch();
+	await onSearch();
 };
 
-const onRefreshData = () => {
+const onRefreshData = async () => {
 	resetPagination();
-	getFinancePage(searchInfo.value, pagination);
-	loadBudgetStatus();
+	await Promise.all([getFinancePage(searchInfo.value, pagination), loadBudgetStatus()]);
 };
 
-const onLoadMore = () => {
-	if (isRefresh.value || finished.value || fetchingPage.value) return;
+const onLoadMore = async () => {
+	if (isRefresh.value || finished.value || fetchingPage.value) {
+		return;
+	}
 	if (dataSource.value.length > 0) {
 		nextPage();
 	}
-	getFinancePage(searchInfo.value, pagination);
+	await getFinancePage(searchInfo.value, pagination);
 };
 
 const onDeleteFinance = async (id?: string) => {
-	if (!id) return;
+	if (!id) {
+		return;
+	}
 	const { code, message } = await deleteFinanceManager(`${id}`);
 	if (code === '200') {
 		triggerHaptic('success');
 		dashboardStore.updateSaveTime('财务信息');
-		onRefreshData();
+		await onRefreshData();
 		showSuccessToast(message || '删除成功');
 		return;
 	}
@@ -439,15 +450,17 @@ const onDeleteFinance = async (id?: string) => {
 	showFailToast(message || '删除失败，请联系管理员');
 };
 
-const handleCardClick = (item: FinanceManagerData) => {
+const handleCardClick = async (item: FinanceManagerData) => {
 	triggerHaptic('light');
-	router.push(getDetailRoute(item.id));
+	await router.push(getDetailRoute(item.id));
 };
 
 const filteredRecords = computed(() => {
 	const keyword = searchInfo.value.bigTypeCode?.trim().toLowerCase();
 	return dataSource.value.filter((item) => {
-		if (!keyword) return true;
+		if (!keyword) {
+			return true;
+		}
 		const searchTargets = [
 			item.name,
 			item.description,
@@ -468,7 +481,9 @@ const groupedDataSource = computed<GroupedFinanceRecords[]>(() => {
 	const groups = new Map<string, GroupedFinanceRecords>();
 
 	filteredRecords.value.forEach((item) => {
-		if (!item.infoDate) return;
+		if (!item.infoDate) {
+			return;
+		}
 		const dateStr = formatDate(item.infoDate);
 		const currentGroup =
 			groups.get(dateStr) ||
@@ -493,17 +508,18 @@ const groupedDataSource = computed<GroupedFinanceRecords[]>(() => {
 	return Array.from(groups.values());
 });
 
+const CURRENCY_FORMATTER = new Intl.NumberFormat('zh-CN', {
+	minimumFractionDigits: 2,
+	maximumFractionDigits: 2,
+});
+
 const formatCurrency = (value: number) => {
-	const parts = Math.abs(value || 0)
-		.toFixed(2)
-		.split('.');
-	parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-	return `¥${parts.join('.')}`;
+	return `¥${CURRENCY_FORMATTER.format(Math.abs(value || 0))}`;
 };
 
 const getWeekdayLabel = (date: string) => formatDayjs(date).format('ddd').replace('.', '');
 
-onMounted(() => {
+onMounted(async () => {
 	// 离线快照秒开：有快照时静默拉取最新第 1 页并平滑替换，避免先清空数据反闪骨架屏
 	const cachedSnapshot = loadFinanceOfflineSnapshot();
 	const hasCachedList = Boolean(cachedSnapshot && cachedSnapshot.records.length > 0);
@@ -518,18 +534,17 @@ onMounted(() => {
 		budgetStatus.value = cachedBudget;
 	}
 
-	fetchCategories();
-	fetchUsers();
+	await Promise.all([fetchCategories(), fetchUsers()]);
 	if (route.query.fromSource) {
 		searchInfo.value.fromSource = route.query.fromSource as string;
 	}
 	if (hasCachedList && !route.query.fromSource) {
 		resetPagination();
-		getFinancePage(searchInfo.value, pagination, { silent: true });
+		await getFinancePage(searchInfo.value, pagination, { silent: true });
 	} else {
-		onSearch();
+		await onSearch();
 	}
-	loadBudgetStatus();
+	await loadBudgetStatus();
 });
 </script>
 
@@ -585,11 +600,14 @@ onMounted(() => {
 			align-items: center;
 			justify-content: center;
 			cursor: pointer;
-			transition: all 0.2s ease;
+			transition:
+				background-color 0.2s ease,
+				color 0.2s ease,
+				transform 0.2s ease;
 
 			&:active {
 				background: #e2e8f0;
-				color: #4f6af6;
+				color: #3730a3;
 				transform: scale(0.96);
 			}
 		}
@@ -600,7 +618,7 @@ onMounted(() => {
 			border-radius: 12px;
 			font-size: 13px;
 			font-weight: 600;
-			color: #4f6af6;
+			color: #3730a3;
 			background: rgba(79, 106, 246, 0.12);
 			border: none;
 			display: inline-flex;
@@ -609,11 +627,13 @@ onMounted(() => {
 			gap: 4px;
 			cursor: pointer;
 			white-space: nowrap;
-			transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+			transition:
+				background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+				transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
 			.search-shell__ai-icon {
 				font-size: 15px;
-				color: #4f6af6;
+				color: #3730a3;
 			}
 
 			&:active {
@@ -648,7 +668,10 @@ onMounted(() => {
 			text-align: center;
 			cursor: pointer;
 			white-space: nowrap;
-			transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+			transition:
+				color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+				background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+				box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
 			&--active {
 				color: #4338ca;
@@ -692,8 +715,8 @@ onMounted(() => {
 	flex: 1;
 	min-height: 0;
 
-	:deep(.list-wrapper) {
-		padding: 0 !important;
+	:deep(.list-wrapper.list-wrapper) {
+		padding: 0;
 	}
 }
 

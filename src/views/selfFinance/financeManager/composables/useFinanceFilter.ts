@@ -38,7 +38,7 @@ export const quickTimeOptions: { label: string; value: TimePreset }[] = [
 	{ label: '今年', value: 'year' },
 ];
 
-export function useFinanceFilter(onSearchCallback?: () => void) {
+export function useFinanceFilter(onSearchCallback?: () => void | Promise<void>) {
 	const categoryList = ref<DictInfo[]>([]);
 	const userList = ref<UserManagerData[]>([]);
 
