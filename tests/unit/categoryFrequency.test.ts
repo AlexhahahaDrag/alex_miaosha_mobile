@@ -3,6 +3,8 @@ import {
 	loadCategoryFrequency,
 	recordCategoryUsage,
 	sortCategoriesByFrequency,
+	loadRecentCategories,
+	saveRecentCategory,
 } from '@/views/selfFinance/financeManager/financeManagerDetail/composables/useCategoryFrequency';
 
 describe('useCategoryFrequency - 记账分类频次自适应记忆与排序测试', () => {
@@ -23,6 +25,10 @@ describe('useCategoryFrequency - 记账分类频次自适应记忆与排序测�
 		const map = loadCategoryFrequency();
 		expect(map['餐饮']).toBe(2);
 		expect(map['交通']).toBe(1);
+
+		const recents = loadRecentCategories();
+		expect(recents[0]).toBe('交通');
+		expect(recents[1]).toBe('餐饮');
 	});
 
 	it('根据频次加权对分类列表进行降序重排，高频优先置顶', () => {
@@ -43,5 +49,19 @@ describe('useCategoryFrequency - 记账分类频次自适应记忆与排序测�
 		recordCategoryUsage('   ');
 		const map = loadCategoryFrequency();
 		expect(Object.keys(map).length).toBe(0);
+
+		saveRecentCategory('');
+		saveRecentCategory('其它');
+		expect(loadRecentCategories().length).toBe(0);
+	});
+
+	it('最近分类列表按最后使用时间倒序排列并去重', () => {
+		saveRecentCategory('餐饮');
+		saveRecentCategory('交通');
+		saveRecentCategory('餐饮'); // 再次使用餐饮，应移到最前
+		saveRecentCategory('宠物');
+
+		const recents = loadRecentCategories();
+		expect(recents).toEqual(['宠物', '餐饮', '交通']);
 	});
 });

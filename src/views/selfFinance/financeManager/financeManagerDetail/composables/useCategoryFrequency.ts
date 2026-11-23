@@ -1,7 +1,8 @@
 /**
- * 记账分类本地使用频次记忆与权重排序组合式函数
+ * 记账分类本地使用频次记忆与最近使用排序组合式函数
  */
 const STORAGE_KEY = 'alex_mobile_finance_category_freq';
+const RECENT_STORAGE_KEY = 'alex_mobile_finance_recent_categories';
 
 export interface CategoryFrequencyMap {
 	[name: string]: number;
@@ -19,6 +20,34 @@ export const loadCategoryFrequency = (): CategoryFrequencyMap => {
 	return {};
 };
 
+export const loadRecentCategories = (): string[] => {
+	try {
+		const raw = localStorage.getItem(RECENT_STORAGE_KEY);
+		if (raw) {
+			const parsed = JSON.parse(raw);
+			if (Array.isArray(parsed)) {
+				return parsed.filter((c): c is string => typeof c === 'string' && !!c.trim() && c !== '其它');
+			}
+		}
+	} catch (e) {
+		console.warn('Failed to load recent categories from localStorage:', e);
+	}
+	return [];
+};
+
+export const saveRecentCategory = (categoryName: string): void => {
+	if (!categoryName || !categoryName.trim()) return;
+	const trimmed = categoryName.trim();
+	if (trimmed === '其它') return;
+	try {
+		const list = loadRecentCategories().filter((c) => c !== trimmed);
+		list.unshift(trimmed);
+		localStorage.setItem(RECENT_STORAGE_KEY, JSON.stringify(list.slice(0, 20)));
+	} catch (e) {
+		console.warn('Failed to save recent category:', e);
+	}
+};
+
 export const recordCategoryUsage = (categoryName: string): void => {
 	if (!categoryName || !categoryName.trim()) return;
 	const trimmed = categoryName.trim();
@@ -26,6 +55,7 @@ export const recordCategoryUsage = (categoryName: string): void => {
 		const map = loadCategoryFrequency();
 		map[trimmed] = (map[trimmed] || 0) + 1;
 		localStorage.setItem(STORAGE_KEY, JSON.stringify(map));
+		saveRecentCategory(trimmed);
 	} catch (e) {
 		console.warn('Failed to record category usage:', e);
 	}

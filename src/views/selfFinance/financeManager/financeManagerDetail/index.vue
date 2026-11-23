@@ -79,18 +79,10 @@
 
 			<!-- 2. 点选详情 Inset List 卡片 (Card 2) -->
 			<div class="detail-inset-card">
-				<!-- 2.1 类别 4 列等宽网格（+ 自定义移至标题栏右侧） -->
+				<!-- 2.1 类别 4 列等宽网格（前 7 个常用/最近分类 + 最后一个自定义直输胶囊，合计两行 8 个） -->
 				<div class="inset-section">
 					<div class="section-label-bar">
 						<span class="section-label">类别</span>
-						<button
-							v-if="canEditRecord"
-							type="button"
-							class="section-action-btn"
-							@click="showCustomCatDialog = true"
-						>
-							+ 自定义
-						</button>
 					</div>
 					<div class="category-pills-wrap">
 						<button
@@ -102,6 +94,26 @@
 						>
 							<span class="pill-text">{{ cat.name }}</span>
 						</button>
+
+						<!-- 最后一个位置：自定义直输胶囊（直接点击输入，免去弹窗打断） -->
+						<div
+							v-if="canEditRecord"
+							:class="['pill-btn', 'pill-custom-input-wrap', { active: isCustomCategoryActive }]"
+							@click="focusCustomInput"
+						>
+							<input
+								ref="customInputRef"
+								v-model="customInputText"
+								type="text"
+								maxlength="10"
+								placeholder="+ 自定义"
+								class="pill-custom-input"
+								@focus="onCustomFocus"
+								@input="onCustomInput"
+								@blur="onCustomBlur"
+								@keydown.enter.prevent="onCustomEnter"
+							/>
+						</div>
 					</div>
 				</div>
 
@@ -319,25 +331,6 @@
 			@select-date-info="selectDateInfo"
 			@cancel-date-info="cancelDateInfo"
 		/>
-
-		<!-- 自定义分类录入轻量弹窗 -->
-		<van-dialog
-			v-model:show="showCustomCatDialog"
-			title="自定义分类"
-			show-cancel-button
-			@confirm="onConfirmCustomCategory"
-		>
-			<div class="custom-cat-dialog-content">
-				<van-field
-					v-model="customCategoryInput"
-					placeholder="输入分类名称 (如: 宠物用品、打车出行)"
-					maxlength="10"
-					autofocus
-					clearable
-					class="custom-cat-field"
-				/>
-			</div>
-		</van-dialog>
 	</div>
 </template>
 
@@ -361,11 +354,21 @@ import { getDictList } from '@/views/finance/dict/api';
 import { getUserManagerList } from '@/views/user/userManager/api';
 import { useUserStore } from '@/store/modules/user/user';
 import type { Info } from '@/components/pop/selectPop.vue';
-import { datePickerFormatter, formatDayjs, nowDayjs } from '@/utils/dayjs';
+import { datePickerFormatter, formatDayjs, nowDayjs, formatMonth } from '@/utils/dayjs';
 import type { DatePickerInfo } from '@/utils/common';
 import type { DictInfo } from '@/views/finance/dict/api';
 import type { UserManagerData } from '@/views/user/userManager/config';
-import { addFinanceManger, editFinanceManger, getFinanceMangerDetail } from '@/views/selfFinance/financeManager/api';
+import {
+	addFinanceManger,
+	editFinanceManger,
+	getFinanceMangerDetail,
+	getBudgetCategories,
+} from '@/views/selfFinance/financeManager/api';
+import {
+	loadRecentCategories,
+	saveRecentCategory,
+	recordCategoryUsage,
+} from '@/views/selfFinance/financeManager/financeManagerDetail/composables/useCategoryFrequency';
 import { useNavBar, type NavBarConfig } from '@/composables/useNavBar';
 import { getRoutePathByName } from '@/utils/router';
 import { useTabBar } from '@/composables/useTabBar';
@@ -430,28 +433,56 @@ const nameRefMap = {
 	infoDate: ref<string>(nowDayjs().format('YYYY年MM月DD日')),
 };
 
-// 预设与动态分类整合
-const customCategories = ref<string[]>([]);
-const showCustomCatDialog = ref<boolean>(false);
-const customCategoryInput = ref<string>('');
+// 预设与动态分类整合（前置取最近添加的 7 个分类 + 常用补齐至 11 个 + 第 12 个自定义直输）
+const recentCategories = ref<string[]>([]);
+const customInputText = ref<string>('');
+const customInputRef = ref<HTMLInputElement>();
+
+const defaultExpensePresets = ['餐饮', '交通', '购物', '日用', '娱乐', '医疗', '住房'];
+const defaultIncomePresets = ['工资', '兼职', '理财', '礼金', '退款', '奖金', '投资'];
 
 const currentPresetCategories = computed<CategoryItem[]>(() => {
-	const presets = formInfo.value.incomeAndExpenses === 'income' ? incomePresets : expensePresets;
-	const list: CategoryItem[] = [...presets];
+	const isIncome = formInfo.value.incomeAndExpenses === 'income';
+	const defaultPool = isIncome ? defaultIncomePresets : defaultExpensePresets;
 
-	if (customCategories.value.length) {
-		for (const name of customCategories.value) {
-			if (!list.some((item) => item.name === name)) {
-				list.push(getCategoryVisualItem(name, formInfo.value.incomeAndExpenses === 'income'));
-			}
+	// 1. 优先取最近添加的至多 7 个分类（过滤空值、'其它'及非当前收支预设）
+	const recents = recentCategories.value
+		.filter(
+			(c) =>
+				Boolean(c) && c !== '其它' && (isIncome ? !defaultExpensePresets.includes(c) : !defaultIncomePresets.includes(c)),
+		)
+		.slice(0, 7);
+
+	// 2. 补齐预设分类，至多达到 7 个分类（与最后一个自定义输入组合为两行 8 个）
+	const resultNames: string[] = [...recents];
+	for (const name of defaultPool) {
+		if (!resultNames.includes(name)) {
+			resultNames.push(name);
 		}
+		if (resultNames.length >= 7) break;
 	}
 
-	if (formInfo.value.typeCode && !list.some((item) => item.name === formInfo.value.typeCode)) {
-		list.unshift(getCategoryVisualItem(formInfo.value.typeCode, formInfo.value.incomeAndExpenses === 'income'));
+	// 3. 若正在编辑已有单据且其历史分类不在列表里且非当前正在输入的自定义内容，则前置展示保证可见
+	if (
+		formInfo.value.typeCode &&
+		formInfo.value.typeCode !== customInputText.value &&
+		!resultNames.includes(formInfo.value.typeCode)
+	) {
+		if (resultNames.length >= 7) {
+			resultNames.pop();
+		}
+		resultNames.unshift(formInfo.value.typeCode);
 	}
 
-	return list;
+	return resultNames.map((name) => getCategoryVisualItem(name, isIncome));
+});
+
+// 判断最后一个自定义输入框是否处于激活高亮态
+const isCustomCategoryActive = computed(() => {
+	if (!formInfo.value.typeCode) return false;
+	const trimmed = customInputText.value.trim();
+	if (trimmed && formInfo.value.typeCode === trimmed) return true;
+	return !currentPresetCategories.value.some((c) => c.name === formInfo.value.typeCode);
 });
 
 // 选择记账分类（支持名称联动与免填回退）
@@ -464,19 +495,43 @@ const selectCategory = (name: string) => {
 	}
 };
 
-// 添加自定义分类
-const onConfirmCustomCategory = () => {
-	const trimmed = customCategoryInput.value.trim();
-	if (!trimmed) {
-		showFailToast('分类名称不能为空');
-		return;
+// 第 12 个自定义直输胶囊交互
+const focusCustomInput = () => {
+	customInputRef.value?.focus();
+};
+
+const onCustomFocus = () => {
+	triggerHaptic('click');
+	const trimmed = customInputText.value.trim();
+	if (trimmed) {
+		selectCategory(trimmed);
 	}
-	if (!customCategories.value.includes(trimmed)) {
-		customCategories.value.push(trimmed);
+};
+
+const onCustomInput = () => {
+	const trimmed = customInputText.value.trim();
+	if (trimmed) {
+		selectCategory(trimmed);
 	}
-	selectCategory(trimmed);
-	customCategoryInput.value = '';
-	triggerHaptic('success');
+};
+
+const onCustomBlur = () => {
+	const trimmed = customInputText.value.trim();
+	if (trimmed) {
+		saveRecentCategory(trimmed);
+		recordCategoryUsage(trimmed);
+		const updated = loadRecentCategories();
+		recentCategories.value = Array.from(new Set([...recentCategories.value, ...updated]));
+	}
+};
+
+const onCustomEnter = () => {
+	const trimmed = customInputText.value.trim();
+	if (trimmed) {
+		saveRecentCategory(trimmed);
+		recordCategoryUsage(trimmed);
+		customInputRef.value?.blur();
+	}
 };
 
 // 选择支付方式
@@ -735,6 +790,7 @@ const validateForm = (): boolean => {
 
 // 清理重置表单为新增默认状态（供再记一笔复用）
 const resetFormFields = () => {
+	customInputText.value = '';
 	formInfo.value = {
 		name: '',
 		typeCode: '餐饮',
@@ -760,6 +816,11 @@ const resetFormFields = () => {
 const handleContinueSubmit = async () => {
 	triggerHaptic('click');
 	if (!validateForm()) return;
+
+	if (formInfo.value.typeCode) {
+		recordCategoryUsage(formInfo.value.typeCode);
+		saveRecentCategory(formInfo.value.typeCode);
+	}
 
 	continueLoading.value = true;
 	try {
@@ -788,6 +849,11 @@ const handleContinueSubmit = async () => {
 const onSubmit = async () => {
 	triggerHaptic('click');
 	if (!validateForm()) return;
+
+	if (formInfo.value.typeCode) {
+		recordCategoryUsage(formInfo.value.typeCode);
+		saveRecentCategory(formInfo.value.typeCode);
+	}
 
 	loading.value = true;
 	try {
@@ -929,6 +995,32 @@ const init = async () => {
 		getUserInfoList(userData || []);
 		getDictInfoList(dictData || []);
 		initInfoDate((formInfo.value?.infoDate as Dayjs) || nowDayjs());
+
+		// 1. 本地最近分类快速秒开
+		recentCategories.value = loadRecentCategories();
+
+		// 若编辑已有记录且为自定义分类，回填直输框
+		if (
+			formInfo.value?.typeCode &&
+			!defaultExpensePresets.includes(formInfo.value.typeCode) &&
+			!defaultIncomePresets.includes(formInfo.value.typeCode)
+		) {
+			customInputText.value = formInfo.value.typeCode;
+		}
+
+		// 2. 异步请求最近分类并合并（优先呈现最近添加的分类）
+		try {
+			const currentMonth = formatMonth(formInfo.value?.infoDate ? formatDayjs(formInfo.value.infoDate) : nowDayjs());
+			const { code: catCode, data: catData } = await getBudgetCategories(currentMonth, formInfo.value?.belongTo);
+			if (catCode === '200' && Array.isArray(catData)) {
+				const clean = catData.filter(
+					(c) => c && c !== '支出' && c !== '收入' && c !== 'expense' && c !== 'income' && c !== '转账' && c !== '其它',
+				);
+				recentCategories.value = Array.from(new Set([...recentCategories.value, ...clean]));
+			}
+		} catch (e) {
+			console.warn('获取最近分类失败:', e);
+		}
 	} catch (error) {
 		console.error('初始化财务明细失败:', error);
 		showFailToast('加载财务数据失败，请重试');
@@ -1130,20 +1222,6 @@ onMounted(() => {
 				font-weight: 600;
 				color: #64748b;
 			}
-
-			.section-action-btn {
-				border: none;
-				background: transparent;
-				color: #4f6af6;
-				font-size: 12px;
-				font-weight: 600;
-				padding: 2px 4px;
-				cursor: pointer;
-
-				&:active {
-					opacity: 0.75;
-				}
-			}
 		}
 
 		.category-pills-wrap {
@@ -1181,6 +1259,54 @@ onMounted(() => {
 					border-color: rgba(79, 106, 246, 0.28);
 					color: #4f6af6;
 					font-weight: 600;
+				}
+			}
+
+			.pill-custom-input-wrap {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				height: 34px;
+				padding: 0 4px;
+				border-radius: 10px;
+				background: #f8fafc;
+				border: 1px dashed #cbd5e1;
+				cursor: text;
+				transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+				box-sizing: border-box;
+
+				.pill-custom-input {
+					width: 100%;
+					height: 100%;
+					border: none;
+					outline: none;
+					background: transparent;
+					font-size: 12px;
+					font-weight: 500;
+					color: #475569;
+					text-align: center;
+					padding: 0;
+
+					&::placeholder {
+						color: #94a3b8;
+						font-size: 11.5px;
+						font-weight: 400;
+					}
+				}
+
+				&:focus-within,
+				&.active {
+					background: #eef2ff;
+					border: 1px solid rgba(79, 106, 246, 0.45);
+
+					.pill-custom-input {
+						color: #4f6af6;
+						font-weight: 600;
+
+						&::placeholder {
+							color: rgba(79, 106, 246, 0.5);
+						}
+					}
 				}
 			}
 		}
