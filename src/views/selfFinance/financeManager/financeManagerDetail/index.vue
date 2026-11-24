@@ -433,7 +433,8 @@ const nameRefMap = {
 	infoDate: ref<string>(nowDayjs().format('YYYY年MM月DD日')),
 };
 
-// 预设与动态分类整合（前置取最近添加的 7 个分类 + 常用补齐至 11 个 + 第 12 个自定义直输）
+// 预设与动态分类整合（默认取前 7 个分类 + 第 8 个自定义直输胶囊，组成两行 4 列共 8 格）
+const MAX_PRESET_CATEGORIES = 7;
 const recentCategories = ref<string[]>([]);
 const customInputText = ref<string>('');
 const customInputRef = ref<HTMLInputElement>();
@@ -444,37 +445,41 @@ const defaultIncomePresets = ['工资', '兼职', '理财', '礼金', '退款', 
 const currentPresetCategories = computed<CategoryItem[]>(() => {
 	const isIncome = formInfo.value.incomeAndExpenses === 'income';
 	const defaultPool = isIncome ? defaultIncomePresets : defaultExpensePresets;
+	const trimmedCustom = customInputText.value.trim();
 
-	// 1. 优先取最近添加的至多 7 个分类（过滤空值、'其它'及非当前收支预设）
+	// 1. 优先取最近添加的至多 7 个分类（过滤空值、'其它'、当前自定义输入词及非当前收支预设）
 	const recents = recentCategories.value
 		.filter(
 			(c) =>
-				Boolean(c) && c !== '其它' && (isIncome ? !defaultExpensePresets.includes(c) : !defaultIncomePresets.includes(c)),
+				Boolean(c) &&
+				c !== '其它' &&
+				c !== trimmedCustom &&
+				(isIncome ? !defaultExpensePresets.includes(c) : !defaultIncomePresets.includes(c)),
 		)
-		.slice(0, 7);
+		.slice(0, MAX_PRESET_CATEGORIES);
 
-	// 2. 补齐预设分类，至多达到 7 个分类（与最后一个自定义输入组合为两行 8 个）
+	// 2. 补齐预设分类，严格限制最多 7 个分类（最后一个位置固定留给“+ 自定义”）
 	const resultNames: string[] = [...recents];
 	for (const name of defaultPool) {
-		if (!resultNames.includes(name)) {
+		if (resultNames.length >= MAX_PRESET_CATEGORIES) break;
+		if (name !== trimmedCustom && !resultNames.includes(name)) {
 			resultNames.push(name);
 		}
-		if (resultNames.length >= 7) break;
 	}
 
-	// 3. 若正在编辑已有单据且其历史分类不在列表里且非当前正在输入的自定义内容，则前置展示保证可见
+	// 3. 若当前选中分类不在前 7 个且非自定义框文本，替换末尾项并前置展示，确保总数恒为 7 个
 	if (
 		formInfo.value.typeCode &&
-		formInfo.value.typeCode !== customInputText.value &&
+		formInfo.value.typeCode !== trimmedCustom &&
 		!resultNames.includes(formInfo.value.typeCode)
 	) {
-		if (resultNames.length >= 7) {
+		if (resultNames.length >= MAX_PRESET_CATEGORIES) {
 			resultNames.pop();
 		}
 		resultNames.unshift(formInfo.value.typeCode);
 	}
 
-	return resultNames.map((name) => getCategoryVisualItem(name, isIncome));
+	return resultNames.slice(0, MAX_PRESET_CATEGORIES).map((name) => getCategoryVisualItem(name, isIncome));
 });
 
 // 判断最后一个自定义输入框是否处于激活高亮态
@@ -495,7 +500,7 @@ const selectCategory = (name: string) => {
 	}
 };
 
-// 第 12 个自定义直输胶囊交互
+// 第 8 个（最后一个）自定义直输胶囊交互
 const focusCustomInput = () => {
 	customInputRef.value?.focus();
 };
@@ -520,8 +525,6 @@ const onCustomBlur = () => {
 	if (trimmed) {
 		saveRecentCategory(trimmed);
 		recordCategoryUsage(trimmed);
-		const updated = loadRecentCategories();
-		recentCategories.value = Array.from(new Set([...recentCategories.value, ...updated]));
 	}
 };
 
@@ -585,6 +588,7 @@ const onDirectionChange = (dir: 'expense' | 'income') => {
 	if (!presets.some((p) => p.name === formInfo.value.typeCode)) {
 		const defaultName = presets[0]?.name || (dir === 'income' ? '工资' : '餐饮');
 		const prevCat = formInfo.value.typeCode;
+		customInputText.value = '';
 		formInfo.value.typeCode = defaultName;
 		if (!formInfo.value.name || formInfo.value.name === prevCat) {
 			formInfo.value.name = defaultName;
@@ -791,6 +795,7 @@ const validateForm = (): boolean => {
 // 清理重置表单为新增默认状态（供再记一笔复用）
 const resetFormFields = () => {
 	customInputText.value = '';
+	recentCategories.value = loadRecentCategories();
 	formInfo.value = {
 		name: '',
 		typeCode: '餐饮',
@@ -999,15 +1004,6 @@ const init = async () => {
 		// 1. 本地最近分类快速秒开
 		recentCategories.value = loadRecentCategories();
 
-		// 若编辑已有记录且为自定义分类，回填直输框
-		if (
-			formInfo.value?.typeCode &&
-			!defaultExpensePresets.includes(formInfo.value.typeCode) &&
-			!defaultIncomePresets.includes(formInfo.value.typeCode)
-		) {
-			customInputText.value = formInfo.value.typeCode;
-		}
-
 		// 2. 异步请求最近分类并合并（优先呈现最近添加的分类）
 		try {
 			const currentMonth = formatMonth(formInfo.value?.infoDate ? formatDayjs(formInfo.value.infoDate) : nowDayjs());
@@ -1020,6 +1016,15 @@ const init = async () => {
 			}
 		} catch (e) {
 			console.warn('获取最近分类失败:', e);
+		}
+
+		// 若编辑已有记录且其分类不在前 7 个候选内，回填第 8 个自定义直输框
+		if (
+			id &&
+			formInfo.value?.typeCode &&
+			!currentPresetCategories.value.some((c) => c.name === formInfo.value.typeCode)
+		) {
+			customInputText.value = formInfo.value.typeCode;
 		}
 	} catch (error) {
 		console.error('初始化财务明细失败:', error);

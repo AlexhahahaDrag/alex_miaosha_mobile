@@ -224,7 +224,8 @@ import {
 	getBudgetCategories,
 	getFinanceSummary,
 } from '@/views/selfFinance/financeManager/api';
-import type { FinanceManagerData } from '@/views/selfFinance/financeManager/config';
+
+const IGNORED_CATEGORY_TOKENS = new Set(['支出', '收入', 'expense', 'income', '转账']);
 
 const router = useRouter();
 const { hasPermission } = usePermission();
@@ -290,6 +291,7 @@ const numericBudgetAmount = computed(() => {
 const pageLoading = ref<boolean>(true);
 const recentCategories = ref<string[]>([]);
 const categoriesLoading = ref<boolean>(false);
+let categoriesLoaded = false;
 const simulatedActualExpense = ref<number>(0);
 const simulationLoading = ref<boolean>(false);
 const saving = ref<boolean>(false);
@@ -298,9 +300,35 @@ const isCategoriesHighlighted = ref<boolean>(false);
 
 const aiAssistantRef = shallowRef<InstanceType<typeof BudgetAiAssistantCard>>();
 
+// ponytail: lazy-load category options only when the user actually expands the scope panel
+const ensureCategoriesLoaded = async () => {
+	if (categoriesLoaded || categoriesLoading.value) return;
+	categoriesLoading.value = true;
+	try {
+		const { code, data } = await getBudgetCategories(currentMonthStr.value);
+		if (code === '200' && Array.isArray(data)) {
+			const merged = new Set<string>();
+			for (const cat of [...data, ...budgetForm.categoryCodes]) {
+				if (cat && !IGNORED_CATEGORY_TOKENS.has(cat)) {
+					merged.add(cat);
+				}
+			}
+			recentCategories.value = Array.from(merged);
+			categoriesLoaded = true;
+		}
+	} catch {
+		// 忽略分类选项加载异常
+	} finally {
+		categoriesLoading.value = false;
+	}
+};
+
 const toggleScopeExpanded = () => {
 	isScopeExpanded.value = !isScopeExpanded.value;
 	navigator.vibrate?.(10);
+	if (isScopeExpanded.value) {
+		ensureCategoriesLoaded();
+	}
 };
 
 const onAiRecommendLoaded = (moderateAmount: number) => {
@@ -311,7 +339,6 @@ const onSelectQuickAmount = (preset: number) => {
 	if (!canEditBudget.value) return;
 	budgetForm.budgetAmount = preset;
 	navigator.vibrate?.(10);
-	debouncedPreview();
 };
 
 const triggerAmountHighlight = () => {
@@ -333,12 +360,12 @@ const triggerCategoriesHighlight = () => {
 const onApplyAiAmount = (amount: number) => {
 	budgetForm.budgetAmount = amount > 0 ? amount : '';
 	triggerAmountHighlight();
-	debouncedPreview();
 };
 
 const onApplyAiCategories = (categories: string[]) => {
-	budgetForm.categoryCodes = [...categories];
+	budgetForm.categoryCodes = categories.filter((c) => c && !IGNORED_CATEGORY_TOKENS.has(c));
 	isScopeExpanded.value = true;
+	ensureCategoriesLoaded();
 	triggerCategoriesHighlight();
 	debouncedPreview();
 };
@@ -355,7 +382,7 @@ const onCategoryOrDirectionChange = () => {
 	debouncedPreview();
 };
 
-// 实时试算与健康度模拟指标
+// 实时试算与健康度模拟指标（改预算金额纯前端 computed 秒算，不发请求）
 const previewStats = computed(() => {
 	const budget = Number(budgetForm.budgetAmount || 0);
 	const actual = simulatedActualExpense.value;
@@ -373,6 +400,8 @@ const previewStats = computed(() => {
 });
 
 let previewTimer: ReturnType<typeof setTimeout> | null = null;
+let simulationSeq = 0;
+
 const debouncedPreview = () => {
 	if (previewTimer) clearTimeout(previewTimer);
 	previewTimer = setTimeout(() => {
@@ -380,111 +409,68 @@ const debouncedPreview = () => {
 	}, 200);
 };
 
-watch(
-	() => budgetForm.budgetAmount,
-	() => {
-		debouncedPreview();
-	},
-);
-
 const fetchPreviewSimulation = async () => {
+	const seq = ++simulationSeq;
 	simulationLoading.value = true;
 	try {
 		const [monthStart, monthEnd] = getMonthRange();
-		const effectiveCategoryCodes = budgetForm.categoryCodes.filter(
-			(c) => c !== '支出' && c !== '收入' && c !== 'expense' && c !== 'income',
-		);
+		const effectiveCategoryCodes = budgetForm.categoryCodes.filter((c) => c && !IGNORED_CATEGORY_TOKENS.has(c));
 
 		const dirs = budgetForm.selectedDirections;
 		const hasExp = dirs.includes('expense');
 		const hasInc = dirs.includes('income');
 
-		const queryParams: FinanceManagerData = {
+		const { code, data } = await getFinanceSummary({
 			infoDateStart: monthStart,
 			infoDateEnd: monthEnd,
-		};
-
-		if (effectiveCategoryCodes.length > 0) {
-			const results = await Promise.all(
-				effectiveCategoryCodes.map((cat) =>
-					getFinanceSummary({
-						...queryParams,
-						typeCode: cat,
-					}),
-				),
-			);
-
-			let total = 0;
-			results.forEach(({ code, data }) => {
-				if (code === '200' && data) {
-					const exp = Number(data.totalExpense || 0);
-					const inc = Number(data.totalIncome || 0);
-					if (hasExp && !hasInc) total += exp;
-					else if (!hasExp && hasInc) total += inc;
-					else total += exp;
-				}
-			});
-			simulatedActualExpense.value = total;
-		} else {
-			const { code, data } = await getFinanceSummary(queryParams);
-			if (code === '200' && data) {
-				const exp = Number(data.totalExpense || 0);
-				const inc = Number(data.totalIncome || 0);
-				if (hasExp && !hasInc) simulatedActualExpense.value = exp;
-				else if (!hasExp && hasInc) simulatedActualExpense.value = inc;
-				else simulatedActualExpense.value = exp - inc;
-			}
+			isValid: '1',
+			incomeAndExpenses: hasExp && hasInc ? undefined : hasInc ? 'income' : 'expense',
+			...(effectiveCategoryCodes.length > 0 ? { typeCodes: effectiveCategoryCodes } : {}),
+		});
+		if (seq !== simulationSeq) return;
+		if (code === '200' && data) {
+			const exp = Number(data.totalExpense || 0);
+			const inc = Number(data.totalIncome || 0);
+			simulatedActualExpense.value = hasExp && hasInc ? exp - inc : hasInc ? inc : exp;
 		}
 	} catch {
 		// 忽略试算临时异常
 	} finally {
-		simulationLoading.value = false;
+		if (seq === simulationSeq) {
+			simulationLoading.value = false;
+		}
 	}
 };
 
 const initData = async () => {
 	pageLoading.value = true;
-	categoriesLoading.value = true;
 	try {
-		const month = currentMonthStr.value;
-		const [{ code: statusCode, data: statusData }, { code: catCode, data: catData }] = await Promise.all([
-			getBudgetStatus(month),
-			getBudgetCategories(month),
-		]);
-
-		if (catCode === '200' && Array.isArray(catData)) {
-			recentCategories.value = catData.filter(
-				(c) => c && c !== '支出' && c !== '收入' && c !== 'expense' && c !== 'income' && c !== '转账',
-			);
-		}
-
-		if (statusCode === '200' && statusData) {
-			const parsedAmount = Number(statusData.budgetAmount || 0);
+		const { code, data } = await getBudgetStatus(currentMonthStr.value);
+		if (code === '200' && data) {
+			const parsedAmount = Number(data.budgetAmount || 0);
 			budgetForm.budgetAmount = parsedAmount > 0 ? parsedAmount : '';
-			budgetForm.incomeAndExpenses = statusData.incomeAndExpenses || 'expense';
 
-			if (statusData.incomeAndExpenses === 'all') {
+			const rawDir = data.incomeAndExpenses || 'expense';
+			const hasBoth = rawDir === 'all' || (rawDir.includes('expense') && rawDir.includes('income'));
+			if (hasBoth) {
+				budgetForm.incomeAndExpenses = 'all';
 				budgetForm.selectedDirections = ['expense', 'income'];
-			} else if (statusData.incomeAndExpenses === 'income') {
+			} else if (rawDir.includes('income')) {
+				budgetForm.incomeAndExpenses = 'income';
 				budgetForm.selectedDirections = ['income'];
 			} else {
+				budgetForm.incomeAndExpenses = 'expense';
 				budgetForm.selectedDirections = ['expense'];
 			}
 
-			if (Array.isArray(statusData.categoryCodes) && statusData.categoryCodes.length > 0) {
-				budgetForm.categoryCodes = [...statusData.categoryCodes];
-			} else if (recentCategories.value.length > 0) {
-				budgetForm.categoryCodes = [...recentCategories.value];
-			}
-		} else if (recentCategories.value.length > 0) {
-			budgetForm.categoryCodes = [...recentCategories.value];
+			budgetForm.categoryCodes = Array.isArray(data.categoryCodes)
+				? data.categoryCodes.filter((c) => c && !IGNORED_CATEGORY_TOKENS.has(c))
+				: [];
+			simulatedActualExpense.value = Number(data.actualExpense || 0);
 		}
-
-		fetchPreviewSimulation();
 	} catch {
 		showFailToast('加载预算数据失败');
 	} finally {
-		categoriesLoading.value = false;
 		pageLoading.value = false;
 	}
 };

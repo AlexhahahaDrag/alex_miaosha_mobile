@@ -211,9 +211,13 @@ const clearAiCommandInput = () => {
 	navigator.vibrate?.(10);
 };
 
+// ponytail: lazy-load AI recommend on first expand instead of firing LLM call while collapsed on mount
 const toggleAiExpanded = () => {
 	isAiExpanded.value = !isAiExpanded.value;
 	navigator.vibrate?.(10);
+	if (isAiExpanded.value && !aiRecommendData.value && !aiRecommending.value) {
+		onFetchAiRecommend(false);
+	}
 };
 
 const applyAiSample = (sample: string) => {
@@ -297,10 +301,6 @@ const handleApplyCategories = (categories?: string[]) => {
 	emit('apply-categories', [...categories]);
 	showSuccessToast('已采纳推荐分类');
 };
-
-onMounted(() => {
-	onFetchAiRecommend(false);
-});
 
 defineExpose({
 	fetchAiRecommend: () => onFetchAiRecommend(true),
