@@ -403,8 +403,8 @@ const mobileGraphOption = computed(() => {
 	});
 
 	// 选取前 8 位往来体量最高亲友
-	const topList = [...list]
-		.sort(
+	const topList = list
+		.toSorted(
 			(a, b) =>
 				Number(b.totalReceiveAmount || 0) +
 				Number(b.totalGiveAmount || 0) -
@@ -733,8 +733,11 @@ onMounted(() => {
 		padding-bottom: 8px;
 		margin-bottom: 8px;
 		-webkit-overflow-scrolling: touch;
-		&::-webkit-scrollbar {
-			display: none;
+		scrollbar-width: none;
+		@supports not (scrollbar-width: none) {
+			&::-webkit-scrollbar {
+				display: none;
+			}
 		}
 
 		.circle-chip {

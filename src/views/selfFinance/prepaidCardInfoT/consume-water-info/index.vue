@@ -226,17 +226,9 @@ const filterParams = reactive<TransactionQueryParams>({
 const activeFilter = ref('all');
 
 // 按日期分组的交易记录
-const groupedTransactions = computed(() => {
-	const groups: Record<string, TransactionRecord[]> = {};
-	transactionList.value.forEach((transaction) => {
-		const date = formatDateGroup(transaction.consumeTime);
-		if (!groups[date]) {
-			groups[date] = [];
-		}
-		groups[date].push(transaction);
-	});
-	return groups;
-});
+const groupedTransactions = computed(() =>
+	Object.groupBy(transactionList.value, (transaction) => formatDateGroup(transaction.consumeTime)),
+);
 
 // 格式化日期分组
 function formatDateGroup(dateStr: string): string {

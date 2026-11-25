@@ -473,8 +473,11 @@ const onClosed = () => {
 			gap: 8px;
 			overflow-x: auto;
 			padding-bottom: 4px;
-			&::-webkit-scrollbar {
-				display: none;
+			scrollbar-width: none;
+			@supports not (scrollbar-width: none) {
+				&::-webkit-scrollbar {
+					display: none;
+				}
 			}
 			.chip-item {
 				cursor: pointer;

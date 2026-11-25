@@ -68,7 +68,7 @@ export const sortCategoriesByFrequency = <T extends { name: string }>(
 	categories: T[],
 	freqMap: CategoryFrequencyMap = loadCategoryFrequency(),
 ): T[] => {
-	return [...categories].sort((a, b) => {
+	return categories.toSorted((a, b) => {
 		const scoreA = freqMap[a.name] || 0;
 		const scoreB = freqMap[b.name] || 0;
 		if (scoreA !== scoreB) {

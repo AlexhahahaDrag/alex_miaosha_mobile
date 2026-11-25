@@ -705,15 +705,28 @@ const displayCategoryList = computed(() => {
 
 .expand-enter-active,
 .expand-leave-active {
-	transition: all 0.24s cubic-bezier(0.4, 0, 0.2, 1);
+	interpolate-size: allow-keywords;
+	height: auto;
 	max-height: 240px;
 	overflow: hidden;
+	transition:
+		height 0.24s cubic-bezier(0.4, 0, 0.2, 1),
+		max-height 0.24s cubic-bezier(0.4, 0, 0.2, 1),
+		opacity 0.24s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .expand-enter-from,
 .expand-leave-to {
+	height: 0;
 	max-height: 0;
 	opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.expand-enter-active,
+	.expand-leave-active {
+		transition: none;
+	}
 }
 
 @keyframes shimmer-pulse {

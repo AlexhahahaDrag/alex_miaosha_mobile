@@ -660,7 +660,7 @@ const primaryUsers = computed<UserManagerData[]>(() => {
 	}
 
 	const currentUserId = String(userInfo?.id || '');
-	const sorted = [...rawList].sort((a, b) => {
+	const sorted = rawList.toSorted((a, b) => {
 		const aIsCurrent = String(a.id) === currentUserId ? -1 : 0;
 		const bIsCurrent = String(b.id) === currentUserId ? -1 : 0;
 		return aIsCurrent - bIsCurrent;

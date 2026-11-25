@@ -489,8 +489,7 @@ const processedExpenseList = computed<ProcessedStructureItem[]>(() => {
 	});
 	const total = filtered.reduce((sum, item) => sum + item.value, 0);
 	return filtered
-		.slice()
-		.sort((a, b) => b.value - a.value)
+		.toSorted((a, b) => b.value - a.value)
 		.slice(0, 6)
 		.map((item) => ({
 			name: item.name,
@@ -505,8 +504,7 @@ const processedIncomeList = computed<ProcessedStructureItem[]>(() => {
 	const list = pieData.value.income;
 	const total = list.reduce((sum, item) => sum + item.value, 0);
 	return list
-		.slice()
-		.sort((a, b) => b.value - a.value)
+		.toSorted((a, b) => b.value - a.value)
 		.map((item) => ({
 			name: item.name,
 			value: item.value,
