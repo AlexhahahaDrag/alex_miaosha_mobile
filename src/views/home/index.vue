@@ -132,6 +132,11 @@
 								class="kpi-val"
 								:class="onlineServiceCount === totalServiceCount ? 'receive' : 'expense'"
 							>
+								<span
+									class="kpi-status-dot"
+									:class="onlineServiceCount === totalServiceCount ? 'is-online' : 'is-warning'"
+									aria-hidden="true"
+								></span>
 								<span class="num">{{ onlineServiceCount }}</span>
 								<span class="unit">/ {{ totalServiceCount }} 在线</span>
 							</div>
@@ -168,22 +173,22 @@
 						<span class="text">随礼记一笔</span>
 					</button>
 				</div>
-			</div>
 
-			<!-- 模块保存动态 (若有) -->
-			<div
-				v-if="visibleStats.length > 0"
-				class="sub-stats-scroller"
-			>
-				<div class="sub-stats-title">近期保存</div>
-				<div class="sub-stats-chips">
-					<span
-						v-for="stat in visibleStats"
-						:key="stat.label"
-						class="mini-chip"
-					>
-						{{ stat.label }}: {{ stat.value }}
-					</span>
+				<!-- 模块保存动态 (集成于卡片底部，保持层级内敛统一) -->
+				<div
+					v-if="visibleStats.length > 0"
+					class="sub-stats-scroller"
+				>
+					<div class="sub-stats-title">近期保存</div>
+					<div class="sub-stats-chips">
+						<span
+							v-for="stat in visibleStats"
+							:key="stat.label"
+							class="mini-chip"
+						>
+							{{ stat.label }}: {{ stat.value }}
+						</span>
+					</div>
 				</div>
 			</div>
 		</section>
@@ -231,7 +236,7 @@
 			>
 				<van-search
 					v-model="searchKeyword"
-					placeholder="搜索功能"
+					placeholder="搜索模块或功能（如：随礼、流水）"
 					shape="round"
 					clearable
 					class="menu-search-bar"
@@ -294,7 +299,17 @@
 				<van-empty
 					image="search"
 					description="未找到相关功能或模块"
-				/>
+				>
+					<template #bottom>
+						<button
+							type="button"
+							class="clear-search-btn"
+							@click="searchKeyword = ''"
+						>
+							清空搜索条件
+						</button>
+					</template>
+				</van-empty>
 			</div>
 		</template>
 		<!-- AI 智能记账 ActionSheet 抽屉 -->
@@ -937,7 +952,7 @@ watch(
 <style lang="less" scoped>
 .home-container {
 	background-color: #f1f4fa;
-	padding: 14px 16px 20px;
+	padding: 14px 16px calc(24px + env(safe-area-inset-bottom));
 	box-sizing: border-box;
 	min-height: 100%;
 	overflow-x: hidden;
@@ -950,7 +965,7 @@ watch(
 
 .role-card-wrapper {
 	background: #ffffff;
-	border-radius: 18px;
+	border-radius: 16px;
 	padding: 16px;
 	box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
 }
@@ -984,7 +999,7 @@ watch(
 }
 
 .role-badge {
-	font-size: 11px;
+	font-size: 12px;
 	font-weight: 600;
 	padding: 2px 9px;
 	border-radius: 9999px;
@@ -1007,9 +1022,9 @@ watch(
 }
 
 .org-chip {
-	font-size: 11px;
+	font-size: 12px;
 	font-weight: 500;
-	color: #64748b;
+	color: #475569;
 	background: #f1f5f9;
 	padding: 2px 9px;
 	border-radius: 9999px;
@@ -1020,8 +1035,8 @@ watch(
 }
 
 .date-badge {
-	font-size: 11px;
-	color: #94a3b8;
+	font-size: 12px;
+	color: #64748b;
 	font-weight: 500;
 	font-variant-numeric: tabular-nums;
 	white-space: nowrap;
@@ -1037,7 +1052,7 @@ watch(
 
 .kpi-box {
 	background: #f8fafc;
-	border-radius: 14px;
+	border-radius: 12px;
 	padding: 12px;
 	min-width: 0;
 
@@ -1059,9 +1074,9 @@ watch(
 }
 
 .kpi-label {
-	font-size: 11px;
+	font-size: 12px;
 	font-weight: 500;
-	color: #64748b;
+	color: #475569;
 	margin-bottom: 4px;
 }
 
@@ -1085,9 +1100,9 @@ watch(
 	}
 
 	.unit {
-		font-size: 11px;
+		font-size: 12px;
 		font-weight: 600;
-		color: #64748b;
+		color: #475569;
 		margin-left: 2px;
 	}
 
@@ -1112,9 +1127,29 @@ watch(
 	}
 }
 
+.kpi-status-dot {
+	display: inline-block;
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	margin-right: 4px;
+	flex-shrink: 0;
+	vertical-align: middle;
+
+	&.is-online {
+		background-color: #059669;
+		box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.2);
+	}
+
+	&.is-warning {
+		background-color: #e11d48;
+		box-shadow: 0 0 0 2px rgba(225, 29, 72, 0.2);
+	}
+}
+
 .kpi-sub {
-	font-size: 11px;
-	color: #94a3b8;
+	font-size: 12px;
+	color: #64748b;
 	margin-top: 4px;
 	font-variant-numeric: tabular-nums;
 }
@@ -1127,14 +1162,15 @@ watch(
 
 .capsule-btn {
 	min-width: 0;
-	height: 40px;
+	height: 44px;
+	min-height: 44px;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	gap: 6px;
 	padding: 0 12px;
 	border-radius: 12px;
-	font-size: 13px;
+	font-size: 14px;
 	font-weight: 600;
 	border: none;
 	white-space: nowrap;
@@ -1146,7 +1182,7 @@ watch(
 	}
 
 	.btn-vant-icon {
-		font-size: 15px;
+		font-size: 16px;
 		flex-shrink: 0;
 	}
 
@@ -1175,16 +1211,17 @@ watch(
 }
 
 .sub-stats-scroller {
-	margin-top: 10px;
-	padding: 10px 12px;
-	background: #ffffff;
-	border-radius: 14px;
-	box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
+	margin-top: 14px;
+	padding-top: 12px;
+	border-top: 0.5px solid rgba(15, 23, 42, 0.08);
+	background: transparent;
+	box-shadow: none;
+	border-radius: 0;
 }
 
 .sub-stats-title {
-	font-size: 11px;
-	color: #94a3b8;
+	font-size: 12px;
+	color: #64748b;
 	margin-bottom: 6px;
 }
 
@@ -1229,7 +1266,7 @@ watch(
 
 .group-card {
 	background-color: #ffffff;
-	border-radius: 18px;
+	border-radius: 16px;
 	padding: 15px 14px 16px;
 	box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
 }
@@ -1240,7 +1277,7 @@ watch(
 	align-items: center;
 	margin-bottom: 14px;
 	padding-bottom: 10px;
-	border-bottom: 1px solid #f1f5f9;
+	border-bottom: 0.5px solid rgba(15, 23, 42, 0.08);
 }
 
 .group-title-box {
@@ -1264,8 +1301,8 @@ watch(
 }
 
 .group-count {
-	font-size: 11px;
-	color: #64748b;
+	font-size: 12px;
+	color: #475569;
 	background-color: #f1f5f9;
 	padding: 2px 9px;
 	border-radius: 9999px;
@@ -1300,7 +1337,7 @@ watch(
 .icon-wrapper {
 	width: 44px;
 	height: 44px;
-	border-radius: 14px;
+	border-radius: 12px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -1315,11 +1352,11 @@ watch(
 }
 
 .homeFontClass {
-	font-size: 12px;
+	font-size: 13px;
 	font-weight: 500;
 	color: #1e293b;
 	text-align: center;
-	line-height: 16px;
+	line-height: 17px;
 	letter-spacing: -0.01em;
 	display: -webkit-box;
 	-webkit-box-orient: vertical;
@@ -1327,12 +1364,30 @@ watch(
 	line-clamp: 2;
 	overflow: hidden;
 	word-break: keep-all;
-	max-width: 76px;
+	max-width: 80px;
 }
 
 /* 搜索空状态 */
 .search-empty-box {
 	padding: 20px 0;
+}
+
+.clear-search-btn {
+	margin-top: 10px;
+	height: 36px;
+	min-height: 36px;
+	padding: 0 16px;
+	border-radius: 9999px;
+	font-size: 13px;
+	font-weight: 500;
+	color: #4f6af6;
+	background: rgba(79, 106, 246, 0.08);
+	border: none;
+	cursor: pointer;
+
+	&:active {
+		opacity: 0.8;
+	}
 }
 
 .shimmer-bar {
@@ -1415,6 +1470,24 @@ watch(
 	}
 	50% {
 		opacity: 0.45;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.shimmer-bar {
+		animation: none;
+		opacity: 0.7;
+	}
+
+	.menu-item-card,
+	.capsule-btn,
+	.kpi-box.click-box {
+		transition: none;
+
+		&:active {
+			transform: none;
+			opacity: 0.75;
+		}
 	}
 }
 </style>
